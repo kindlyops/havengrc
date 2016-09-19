@@ -1,0 +1,5 @@
+%syntax-version=1.0.0
+%project=mappamundi
+%uri=https://github.com/kindlyops/mappamundi/
+
+appschema 2016-09-19T20:58:59Z root <root@da5b40f5b7b5> # Add schema for all mappamundi objects

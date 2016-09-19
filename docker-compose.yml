@@ -1,0 +1,18 @@
+version: '2'
+services:
+  sqitch:
+    image: docteurklein/sqitch:pgsql
+    working_dir: /code
+    volumes:
+      - .:/code
+    links:
+      - db
+  postgrest:
+    image: begriffs/postgrest:v0.3.2.0
+    working_dir: /code
+    volumes:
+      - .:/code
+      - /code/node_modules
+  db:
+    image: postgres:9.5
+
