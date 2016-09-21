@@ -74,6 +74,10 @@ to the DB server running in the database image.
     SELECT * from foo LIMIT 1;  # run arbitrary queries
     \q                          # disconnect
 
+## Use REST client to interact with the API
+
+[Postman](https://www.getpostman.com/) is a free GUI REST client that makes exploration easy. Run postman, and import a couple of predefined
+requests from the collection at postman/*.json.
 
 ## More info on postgrest
 

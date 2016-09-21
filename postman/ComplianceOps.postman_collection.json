@@ -1,0 +1,45 @@
+{
+	"variables": [],
+	"info": {
+		"name": "ComplianceOps",
+		"_postman_id": "3de6f719-8e19-256c-25cf-8e683eb2547b",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "http://localhost:3000/regulation",
+			"request": {
+				"url": "http://localhost:3000/regulation",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "text/csv",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "identifier\nCIS1.1\nCIS1.2\nCIS1.3\nCIS1.4\nCIS1.5\nCIS1.6\nCIS2.1\nCIS2.2\nCIS2.3\nCIS2.4"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:3000/regulation",
+			"request": {
+				"url": "http://localhost:3000/regulation",
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}
