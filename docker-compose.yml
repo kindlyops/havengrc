@@ -1,18 +1,19 @@
 version: '2'
 services:
   sqitch:
-    image: docteurklein/sqitch:pgsql
+    image: kindlyops/sqitch:pgsql
     working_dir: /code
     volumes:
       - .:/code
     links:
       - db
-  postgrest:
+    command: "/bin/true"
+  api:
     image: begriffs/postgrest:v0.3.2.0
-    working_dir: /code
-    volumes:
-      - .:/code
-      - /code/node_modules
+    command: [postgrest, "postgres://postgres@db/mappamundi_dev", -a, postgres, --schema, "1"]
+    ports:
+      - "3000:3000"
+    links:
+      - db
   db:
     image: postgres:9.5
-

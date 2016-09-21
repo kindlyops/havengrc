@@ -2,4 +2,4 @@
 %project=mappamundi
 %uri=https://github.com/kindlyops/mappamundi/
 
-appschema 2016-09-19T20:58:59Z root <root@da5b40f5b7b5> # Add schema for all mappamundi objects
+dev 2016-09-21T15:21:22Z root <root@b9e980eb9b93> # Adding initial schema.

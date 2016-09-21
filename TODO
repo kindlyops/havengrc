@@ -1,0 +1,5 @@
+* set up appropriate role for anonymous user
+* set up JWT
+* set up some fixture data
+* try adding the CIS top 20 mappings (this will require schema changes)
+* make it deployable

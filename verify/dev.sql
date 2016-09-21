@@ -1,4 +1,4 @@
--- Verify mappamundi:appschema on pg
+-- Verify mappamundi:dev on pg
 
 BEGIN;
 
