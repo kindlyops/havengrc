@@ -10,10 +10,12 @@ services:
     command: "/bin/true"
   api:
     image: begriffs/postgrest:v0.3.2.0
-    command: [postgrest, "postgres://postgres@db/mappamundi_dev", -a, postgres, --schema, "1"]
+    command: [postgrest, "postgres://postgres@db/mappamundi_dev", "--jwt-secret=$JWT_SECRET", -a, postgres, --schema, "1"]
     ports:
       - "3000:3000"
     links:
       - db
+    environment:
+      - JWT_SECRET
   db:
     image: postgres:9.5

@@ -1,0 +1,55 @@
+#! /bin/sh
+
+# Copyright 2014 Gleetr SAS
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Pre-requisite: you need jq - http://stedolan.github.io/jq/
+# set -x
+
+CURL_ARGS=$@
+# CURL_VERBOSE=-vvv
+
+AUTH0_DOMAIN=auditproof.auth0.com
+# ComplianceOps client id MBeB7gLN6pv2ZLptkIWaBROECQGk7y3G
+AUTH0_CLIENTID=MBeB7gLN6pv2ZLptkIWaBROECQGk7y3G
+AUTH0_USERNAME=support@kindlyops.com
+unset AUTH0_PASSWORD
+set +a
+echo "Password for $AUTH0_USERNAME:\c"
+read -rs AUTH0_PASSWORD < /dev/tty 
+echo
+echo requesting role claim in Auth0 scope
+AUTH0_SCOPE='openid email role' 
+
+RO_URL=https://${AUTH0_DOMAIN}/oauth/ro
+RO_PAYLOAD="{
+   \"client_id\":   \"${AUTH0_CLIENTID}\",
+   \"username\":    \"${AUTH0_USERNAME}\",
+   \"password\":    \"${AUTH0_PASSWORD}\",
+   \"connection\":  \"Username-Password-Authentication\",
+   \"grant_type\":  \"password\",
+   \"scope\":       \"${AUTH0_SCOPE}\",
+   \"device\":      \"\"
+}"
+
+# call Auth0 to retrieve the JWT
+JWT=$(echo ${RO_PAYLOAD} | curl -s ${CURL_VERBOSE} -X POST --header 'Content-Type: application/json' --data-binary @- ${RO_URL})
+# Result: {"id_token":"xxx.yyy.zzz","access_token":"aaaaaaaaaaaaaaaa","token_type":"bearer"}
+
+# extract the id_token in the JWT
+ID_TOKEN=$(echo ${JWT} | jq -r '.id_token')
+
+echo ID_TOKEN is $ID_TOKEN
+# execute the asked cURL with the correct Authorization header
+#curl --header "Authorization: Bearer ${ID_TOKEN}" ${CURL_VERBOSE} ${CURL_ARGS}
