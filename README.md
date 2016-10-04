@@ -76,8 +76,8 @@ to the DB server running in the database image.
 
 ## Use REST client to interact with the API
 
-[Postman](https://www.getpostman.com/) is a free GUI REST client that makes exploration easy. Run postman, and import a couple of predefined requests 
-from the collection at postman/ComplianceOps.postman_collection.json. 
+[Postman](https://www.getpostman.com/) is a free GUI REST client that makes exploration easy. Run postman, and import a couple of predefined requests
+from the collection at postman/ComplianceOps.postman_collection.json.
 Then execute the POST and GET requests to see how the API behaves.
 
 ## More info on postgrest
@@ -86,16 +86,12 @@ A tutorial is available here. http://blog.jonharrington.org/postgrest-introducti
 
 ## Authentication with JWT and Auth0
 
-Set JWT_SECRET in your environment from the 'Client Secret' in the Compliance Ops Auth0 admin page. This is the shared secret that is used to verify the
-JWT signature. JWTs are signed/hashed but not encrypted, so don't put
-confidential attributes in the JWT.
+Set JWT_SECRET in your environment from the 'Client Secret' in the Compliance Ops Auth0 admin page. This is the shared secret that is used to verify the JWT signature. JWTs are signed/hashed but not encrypted, so don't put confidential attributes in the JWT.
 
-For the Auth0 user that you want to work with, set a read-only claim on the 
-user in app_metadata, something like { "role" : "admin" }. The role value
-must link up with the role defined inside postgrest.
+For the Auth0 user that you want to work with, set a read-only claim on the user in app_metadata, something like { "role" : "admin" }.
+The role value must link up with the role defined inside postgrest.
 
-There is a script in contrib that shows how to get a JWT from Auth0. You
-can then specify this JWT string in an Authorization: Bearer 'JWT' 
+There is a script in contrib that shows how to get a JWT from Auth0. You can then specify this JWT string in an Authorization: Bearer 'JWT'
 header in Postman or in curl.
 
 Note that we are currently running into https://github.com/begriffs/postgrest/issues/495 with the client secret that is provided by Auth0.
