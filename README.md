@@ -1,5 +1,12 @@
 # ComplianceOps
 
+## quick start
+
+```sh
+npm install -g create-elm-app
+elm-app start
+```
+
 ### Safety at speed
 By connecting activities to policies to values & customer requirements, we help organizations avoid getting bogged down in rules that no longer make sense, and empower people to update practices to use modern tools and techniques without abandoning responsible oversight and administrative controls.
 
