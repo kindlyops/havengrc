@@ -3,7 +3,7 @@ node_js:
   - "6"
 install:
   - npm install -g create-elm-app
-  - elm-app make
+  - elm-app make --yes
 script: elm-app test
 notifications:
   slack: kindlyops:YkyQcYjU04mC2JTN1orHBDCs
