@@ -1,4 +1,8 @@
-language: haskell
+language: node_js
+node_js:
+  - "6"
 install:
-        - npm install -g create-elm-app
+  - npm install -g create-elm-app
 script: elm-app test
+notifications:
+  slack: kindlyops:YkyQcYjU04mC2JTN1orHBDCs
