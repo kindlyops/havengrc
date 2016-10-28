@@ -1,0 +1,4 @@
+language: haskell
+install:
+        - npm install -g elm-app
+script: elm-app test
