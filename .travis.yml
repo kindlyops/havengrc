@@ -9,6 +9,7 @@ cache:
     - test/elm-stuff/build-artifacts
     - sysconfcpus
     - $HOME/.nvm
+    - node_modules
 os:
   - linux
 
