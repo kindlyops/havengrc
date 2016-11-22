@@ -6,7 +6,6 @@
 
 module Main exposing (..)
 
-import Html.App as App
 import Html exposing (..)
 import Html.Attributes exposing (href, class, style)
 import Material
@@ -168,9 +167,9 @@ viewCounter model =
 -- for the `Material` module for details.
 
 
-main : Program Never
+main : Program Never Model Msg
 main =
-    App.program
+    Html.program
         { init = ( model, Cmd.none )
         , view =
             view
