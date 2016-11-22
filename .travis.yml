@@ -1,9 +1,27 @@
-language: node_js
-node_js:
-  - "6"
+sudo: false
+
+services:
+  - docker
+
+cache:
+  directories:
+    - elm-stuff/build-artifacts
+    - test/elm-stuff/build-artifacts
+    - sysconfcpus
+    - $HOME/.nvm
+    - node_modules
+
 install:
-  - npm install -g create-elm-app
-  - elm-app make --yes
-script: elm-app test
+  - nvm install 6.9.1
+  - nvm use 6.9.1
+  - node --version
+  - npm --version
+  - npm install -g elm@0.18.0
+  - npm install
+
+script:
+  - npm run-script build
+  - npm run-script test
+
 notifications:
   slack: kindlyops:YkyQcYjU04mC2JTN1orHBDCs
