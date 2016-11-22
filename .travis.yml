@@ -13,8 +13,7 @@ os:
   - linux
 
 env:
-  - ELM_VERSION=0.18.0
-  - TARGET_NODE_VERSION=node
+  - ELM_VERSION=0.18.0 TARGET_NODE_VERSION=6.9.1
 
 install:
   - nvm install $TARGET_NODE_VERSION
