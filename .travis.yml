@@ -10,19 +10,13 @@ cache:
     - sysconfcpus
     - $HOME/.nvm
     - node_modules
-os:
-  - linux
-
-env:
-  - ELM_VERSION=0.18.0
-  - TARGET_NODE_VERSION=6.9.1
 
 install:
-  - nvm install $TARGET_NODE_VERSION
-  - nvm use $TARGET_NODE_VERSION
+  - nvm install 6.9.1
+  - nvm use 6.9.1
   - node --version
   - npm --version
-  - npm install -g elm@$ELM_VERSION
+  - npm install -g elm@=0.18.0
   - npm install
 
 script:
