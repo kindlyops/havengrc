@@ -5,6 +5,7 @@ cache:
     - elm-stuff/build-artifacts
     - test/elm-stuff/build-artifacts
     - sysconfcpus
+    - $HOME/.nvm
 os:
   - linux
 
