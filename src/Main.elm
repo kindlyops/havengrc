@@ -83,8 +83,8 @@ update msg model =
                 { model | selectedTab = num } ! []
 
         -- When the `Mdl` messages come through, update appropriately.
-        Mdl msg' ->
-            Material.update msg' model
+        Mdl msg_ ->
+            Material.update msg_ model
 
 
 
