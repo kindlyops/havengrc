@@ -22,6 +22,7 @@ install:
 script:
   - npm run-script build
   - npm run-script test
+  - docker build -t kindlyops/complianceops .
 
 notifications:
   slack: kindlyops:YkyQcYjU04mC2JTN1orHBDCs
