@@ -1,5 +1,8 @@
 sudo: false
 
+services:
+  - docker
+
 cache:
   directories:
     - elm-stuff/build-artifacts
@@ -13,32 +16,16 @@ env:
   matrix:
     - ELM_VERSION=0.18.0 TARGET_NODE_VERSION=node
 
-before_install:
-  - | # epic build time improvement - see https://github.com/elm-lang/elm-compiler/issues/1473#issuecomment-245704142
-    if [ ! -d sysconfcpus/bin ];
-    then
-      git clone https://github.com/obmarg/libsysconfcpus.git;
-      cd libsysconfcpus;
-      ./configure --prefix=$TRAVIS_BUILD_DIR/sysconfcpus;
-      make && make install;
-      cd ..;
-    fi
-
 install:
   - nvm install $TARGET_NODE_VERSION
   - nvm use $TARGET_NODE_VERSION
   - node --version
   - npm --version
   - npm install -g elm@$ELM_VERSION
-  - # mv $(npm config get prefix)/bin/elm-make $(npm config get prefix)/bin/elm-make-old
-  - # echo "#\!/bin/bash\\n\\necho \"Running elm-make with sysconfcpus -n 2\"\\n\\n$TRAVIS_BUILD_DIR/sysconfcpus/bin/sysconfcpus -n 2 elm-make-old \"\$@\"" > $(npm config get prefix)/bin/elm-make
-  - # chmod +x $(npm config get prefix)/bin/elm-make
-  - npm install -g create-elm-app@0.2.1
-  - elm-app make --yes
 
 script:
-  - elm-app build
-  - elm-app test
+  - npm run-script build
+  - npm run-script test
 
 notifications:
   slack: kindlyops:YkyQcYjU04mC2JTN1orHBDCs
