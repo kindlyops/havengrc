@@ -36,7 +36,9 @@ install:
   - npm install -g create-elm-app@0.2.1
   - elm-app make --yes
 
-script: elm-app test
+script:
+  - elm-app build
+  - elm-app test
 
 notifications:
   slack: kindlyops:YkyQcYjU04mC2JTN1orHBDCs
