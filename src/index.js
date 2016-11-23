@@ -3,7 +3,7 @@ require('./main.css');
 var Elm = require('./Main.elm');
 
 var options = {
-  allowedConnections: ['Username-Password-Authentication'],
+  allowedConnections: ['Username-Password-Authentication', 'google-oauth2'],
   theme: {
     logo: 'https://www.kindlyops.com/img/compliance_ops_lock_logo.png',
     primaryColor: '#5ab4ac'
