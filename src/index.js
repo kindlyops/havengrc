@@ -3,7 +3,15 @@ require('./main.css');
 var Elm = require('./Main.elm');
 
 var options = {
-  allowedConnections: ['Username-Password-Authentication']
+  allowedConnections: ['Username-Password-Authentication'],
+  theme: {
+    logo: 'https://www.kindlyops.com/img/compliance_ops_lock_logo.png',
+    primaryColor: '#5ab4ac'
+  },
+  languageDictionary: {
+    emailInputPlaceholder: "yours@example.com",
+    title: "ComplianceOps"
+  },
 };
 var CLIENT_ID = "oq2p8P3pe9EO6WdXAJVJSjOE6PR7izX7"; // TODO: make this configurable
 var CLIENT_DOMAIN = "auditproof.auth0.com";
