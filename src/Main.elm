@@ -1,13 +1,13 @@
-{- This file re-implements the Elm Counter example (1 counter) with elm-mdl
-   buttons. Use this as a starting point for using elm-mdl components in your own
-   app.
--}
+-- Main.elm
 
 
-module Main exposing (..)
+port module Main exposing (..)
 
 import Html exposing (..)
-import Html.Attributes exposing (href, class, style)
+import Html.Events exposing (..)
+import Html.Attributes exposing (..)
+import Auth0
+import Authentication
 import Material
 import Material.Scheme
 import Material.Button as Button
@@ -16,63 +16,77 @@ import Material.Layout as Layout
 import Material.Options exposing (css)
 
 
--- MODEL
--- You have to add a field to your model where you track the `Material.Model`.
--- This is referred to as the "model container"
+main : Program (Maybe Auth0.LoggedInUser) Model Msg
+main =
+    Html.programWithFlags
+        { init = init
+        , update = update
+        , subscriptions = subscriptions
+        , view = view
+        }
 
 
 type alias Model =
     { count : Int
-    , mdl :
-        Material.Model
-        -- Boilerplate: model store for any and all Mdl components you use.
+    , authModel : Authentication.Model
+    , mdl : Material.Model
     , selectedTab : Int
     }
 
 
-
--- `Material.model` provides the initial model
-
-
-model : Model
-model =
-    { count = 0
-    , mdl =
-        Material.model
-        -- Boilerplate: Always use this initial Mdl model store.
-    , selectedTab = 0
-    }
+type alias Mdl =
+    Material.Model
 
 
 
--- ACTION, UPDATE
--- You need to tag `Msg` that are coming from `Mdl` so you can dispatch them
--- appropriately.
+-- Init
+
+
+init : Maybe Auth0.LoggedInUser -> ( Model, Cmd Msg )
+init initialUser =
+    ( Model 0 (Authentication.init auth0showLock auth0logout initialUser) Material.model 0, Cmd.none )
+
+
+
+-- Messages
 
 
 type Msg
-    = Increase
-    | Reset
+    = AuthenticationMsg Authentication.Msg
     | Mdl (Material.Msg Msg)
     | SelectTab Int
 
 
 
--- Boilerplate: Msg clause for internal Mdl messages.
+-- Ports
+
+
+port auth0showLock : Auth0.Options -> Cmd msg
+
+
+port auth0authResult : (Auth0.RawAuthenticationResult -> msg) -> Sub msg
+
+
+port auth0logout : () -> Cmd msg
+
+
+
+-- Update
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        Increase ->
-            ( { model | count = model.count + 1 }
-            , Cmd.none
-            )
+        AuthenticationMsg authMsg ->
+            let
+                ( authModel, cmd ) =
+                    Authentication.update authMsg model.authModel
+            in
+                ( { model | authModel = authModel }, Cmd.map AuthenticationMsg cmd )
 
-        Reset ->
-            ( { model | count = 0 }
-            , Cmd.none
-            )
+        -- When the `Mdl` messages come through, update appropriately.
+        Mdl msg_ ->
+            Material.update msg_ model
 
         SelectTab num ->
             let
@@ -81,17 +95,18 @@ update msg model =
             in
                 { model | selectedTab = num } ! []
 
-        -- When the `Mdl` messages come through, update appropriately.
-        Mdl msg_ ->
-            Material.update msg_ model
+
+
+-- Subscriptions
+
+
+subscriptions : a -> Sub Msg
+subscriptions model =
+    auth0authResult (Authentication.handleAuthResult >> AuthenticationMsg)
 
 
 
--- VIEW
-
-
-type alias Mdl =
-    Material.Model
+-- View
 
 
 view : Model -> Html Msg
@@ -103,7 +118,7 @@ view model =
             , Layout.selectedTab model.selectedTab
             , Layout.onSelectTab SelectTab
             ]
-            { header = [ h1 [ style [ ( "padding", "2rem" ) ] ] [ text "Counter" ] ]
+            { header = [ h1 [ style [ ( "padding", "2rem" ) ] ] [ text "ComplianceOps" ] ]
             , drawer = []
             , tabs = ( [ text "Controls", text "Activities" ], [ Color.background (Color.color Color.Teal Color.S400) ] )
             , main = [ viewBody model ]
@@ -112,68 +127,47 @@ view model =
 
 viewBody : Model -> Html Msg
 viewBody model =
-    case model.selectedTab of
-        0 ->
-            viewCounter model
-
-        1 ->
-            text "something else"
-
-        _ ->
-            text "not found fake 404"
-
-
-viewCounter : Model -> Html Msg
-viewCounter model =
     div
         [ style [ ( "padding", "2rem" ) ] ]
-        [ text ("Current count: " ++ toString model.count)
-          {- We construct the instances of the Button component that we need, one
-             for the increase button, one for the reset button. First, the increase
-             button. The first three arguments are:
+        [ div []
+            (case Authentication.tryGetUserProfile model.authModel of
+                Nothing ->
+                    [ p [] [ text "Please log in" ] ]
 
-               - A Msg constructor (`Mdl`), lifting Mdl messages to the Msg type.
-               - An instance id (the `[0]`). Every component that uses the same model
-                 collection (model.mdl in this file) must have a distinct instance id.
-               - A reference to the elm-mdl model collection (`model.mdl`).
-
-             Notice that we do not have to add fields for the increase and reset buttons
-             separately to our model; and we did not have to add to our update messages
-             to handle their internal events.
-
-             Mdl components are configured with `Options`, similar to `Html.Attributes`.
-             The `Button.onClick Increase` option instructs the button to send the `Increase`
-             message when clicked. The `css ...` option adds CSS styling to the button.
-             See `Material.Options` for details on options.
-          -}
+                Just user ->
+                    [ p [] [ img [ src user.picture ] [] ]
+                    , p [] [ text ("Hello, " ++ user.name ++ "!") ]
+                    ]
+            )
         , Button.render Mdl
             [ 0 ]
             model.mdl
-            [ Button.onClick Increase
+            [ Button.onClick
+                (AuthenticationMsg
+                    (if Authentication.isLoggedIn model.authModel then
+                        Authentication.LogOut
+                     else
+                        Authentication.ShowLogIn
+                    )
+                )
             , css "margin" "0 24px"
             ]
-            [ text "Increase" ]
-        , Button.render Mdl
-            [ 1 ]
-            model.mdl
-            [ Button.onClick Reset ]
-            [ text "Reset" ]
+            [ text
+                (if Authentication.isLoggedIn model.authModel then
+                    "Logout"
+                 else
+                    "Login"
+                )
+            ]
+        , text
+            (case model.selectedTab of
+                0 ->
+                    "First tab content"
+
+                1 ->
+                    "Second tab content"
+
+                _ ->
+                    "We don't have this tab"
+            )
         ]
-
-
-
--- Load Google Mdl CSS. You'll likely want to do that not in code as we
--- do here, but rather in your master .html file. See the documentation
--- for the `Material` module for details.
-
-
-main : Program Never Model Msg
-main =
-    Html.program
-        { init = ( model, Cmd.none )
-        , view =
-            view
-            -- Here we've added no subscriptions, but we'll need to use the `Mdl` subscriptions for some components later.
-        , subscriptions = always Sub.none
-        , update = update
-        }
