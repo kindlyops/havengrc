@@ -1,7 +1,7 @@
 -- Auth0.elm
 
 
-module Auth0
+port module Auth0
     exposing
         ( AuthenticationState(..)
         , AuthenticationError
@@ -13,6 +13,9 @@ module Auth0
         , UserProfile
         , Token
         , mapResult
+        , auth0showLock
+        , auth0logout
+        , auth0authResult
         )
 
 
@@ -79,3 +82,16 @@ mapResult result =
 defaultOpts : Options
 defaultOpts =
     {}
+
+
+
+-- Ports
+
+
+port auth0showLock : Options -> Cmd msg
+
+
+port auth0authResult : (RawAuthenticationResult -> msg) -> Sub msg
+
+
+port auth0logout : () -> Cmd msg
