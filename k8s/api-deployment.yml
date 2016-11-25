@@ -1,0 +1,31 @@
+---
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: api
+  creationTimestamp:
+spec:
+  replicas: 1
+  template:
+    metadata:
+      creationTimestamp:
+      labels:
+        service: api
+    spec:
+      containers:
+      - name: api
+        image: begriffs/postgrest
+        args:
+        - postgrest
+        - postgres://postgres@db/mappamundi_dev
+        - "-a"
+        - postgres
+        - "--schema"
+        - '1'
+        ports:
+        - containerPort: 3000
+          protocol: TCP
+        resources: {}
+      restartPolicy: Always
+  strategy: {}
+status: {}

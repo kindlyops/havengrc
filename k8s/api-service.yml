@@ -1,0 +1,18 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: api
+  creationTimestamp:
+  labels:
+    service: api
+spec:
+  ports:
+  - name: '3000'
+    protocol: TCP
+    port: 3000
+    targetPort: 3000
+  selector:
+    service: api
+status:
+  loadBalancer: {}
