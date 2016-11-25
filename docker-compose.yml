@@ -7,7 +7,6 @@ services:
       - .:/src
     links:
       - db
-    command: "/bin/true"
   api:
     image: begriffs/postgrest:v0.3.2.0
     command: [postgrest, "postgres://postgres@db/mappamundi_dev", "--jwt-secret=$JWT_SECRET", -a, postgres, --schema, "1"]
