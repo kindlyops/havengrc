@@ -24,6 +24,8 @@ view model user =
             model.mdl
             [ Layout.fixedHeader
             , Layout.fixedDrawer
+            , Layout.selectedTab model.selectedTab
+            , Layout.onSelectTab SelectTab
             ]
             { header = header model
             , drawer = drawer model
@@ -41,7 +43,7 @@ type alias MenuItem =
 
 header : Model -> List (Html Msg)
 header model =
-    [ h1 [ style [ ( "padding", "2rem" ) ] ] [ text "ComplianceOps" ] ]
+    []
 
 
 drawer : Model -> List (Html Msg)
@@ -106,5 +108,15 @@ viewBody model user =
             , Options.css "margin" "0 24px"
             ]
             [ text "Logout" ]
-        , text "hello"
+        , text
+            (case model.selectedTab of
+                0 ->
+                    "First tab content"
+
+                1 ->
+                    "Second tab content"
+
+                _ ->
+                    "We don't have this tab"
+            )
         ]
