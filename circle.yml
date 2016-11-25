@@ -1,0 +1,34 @@
+machine:
+  pre:
+    - curl -sSL https://s3.amazonaws.com/circle-downloads/install-circleci-docker.sh | bash -s -- 1.10.0
+    - sudo rm /usr/local/bin/docker-compose
+    - sudo curl -L https://github.com/docker/compose/releases/download/1.7.0/docker-compose-Linux-x86_64 > docker-compose
+    - sudo mv docker-compose /usr/local/bin/
+    - sudo chmod +x /usr/local/bin/docker-compose
+  services:
+    - docker
+
+dependencies:
+  override:
+    - docker-compose run --entrypoint="psql -h db -U postgres -c 'CREATE DATABASE mappamundi_dev'" sqitch
+
+test:
+  override:
+    - docker-compose run sqitch deploy
+
+
+deployment:
+  prerelease:
+    branch: master
+    commands:
+      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+      - docker tag kindlyops/mappamundi kindlyops/mappamundi:prerelease
+      - docker push kindlyops/mappamundi:latest
+      - make prerelease
+  release:
+    tag: /v[0-9]+(\.[0-9]+)*/
+    owner: kindlyops
+    commands:
+      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+      - docker tag kindlyops/mappamundi kindlyops/mappamundi:$CIRCLE_TAG
+      - docker push kindlyops/mappamundi:$CIRCLE_TAG
