@@ -11,9 +11,9 @@ machine:
 
 test:
   override:
-    - npm run-script build
+    - npm run-script build:
         timeout: 900
-    - npm run-script test
+    - npm run-script test:
         timeout: 900
     - docker build -t kindlyops/complianceops .
 
