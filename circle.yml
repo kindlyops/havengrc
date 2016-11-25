@@ -16,6 +16,7 @@ dependencies:
 test:
   override:
     - docker-compose run sqitch deploy
+    - docker build -t kindlyops/mappamundi .
 
 
 deployment:
@@ -25,7 +26,6 @@ deployment:
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
       - docker tag kindlyops/mappamundi kindlyops/mappamundi:prerelease
       - docker push kindlyops/mappamundi:latest
-      - make prerelease
   release:
     tag: /v[0-9]+(\.[0-9]+)*/
     owner: kindlyops
