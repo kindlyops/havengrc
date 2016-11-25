@@ -4,11 +4,8 @@ import Authentication
 import Msg exposing (Msg)
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Material
 import Material.Button as Button
-import Material.Grid exposing (grid, size, cell, Device(..))
 import Material.Options exposing (css)
-import Material.Layout as Layout
 import Material.Scheme
 import Model exposing (Model)
 import Msg exposing (..)
