@@ -12,6 +12,10 @@ machine:
 dependencies:
   override:
     - docker-compose run --entrypoint="psql -h db -U postgres -c 'CREATE DATABASE mappamundi_dev'" sqitch
+    - npm install:
+        timeout: 900
+        pwd:
+          web
 
 test:
   override:
@@ -20,7 +24,7 @@ test:
     - npm run-script build:
         timeout: 900
         pwd:
-          mappamundi/web
+          web
 
 
 deployment:
