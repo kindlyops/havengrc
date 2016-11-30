@@ -23,8 +23,8 @@ type alias Model =
 -- initialModel initialUser location =
 
 
-initialModel : Maybe Auth0.LoggedInUser -> ( Model, Cmd Msg )
-initialModel initialUser =
+initialModel : Maybe Auth0.LoggedInUser -> Navigation.Location -> ( Model, Cmd Msg )
+initialModel initialUser location =
     ( { count = 0
       , authModel = (Authentication.init auth0showLock auth0logout initialUser)
       , route =

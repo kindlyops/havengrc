@@ -30,6 +30,13 @@ update msg model =
                 Just location ->
                     model ! [ Navigation.newUrl (Route.urlFor location) ]
 
+        UrlChange location ->
+            let
+                _ =
+                    Debug.log "UrlChange: " location.hash
+            in
+                model ! []
+
         SelectTab num ->
             let
                 _ =

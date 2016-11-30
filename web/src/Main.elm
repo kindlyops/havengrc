@@ -14,14 +14,9 @@ import Update
 import View
 
 
--- TODO fix this up to use Navigation.programWithFlags correctly
--- main : Program (Maybe Auth0.LoggedInUser) Navigation.Location Model
-
-
 main : Program (Maybe Auth0.LoggedInUser) Model Msg
 main =
-    Html.programWithFlags
-        -- (NavigateTo)
+    Navigation.programWithFlags (UrlChange)
         { init = Model.initialModel
         , update = Update.update
         , subscriptions = subscriptions

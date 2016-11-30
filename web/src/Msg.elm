@@ -14,3 +14,4 @@ type Msg
     | Mdl (Material.Msg Msg)
     | SelectTab Int
     | NavigateTo (Maybe Route.Location)
+    | UrlChange Navigation.Location
