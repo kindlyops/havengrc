@@ -35,7 +35,7 @@ update msg model =
                 _ =
                     Debug.log "UrlChange: " location.hash
             in
-                model ! []
+                { model | route = Route.locFor (Just location) } ! []
 
         SelectTab num ->
             let

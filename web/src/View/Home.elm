@@ -72,13 +72,11 @@ drawerMenuItem : Model -> MenuItem -> Html Msg
 drawerMenuItem model menuItem =
     Layout.link
         [ Layout.onClick <| NavigateTo <| menuItem.route
-        , -- (if model.route == menuItem.route then
-          -- TODO fix this chunk of code up to only highlight the current route
-          -- Color.text <| Color.accent
-          -- else
-          Color.text <| Color.primaryDark
-          --)
-          -- 0.18 upgrade `when` |> when (model.route == menuItem.route)
+        , (if model.route == menuItem.route then
+            Color.text <| Color.primaryContrast
+           else
+            Color.text <| Color.primaryDark
+          )
         , Options.css "font-weight" "500"
         , Options.css "cursor" "pointer"
           -- http://outlinenone.com/ TODO: tl;dr don't do this (from Elm Daily Drip example)
