@@ -17,6 +17,10 @@ test:
   override:
     - docker-compose run sqitch deploy
     - docker build -t kindlyops/mappamundi .
+    - npm run-script build:
+        timeout: 900
+        pwd:
+          mappamundi/web
 
 
 deployment:
