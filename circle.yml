@@ -10,9 +10,18 @@ machine:
     - docker
 
 dependencies:
+  cache_directories:
+    - "sysconfcpus"
   override:
     - docker-compose run --entrypoint="psql -h db -U postgres -c 'CREATE DATABASE mappamundi_dev'" sqitch
-    - npm install:
+    - |
+      if [ ! -d sysconfcpus/bin ];
+        git clone https://github.com/obmarg/libsysconfcpus.git;
+        cd libsysconfcpus;
+        ./configure --prefix="$HOME/$CIRCLE_PROJECT_REPONAME/sysconfcpus";
+        make && make install;
+        cd ..
+    - $HOME/$CIRCLE_PROJECT_REPONAME/sysconfcpus/bin/sysconfcpus -n 2 npm install:
         timeout: 900
         pwd:
           web
@@ -21,7 +30,7 @@ test:
   override:
     - docker-compose run sqitch deploy
     - docker build -t kindlyops/mappamundi .
-    - npm run-script build:
+    - $HOME/$CIRCLE_PROJECT_REPONAME/sysconfcpus/bin/sysconfcpus -n 2 npm run-script build:
         timeout: 900
         pwd:
           web
