@@ -6,6 +6,8 @@ The Controls Mapping service for Compliance Ops.
 
 This exposes a data model using [PostgREST](http://postgrest.com/).
 
+Web front end is in web/README.md
+
 ## run the service
 
 The db schema and migrations are managed using sqitch.
