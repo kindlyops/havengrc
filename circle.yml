@@ -21,6 +21,7 @@ dependencies:
         ./configure --prefix="$HOME/$CIRCLE_PROJECT_REPONAME/sysconfcpus";
         make && make install;
         cd ..
+      fi
     - $HOME/$CIRCLE_PROJECT_REPONAME/sysconfcpus/bin/sysconfcpus -n 2 npm install:
         timeout: 900
         pwd:
