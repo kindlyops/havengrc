@@ -21,16 +21,15 @@ CURL_ARGS=$@
 # CURL_VERBOSE=-vvv
 
 AUTH0_DOMAIN=auditproof.auth0.com
-# ComplianceOps client id MBeB7gLN6pv2ZLptkIWaBROECQGk7y3G
-AUTH0_CLIENTID=MBeB7gLN6pv2ZLptkIWaBROECQGk7y3G
+# ComplianceOps developer client id must be set in AUTH0_CLIENT_ID
 AUTH0_USERNAME=support@kindlyops.com
 unset AUTH0_PASSWORD
 set +a
 echo "Password for $AUTH0_USERNAME:\c"
-read -rs AUTH0_PASSWORD < /dev/tty 
+read -rs AUTH0_PASSWORD < /dev/tty
 echo
 echo requesting role claim in Auth0 scope
-AUTH0_SCOPE='openid email role' 
+AUTH0_SCOPE='openid email role'
 
 RO_URL=https://${AUTH0_DOMAIN}/oauth/ro
 RO_PAYLOAD="{
