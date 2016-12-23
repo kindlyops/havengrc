@@ -18,16 +18,16 @@ services:
     env_file: .env
   db:
     image: postgres:9.5
-  web:
+  webui:
+    working_dir: /code
+    volumes:
+      - ./web:/code
+      - /code/node_modules
     build:
       context: .
-      dockerfile: web/Dockerfile-hotreload
-    working_dir: /src
-    volumes:
-      - .:/src
-      - /src/node_modules
+      dockerfile: ./web/Dockerfile-hotreload
     links:
       - api
     ports:
-      - "5001:2015"
-    command: [npm, run-script, start]
+      - "2015:2015"
+    command: [/code/installrun.sh]
