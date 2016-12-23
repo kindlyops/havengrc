@@ -79,6 +79,11 @@ module.exports = {
       template: paths.template,
       favicon: paths.favicon
     }),
+    new webpack.DefinePlugin({
+      'process.env': {
+          APP_ENV: JSON.stringify('dev')
+      }
+    }),
     new webpack.HotModuleReplacementPlugin()
   ]
 };

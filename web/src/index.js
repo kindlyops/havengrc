@@ -3,7 +3,7 @@ require('./main.css');
 var Elm = require('./Main.elm');
 
 var options = {
-  allowedConnections: ['Username-Password-Authentication', 'google-oauth2'],
+  allowedConnections: ['Username-Password-Authentication'],
   theme: {
     logo: 'https://www.kindlyops.com/img/compliance_ops_lock_logo.png',
     primaryColor: '#5ab4ac'
@@ -13,7 +13,12 @@ var options = {
     title: "ComplianceOps"
   },
 };
-var CLIENT_ID = "oq2p8P3pe9EO6WdXAJVJSjOE6PR7izX7"; // TODO: make this configurable
+
+if (process.env.APP_ENV === 'dev') {
+  CLIENT_ID = "dLgiofn95h2SnOUllXUdaQaL5S2ShWrk"; // ComplianceOps dev id
+} else {
+  CLIENT_ID = "{{.Env.AUTH0_CLIENT_ID}}";
+}
 var CLIENT_DOMAIN = "auditproof.auth0.com";
 var lock = new Auth0Lock(CLIENT_ID, CLIENT_DOMAIN, options);
 var storedProfile = localStorage.getItem('profile');
