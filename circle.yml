@@ -23,7 +23,7 @@ dependencies:
         make && make install;
         cd ..;
       fi
-    - $HOME/$CIRCLE_PROJECT_REPONAME/sysconfcpus/bin/sysconfcpus -n 2 npm install:
+    - $HOME/$CIRCLE_PROJECT_REPONAME/sysconfcpus/bin/sysconfcpus -n 2 npm install --only=dev:
         timeout: 900
         pwd:
           web
@@ -36,6 +36,7 @@ test:
         timeout: 900
         pwd:
           web
+    - docker build --rm=false -t kindlyops/complianceops web
 
 
 deployment:
@@ -44,11 +45,15 @@ deployment:
     commands:
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
       - docker tag kindlyops/mappamundi kindlyops/mappamundi:prerelease
+      - docker tag kindlyops/complianceops kindlyops/complianceops:prelease
       - docker push kindlyops/mappamundi:latest
+      - docker push kindlyops/complianceops:latest
   release:
     tag: /v[0-9]+(\.[0-9]+)*/
     owner: kindlyops
     commands:
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
       - docker tag kindlyops/mappamundi kindlyops/mappamundi:$CIRCLE_TAG
+      - docker tag kindlyops/complianceops kindlyops/complianceops:$CIRCLE_TAG
       - docker push kindlyops/mappamundi:$CIRCLE_TAG
+      - docker push kindlyops/complianceops:$CIRCLE_TAG
