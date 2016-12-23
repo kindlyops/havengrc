@@ -1,7 +1,8 @@
 version: '2'
 services:
   sqitch:
-    build: .
+    build:
+      context: .
     working_dir: /src
     volumes:
       - .:/src
@@ -17,3 +18,16 @@ services:
     env_file: .env
   db:
     image: postgres:9.5
+  web:
+    build:
+      context: .
+      dockerfile: web/Dockerfile-hotreload
+    working_dir: /src
+    volumes:
+      - .:/src
+      - /src/node_modules
+    links:
+      - api
+    ports:
+      - "5001:2015"
+    command: [npm, run-script, start]

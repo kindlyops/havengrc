@@ -1,0 +1,8 @@
+FROM        node:6.2.2
+MAINTAINER  Kindly Ops, LLC <support@kindlyops.com>
+RUN mkdir /src
+WORKDIR /src
+ADD ./web /src/
+RUN ls -lah /src
+RUN pwd
+RUN npm install
