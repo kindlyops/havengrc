@@ -2,4 +2,6 @@
 
 log / stdout "{combined}"
 
+templates /js .js
+
 errors stdout

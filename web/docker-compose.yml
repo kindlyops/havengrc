@@ -4,3 +4,5 @@ services:
     build: .
     ports:
      - "5001:2015"
+    environment:
+      - AUTH0_CLIENT_ID=MONKEY

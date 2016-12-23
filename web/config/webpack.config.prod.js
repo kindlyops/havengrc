@@ -77,6 +77,11 @@ module.exports = {
       verbose: true,
       dry: false
     }),
+    new webpack.DefinePlugin({
+      'process.env': {
+          APP_ENV: JSON.stringify('docker')
+      }
+    }),
 
     // Minify the compiled JavaScript.
     new webpack.optimize.UglifyJsPlugin({
