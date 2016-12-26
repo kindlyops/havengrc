@@ -16,7 +16,7 @@ if (pathExists.sync('elm-package.json') === false) {
 
 // http://webpack.github.io/docs/node.js-api.html#the-long-way
 var compiler = webpack(config);
-var port = 3000;
+var port = 2015;
 
 compiler.plugin('invalid', function () {
   clearConsole();
@@ -66,5 +66,3 @@ devServer.listen(port, function (err) {
 });
 
 openBrowser('http://localhost:' + port + '/');
-
-
