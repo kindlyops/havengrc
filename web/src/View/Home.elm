@@ -45,11 +45,24 @@ header : Model -> List (Html Msg)
 header model =
     []
 
+drawHeader : Model -> (Html Msg)
+drawHeader model =
+  let
+    name = (case Authentication.tryGetUserProfile model.authModel of
+      Nothing ->
+         "unknown"
+      Just user ->
+         user.name
+    )
+  in
+  header [] [
+  text ("hello" ++ " " ++ name)
+  ]
 
 drawer : Model -> List (Html Msg)
 drawer model =
-    [ Layout.title []
-        [ text "Compliance Ops" ]
+    [
+         (drawHeader model)
     , Layout.navigation
         [ Options.css "flex-grow" "1" ]
         (List.map (drawerMenuItem model) menuItems)
