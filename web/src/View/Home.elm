@@ -27,7 +27,7 @@ view model user =
             , Layout.selectedTab model.selectedTab
             , Layout.onSelectTab SelectTab
             ]
-            { header = header model
+            { header = mainHeader model
             , drawer = drawer model
             , tabs = ( [ text "Controls", text "Activities" ], [ Color.background (Color.color Color.Teal Color.S400) ] )
             , main = [ viewBody model user ]
@@ -41,28 +41,34 @@ type alias MenuItem =
     }
 
 
-header : Model -> List (Html Msg)
-header model =
+mainHeader : Model -> List (Html Msg)
+mainHeader model =
     []
 
-drawHeader : Model -> (Html Msg)
+
+drawHeader : Model -> Html Msg
 drawHeader model =
-  let
-    name = (case Authentication.tryGetUserProfile model.authModel of
-      Nothing ->
-         "unknown"
-      Just user ->
-         user.name
-    )
-  in
-  header [] [
-  text ("hello" ++ " " ++ name)
-  ]
+    let
+        ( name, avatar ) =
+            (case Authentication.tryGetUserProfile model.authModel of
+                Nothing ->
+                    ( "unknown", "unknown" )
+
+                Just user ->
+                    ( user.nickname, user.picture )
+            )
+    in
+        (header
+            []
+            [ List.avatarImage avatar [ Options.css "margin-right" "16px" ]
+            , text name
+            ]
+        )
+
 
 drawer : Model -> List (Html Msg)
 drawer model =
-    [
-         (drawHeader model)
+    [ Layout.title [] [ drawHeader model ]
     , Layout.navigation
         [ Options.css "flex-grow" "1" ]
         (List.map (drawerMenuItem model) menuItems)
@@ -107,11 +113,7 @@ viewBody : Model -> Auth0.UserProfile -> Html Msg
 viewBody model user =
     div
         [ style [ ( "padding", "2rem" ) ] ]
-        [ div []
-            [ p [] [ img [ src user.picture ] [] ]
-            , p [] [ text ("Hello, " ++ user.name ++ "!") ]
-            ]
-        , Button.render Mdl
+        [ Button.render Mdl
             [ 0 ]
             model.mdl
             [ Button.onClick
