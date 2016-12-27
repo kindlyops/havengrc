@@ -8,13 +8,13 @@ import Material.Button as Button
 import Material.Scheme
 import Material.Color as Color
 import Material.Layout as Layout
+import Material.List as List
 import Material.Icon as Icon
 import Material.Options as Options exposing (css, when, Property)
-import Route exposing (Location(..))
+import Route exposing (Location(..), locFor)
 import Model exposing (Model)
 import Msg exposing (..)
 import Navigation
-import Route exposing (locFor)
 
 
 view : Model -> Auth0.UserProfile -> Html Msg

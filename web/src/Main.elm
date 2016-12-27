@@ -5,11 +5,9 @@ port module Main exposing (..)
 
 import Authentication
 import Auth0 exposing (auth0authResult)
-import Html
 import Model exposing (Model)
 import Msg exposing (Msg(..))
 import Navigation
-import Route exposing (locFor)
 import Update
 import View
 
