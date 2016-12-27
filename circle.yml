@@ -44,10 +44,10 @@ deployment:
     branch: master
     commands:
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-      - docker tag kindlyops/mappamundi kindlyops/mappamundi:prerelease
-      - docker tag kindlyops/complianceops kindlyops/complianceops:prelease
-      - docker push kindlyops/mappamundi:latest
-      - docker push kindlyops/complianceops:latest
+      - docker tag kindlyops/mappamundi kindlyops/mappamundi:$CIRCLE_SHA1
+      - docker tag kindlyops/complianceops kindlyops/complianceops:$CIRCLE_SHA1
+      - docker push kindlyops/mappamundi:$CIRCLE_SHA1
+      - docker push kindlyops/complianceops:$CIRCLE_SHA1
   release:
     tag: /v[0-9]+(\.[0-9]+)*/
     owner: kindlyops
@@ -55,5 +55,9 @@ deployment:
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
       - docker tag kindlyops/mappamundi kindlyops/mappamundi:$CIRCLE_TAG
       - docker tag kindlyops/complianceops kindlyops/complianceops:$CIRCLE_TAG
+      - docker tag kindlyops/mappamundi kindlyops/mappamundi:$CIRCLE_SHA1
+      - docker tag kindlyops/complianceops kindlyops/complianceops:$CIRCLE_SHA1
       - docker push kindlyops/mappamundi:$CIRCLE_TAG
       - docker push kindlyops/complianceops:$CIRCLE_TAG
+      - docker push kindlyops/mappamundi:$CIRCLE_SHA1
+      - docker push kindlyops/complianceops:$CIRCLE_SHA1
