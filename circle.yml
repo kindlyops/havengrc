@@ -34,7 +34,7 @@ test:
     - ./vendor/linux/hugo:
         pwd:
           marketing
-    - docker build --rm=false -t kindlyops/complianceopsmarketing marketing
+    - docker build --rm=false -t kindlyops/complianceopsmarketing -f marketing/Dockerfile .
     - docker build --rm=false -t kindlyops/mappamundi .
     - $HOME/$CIRCLE_PROJECT_REPONAME/sysconfcpus/bin/sysconfcpus -n 2 npm run-script build:
         timeout: 900
