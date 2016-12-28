@@ -31,3 +31,11 @@ services:
     ports:
       - "2015:2015"
     command: [/code/installrun.sh]
+  marketing:
+    volumes:
+      - ./marketing/public:/public
+    build:
+      context: .
+      dockerfile: ./marketing/Dockerfile
+    ports:
+      - "8080:2015"

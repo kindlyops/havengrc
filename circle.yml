@@ -31,6 +31,10 @@ dependencies:
 test:
   override:
     - docker-compose run sqitch deploy
+    - ./vendor/linux/hugo:
+        pwd:
+          marketing
+    - docker build --rm=false -t kindlyops/complianceopsmarketing -f marketing/Dockerfile .
     - docker build --rm=false -t kindlyops/mappamundi .
     - $HOME/$CIRCLE_PROJECT_REPONAME/sysconfcpus/bin/sysconfcpus -n 2 npm run-script build:
         timeout: 900
@@ -45,7 +49,9 @@ deployment:
     commands:
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
       - docker tag kindlyops/mappamundi kindlyops/mappamundi:$CIRCLE_SHA1
+      - docker tag kindlyops/complianceopsmarketing kindlyops/complianceopsmarketing:$CIRCLE_SHA1
       - docker tag kindlyops/complianceops kindlyops/complianceops:$CIRCLE_SHA1
+      - docker push kindlyops/mappamundi:$CIRCLE_SHA1
       - docker push kindlyops/mappamundi:$CIRCLE_SHA1
       - docker push kindlyops/complianceops:$CIRCLE_SHA1
   release:
@@ -54,10 +60,14 @@ deployment:
     commands:
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
       - docker tag kindlyops/mappamundi kindlyops/mappamundi:$CIRCLE_TAG
+      - docker tag kindlyops/complianceopsmarketing kindlyops/complianceopsmarketing:$CIRCLE_TAG
       - docker tag kindlyops/complianceops kindlyops/complianceops:$CIRCLE_TAG
       - docker tag kindlyops/mappamundi kindlyops/mappamundi:$CIRCLE_SHA1
+      - docker tag kindlyops/complianceopsmarketing kindlyops/complianceopsmarketing:$CIRCLE_SHA1
       - docker tag kindlyops/complianceops kindlyops/complianceops:$CIRCLE_SHA1
       - docker push kindlyops/mappamundi:$CIRCLE_TAG
       - docker push kindlyops/complianceops:$CIRCLE_TAG
+      - docker push kindlyops/complianceopsmarketing:$CIRCLE_TAG
+      - docker push kindlyops/complianceopsmarketing:$CIRCLE_SHA1
       - docker push kindlyops/mappamundi:$CIRCLE_SHA1
       - docker push kindlyops/complianceops:$CIRCLE_SHA1
