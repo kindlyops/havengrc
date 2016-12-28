@@ -52,7 +52,7 @@ deployment:
       - docker tag kindlyops/complianceopsmarketing kindlyops/complianceopsmarketing:$CIRCLE_SHA1
       - docker tag kindlyops/complianceops kindlyops/complianceops:$CIRCLE_SHA1
       - docker push kindlyops/mappamundi:$CIRCLE_SHA1
-      - docker push kindlyops/mappamundi:$CIRCLE_SHA1
+      - docker push kindlyops/complianceopsmarketing:$CIRCLE_SHA1
       - docker push kindlyops/complianceops:$CIRCLE_SHA1
   release:
     tag: /v[0-9]+(\.[0-9]+)*/
