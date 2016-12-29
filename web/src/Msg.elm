@@ -1,8 +1,10 @@
 module Msg exposing (Msg(..))
 
 import Authentication
+import Http
 import Material
 import Navigation
+import Regulation exposing (Regulation)
 import Route
 
 
@@ -15,3 +17,4 @@ type Msg
     | SelectTab Int
     | NavigateTo (Maybe Route.Location)
     | UrlChange Navigation.Location
+    | NewRegulations (Result Http.Error (List Regulation))

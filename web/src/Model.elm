@@ -1,11 +1,13 @@
 module Model exposing (Model, initialModel)
 
+import API exposing (getRegulations)
 import Authentication
 import Auth0 exposing (auth0showLock, auth0logout)
 import Material
 import Msg exposing (Msg)
 import Navigation
 import Route
+import Regulation exposing (Regulation)
 
 
 type alias Model =
@@ -14,6 +16,7 @@ type alias Model =
     , route : Route.Model
     , mdl : Material.Model
     , selectedTab : Int
+    , regulations : List Regulation
     }
 
 
@@ -32,6 +35,7 @@ initialModel initialUser location =
             -- (Just location)
       , mdl = Material.model
       , selectedTab = 0
+      , regulations = []
       }
-    , Cmd.none
+    , getRegulations
     )
