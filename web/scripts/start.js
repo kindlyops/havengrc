@@ -14,6 +14,15 @@ if (pathExists.sync('elm-package.json') === false) {
   process.exit(0);
 }
 
+//console.log('DEBUG: Output path is ' + config.output.path );
+//console.log('DEBUG: current PWD is ' + process.env.PWD);
+//console.log('DEBUG: current TMPDIR is ' + process.env.TMPDIR);
+if ('/code' == process.env.TMPDIR) {
+  console.log('DEBUG: overriding $TMPDIR from /code to /tmp from start.js');
+  process.env.TMPDIR = '/tmp';
+  console.log('DEBUG: current TMPDIR is ' + process.env.TMPDIR);
+}
+
 // http://webpack.github.io/docs/node.js-api.html#the-long-way
 var compiler = webpack(config);
 var port = 2015;

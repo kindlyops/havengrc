@@ -18,6 +18,8 @@ services:
     env_file: .env
   db:
     image: postgres:9.5
+    ports:
+      - "5434:5432"
   webui:
     working_dir: /code
     volumes:
