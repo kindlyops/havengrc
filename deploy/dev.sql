@@ -13,6 +13,6 @@ CREATE TABLE mappa.regulation
 );
 
 CREATE OR REPLACE VIEW "1".regulation as
-  SELECT identifier, uri, description from mappa.regulation;
+  SELECT id, identifier, uri, description from mappa.regulation;
 
 COMMIT;

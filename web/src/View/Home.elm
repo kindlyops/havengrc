@@ -14,7 +14,6 @@ import Material.Options as Options exposing (css, when, Property)
 import Route exposing (Location(..), locFor)
 import Model exposing (Model)
 import Msg exposing (..)
-import Navigation
 
 
 view : Model -> Auth0.UserProfile -> Html Msg
@@ -121,15 +120,15 @@ viewBody model user =
             , Options.css "margin" "0 24px"
             ]
             [ text "Logout" ]
-        , text
-            (case model.selectedTab of
-                0 ->
-                    "First tab content"
+        , (case model.selectedTab of
+            0 ->
+                ul []
+                    (List.map (\r -> li [] [ text r.description ]) model.regulations)
 
-                1 ->
-                    "Second tab content"
+            1 ->
+                text "Second tab content"
 
-                _ ->
-                    "We don't have this tab"
-            )
+            _ ->
+                text "We don't have this tab"
+          )
         ]
