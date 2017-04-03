@@ -33,6 +33,24 @@ services:
     ports:
       - "2015:2015"
     command: [/code/installrun.sh]
+  tellform:
+      image: tellform/development
+      environment:
+        - REDIS_URL=redis://redis-db:6379
+        - DB_HOST=db
+      links:
+        - redis:redis-db
+        - mongo:db
+      ports:
+        - "4000:3000"
+  mongo:
+      image: mongo
+      ports:
+        - "27017:27017"
+  redis:
+      image: redis
+      ports:
+        - "6379:6379"
   marketing:
     volumes:
       - ./marketing/public:/public
