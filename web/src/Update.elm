@@ -21,7 +21,7 @@ update msg model =
 
         -- When the `Mdl` messages come through, update appropriately.
         Mdl msg_ ->
-            Material.update msg_ model
+            Material.update Mdl msg_ model
 
         NavigateTo maybeLocation ->
             case maybeLocation of
