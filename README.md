@@ -29,7 +29,11 @@ Once you have docker set up:
     docker-compose run --entrypoint="psql -h db -U postgres -c 'CREATE DATABASE mappamundi_dev'" sqitch
     docker-compose run sqitch deploy
     docker-compose up
-    curl -s http://localhost:3000/ | jq
+    curl -s http://localhost:3001/ | jq
+
+## to access tellform
+
+Open http://localhost:3000/, you can sign in with admin/admin in the dev env.
 
 ## add a database migration
 
