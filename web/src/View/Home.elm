@@ -10,7 +10,7 @@ import Material.Color as Color
 import Material.Layout as Layout
 import Material.List as List
 import Material.Icon as Icon
-import Material.Options as Options exposing (css, when, Property)
+import Material.Options as Options exposing (css, when, Property, onClick)
 import Route exposing (Location(..), locFor)
 import Model exposing (Model)
 import Msg exposing (..)
@@ -89,7 +89,7 @@ menuItems =
 drawerMenuItem : Model -> MenuItem -> Html Msg
 drawerMenuItem model menuItem =
     Layout.link
-        [ Layout.onClick <| NavigateTo <| menuItem.route
+        [ Options.onClick <| NavigateTo <| menuItem.route
         , (if model.route == menuItem.route then
             Color.text <| Color.primaryContrast
            else
@@ -115,7 +115,7 @@ viewBody model user =
         [ Button.render Mdl
             [ 0 ]
             model.mdl
-            [ Button.onClick
+            [ Options.onClick
                 (Msg.AuthenticationMsg Authentication.LogOut)
             , Options.css "margin" "0 24px"
             ]
