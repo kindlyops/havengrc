@@ -24,6 +24,19 @@ services:
       image: redis
       ports:
         - "6379:6379"
+  keycloak:
+    image: jboss/keycloak-postgres
+    environment:
+      - POSTGRES_DATABASE=mappamundi_dev
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_PORT_5432_TCP_ADDR=postgres
+    volumes:
+      - ./keycloak/keycloak-add-user.json:/opt/jboss/keycloak/standalone/configuration/keycloak-add-user.json
+    ports:
+      - "8080:8080"
+    links:
+      - db:postgres
   sqitch:
     build:
       context: .
@@ -64,4 +77,4 @@ services:
       context: .
       dockerfile: ./marketing/Dockerfile
     ports:
-      - "8080:2015"
+      - "5000:2015"
