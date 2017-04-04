@@ -35,6 +35,14 @@ Once you have docker set up:
 
 Open http://localhost:3000/, you can sign in with admin/admin in the dev env.
 
+## to access keycloak
+
+Open http://localhost:8080/, you can sign in with admin/admin
+
+## to access the marketing site
+
+Open http://localhost:5000/
+
 ## add a database migration
 
     docker-compose run sqitch add foo -n "Add the foo table"
