@@ -1,0 +1,16 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: havenweb-service
+  namespace: default
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: arn:aws:acm:us-west-2:211129858938:certificate/7f310d29-03a1-4321-bb84-cb76355a8b90
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: http
+spec:
+  selector:
+    app: havenweb
+  ports:
+  - protocol: TCP
+    port: 443
+    targetPort: http
+  type: LoadBalancer

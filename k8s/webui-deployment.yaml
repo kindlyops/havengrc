@@ -1,16 +1,20 @@
-apiVersion: apps/v1beta1
+apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: webui-deployment
+  name: havenweb-deployment
+  namespace: default
+  labels:
+    app: havenweb
 spec:
   replicas: 2
   template:
     metadata:
       labels:
-        app: webui
+        app: havenweb
     spec:
       containers:
-      - name: nginx
-        image: nginx:1.7.9
+      - name: havenweb
+        image: kindlyops/havenweb:v0.0.1
         ports:
-        - containerPort: 2015
+        - name: http
+          containerPort: 2015
