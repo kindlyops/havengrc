@@ -31,6 +31,10 @@ Once you have docker set up:
     docker-compose up
     curl -s http://localhost:3001/ | jq
 
+## to access the main webUI
+
+Open http://localhost:2015/, click the login button.
+
 ## to access tellform
 
 Open http://localhost:3000/, you can sign in with admin/admin in the dev env.

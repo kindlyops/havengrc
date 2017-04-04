@@ -1,0 +1,16 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: webui-deployment
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: webui
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.7.9
+        ports:
+        - containerPort: 2015
