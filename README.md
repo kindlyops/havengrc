@@ -24,6 +24,9 @@ To check and see if you have docker available and set up
 If you don't have docker running, use the instructions at https://docs.docker.com/docker-for-mac/.
 At the time of writing, this is working fine with docker 1.12.
 
+Create an empty .env file in the project root:
+    touch .env
+
 Once you have docker set up:
 
     docker-compose run --entrypoint="psql -h db -U postgres -c 'CREATE DATABASE mappamundi_dev'" sqitch

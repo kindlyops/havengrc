@@ -32,7 +32,8 @@ initialModel initialUser location =
       , authModel = (Authentication.init auth0showLock auth0logout initialUser)
       , route =
             Route.init Nothing
-            -- (Just location)
+
+      -- (Just location)
       , mdl = Material.model
       , selectedTab = 0
       , regulations = []
