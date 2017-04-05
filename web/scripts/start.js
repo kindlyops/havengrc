@@ -25,7 +25,7 @@ if ('/code' == process.env.TMPDIR) {
 
 // http://webpack.github.io/docs/node.js-api.html#the-long-way
 var compiler = webpack(config);
-var port = 2015;
+var port = 2016;
 
 compiler.plugin('invalid', function () {
   clearConsole();
@@ -42,7 +42,7 @@ compiler.plugin('done', function (stats) {
 
     console.log(chalk.green('Compiled successfully!'));
     console.log('\nThe app is running at:');
-    console.log('\n    ' + chalk.cyan('http://localhost:' + port + '/'));
+    console.log('\n    ' + chalk.cyan('http://localhost:2015/'));
     console.log('\nTo create production build, run:');
     console.log('\n    elm-app build');
     return;

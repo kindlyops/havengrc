@@ -15,7 +15,7 @@ var options = {
 };
 
 if (process.env.APP_ENV === 'dev') {
-  CLIENT_ID = "dLgiofn95h2SnOUllXUdaQaL5S2ShWrk"; // ComplianceOps dev id
+  CLIENT_ID = process.env.AUTH0_CLIENT_ID; // HavenGRC dev id
 } else {
   CLIENT_ID = "{{.Env.AUTH0_CLIENT_ID}}";
 }

@@ -70,6 +70,7 @@ services:
     ports:
       - "2015:2015"
     command: [/code/installrun.sh]
+    env_file: .env
   marketing:
     volumes:
       - ./marketing/public:/public
