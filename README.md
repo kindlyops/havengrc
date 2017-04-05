@@ -24,8 +24,12 @@ To check and see if you have docker available and set up
 If you don't have docker running, use the instructions at https://docs.docker.com/docker-for-mac/.
 At the time of writing, this is working fine with docker 1.12.
 
-Create an empty .env file in the project root:
+Create an .env file in the project root:
     touch .env
+    echo AUTH0_CLIENT_ID=REPLACEME >> .env
+
+Ask one of the project members with access to Auth0 to get you the client ID,
+or set up your own Auth0 account and get the client ID from there.
 
 Once you have docker set up:
 
