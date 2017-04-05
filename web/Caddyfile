@@ -1,5 +1,10 @@
 0.0.0.0
 
+redir 301 {
+  if {>X-Forwarded-Proto} is http
+  / https://{host}{uri}
+}
+
 log / stdout "{combined}"
 
 templates /js .js
