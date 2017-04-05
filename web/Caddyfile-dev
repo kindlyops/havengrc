@@ -1,0 +1,11 @@
+0.0.0.0
+
+startup npm run-script start &
+
+proxy / localhost:2016 {
+  transparent
+  websocket
+}
+
+log / stdout "{combined}"
+errors stdout
