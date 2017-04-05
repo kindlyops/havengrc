@@ -117,3 +117,20 @@ There is a script in contrib that shows how to get a JWT from Auth0. You can the
 header in Postman or in curl.
 
 Note that we are currently running into https://github.com/begriffs/postgrest/issues/495 with the client secret that is provided by Auth0.
+
+## Deploying with kubernetes
+
+To create a new release, go to https://github.com/kindlyops/mappamundi/releases
+and click 'Draft a new release'. Put a tag in incrementing the version. The
+new tag will create a release and will trigger a CircleCI release build, which
+will push a new container tagged with the version of the release.
+
+You can see the available container tags at https://hub.docker.com/r/kindlyops/havenweb/tags/
+
+Then tell kubernetes to update the image used by the havenweb deployment to the
+new tag
+    kubectl set image deployment/havenweb-deployment havenweb=kindlyops/havenweb:v0.0.2
+
+You can check on the progress of the deployment
+
+    kubectl rollout status deployment/havenweb-deployment
