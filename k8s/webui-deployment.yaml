@@ -18,3 +18,9 @@ spec:
         ports:
         - name: http
           containerPort: 2015
+        env:
+          - name: AUTH0_CLIENT_ID
+            valueFrom:
+              configMapKeyRef:
+                name: webui-config
+                key: AUTH0_CLIENT_ID
