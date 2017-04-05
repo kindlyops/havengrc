@@ -42,6 +42,10 @@ Once you have docker set up:
 
 Open http://localhost:2015/, click the login button.
 
+## to access the swagger-ui for the postgrest API
+
+Open http://localhost:3002/
+
 ## to access tellform
 
 Open http://localhost:3000/, you can sign in with admin/admin in the dev env.

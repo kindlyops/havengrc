@@ -25,7 +25,7 @@ services:
       ports:
         - "6379:6379"
   keycloak:
-    image: jboss/keycloak-postgres
+    image: jboss/keycloak-postgres:3.0.0.Final
     environment:
       - POSTGRES_DATABASE=mappamundi_dev
       - POSTGRES_USER=postgres
@@ -46,13 +46,21 @@ services:
     links:
       - db
   api:
-    image: begriffs/postgrest:v0.3.2.0
-    command: [postgrest, "postgres://postgres@db/mappamundi_dev", --jwt-secret, "${POSTGREST_JWT_SECRET}", -a, postgres, --schema, "1"]
+    image: begriffs/postgrest:nightly
+    command: [postgrest, "/config"]
     ports:
       - "3001:3000"
     links:
       - db
     env_file: .env
+    volumes:
+      - ./postgrest/config:/config
+  swagger:
+    image: swaggerapi/swagger-ui:v3.0.2
+    ports:
+      - "3002:8080"
+    volumes:
+      - ./swagger/index.html:/usr/share/nginx/html/index.html
   db:
     image: postgres:9.5
     ports:
