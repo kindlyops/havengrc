@@ -69,7 +69,7 @@ services:
     ports:
       - "5434:5432"
     volumes:
-      - ./postgresql-data:/var/lib/postgresql/data
+      - ./postgresql-data:/var/lib/postgresql
   webui:
     working_dir: /code
     volumes:
