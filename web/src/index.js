@@ -17,23 +17,38 @@ var storedToken = localStorage.getItem('token');
 var authData = storedProfile && storedToken ? { profile: JSON.parse(storedProfile), token: storedToken } : null;
 var elmApp = Elm.Main.embed(document.getElementById('root'), authData);
 
-options = { onLoad: 'login-required', redirect_uri: 'http://localhost:2015/' };
-keycloak.init(options).success(function(authenticated) {
-  if (authenticated) {
-    keycloak.loadUserProfile().success(function() {
-          console.log(keycloak.profile);
-          localStorage.setItem('profile', JSON.stringify(keycloak.profile));
-          localStorage.setItem('token', keycloak.token);
-      }).error(function() {
-          result.err = { name: "unknown error" };
-      });
-    //elmApp.ports.auth0authResult.send(result);
-  } else {
-    alert('authentication failed'); // TODO polish
-  }
-}).error(function() {
-  alert('failed to initialize'); // TODO polish this error case
+options = { redirect_uri: 'http://localhost:2015/' };
+keycloak.init(options);
+
+keycloak.onAuthSuccess = function() {
+  console.log("success from keycloak login");
+  var result = { err: null, ok: null };
+  keycloak.loadUserProfile().success(function() {
+        console.log("success from keycloak.loadUserProfile");
+        console.log(keycloak.profile);
+        localStorage.setItem('profile', JSON.stringify(keycloak.profile));
+        localStorage.setItem('token', keycloak.token);
+        result.ok = { profile: keycloak.profile, token: keycloak.token };
+        console.log("sending result ");
+        console.log(result);
+        elmApp.ports.auth0authResult.send(result);
+    }).error(function(errorData) {
+        result.err = { name: "unknown error" };
+        // check for error, error_description
+        // https://github.com/keycloak/keycloak-js-bower/blob/master/dist/keycloak.js#L506
+        elmApp.ports.auth0authResult.send(result);
+  });
+};
+
+elmApp.ports.auth0showLock.subscribe(function(opts) {
+  console.log("calling login");
+  keycloak.login().error(function(errorData) {
+    alert('failed to initialize'); // TODO polish this error case
+    // check for error, error_description
+    // https://github.com/keycloak/keycloak-js-bower/blob/master/dist/keycloak.js#L506
+  });
 });
+
 
 
 // Log out of keycloak
