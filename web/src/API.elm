@@ -19,7 +19,7 @@ regulationDecoder =
 
 regulationsUrl : String
 regulationsUrl =
-    "http://localhost:3000/regulation"
+    "http://localhost:3001/regulation"
 
 
 getRegulations : Cmd Msg
