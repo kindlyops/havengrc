@@ -3,9 +3,9 @@ require('./main.css');
 var Elm = require('./Main.elm');
 
 if (process.env.APP_ENV === 'dev') {
-  CLIENT_ID = process.env.AUTH0_CLIENT_ID; // HavenGRC dev id
+  CLIENT_ID = process.env.KEYCLOAK_CLIENT_ID;
 } else {
-  CLIENT_ID = "{{.Env.AUTH0_CLIENT_ID}}"; // TODO rename from Auth0 to keycloak
+  CLIENT_ID = "{{.Env.KEYCLOAK_CLIENT_ID}}";
 }
 var keycloak = Keycloak({
     url: '/auth',

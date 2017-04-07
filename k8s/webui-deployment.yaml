@@ -19,8 +19,8 @@ spec:
         - name: http
           containerPort: 2015
         env:
-          - name: AUTH0_CLIENT_ID
+          - name: KEYCLOAK_CLIENT_ID
             valueFrom:
               configMapKeyRef:
                 name: webui-config
-                key: AUTH0_CLIENT_ID
+                key: KEYCLOAK_CLIENT_ID
