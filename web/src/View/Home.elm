@@ -54,7 +54,8 @@ drawHeader model =
                     ( "unknown", "unknown" )
 
                 Just user ->
-                    ( user.nickname, user.picture )
+                    ( user.firstName, "" )
+             -- TODO figure out where to get avatar
             )
     in
         (header
@@ -97,9 +98,8 @@ drawerMenuItem model menuItem =
           )
         , Options.css "font-weight" "500"
         , Options.css "cursor" "pointer"
-
-        -- http://outlinenone.com/ TODO: tl;dr don't do this (from Elm Daily Drip example)
-        -- should be using ":focus { outline: 0 }" but can't with inline styles so hack
+          -- http://outlinenone.com/ TODO: tl;dr don't do this (from Elm Daily Drip example)
+          -- should be using ":focus { outline: 0 }" but can't with inline styles so hack
         , Options.css "outline" "none"
         ]
         [ Icon.view menuItem.iconName

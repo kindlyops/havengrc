@@ -36,11 +36,10 @@ type alias Options =
 
 type alias UserProfile =
     { email : String
-    , email_verified : Bool
-    , name : String
-    , nickname : String
-    , picture : String
-    , user_id : String
+    , emailVerified : Bool
+    , firstName : String
+    , lastName : String
+    , id : String
     }
 
 

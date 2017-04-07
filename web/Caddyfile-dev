@@ -7,5 +7,9 @@ proxy / localhost:2016 {
   websocket
 }
 
+proxy /auth keycloak:8080 {
+  transparent
+}
+
 log / stdout "{combined}"
 errors stdout

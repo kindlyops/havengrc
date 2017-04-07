@@ -17,25 +17,7 @@ view model =
         [ class "mdl-grid" ]
         [ div [ class "mdl-layout-spacer" ] []
         , div [ class "mdl-cell mdl-cell--4-col" ]
-            [ text "compelling value"
-            , Button.render Mdl
-                [ 0 ]
-                model.mdl
-                [ Options.onClick (AuthenticationMsg Authentication.ShowLogIn)
-                , css "margin" "0 24px"
-                ]
-                [ text "Login" ]
-            ]
+            [ text "redirecting to login page" ]
         , div [ class "mdl-layout-spacer" ] []
         ]
         |> Material.Scheme.top
-
-
-
--- Button.render
--- Mdl
--- [ 0 ]
--- model.mdl
--- [ Button.onClick (Msg.AuthenticationMsg Authentication.ShowLogIn)
--- , css "margin" "0 24px"
--- ]
