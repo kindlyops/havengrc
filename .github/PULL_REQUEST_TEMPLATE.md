@@ -25,7 +25,7 @@ apply. -->
 <!--- If you're unsure about any of these, don't hesitate to ask. We're here to
 help! -->
 - [ ] My pull request is based on the latest master branch
-  `git pull --rebase upstream master`.
+  `git pull --rebase origin master`.
 - [ ] My code is formatted with elm-format.
 - [ ] All new and existing tests passed.
 - [ ] For visual changes, I've attached before and after screenshots
