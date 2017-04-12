@@ -28,9 +28,6 @@ Create an .env file in the project root:
     touch .env
     echo KEYCLOAK_CLIENT_ID=havendev >> .env
 
-Ask one of the project members with access to Auth0 to get you the client ID,
-or set up your own Auth0 account and get the client ID from there.
-
 Once you have docker set up, you will need to run these commands the first
 time just to initialize the database:
 
