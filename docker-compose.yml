@@ -34,12 +34,14 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_PORT_5432_TCP_ADDR=postgres
-    volumes:
-      - ./keycloak/keycloak-add-user.json:/opt/jboss/keycloak/standalone/configuration/keycloak-add-user.json
+      - KEYCLOAK_USER=admin
+      - KEYCLOAK_PASSWORD=admin
     ports:
       - "8080:8080"
     links:
       - db:postgres
+    volumes:
+      - ./keycloak:/keycloak
   sqitch:
     build:
       context: .
@@ -68,6 +70,8 @@ services:
     image: postgres:9.6.2
     ports:
       - "5434:5432"
+    environment:
+      - POSTGRES_DB=mappamundi_dev
     volumes:
       - ./postgresql-data:/var/lib/postgresql
   webui:

@@ -9,7 +9,7 @@ if (process.env.APP_ENV === 'dev') {
 }
 var keycloak = Keycloak({
     url: '/auth',
-    realm: 'haven',
+    realm: 'havendev',
     clientId: CLIENT_ID
 });
 var storedProfile = localStorage.getItem('profile');

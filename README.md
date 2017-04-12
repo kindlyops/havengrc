@@ -31,16 +31,30 @@ Create an .env file in the project root:
 Ask one of the project members with access to Auth0 to get you the client ID,
 or set up your own Auth0 account and get the client ID from there.
 
-Once you have docker set up:
+Once you have docker set up, you will need to run these commands the first
+time just to initialize the database:
 
-    docker-compose run --entrypoint="psql -h db -U postgres -c 'CREATE DATABASE mappamundi_dev'" sqitch
+    docker-compose up -d db
     docker-compose run sqitch deploy
+
+Then you will normally run all the services using:
+
     docker-compose up
-    curl -s http://localhost:3001/ | jq
+
+The first time you bring the services up, you will want to import some test
+users and groups. Open http://localhost:8080/auth, sign in with admin/admin.
+Then go to 'add-realm' menu at the top right corner next to 'master', and import
+the ./keycloak/havendev-realm.json file from this repo. Select to import the
+havendev realm, and make sure it is enabled.
+
+From this point on, you just just be able to use docker-compose up/down normally.
+Move on to access the main webUI in the next section.
 
 ## to access the main webUI
 
-Open http://localhost:2015/, click the login button.
+Open http://localhost:2015/, click the login button. You can login with
+user1@havengrc.com/password or user2@havengrc.com/password. User2 will prompt
+you to configure 2Factor authentication.
 
 ## to access the swagger-ui for the postgrest API
 
@@ -57,6 +71,26 @@ Open http://localhost:8080/, you can sign in with admin/admin
 ## to access the marketing site
 
 Open http://localhost:5000/
+
+## to see the REST API
+
+    curl -s http://localhost:3001/ | jq
+
+## to export keycloak realm data (to refresh the dev users)
+
+First enter the keycloak container
+
+    docker-compose run --entrypoint=/bin/bash keycloak
+
+Now run the keycloak server command with export strategies defined
+
+    /opt/jboss/keycloak/bin/standalone.sh -Dkeycloak.migration.action=export -Dkeycloak.migration.provider=dir -Dkeycloak.migration.dir=/keycloak -Dkeycloak.migration.usersExportStrategy=REALM_FILE -Dkeycloak.migration.realmName=havendev
+
+## To clear local storage in Chrome for your local site
+
+Sometimes messing with logins and cookies you get stuff corrupted and need
+to invalidate a session/drop some cookies/tokens that were in localstorage.
+Visit chrome://settings/cookies#cont and search for localhost.
 
 ## add a database migration
 
