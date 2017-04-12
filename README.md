@@ -26,7 +26,7 @@ At the time of writing, this is working fine with docker 1.12.
 
 Create an .env file in the project root:
     touch .env
-    echo AUTH0_CLIENT_ID=REPLACEME >> .env
+    echo KEYCLOAK_CLIENT_ID=havendev >> .env
 
 Ask one of the project members with access to Auth0 to get you the client ID,
 or set up your own Auth0 account and get the client ID from there.
@@ -114,17 +114,10 @@ Then execute the POST and GET requests to see how the API behaves.
 
 A tutorial is available here. http://blog.jonharrington.org/postgrest-introduction/
 
-## Authentication with JWT and Auth0
+## Authentication with JWT and Keycloak
 
-Set JWT_SECRET in your environment from the 'Client Secret' in the Compliance Ops Auth0 admin page. This is the shared secret that is used to verify the JWT signature. JWTs are signed/hashed but not encrypted, so don't put confidential attributes in the JWT.
-
-For the Auth0 user that you want to work with, set a read-only claim on the user in app_metadata, something like { "role" : "admin" }.
-The role value must link up with the role defined inside postgrest.
-
-There is a script in contrib that shows how to get a JWT from Auth0. You can then specify this JWT string in an Authorization: Bearer 'JWT'
-header in Postman or in curl.
-
-Note that we are currently running into https://github.com/begriffs/postgrest/issues/495 with the client secret that is provided by Auth0.
+TODO: explain how Keycloak realms, roles, users, and groups are configured
+and how to extract a JWT token for manually hitting the UI.
 
 ## Deploying with kubernetes
 

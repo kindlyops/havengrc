@@ -80,6 +80,7 @@ services:
       dockerfile: ./web/Dockerfile-hotreload
     links:
       - api
+      - keycloak
     ports:
       - "2015:2015"
     command: [/code/installrun.sh]

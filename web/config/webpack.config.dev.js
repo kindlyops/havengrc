@@ -82,7 +82,7 @@ module.exports = {
     new webpack.DefinePlugin({
       'process.env': {
           APP_ENV: JSON.stringify('dev'),
-          AUTH0_CLIENT_ID: JSON.stringify(process.env.AUTH0_CLIENT_ID)
+          KEYCLOAK_CLIENT_ID: JSON.stringify(process.env.KEYCLOAK_CLIENT_ID)
       }
     }),
     new webpack.HotModuleReplacementPlugin()
