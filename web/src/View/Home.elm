@@ -121,6 +121,7 @@ viewBody model user =
             , Options.css "margin" "0 24px"
             ]
             [ text "Logout" ]
+        , a [ href "http://localhost:8080/auth/realms/havendev/account/" ] [ text "Edit user profile" ]
         , (case model.selectedTab of
             0 ->
                 ul []

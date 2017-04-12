@@ -13,7 +13,6 @@ dependencies:
   cache_directories:
     - "sysconfcpus"
   override:
-    - docker-compose run --entrypoint="psql -h db -U postgres -c 'CREATE DATABASE mappamundi_dev'" sqitch
     - |
       if [ ! -d sysconfcpus/bin ];
       then
