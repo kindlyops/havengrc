@@ -1,4 +1,4 @@
-port module Keycloak
+module Keycloak
     exposing
         ( AuthenticationState(..)
         , AuthenticationError
@@ -10,9 +10,6 @@ port module Keycloak
         , UserProfile
         , Token
         , mapResult
-        , keycloakShowLock
-        , keycloakLogout
-        , keycloakAuthResult
         )
 
 
@@ -78,16 +75,3 @@ mapResult result =
 defaultOpts : Options
 defaultOpts =
     {}
-
-
-
--- Ports
-
-
-port keycloakShowLock : Options -> Cmd msg
-
-
-port keycloakAuthResult : (RawAuthenticationResult -> msg) -> Sub msg
-
-
-port keycloakLogout : () -> Cmd msg

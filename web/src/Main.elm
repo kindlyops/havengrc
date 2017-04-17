@@ -1,10 +1,11 @@
-port module Main exposing (..)
+module Main exposing (..)
 
 import Authentication
-import Keycloak exposing (keycloakAuthResult)
+import Keycloak
 import Model exposing (Model)
 import Msg exposing (Msg(..))
 import Navigation
+import Ports exposing (keycloakAuthResult)
 import Update
 import View
 

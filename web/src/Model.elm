@@ -2,10 +2,11 @@ module Model exposing (Model, initialModel)
 
 import API exposing (getRegulations)
 import Authentication
-import Keycloak exposing (keycloakShowLock, keycloakLogout)
+import Keycloak
 import Material
 import Msg exposing (Msg)
 import Navigation
+import Ports exposing (keycloakShowLock, keycloakLogout)
 import Route
 import Regulation exposing (Regulation)
 
