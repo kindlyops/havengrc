@@ -1,7 +1,4 @@
--- Auth0.elm
-
-
-port module Auth0
+port module Keycloak
     exposing
         ( AuthenticationState(..)
         , AuthenticationError
@@ -13,9 +10,9 @@ port module Auth0
         , UserProfile
         , Token
         , mapResult
-        , auth0showLock
-        , auth0logout
-        , auth0authResult
+        , keycloakShowLock
+        , keycloakLogout
+        , keycloakAuthResult
         )
 
 
@@ -87,10 +84,10 @@ defaultOpts =
 -- Ports
 
 
-port auth0showLock : Options -> Cmd msg
+port keycloakShowLock : Options -> Cmd msg
 
 
-port auth0authResult : (RawAuthenticationResult -> msg) -> Sub msg
+port keycloakAuthResult : (RawAuthenticationResult -> msg) -> Sub msg
 
 
-port auth0logout : () -> Cmd msg
+port keycloakLogout : () -> Cmd msg

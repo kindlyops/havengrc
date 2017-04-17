@@ -31,16 +31,16 @@ keycloak.onAuthSuccess = function() {
         result.ok = { profile: keycloak.profile, token: keycloak.token };
         console.log("sending result ");
         console.log(result);
-        elmApp.ports.auth0authResult.send(result);
+        elmApp.ports.keycloakAuthResult.send(result);
     }).error(function(errorData) {
         result.err = { name: "unknown error" };
         // check for error, error_description
         // https://github.com/keycloak/keycloak-js-bower/blob/master/dist/keycloak.js#L506
-        elmApp.ports.auth0authResult.send(result);
+        elmApp.ports.keycloakAuthResult.send(result);
   });
 };
 
-elmApp.ports.auth0showLock.subscribe(function(opts) {
+elmApp.ports.keycloakShowLock.subscribe(function(opts) {
   console.log("calling login");
   keycloak.login().error(function(errorData) {
     alert('failed to initialize'); // TODO polish this error case
@@ -52,7 +52,7 @@ elmApp.ports.auth0showLock.subscribe(function(opts) {
 
 
 // Log out of keycloak
-elmApp.ports.auth0logout.subscribe(function(opts) {
+elmApp.ports.keycloakLogout.subscribe(function(opts) {
   localStorage.removeItem('profile');
   localStorage.removeItem('token');
   keycloak.logout();

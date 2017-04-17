@@ -1,7 +1,7 @@
 module View.Home exposing (view)
 
 import Authentication
-import Auth0
+import Keycloak
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Material.Button as Button
@@ -16,7 +16,7 @@ import Model exposing (Model)
 import Msg exposing (..)
 
 
-view : Model -> Auth0.UserProfile -> Html Msg
+view : Model -> Keycloak.UserProfile -> Html Msg
 view model user =
     Material.Scheme.topWithScheme Color.Teal Color.LightGreen <|
         Layout.render Mdl
@@ -98,8 +98,9 @@ drawerMenuItem model menuItem =
           )
         , Options.css "font-weight" "500"
         , Options.css "cursor" "pointer"
-          -- http://outlinenone.com/ TODO: tl;dr don't do this (from Elm Daily Drip example)
-          -- should be using ":focus { outline: 0 }" but can't with inline styles so hack
+
+        -- http://outlinenone.com/ TODO: tl;dr don't do this (from Elm Daily Drip example)
+        -- should be using ":focus { outline: 0 }" but can't with inline styles so hack
         , Options.css "outline" "none"
         ]
         [ Icon.view menuItem.iconName
@@ -109,7 +110,7 @@ drawerMenuItem model menuItem =
         ]
 
 
-viewBody : Model -> Auth0.UserProfile -> Html Msg
+viewBody : Model -> Keycloak.UserProfile -> Html Msg
 viewBody model user =
     div
         [ style [ ( "padding", "2rem" ) ] ]

@@ -2,7 +2,7 @@ module Model exposing (Model, initialModel)
 
 import API exposing (getRegulations)
 import Authentication
-import Auth0 exposing (auth0showLock, auth0logout)
+import Keycloak exposing (keycloakShowLock, keycloakLogout)
 import Material
 import Msg exposing (Msg)
 import Navigation
@@ -20,16 +20,10 @@ type alias Model =
     }
 
 
-
--- Init
--- initialModel : Maybe Auth0.LoggedInUser -> Navigation.Location -> ( Model, Cmd Msg )
--- initialModel initialUser location =
-
-
-initialModel : Maybe Auth0.LoggedInUser -> Navigation.Location -> ( Model, Cmd Msg )
+initialModel : Maybe Keycloak.LoggedInUser -> Navigation.Location -> ( Model, Cmd Msg )
 initialModel initialUser location =
     ( { count = 0
-      , authModel = (Authentication.init auth0showLock auth0logout initialUser)
+      , authModel = (Authentication.init keycloakShowLock keycloakLogout initialUser)
       , route =
             Route.init Nothing
 

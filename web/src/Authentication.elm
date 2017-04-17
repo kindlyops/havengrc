@@ -1,6 +1,3 @@
--- Authentication.elm
-
-
 module Authentication
     exposing
         ( Msg(..)
@@ -12,26 +9,26 @@ module Authentication
         , isLoggedIn
         )
 
-import Auth0
+import Keycloak
 
 
 type alias Model =
-    { state : Auth0.AuthenticationState
-    , lastError : Maybe Auth0.AuthenticationError
-    , showLock : Auth0.Options -> Cmd Msg
+    { state : Keycloak.AuthenticationState
+    , lastError : Maybe Keycloak.AuthenticationError
+    , showLock : Keycloak.Options -> Cmd Msg
     , logOut : () -> Cmd Msg
     }
 
 
-init : (Auth0.Options -> Cmd Msg) -> (() -> Cmd Msg) -> Maybe Auth0.LoggedInUser -> Model
+init : (Keycloak.Options -> Cmd Msg) -> (() -> Cmd Msg) -> Maybe Keycloak.LoggedInUser -> Model
 init showLock logOut initialData =
     { state =
         case initialData of
             Just user ->
-                Auth0.LoggedIn user
+                Keycloak.LoggedIn user
 
             Nothing ->
-                Auth0.LoggedOut
+                Keycloak.LoggedOut
     , lastError = Nothing
     , showLock = showLock
     , logOut = logOut
@@ -39,7 +36,7 @@ init showLock logOut initialData =
 
 
 type Msg
-    = AuthenticationResult Auth0.AuthenticationResult
+    = AuthenticationResult Keycloak.AuthenticationResult
     | ShowLogIn
     | LogOut
 
@@ -52,7 +49,7 @@ update msg model =
                 ( newState, error ) =
                     case result of
                         Ok user ->
-                            ( Auth0.LoggedIn user, Nothing )
+                            ( Keycloak.LoggedIn user, Nothing )
 
                         Err err ->
                             ( model.state, Just err )
@@ -60,32 +57,32 @@ update msg model =
                 ( { model | state = newState, lastError = error }, Cmd.none )
 
         ShowLogIn ->
-            ( model, model.showLock Auth0.defaultOpts )
+            ( model, model.showLock Keycloak.defaultOpts )
 
         LogOut ->
-            ( { model | state = Auth0.LoggedOut }, model.logOut () )
+            ( { model | state = Keycloak.LoggedOut }, model.logOut () )
 
 
-handleAuthResult : Auth0.RawAuthenticationResult -> Msg
+handleAuthResult : Keycloak.RawAuthenticationResult -> Msg
 handleAuthResult =
-    Auth0.mapResult >> AuthenticationResult
+    Keycloak.mapResult >> AuthenticationResult
 
 
-tryGetUserProfile : Model -> Maybe Auth0.UserProfile
+tryGetUserProfile : Model -> Maybe Keycloak.UserProfile
 tryGetUserProfile model =
     case model.state of
-        Auth0.LoggedIn user ->
+        Keycloak.LoggedIn user ->
             Just user.profile
 
-        Auth0.LoggedOut ->
+        Keycloak.LoggedOut ->
             Nothing
 
 
 isLoggedIn : Model -> Bool
 isLoggedIn model =
     case model.state of
-        Auth0.LoggedIn _ ->
+        Keycloak.LoggedIn _ ->
             True
 
-        Auth0.LoggedOut ->
+        Keycloak.LoggedOut ->
             False
