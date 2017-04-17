@@ -1,30 +1,29 @@
 module View.Home exposing (view)
 
 import Authentication
-import Keycloak
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Keycloak
 import Material.Button as Button
-import Material.Scheme
 import Material.Color as Color
+import Material.Icon as Icon
 import Material.Layout as Layout
 import Material.List as List
-import Material.Icon as Icon
-import Material.Options as Options exposing (css, when, Property, onClick)
+import Material.Options as Options exposing (Property, css, onClick, when)
+import Material.Scheme
 import Route exposing (Location(..), locFor)
-import Model exposing (Model)
-import Msg exposing (..)
+import Types exposing (Model, Msg)
 
 
 view : Model -> Keycloak.UserProfile -> Html Msg
 view model user =
     Material.Scheme.topWithScheme Color.Teal Color.LightGreen <|
-        Layout.render Mdl
+        Layout.render Types.Mdl
             model.mdl
             [ Layout.fixedHeader
             , Layout.fixedDrawer
             , Layout.selectedTab model.selectedTab
-            , Layout.onSelectTab SelectTab
+            , Layout.onSelectTab Types.SelectTab
             ]
             { header = mainHeader model
             , drawer = drawer model
@@ -90,7 +89,7 @@ menuItems =
 drawerMenuItem : Model -> MenuItem -> Html Msg
 drawerMenuItem model menuItem =
     Layout.link
-        [ Options.onClick <| NavigateTo <| menuItem.route
+        [ Options.onClick <| Types.NavigateTo <| menuItem.route
         , (if model.route == menuItem.route then
             Color.text <| Color.primaryContrast
            else
@@ -114,11 +113,11 @@ viewBody : Model -> Keycloak.UserProfile -> Html Msg
 viewBody model user =
     div
         [ style [ ( "padding", "2rem" ) ] ]
-        [ Button.render Mdl
+        [ Button.render Types.Mdl
             [ 0 ]
             model.mdl
             [ Options.onClick
-                (Msg.AuthenticationMsg Authentication.LogOut)
+                (Types.AuthenticationMsg Authentication.LogOut)
             , Options.css "margin" "0 24px"
             ]
             [ text "Logout" ]

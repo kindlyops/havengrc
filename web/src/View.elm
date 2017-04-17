@@ -2,8 +2,7 @@ module View exposing (view)
 
 import Authentication
 import Html exposing (Html)
-import Model exposing (Model)
-import Msg exposing (Msg)
+import Types exposing (Model, Msg)
 import View.Login
 import View.Home
 

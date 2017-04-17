@@ -1,11 +1,9 @@
 module API exposing (getRegulations)
 
-import Authentication
 import Http
 import Json.Decode as Decode exposing (Decoder, field, succeed)
-import Json.Encode as Encode
 import Regulation exposing (Regulation)
-import Msg exposing (Msg(..))
+import Types exposing (..)
 
 
 regulationDecoder : Decoder Regulation

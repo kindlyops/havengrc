@@ -1,29 +1,17 @@
 module Main exposing (..)
 
-import Authentication
 import Keycloak
-import Model exposing (Model)
-import Msg exposing (Msg(..))
 import Navigation
-import Ports exposing (keycloakAuthResult)
-import Update
+import State
+import Types exposing (..)
 import View
 
 
 main : Program (Maybe Keycloak.LoggedInUser) Model Msg
 main =
     Navigation.programWithFlags (UrlChange)
-        { init = Model.initialModel
-        , update = Update.update
-        , subscriptions = subscriptions
+        { init = State.init
+        , update = State.update
+        , subscriptions = State.subscriptions
         , view = View.view
         }
-
-
-
--- Subscriptions
-
-
-subscriptions : a -> Sub Msg
-subscriptions model =
-    keycloakAuthResult (Authentication.handleAuthResult >> Msg.AuthenticationMsg)

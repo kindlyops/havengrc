@@ -1,4 +1,4 @@
-module Msg exposing (Msg(..))
+module Types exposing (..)
 
 import Authentication
 import Http
@@ -8,7 +8,14 @@ import Regulation exposing (Regulation)
 import Route
 
 
--- Messages
+type alias Model =
+    { count : Int
+    , authModel : Authentication.Model
+    , route : Route.Model
+    , mdl : Material.Model
+    , selectedTab : Int
+    , regulations : List Regulation
+    }
 
 
 type Msg
