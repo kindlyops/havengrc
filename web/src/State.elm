@@ -1,12 +1,12 @@
 module State exposing (init, update, subscriptions)
 
 import Authentication
-import API
 import Http
 import Keycloak
 import Material
 import Navigation
 import Ports
+import Regulation.Rest exposing (getRegulations)
 import Route
 import Types exposing (..)
 
@@ -23,7 +23,7 @@ init initialUser location =
       , selectedTab = 0
       , regulations = []
       }
-    , API.getRegulations
+    , getRegulations
     )
 
 

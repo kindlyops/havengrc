@@ -1,4 +1,4 @@
-module Regulation exposing (Regulation)
+module Regulation.Types exposing (..)
 
 
 type alias Regulation =

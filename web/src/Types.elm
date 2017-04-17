@@ -4,7 +4,7 @@ import Authentication
 import Http
 import Material
 import Navigation
-import Regulation exposing (Regulation)
+import Regulation.Types
 import Route
 
 
@@ -14,7 +14,7 @@ type alias Model =
     , route : Route.Model
     , mdl : Material.Model
     , selectedTab : Int
-    , regulations : List Regulation
+    , regulations : List Regulation.Types.Regulation
     }
 
 
@@ -24,4 +24,4 @@ type Msg
     | SelectTab Int
     | NavigateTo (Maybe Route.Location)
     | UrlChange Navigation.Location
-    | NewRegulations (Result Http.Error (List Regulation))
+    | NewRegulations (Result Http.Error (List Regulation.Types.Regulation))

@@ -1,8 +1,8 @@
-module API exposing (getRegulations)
+module Regulation.Rest exposing (..)
 
 import Http
 import Json.Decode as Decode exposing (Decoder, field, succeed)
-import Regulation exposing (Regulation)
+import Regulation.Types exposing (..)
 import Types exposing (..)
 
 
