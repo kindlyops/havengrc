@@ -1,23 +1,41 @@
-module Update exposing (update)
+module State exposing (init, update, subscriptions)
 
 import Authentication
 import Http
+import Keycloak
 import Material
-import Model exposing (Model)
-import Msg exposing (Msg(..))
 import Navigation
-import Route exposing (Location(..))
+import Ports
+import Regulation.Rest exposing (getRegulations)
+import Route
+import Types exposing (..)
+
+
+init : Maybe Keycloak.LoggedInUser -> Navigation.Location -> ( Model, Cmd Msg )
+init initialUser location =
+    ( { count = 0
+      , authModel = (Authentication.init Ports.keycloakShowLock Ports.keycloakLogout initialUser)
+      , route =
+            Route.init Nothing
+
+      -- (Just location)
+      , mdl = Material.model
+      , selectedTab = 0
+      , regulations = []
+      }
+    , getRegulations
+    )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        AuthenticationMsg authMsg ->
+        Types.AuthenticationMsg authMsg ->
             let
                 ( authModel, cmd ) =
                     Authentication.update authMsg model.authModel
             in
-                ( { model | authModel = authModel }, Cmd.map AuthenticationMsg cmd )
+                ( { model | authModel = authModel }, Cmd.map Types.AuthenticationMsg cmd )
 
         -- When the `Mdl` messages come through, update appropriately.
         Mdl msg_ ->
@@ -72,3 +90,8 @@ update msg model =
                     Debug.log "DEBUG: " errorMessage
             in
                 ( model, Cmd.none )
+
+
+subscriptions : a -> Sub Msg
+subscriptions model =
+    Ports.keycloakAuthResult (Authentication.handleAuthResult >> AuthenticationMsg)
