@@ -1,7 +1,7 @@
 # Mappa Mundi
 [![CircleCI](https://circleci.com/gh/kindlyops/mappamundi.svg?style=svg)](https://circleci.com/gh/kindlyops/mappamundi)
 [![experimental](http://badges.github.io/stability-badges/dist/experimental.svg)](http://github.com/badges/stability-badges)
-
+[![Say Thanks!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/statik)
 Haven GRC is a modern risk & compliance dashboard for the cloud.
 
 This exposes a data model using [PostgREST](http://postgrest.com/).
