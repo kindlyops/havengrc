@@ -1,6 +1,9 @@
 ## Description
-<!--- Describe the changes in a way that would make sense to someone looking
-at the note a year from now, describe the big picture and reason -->
+Describe the changes in a way that would make sense to someone looking
+at the note a year from now, describe the big picture and reason.
+Feel free to delete any/all of this template if it does not make sense
+for your PR, such as a trivial change. 
+This is just a helpful starter template, not a rule.
 
 ## TODO / Discussion list
 <!-- it's often easier to discuss a change before it's totally done.
