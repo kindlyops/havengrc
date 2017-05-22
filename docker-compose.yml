@@ -4,7 +4,7 @@ volumes:
 
 services:
   tellform:
-      image: tellform/production:no_subdomains
+      image: havengrc-docker.jfrog.io/tellform/production:no_subdomains
       environment:
         - REDIS_URL=redis://redis-db:6379
         - MONGODB_URI=mongodb://mongo-db:27017/mean
@@ -20,15 +20,15 @@ services:
         - "3000:3000"
         - "5555:5555"
   mongo:
-      image: mongo
+      image: havengrc-docker.jfrog.io/mongo
       ports:
         - "27017:27017"
   redis:
-      image: redis
+      image: havengrc-docker.jfrog.io/redis
       ports:
         - "6379:6379"
   keycloak:
-    image: jboss/keycloak-postgres:3.0.0.Final
+    image: havengrc-docker.jfrog.io/jboss/keycloak-postgres:3.0.0.Final
     environment:
       - POSTGRES_DATABASE=mappamundi_dev
       - POSTGRES_USER=postgres
@@ -51,7 +51,7 @@ services:
     links:
       - db
   api:
-    image: begriffs/postgrest:v0.4.0.0
+    image: havengrc-docker.jfrog.io/begriffs/postgrest:v0.4.0.0
     command: [postgrest, "/config"]
     ports:
       - "3001:3000"
@@ -61,7 +61,7 @@ services:
     volumes:
       - ./postgrest/config:/config
   swagger:
-    image: swaggerapi/swagger-ui:v3.0.2
+    image: havengrc-docker.jfrog.io/swaggerapi/swagger-ui:v3.0.2
     ports:
       - "3002:8080"
     volumes:

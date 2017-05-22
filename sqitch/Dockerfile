@@ -1,4 +1,4 @@
-FROM perl:latest
+FROM havengrc-docker.jfrog.io/perl:latest
 RUN apt-get clean && apt-get update && apt-get -y install vim postgresql-client
 RUN cpan inc::latest
 RUN cpan App::Sqitch
