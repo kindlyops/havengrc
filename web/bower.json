@@ -17,6 +17,7 @@
   ],
   "dependencies": {
     "app-layout": "PolymerElements/app-layout#^2.0.0",
-    "paper-button": "^2.0.0"
+    "paper-button": "^2.0.0",
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^1.0.1"
   }
 }
