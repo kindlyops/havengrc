@@ -3,7 +3,6 @@ module State exposing (init, update, subscriptions)
 import Authentication
 import Http
 import Keycloak
-import Material
 import Navigation
 import Ports
 import Regulation.Rest exposing (getRegulations)
@@ -17,9 +16,7 @@ init initialUser location =
       , authModel = (Authentication.init Ports.keycloakShowLock Ports.keycloakLogout initialUser)
       , route =
             Route.init Nothing
-
-      -- (Just location)
-      , mdl = Material.model
+            -- (Just location)
       , selectedTab = 0
       , regulations = []
       }
@@ -36,10 +33,6 @@ update msg model =
                     Authentication.update authMsg model.authModel
             in
                 ( { model | authModel = authModel }, Cmd.map Types.AuthenticationMsg cmd )
-
-        -- When the `Mdl` messages come through, update appropriately.
-        Mdl msg_ ->
-            Material.update Mdl msg_ model
 
         NavigateTo maybeLocation ->
             case maybeLocation of
