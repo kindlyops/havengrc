@@ -6,7 +6,24 @@ Haven GRC is a modern risk & compliance dashboard for the cloud.
 
 This exposes a data model using [PostgREST](http://postgrest.com/).
 
-Web front end is in web/README.md
+Web front end is in web/
+
+## Learning Elm
+
+Why use Elm? Elm is both a framework and a language. Here is an excellent 16
+minute video by Richard Feldman that explains the framework architecture choices
+that Elm makes compared to jQuery and Flux. [From jQuery to Flux to Elm](https://www.youtube.com/watch?v=NgwQHGqIMbw).
+
+Elm is also a language that compiles to javascript. Here are some resources for
+learning Elm. In particular, the DailyDrip course is quite good, and provides
+several wonderful example applications that are MIT licensed and have been used
+to help bootstrap this application. You should subscribe to DailyDrip and support
+their work.
+
+ * Free elm course http://courses.knowthen.com/p/elm-for-beginners
+ * Daily Drip elm course that sends you a little bit of code each day to work on https://www.dailydrip.com/topics/elm
+ * Pragmatic Programmers course https://pragmaticstudio.com/elm
+ * Frontend Masters 2-day elm workshop https://frontendmasters.com/workshops/elm/
 
 ## run the service
 
