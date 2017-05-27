@@ -1,0 +1,23 @@
+{
+  "name": "havenweb",
+  "description": "",
+  "main": "",
+  "authors": [
+    "Elliot Murphy <statik@users.noreply.github.com>"
+  ],
+  "license": "apache2",
+  "homepage": "https://github.com/kindlyops/mappamundi",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "app-layout": "PolymerElements/app-layout#^2.0.0",
+    "paper-button": "^2.0.0",
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^1.0.1"
+  }
+}

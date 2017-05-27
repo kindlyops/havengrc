@@ -29,6 +29,22 @@
     <meta name="theme-color" content="#ffffff">
 
     <script src="/auth/js/keycloak.js"></script>
+    <script src="/bower_components/webcomponentsjs/webcomponents-loader.js"></script>
+    <script>
+      window.Polymer = {
+        dom: 'shadow'
+      };
+    </script>
+    <link rel="import" href="/bower_components/polymer/polymer.html">
+
+    <link rel="import" href="../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
+    <link rel="import" href="../bower_components/app-layout/app-drawer/app-drawer.html">
+    <link rel="import" href="../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
+    <link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
+    <link rel="import" href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
+    <link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
+
+    <link rel="import" href="/bower_components/paper-button/paper-button.html">
 </head>
 <body>
     <div id="root"></div>

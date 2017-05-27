@@ -9,6 +9,7 @@ repl-temp-*
 
 # Dependency directories
 node_modules
+bower_components
 
 # Desktop Services Store on macOS
 .DS_Store
