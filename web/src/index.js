@@ -15,6 +15,15 @@ var keycloak = Keycloak({
 var storedProfile = localStorage.getItem('profile');
 var storedToken = localStorage.getItem('token');
 var authData = storedProfile && storedToken ? { profile: JSON.parse(storedProfile), token: storedToken } : null;
+
+window.addEventListener('WebComponentsReady', function() {
+  // At this point we are guaranteed that all required polyfills have loaded,
+  // all HTML imports have loaded, and all defined custom elements have upgraded
+  // TODO We have a problem with flickering caused by elm
+  // emitting webcomponent tags before the webcomponent system is ready.
+  // unrecognized tags are simply rendered as an empty div by browers.
+});
+
 var elmApp = Elm.Main.embed(document.getElementById('root'), authData);
 
 options = { redirect_uri: 'http://localhost:2015/' };
@@ -48,8 +57,6 @@ elmApp.ports.keycloakShowLock.subscribe(function(opts) {
     // https://github.com/keycloak/keycloak-js-bower/blob/master/dist/keycloak.js#L506
   });
 });
-
-
 
 // Log out of keycloak
 elmApp.ports.keycloakLogout.subscribe(function(opts) {
