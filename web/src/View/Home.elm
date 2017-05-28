@@ -7,12 +7,73 @@ import Html.Events exposing (onClick)
 import Keycloak
 import Route exposing (Location(..), locFor)
 import Types exposing (Model, Msg)
+import WebComponents.App exposing (appDrawer, appDrawerLayout, appToolbar, appHeader, appHeaderLayout, ironSelector)
+
+
+header : Model -> Html Msg
+header model =
+    appHeaderLayout
+        [ attribute "has-scrolling-region" "" ]
+        [ appHeader
+            [ attribute "reveals" ""
+            ]
+            [ appToolbar
+                -- top toolbar
+                []
+                [ node "paper-icon-button"
+                    [ attribute "icon" "menu"
+                    , attribute "drawer-toggle" ""
+                      -- TODO add "hidden$=" attribute to hide when drawer is open
+                    ]
+                    []
+                , div
+                    [ attribute "main-title" "" ]
+                    []
+                ]
+            , appToolbar
+                -- bottom toolbar
+                []
+                []
+            ]
+        ]
 
 
 view : Model -> Keycloak.UserProfile -> Html Msg
 view model user =
-    div
+    appDrawerLayout
         []
+        [ appDrawer
+            [ attribute "slot" "drawer"
+            , attribute "id" "drawer"
+            ]
+            [ appHeaderLayout
+                [ attribute "has-scrolling-region" "" ]
+                [ appHeader [ attribute "fixed" "", attribute "slot" "header" ]
+                    [ appToolbar [] []
+                    , appToolbar [ classList [ ( "title-toolbar", True ), ( "nav-title-toolbar", True ) ] ]
+                        [ div [ class "title" ] [ text "Haven GRC" ] ]
+                    ]
+                , ironSelector
+                    [ class "nav-menu"
+                    , attribute "attr-for-selected" "name"
+                    ]
+                    [ a [ href "http://elm-lang.org/" ] [ text "item 1" ]
+                    , a [ href "http://elm-lang.org/" ] [ text "item 2" ]
+                    ]
+                ]
+            ]
+        , header model
+        , body model
+        ]
+
+
+body : Model -> Html Msg
+body model =
+    div
+        [ style
+            [ ( "min-height", "2000px" )
+            ]
+        ]
         [ text "This is the logged in view"
         , div
             []
