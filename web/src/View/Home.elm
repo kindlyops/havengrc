@@ -3,21 +3,136 @@ module View.Home exposing (view)
 import Authentication
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onClick)
+import Html.Events exposing (onClick, onWithOptions)
 import Keycloak
 import Route exposing (Location(..), locFor)
 import Types exposing (Model, Msg)
+import WebComponents.App exposing (appDrawer, appDrawerLayout, appToolbar, appHeader, appHeaderLayout, ironSelector)
+
+
+header : Model -> Html Msg
+header model =
+    appHeaderLayout
+        []
+        [ appHeader
+            [ attribute "fixed" ""
+            , attribute "effects" "waterfall"
+            ]
+            [ appToolbar
+                [ classList [ ( "title-toolbar", True ), ( "nav-title-toolbar", True ) ] ]
+                [ node "paper-icon-button"
+                    [ attribute "icon" "menu"
+                    , attribute "drawer-toggle" ""
+                      -- , hidden True
+                      -- TODO hide button in wide view
+                      -- TODO fix main toolbar scrolling offscreen for dashboard
+                    ]
+                    []
+                , div
+                    [ class "title" ]
+                    [ text "Haven GRC" ]
+                ]
+            ]
+        ]
 
 
 view : Model -> Keycloak.UserProfile -> Html Msg
 view model user =
-    div
+    appDrawerLayout
         []
-        [ text "This is the logged in view"
+        [ appDrawer
+            [ attribute "slot" "drawer"
+            , attribute "id" "drawer"
+            ]
+            [ appHeaderLayout
+                [ attribute "has-scrolling-region" "" ]
+                [ appHeader
+                    [ attribute "fixed" ""
+                    , attribute "slot" "header"
+                    , class "main-header"
+                    ]
+                    [ appToolbar [] [] ]
+                , ironSelector
+                    [ class "nav-menu"
+                    , attribute "attr-for-selected" "name"
+                    , attribute "selected" (selectedItem model)
+                    ]
+                    -- TODO refactor rendering of drawer items
+                    -- TODO make the icons more muted
+                    [ div
+                        [ attribute "name" "dashboard"
+                        , onClick <| Types.NavigateTo <| Just Home
+                        ]
+                        [ node "iron-icon" [ attribute "icon" "icons:dashboard" ] []
+                        , text (" " ++ "Dashboard")
+                        ]
+                    , div
+                        [ attribute "name" "reports"
+                        , onClick <| Types.NavigateTo <| Just Projects
+                        ]
+                        [ node "iron-icon" [ attribute "icon" "av:library-books" ] []
+                        , text (" " ++ "Reports")
+                        ]
+                    ]
+                ]
+            ]
+        , header model
+        , body model
+        ]
+
+
+selectedItem : Model -> String
+selectedItem model =
+    -- TODO refactor / clean up
+    case model.route of
+        Nothing ->
+            "dashboard"
+
+        Just Home ->
+            "dashboard"
+
+        Just Projects ->
+            "reports"
+
+        Just _ ->
+            "reports"
+
+
+body : Model -> Html Msg
+body model =
+    case model.route of
+        Nothing ->
+            dashboardBody model
+
+        Just Home ->
+            dashboardBody model
+
+        Just Projects ->
+            reportsBody model
+
+        Just _ ->
+            notFoundBody model
+
+
+dashboardBody : Model -> Html Msg
+dashboardBody model =
+    div
+        [ style
+            [ ( "min-height", "2000px" )
+            ]
+        ]
+        [ text "This is the dashboard view"
+        , div
+            []
+            [ a [ href "/auth/realms/havendev/account/" ]
+                [ node "paper-button"
+                    [ attribute "raised" "raised" ]
+                    [ text "Edit account" ]
+                ]
+            ]
         , div
             []
             [ node "paper-button"
-                -- Add this attribute
                 [ attribute "raised" "raised"
                 , onClick (Types.AuthenticationMsg Authentication.LogOut)
                 ]
@@ -26,23 +141,17 @@ view model user =
         ]
 
 
+reportsBody : Model -> Html Msg
+reportsBody model =
+    div [] [ text "This is the reports view" ]
 
--- view : Model -> Keycloak.UserProfile -> Html Msg
--- view model user =
---     Material.Scheme.topWithScheme Color.Teal Color.LightGreen <|
---         Layout.render Types.Mdl
---             model.mdl
---             [ Layout.fixedHeader
---             , Layout.fixedDrawer
---             , Layout.selectedTab model.selectedTab
---             , Layout.onSelectTab Types.SelectTab
---             ]
---             { header = mainHeader model
---             , drawer = drawer model
---             , tabs = ( [ text "Controls", text "Activities" ], [ Color.background (Color.color Color.Teal Color.S400) ] )
---             , main = [ viewBody model user ]
---             }
---
+
+notFoundBody : Model -> Html Msg
+notFoundBody model =
+    div [] [ text "This is the notFound view" ]
+
+
+
 --
 -- type alias MenuItem =
 --     { text : String
@@ -51,30 +160,6 @@ view model user =
 --     }
 --
 --
--- mainHeader : Model -> List (Html Msg)
--- mainHeader model =
---     []
---
---
--- drawHeader : Model -> Html Msg
--- drawHeader model =
---     let
---         ( name, avatar ) =
---             (case Authentication.tryGetUserProfile model.authModel of
---                 Nothing ->
---                     ( "unknown", "unknown" )
---
---                 Just user ->
---                     ( user.firstName, "" )
---              -- TODO figure out where to get avatar
---             )
---     in
---         (header
---             []
---             [ List.avatarImage avatar [ Options.css "margin-right" "16px" ]
---             , text name
---             ]
---         )
 --
 --
 -- drawer : Model -> List (Html Msg)

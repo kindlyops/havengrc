@@ -15,8 +15,7 @@ init initialUser location =
     ( { count = 0
       , authModel = (Authentication.init Ports.keycloakShowLock Ports.keycloakLogout initialUser)
       , route =
-            Route.init Nothing
-            -- (Just location)
+            Route.init (Just location)
       , selectedTab = 0
       , regulations = []
       }

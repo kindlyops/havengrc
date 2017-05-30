@@ -38,7 +38,20 @@ type alias Model =
 
 init : Maybe Navigation.Location -> Model
 init location =
-    locFor location
+    let
+        route =
+            locFor location
+
+        _ =
+            Debug.log "Route.init : " (toString route)
+    in
+        -- TODO when we are loaded with an invalid URL, the wildcard case
+        -- in locFor is giving us a route of Nothing, but the browser location
+        -- is invalid. In this case the address needs to be updated to the
+        -- URL that matches the route or we need to introduce a 404 route.
+        -- revisit routing when Elm 0.19 comes out to see if there are better
+        -- patterns we should be using
+        route
 
 
 urlFor : Location -> String
@@ -103,6 +116,9 @@ locFor path =
                     path.hash
                         |> split "/"
                         |> List.filter (\seg -> seg /= "" && seg /= "#")
+
+                _ =
+                    Debug.log "Route.locFor " (toString segments)
             in
                 case segments of
                     [ "login" ] ->
@@ -169,4 +185,8 @@ locFor path =
                             |> Maybe.map EditOrganization
 
                     _ ->
-                        Nothing
+                        let
+                            _ =
+                                Debug.log "Route.locFor resolved wildcard, location Nothing"
+                        in
+                            Nothing
