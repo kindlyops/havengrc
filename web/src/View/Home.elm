@@ -83,7 +83,7 @@ view model user =
                         , text (" " ++ "Reports")
                         ]
                     ]
-                  -- TODO figure out why this is not showing up
+                  -- TODO center in drawer, move to bottom
                 , node "iron-image" [ attribute "src" "/img/logo.png", attribute "id" "drawerlogo" ] []
                 ]
             ]
@@ -170,18 +170,6 @@ notFoundBody model =
 --     , route : Maybe Route.Location
 --     }
 --
---
---
---
--- drawer : Model -> List (Html Msg)
--- drawer model =
---     [ Layout.title [] [ drawHeader model ]
---     , Layout.navigation
---         [ Options.css "flex-grow" "1" ]
---         (List.map (drawerMenuItem model) menuItems)
---     ]
---
---
 -- menuItems : List MenuItem
 -- menuItems =
 --     [ { text = "Dashboard", iconName = "dashboard", route = Just Home }
@@ -217,28 +205,3 @@ notFoundBody model =
 --         ]
 --
 --
--- viewBody : Model -> Keycloak.UserProfile -> Html Msg
--- viewBody model user =
---     div
---         [ style [ ( "padding", "2rem" ) ] ]
---         [ Button.render Types.Mdl
---             [ 0 ]
---             model.mdl
---             [ Options.onClick
---                 (Types.AuthenticationMsg Authentication.LogOut)
---             , Options.css "margin" "0 24px"
---             ]
---             [ text "Logout" ]
---         , a [ href "http://localhost:8080/auth/realms/havendev/account/" ] [ text "Edit user profile" ]
---         , (case model.selectedTab of
---             0 ->
---                 ul []
---                     (List.map (\r -> li [] [ text r.description ]) model.regulations)
---
---             1 ->
---                 text "Second tab content"
---
---             _ ->
---                 text "We don't have this tab"
---           )
---         ]
