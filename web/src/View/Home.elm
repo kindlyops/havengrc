@@ -51,14 +51,23 @@ view model user =
                     , attribute "slot" "header"
                     , class "main-header"
                     ]
-                    [ appToolbar [] [] ]
+                    [ appToolbar []
+                        [ div
+                            [ class "title" ]
+                            [ text "Haven GRC" ]
+                        ]
+                    , appToolbar
+                        [ attribute "id" "profiletoolbar" ]
+                        [ node "ash-avatar" [ attribute "name" user.firstName ] []
+                        , text user.username
+                        ]
+                    ]
                 , ironSelector
                     [ class "nav-menu"
                     , attribute "attr-for-selected" "name"
                     , attribute "selected" (selectedItem model)
                     ]
                     -- TODO refactor rendering of drawer items
-                    -- TODO make the icons more muted
                     [ div
                         [ attribute "name" "dashboard"
                         , onClick <| Types.NavigateTo <| Just Home
@@ -74,6 +83,8 @@ view model user =
                         , text (" " ++ "Reports")
                         ]
                     ]
+                  -- TODO figure out why this is not showing up
+                , node "iron-image" [ attribute "src" "/img/logo.png", attribute "id" "drawerlogo" ] []
                 ]
             ]
         , header model

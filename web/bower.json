@@ -21,6 +21,8 @@
     "webcomponentsjs": "webcomponents/webcomponentsjs#^1.0.1",
     "paper-icon-button": "^2.0.0",
     "iron-icons": "^2.0.0",
-    "iron-selector": "PolymerElements/iron-selector#^2.0.0"
+    "iron-selector": "PolymerElements/iron-selector#^2.0.0",
+    "iron-image": "PolymerElements/iron-image#^2.1.0",
+    "ash-avatar": "tegola/ash-avatar#^1.0.3"
   }
 }

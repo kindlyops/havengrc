@@ -48,6 +48,8 @@
     <link rel="import" href="/bower_components/iron-icons/iron-icons.html">
     <link rel="import" href="/bower_components/paper-icon-button/paper-icon-button.html">
     <link rel="import" href="/bower_components/iron-icons/av-icons.html">
+    <link rel="import" href="/bower_components/iron-image/iron-image.html">
+    <link rel="import" href="/bower_components/ash-avatar/ash-avatar.html">
 
     <link rel="import" href="/bower_components/iron-selector/iron-selector.html">
     <!--  TODO migrate this CSS to SASS or elm-css outside this file -->
@@ -62,6 +64,10 @@
         font-family: 'Roboto', Helvetica, sans-serif;
         color: white;
         --app-toolbar-font-size: 24px;
+      }
+      #profiletoolbar {
+        background-color: #333333;
+        font-size: 15px;
       }
       app-drawer {
         / * TODO figure out why this background color isn't working */
@@ -81,6 +87,9 @@
       }
       .nav-menu > div.iron-selected {
         background-color: #888;
+      }
+      #drawerlogo {
+        @apply --layout-center-center;
       }
       .title-toolbar {
         @apply --layout-center-center;
