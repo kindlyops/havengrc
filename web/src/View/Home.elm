@@ -28,9 +28,6 @@ header model =
                       -- TODO fix main toolbar scrolling offscreen for dashboard
                     ]
                     []
-                , div
-                    [ class "title" ]
-                    [ text "Haven GRC" ]
                 ]
             ]
         ]

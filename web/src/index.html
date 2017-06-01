@@ -85,15 +85,14 @@
       #drawer > app-header-layout > iron-selector > div > iron-icon {
         color: lightgray;
       }
+      app-drawer-layout:not([narrow]) [drawer-toggle] {
+        display: none;
+      }
       .nav-menu > div.iron-selected {
         background-color: #888;
       }
       #drawerlogo {
         @apply --layout-center-center;
-      }
-      .title-toolbar {
-        @apply --layout-center-center;
-        box-sizing: border-box;
       }
 
       [hidden] {
