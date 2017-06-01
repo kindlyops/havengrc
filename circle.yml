@@ -22,7 +22,12 @@ dependencies:
         make && make install;
         cd ..;
       fi
+    - curl -o- -L https://yarnpkg.com/install.sh | bash
     - $HOME/$CIRCLE_PROJECT_REPONAME/sysconfcpus/bin/sysconfcpus -n 2 npm install --only=dev:
+        timeout: 900
+        pwd:
+          web
+    - $HOME/$CIRCLE_PROJECT_REPONAME/sysconfcpus/bin/sysconfcpus -n 2 bower install:
         timeout: 900
         pwd:
           web
