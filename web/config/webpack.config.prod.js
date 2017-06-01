@@ -44,8 +44,8 @@ module.exports = {
         }
       },
       {
-        test: /\.css$/,
-        loader: ExtractTextPlugin.extract('style', 'css?-autoprefixer!postcss')
+        test: /\.scss$/,
+        loader: ExtractTextPlugin.extract('style', 'css?-autoprefixer!postcss!sass!import-glob')
       },
       {
         test: /\.(ico|jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2)(\?.*)?$/,

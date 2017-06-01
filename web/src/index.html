@@ -54,50 +54,6 @@
     <link rel="import" href="/bower_components/iron-selector/iron-selector.html">
     <!--  TODO migrate this CSS to SASS or elm-css outside this file -->
     <style is="custom-style">
-      body {
-        /* No margin on body so toolbar can span the screen */
-        margin: 0;
-      }
-      app-toolbar {
-        /* Toolbar is the main header, so give it some color */
-        background-color: #E86953;
-        font-family: 'Roboto', Helvetica, sans-serif;
-        color: white;
-        --app-toolbar-font-size: 24px;
-      }
-      #profiletoolbar {
-        background-color: #333333;
-        font-size: 15px;
-      }
-      app-drawer {
-        / * TODO figure out why this background color isn't working */
-        background-color: #F3F4F4;
-      }
-      .nav-menu > div {
-        display: block;
-        padding: 12px 16px;
-        font-size: 20px;
-        font-weight: 500;
-      }
-      #drawer > app-header-layout > iron-selector {
-        cursor: pointer;
-      }
-      #drawer > app-header-layout > iron-selector > div > iron-icon {
-        color: lightgray;
-      }
-      app-drawer-layout:not([narrow]) [drawer-toggle] {
-        display: none;
-      }
-      .nav-menu > div.iron-selected {
-        background-color: #888;
-      }
-      #drawerlogo {
-        @apply --layout-center-center;
-      }
-
-      [hidden] {
-        display: none;
-      }
     </style>
 </head>
 <body>

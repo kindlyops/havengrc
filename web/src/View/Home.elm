@@ -23,9 +23,7 @@ header model =
                 [ node "paper-icon-button"
                     [ attribute "icon" "menu"
                     , attribute "drawer-toggle" ""
-                      -- , hidden True
-                      -- TODO hide button in wide view
-                      -- TODO fix main toolbar scrolling offscreen for dashboard
+                      -- TODO fix main toolbar scrolling offscreen for dashboard with long content
                     ]
                     []
                 ]

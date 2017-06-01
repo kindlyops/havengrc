@@ -25,6 +25,17 @@ their work.
  * Pragmatic Programmers course https://pragmaticstudio.com/elm
  * Frontend Masters 2-day elm workshop https://frontendmasters.com/workshops/elm/
 
+### Design framework and tooling.
+
+We are making use of the [Material Design](https://material.io/guidelines/)
+system as a base for our design. We are also using Web Components,
+specifically the [PolymerElements](https://www.webcomponents.org/author/PolymerElements)
+collections which are implementations of common elements that follow Material Design.
+
+Within the app we are using [SASS](http://sass-lang.com/), and the guidance from
+[Inverted Triangle CSS](https://www.xfive.co/blog/itcss-scalable-maintainable-css-architecture/) 
+and [Reasonable CSS](http://rscss.io/) to try and keep the CSS manageable.
+
 ## run the service
 
 The db schema and migrations are managed using sqitch.
