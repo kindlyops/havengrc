@@ -79,7 +79,16 @@ view model user =
                         ]
                     ]
                   -- TODO center in drawer, move to bottom
-                , node "iron-image" [ attribute "src" "/img/logo.png", attribute "id" "drawerlogo" ] []
+                , div
+                    [ class "layout vertical fit"
+                    ]
+                    [ div [ class "layout flex" ] []
+                    , node "iron-image"
+                        [ attribute "src" "/img/logo.png"
+                        , attribute "id" "drawerlogo"
+                        ]
+                        []
+                    ]
                 ]
             ]
         , header model
