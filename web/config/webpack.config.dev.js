@@ -48,8 +48,8 @@ module.exports = {
         loader: 'elm-hot!elm-webpack?verbose=true&warn=true&debug=true&pathToMake=' + paths.elmMake
       },
       {
-        test: /\.css$/,
-        loader: 'style!css!postcss'
+        test: /\.scss$/,
+        loader: 'style!css!postcss!sass!import-glob'
       },
       {
         test: /\.(ico|jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2)(\?.*)?$/,

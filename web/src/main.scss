@@ -1,0 +1,48 @@
+body {
+  /* No margin on body so toolbar can span the screen */
+  margin: 0;
+}
+
+.elm-overlay {
+  /* make sure the elm time-travel control is on top */
+  z-index: 999;
+}
+
+app-toolbar {
+  /* Toolbar is the main header, so give it some color */
+  background-color: #E86953;
+  font-family: 'Roboto', Helvetica, sans-serif;
+  color: white;
+  --app-toolbar-font-size: 24px;
+}
+
+#profiletoolbar {
+  background-color: #333333;
+  font-size: 15px;
+}
+
+.nav-menu > div {
+  display: block;
+  padding: 12px 16px;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+#drawer > app-header-layout > iron-selector {
+  cursor: pointer;
+  > div > iron-icon {
+    color: lightgray;
+  }
+}
+
+app-drawer-layout:not([narrow]) [drawer-toggle] {
+  display: none;
+}
+
+.nav-menu > div.iron-selected {
+  background-color: #888;
+}
+
+[hidden] {
+  display: none;
+}

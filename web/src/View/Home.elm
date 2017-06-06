@@ -23,14 +23,9 @@ header model =
                 [ node "paper-icon-button"
                     [ attribute "icon" "menu"
                     , attribute "drawer-toggle" ""
-                      -- , hidden True
-                      -- TODO hide button in wide view
-                      -- TODO fix main toolbar scrolling offscreen for dashboard
+                      -- TODO fix main toolbar scrolling offscreen for dashboard with long content
                     ]
                     []
-                , div
-                    [ class "title" ]
-                    [ text "Haven GRC" ]
                 ]
             ]
         ]
@@ -51,14 +46,23 @@ view model user =
                     , attribute "slot" "header"
                     , class "main-header"
                     ]
-                    [ appToolbar [] [] ]
+                    [ appToolbar []
+                        [ div
+                            [ class "title" ]
+                            [ text "Haven GRC" ]
+                        ]
+                    , appToolbar
+                        [ attribute "id" "profiletoolbar" ]
+                        [ node "ash-avatar" [ attribute "name" user.firstName ] []
+                        , text user.username
+                        ]
+                    ]
                 , ironSelector
                     [ class "nav-menu"
                     , attribute "attr-for-selected" "name"
                     , attribute "selected" (selectedItem model)
                     ]
                     -- TODO refactor rendering of drawer items
-                    -- TODO make the icons more muted
                     [ div
                         [ attribute "name" "dashboard"
                         , onClick <| Types.NavigateTo <| Just Home
@@ -73,6 +77,17 @@ view model user =
                         [ node "iron-icon" [ attribute "icon" "av:library-books" ] []
                         , text (" " ++ "Reports")
                         ]
+                    ]
+                  -- TODO center in drawer, move to bottom
+                , div
+                    [ class "layout vertical fit"
+                    ]
+                    [ div [ class "layout flex" ] []
+                    , node "iron-image"
+                        [ attribute "src" "/img/logo.png"
+                        , attribute "id" "drawerlogo"
+                        ]
+                        []
                     ]
                 ]
             ]
@@ -159,18 +174,6 @@ notFoundBody model =
 --     , route : Maybe Route.Location
 --     }
 --
---
---
---
--- drawer : Model -> List (Html Msg)
--- drawer model =
---     [ Layout.title [] [ drawHeader model ]
---     , Layout.navigation
---         [ Options.css "flex-grow" "1" ]
---         (List.map (drawerMenuItem model) menuItems)
---     ]
---
---
 -- menuItems : List MenuItem
 -- menuItems =
 --     [ { text = "Dashboard", iconName = "dashboard", route = Just Home }
@@ -206,28 +209,3 @@ notFoundBody model =
 --         ]
 --
 --
--- viewBody : Model -> Keycloak.UserProfile -> Html Msg
--- viewBody model user =
---     div
---         [ style [ ( "padding", "2rem" ) ] ]
---         [ Button.render Types.Mdl
---             [ 0 ]
---             model.mdl
---             [ Options.onClick
---                 (Types.AuthenticationMsg Authentication.LogOut)
---             , Options.css "margin" "0 24px"
---             ]
---             [ text "Logout" ]
---         , a [ href "http://localhost:8080/auth/realms/havendev/account/" ] [ text "Edit user profile" ]
---         , (case model.selectedTab of
---             0 ->
---                 ul []
---                     (List.map (\r -> li [] [ text r.description ]) model.regulations)
---
---             1 ->
---                 text "Second tab content"
---
---             _ ->
---                 text "We don't have this tab"
---           )
---         ]
