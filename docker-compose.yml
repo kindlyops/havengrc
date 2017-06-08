@@ -3,30 +3,38 @@ volumes:
   database:
 
 services:
-  tellform:
-      image: havengrc-docker.jfrog.io/tellform/production:no_subdomains
-      environment:
-        - REDIS_URL=redis://redis-db:6379
-        - MONGODB_URI=mongodb://mongo-db:27017/mean
-        - CREATE_ADMIN_ACCOUNT=TRUE
-        - SUBDOMAINS_DISABLED=TRUE
-        - BASE_URL=localhost
-        - SOCKET_URL=localhost
-        - SOCKET_PORT=5555
-      links:
-        - redis:redis-db
-        - mongo:mongo-db
-      ports:
-        - "3000:3000"
-        - "5555:5555"
-  mongo:
-      image: havengrc-docker.jfrog.io/mongo
-      ports:
-        - "27017:27017"
-  redis:
-      image: havengrc-docker.jfrog.io/redis
-      ports:
-        - "6379:6379"
+  # tellform:
+  #     image: havengrc-docker.jfrog.io/tellform/production:no_subdomains
+  #     environment:
+  #       - REDIS_URL=redis://redis-db:6379
+  #       - MONGODB_URI=mongodb://mongo-db:27017/mean
+  #       - CREATE_ADMIN_ACCOUNT=TRUE
+  #       - SUBDOMAINS_DISABLED=TRUE
+  #       - BASE_URL=localhost
+  #       - SOCKET_URL=localhost
+  #       - SOCKET_PORT=5555
+  #     links:
+  #       - redis:redis-db
+  #       - mongo:mongo-db
+  #     ports:
+  #       - "3000:3000"
+  #       - "5555:5555"
+  # mongo:
+  #     image: havengrc-docker.jfrog.io/mongo
+  #     ports:
+  #       - "27017:27017"
+  # redis:
+  #     image: havengrc-docker.jfrog.io/redis
+  #     ports:
+  #       - "6379:6379"
+  # marketing:
+  #   volumes:
+  #     - ./marketing/public:/public
+  #   build:
+  #     context: .
+  #     dockerfile: ./marketing/Dockerfile
+  #   ports:
+  #     - "5000:2015"
   keycloak:
     image: havengrc-docker.jfrog.io/jboss/keycloak-postgres:3.0.0.Final
     environment:
@@ -89,11 +97,3 @@ services:
       - "2015:2015"
     command: [/code/installrun.sh]
     env_file: .env
-  marketing:
-    volumes:
-      - ./marketing/public:/public
-    build:
-      context: .
-      dockerfile: ./marketing/Dockerfile
-    ports:
-      - "5000:2015"
