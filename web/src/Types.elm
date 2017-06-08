@@ -18,7 +18,6 @@ type alias Model =
 
 type Msg
     = AuthenticationMsg Authentication.Msg
-    | SelectTab Int
     | NavigateTo (Maybe Route.Location)
     | UrlChange Navigation.Location
     | NewRegulations (Result Http.Error (List Regulation.Types.Regulation))

@@ -48,13 +48,6 @@ update msg model =
             in
                 { model | route = Route.locFor (Just location) } ! []
 
-        SelectTab num ->
-            let
-                _ =
-                    Debug.log "SelectTab: " num
-            in
-                { model | selectedTab = num } ! []
-
         NewRegulations (Ok regulations) ->
             let
                 _ =
