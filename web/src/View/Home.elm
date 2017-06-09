@@ -40,7 +40,7 @@ view model user =
         []
         [ appDrawer
             [ attribute "slot" "drawer"
-            , attribute "id" "drawer"
+            , id "drawer"
             ]
             [ appHeaderLayout
                 [ attribute "has-scrolling-region" "" ]
@@ -55,7 +55,7 @@ view model user =
                             [ text "Haven GRC" ]
                         ]
                     , appToolbar
-                        [ attribute "id" "profiletoolbar" ]
+                        [ id "profiletoolbar" ]
                         [ node "ash-avatar" [ attribute "name" user.firstName ] []
                         , text user.username
                         ]
@@ -68,7 +68,7 @@ view model user =
                     (List.map drawerMenuItem menuItems)
                 , node "iron-image"
                     [ attribute "src" "/img/logo.png"
-                    , attribute "id" "drawerlogo"
+                    , id "drawerlogo"
                     ]
                     []
                 ]
@@ -160,6 +160,8 @@ regulationsForm : Model -> Html Msg
 regulationsForm model =
     node "iron-form"
         []
+        -- TODO wire up a handler to save the data from these inputs into
+        -- our model when they change
         [ node "paper-input" [ attribute "label" "URL" ] []
         , node "paper-input" [ attribute "label" "identifier" ] []
         , node "paper-textarea" [ attribute "label" "description" ] []
