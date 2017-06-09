@@ -43,6 +43,12 @@ app-drawer-layout:not([narrow]) [drawer-toggle] {
   background-color: #888;
 }
 
+#drawerlogo{
+  position: absolute;
+  bottom: 5%;
+  left: 34%;
+}
+
 [hidden] {
   display: none;
 }

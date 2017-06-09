@@ -66,18 +66,11 @@ view model user =
                     , attribute "selected" (selectedItem model)
                     ]
                     (List.map drawerMenuItem menuItems)
-
-                -- TODO center in drawer, move to bottom
-                , div
-                    [ class "layout vertical fit"
+                , node "iron-image"
+                    [ attribute "src" "/img/logo.png"
+                    , attribute "id" "drawerlogo"
                     ]
-                    [ div [ class "layout flex" ] []
-                    , node "iron-image"
-                        [ attribute "src" "/img/logo.png"
-                        , attribute "id" "drawerlogo"
-                        ]
-                        []
-                    ]
+                    []
                 ]
             ]
         , header model
