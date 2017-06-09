@@ -22,7 +22,9 @@
     "paper-icon-button": "^2.0.0",
     "iron-icons": "^2.0.0",
     "iron-selector": "PolymerElements/iron-selector#^2.0.0",
-    "ash-avatar": "tegola/ash-avatar#^1.0.3"
+    "ash-avatar": "tegola/ash-avatar#^1.0.3",
+    "iron-form": "PolymerElements/iron-form#^1.1.5",
+    "paper-input": "PolymerElements/paper-input#^2.0.1"
   },
   "resolutions": {
     "iron-flex-layout": "^1.3.1",
