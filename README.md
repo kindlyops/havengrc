@@ -118,6 +118,24 @@ Sometimes messing with logins and cookies you get stuff corrupted and need
 to invalidate a session/drop some cookies/tokens that were in localstorage.
 Visit chrome://settings/cookies#cont and search for localhost.
 
+## Testing on a real mobile device
+
+It's often useful to test your dev code on a variety of real world phones
+and tablets so you can confirm UI behavior. The easiest way to do this is
+with a tool called [ngrok](https://ngrok.com). ngrok creates a public URL
+to a local webserver. If you use ngrok, it's worth signing up for the free
+plan at least. You will be able to inspect the traffic going over the tunnel,
+and use http auth credentials to protect access to your tunnel and those you
+share it with.
+
+If you have a free ngrok plan, something like this should work
+
+    ngrok http -auth "user:password" 2015
+
+If you have a paid ngrok plan, something like this should work
+
+    ngrok http -auth "user:password" -subdomain=$USER-haven 2015
+
 ## add a database migration
 
     docker-compose run sqitch add foo -n "Add the foo table"
