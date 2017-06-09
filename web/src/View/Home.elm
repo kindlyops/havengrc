@@ -155,7 +155,11 @@ reportsBody model =
 
 regulationsBody : Model -> Html Msg
 regulationsBody model =
-    div [] [ text "This is the regulations view" ]
+    div []
+        [ text "This is the regulations view"
+        , ul []
+            (List.map (\l -> li [] [ text l.description ]) model.regulations)
+        ]
 
 
 activityBody : Model -> Html Msg
