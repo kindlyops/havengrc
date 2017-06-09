@@ -33,7 +33,7 @@ specifically the [PolymerElements](https://www.webcomponents.org/author/PolymerE
 collections which are implementations of common elements that follow Material Design.
 
 Within the app we are using [SASS](http://sass-lang.com/), and the guidance from
-[Inverted Triangle CSS](https://www.xfive.co/blog/itcss-scalable-maintainable-css-architecture/) 
+[Inverted Triangle CSS](https://www.xfive.co/blog/itcss-scalable-maintainable-css-architecture/)
 and [Reasonable CSS](http://rscss.io/) to try and keep the CSS manageable.
 
 ## run the service
@@ -53,6 +53,7 @@ If you don't have docker running, use the instructions at https://docs.docker.co
 At the time of writing, this is working fine with docker 1.12.
 
 Create an .env file in the project root:
+
     touch .env
     echo KEYCLOAK_CLIENT_ID=havendev >> .env
 
