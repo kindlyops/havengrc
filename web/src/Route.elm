@@ -18,6 +18,7 @@ import Navigation
 type Location
     = Login
     | Home
+    | Activity
     | Reports
     | Regulations
     | NewRegulation
@@ -66,6 +67,9 @@ urlFor loc =
                 Reports ->
                     "/reports"
 
+                Activity ->
+                    "/activity"
+
                 Regulations ->
                     "/regulations"
 
@@ -103,6 +107,9 @@ locFor path =
 
                     [] ->
                         Just Home
+
+                    [ "activity" ] ->
+                        Just Activity
 
                     [ "reports" ] ->
                         Just Reports

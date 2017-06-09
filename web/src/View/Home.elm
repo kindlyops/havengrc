@@ -87,22 +87,16 @@ view model user =
 
 selectedItem : Model -> String
 selectedItem model =
-    -- TODO refactor / clean up
-    case model.route of
-        Nothing ->
-            "dashboard"
+    let
+        item =
+            List.head (List.filter (\m -> m.route == model.route) menuItems)
+    in
+        case item of
+            Nothing ->
+                "dashboard"
 
-        Just Home ->
-            "dashboard"
-
-        Just Reports ->
-            "reports"
-
-        Just Regulations ->
-            "regulations"
-
-        Just _ ->
-            ""
+            Just item ->
+                String.toLower item.text
 
 
 body : Model -> Html Msg
@@ -119,6 +113,9 @@ body model =
 
         Just Regulations ->
             regulationsBody model
+
+        Just Activity ->
+            activityBody model
 
         Just _ ->
             notFoundBody model
@@ -161,6 +158,11 @@ regulationsBody model =
     div [] [ text "This is the regulations view" ]
 
 
+activityBody : Model -> Html Msg
+activityBody model =
+    div [] [ text "This is the activity view" ]
+
+
 notFoundBody : Model -> Html Msg
 notFoundBody model =
     div [] [ text "This is the notFound view" ]
@@ -176,7 +178,7 @@ type alias MenuItem =
 menuItems : List MenuItem
 menuItems =
     [ { text = "Dashboard", iconName = "icons:dashboard", route = Just Home }
-    , { text = "Activity", iconName = "icons:history", route = Nothing }
+    , { text = "Activity", iconName = "icons:history", route = Just Activity }
     , { text = "Reports", iconName = "av:library-books", route = Just Reports }
     , { text = "Regulations", iconName = "icons:gavel", route = Just Regulations }
     ]
