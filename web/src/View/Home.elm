@@ -133,14 +133,14 @@ dashboardBody model =
             []
             [ a [ href "/auth/realms/havendev/account/" ]
                 [ node "paper-button"
-                    [ attribute "raised" "raised" ]
+                    [ attribute "raised" "" ]
                     [ text "Edit account" ]
                 ]
             ]
         , div
             []
             [ node "paper-button"
-                [ attribute "raised" "raised"
+                [ attribute "raised" ""
                 , onClick (Types.AuthenticationMsg Authentication.LogOut)
                 ]
                 [ text "Logout" ]
@@ -159,6 +159,24 @@ regulationsBody model =
         [ text "This is the regulations view"
         , ul []
             (List.map (\l -> li [] [ text l.description ]) model.regulations)
+        , regulationsForm model
+        ]
+
+
+regulationsForm : Model -> Html Msg
+regulationsForm model =
+    node "iron-form"
+        []
+        [ node "paper-input" [ attribute "label" "URL" ] []
+        , node "paper-input" [ attribute "label" "identifier" ] []
+        , node "paper-textarea" [ attribute "label" "description" ] []
+        , node "paper-button"
+            [ attribute "raised" ""
+
+            -- TODO add a POST task to the Regulation type and fire it off
+            -- , onClick (Types.AuthenticationMsg Authentication.LogOut)
+            ]
+            [ text "Add" ]
         ]
 
 
