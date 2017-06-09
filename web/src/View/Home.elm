@@ -1,11 +1,13 @@
 module View.Home exposing (view)
 
 import Authentication
+import List exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onWithOptions)
 import Keycloak
 import Route exposing (Location(..), locFor)
+import String exposing (toLower)
 import Types exposing (Model, Msg)
 import WebComponents.App exposing (appDrawer, appDrawerLayout, appToolbar, appHeader, appHeaderLayout, ironSelector)
 
@@ -23,7 +25,8 @@ header model =
                 [ node "paper-icon-button"
                     [ attribute "icon" "menu"
                     , attribute "drawer-toggle" ""
-                      -- TODO fix main toolbar scrolling offscreen for dashboard with long content
+
+                    -- TODO fix main toolbar scrolling offscreen for dashboard with long content
                     ]
                     []
                 ]
@@ -62,23 +65,9 @@ view model user =
                     , attribute "attr-for-selected" "name"
                     , attribute "selected" (selectedItem model)
                     ]
-                    -- TODO refactor rendering of drawer items
-                    [ div
-                        [ attribute "name" "dashboard"
-                        , onClick <| Types.NavigateTo <| Just Home
-                        ]
-                        [ node "iron-icon" [ attribute "icon" "icons:dashboard" ] []
-                        , text (" " ++ "Dashboard")
-                        ]
-                    , div
-                        [ attribute "name" "reports"
-                        , onClick <| Types.NavigateTo <| Just Projects
-                        ]
-                        [ node "iron-icon" [ attribute "icon" "av:library-books" ] []
-                        , text (" " ++ "Reports")
-                        ]
-                    ]
-                  -- TODO center in drawer, move to bottom
+                    (List.map drawerMenuItem menuItems)
+
+                -- TODO center in drawer, move to bottom
                 , div
                     [ class "layout vertical fit"
                     ]
@@ -106,11 +95,14 @@ selectedItem model =
         Just Home ->
             "dashboard"
 
-        Just Projects ->
+        Just Reports ->
             "reports"
 
+        Just Regulations ->
+            "regulations"
+
         Just _ ->
-            "reports"
+            ""
 
 
 body : Model -> Html Msg
@@ -122,8 +114,11 @@ body model =
         Just Home ->
             dashboardBody model
 
-        Just Projects ->
+        Just Reports ->
             reportsBody model
+
+        Just Regulations ->
+            regulationsBody model
 
         Just _ ->
             notFoundBody model
@@ -161,51 +156,38 @@ reportsBody model =
     div [] [ text "This is the reports view" ]
 
 
+regulationsBody : Model -> Html Msg
+regulationsBody model =
+    div [] [ text "This is the regulations view" ]
+
+
 notFoundBody : Model -> Html Msg
 notFoundBody model =
     div [] [ text "This is the notFound view" ]
 
 
+type alias MenuItem =
+    { text : String
+    , iconName : String
+    , route : Maybe Route.Location
+    }
 
---
--- type alias MenuItem =
---     { text : String
---     , iconName : String
---     , route : Maybe Route.Location
---     }
---
--- menuItems : List MenuItem
--- menuItems =
---     [ { text = "Dashboard", iconName = "dashboard", route = Just Home }
---     , { text = "Users", iconName = "group", route = Just Users }
---     , { text = "Last Activity", iconName = "alarm", route = Nothing }
---     , { text = "Timesheets", iconName = "event", route = Nothing }
---     , { text = "Reports", iconName = "list", route = Nothing }
---     , { text = "Organizations", iconName = "store", route = Just Organizations }
---     , { text = "Projects", iconName = "view_list", route = Just Projects }
---     ]
---
---
--- drawerMenuItem : Model -> MenuItem -> Html Msg
--- drawerMenuItem model menuItem =
---     Layout.link
---         [ Options.onClick <| Types.NavigateTo <| menuItem.route
---         , (if model.route == menuItem.route then
---             Color.text <| Color.primaryContrast
---            else
---             Color.text <| Color.primaryDark
---           )
---         , Options.css "font-weight" "500"
---         , Options.css "cursor" "pointer"
---
---         -- http://outlinenone.com/ TODO: tl;dr don't do this (from Elm Daily Drip example)
---         -- should be using ":focus { outline: 0 }" but can't with inline styles so hack
---         , Options.css "outline" "none"
---         ]
---         [ Icon.view menuItem.iconName
---             [ Options.css "margin-right" "32px"
---             ]
---         , text menuItem.text
---         ]
---
---
+
+menuItems : List MenuItem
+menuItems =
+    [ { text = "Dashboard", iconName = "icons:dashboard", route = Just Home }
+    , { text = "Activity", iconName = "icons:history", route = Nothing }
+    , { text = "Reports", iconName = "av:library-books", route = Just Reports }
+    , { text = "Regulations", iconName = "icons:gavel", route = Just Regulations }
+    ]
+
+
+drawerMenuItem : MenuItem -> Html Msg
+drawerMenuItem menuItem =
+    div
+        [ attribute "name" (toLower menuItem.text)
+        , onClick <| Types.NavigateTo <| menuItem.route
+        ]
+        [ node "iron-icon" [ attribute "icon" menuItem.iconName ] []
+        , text (" " ++ menuItem.text)
+        ]

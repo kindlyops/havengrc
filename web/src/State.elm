@@ -12,15 +12,18 @@ import Types exposing (..)
 
 init : Maybe Keycloak.LoggedInUser -> Navigation.Location -> ( Model, Cmd Msg )
 init initialUser location =
-    ( { count = 0
-      , authModel = (Authentication.init Ports.keycloakShowLock Ports.keycloakLogout initialUser)
-      , route =
+    let
+        ( route, routeCmd ) =
             Route.init (Just location)
-      , selectedTab = 0
-      , regulations = []
-      }
-    , getRegulations
-    )
+    in
+        ( { count = 0
+          , authModel = (Authentication.init Ports.keycloakShowLock Ports.keycloakLogout initialUser)
+          , route = route
+          , selectedTab = 0
+          , regulations = []
+          }
+        , Cmd.batch [ routeCmd, getRegulations ]
+        )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )

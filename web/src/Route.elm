@@ -18,25 +18,18 @@ import Navigation
 type Location
     = Login
     | Home
-    | Users
-    | NewUser
-    | ShowUser Int
-    | EditUser Int
-    | Projects
-    | NewProject
-    | ShowProject Int
-    | EditProject Int
-    | Organizations
-    | NewOrganization
-    | ShowOrganization Int
-    | EditOrganization Int
+    | Reports
+    | Regulations
+    | NewRegulation
+    | ShowRegulation Int
+    | EditRegulation Int
 
 
 type alias Model =
     Maybe Location
 
 
-init : Maybe Navigation.Location -> Model
+init : Maybe Navigation.Location -> ( Model, Cmd msg )
 init location =
     let
         route =
@@ -51,7 +44,12 @@ init location =
         -- URL that matches the route or we need to introduce a 404 route.
         -- revisit routing when Elm 0.19 comes out to see if there are better
         -- patterns we should be using
-        route
+        case route of
+            Nothing ->
+                ( route, Navigation.newUrl (urlFor Home) )
+
+            _ ->
+                ( route, Cmd.none )
 
 
 urlFor : Location -> String
@@ -65,41 +63,20 @@ urlFor loc =
                 Home ->
                     "/"
 
-                Users ->
-                    "/users"
+                Reports ->
+                    "/reports"
 
-                NewUser ->
-                    "/users/new"
+                Regulations ->
+                    "/regulations"
 
-                ShowUser id ->
-                    "/users/" ++ (toString id)
+                NewRegulation ->
+                    "/regulations/new"
 
-                EditUser id ->
-                    "/users/" ++ (toString id) ++ "/edit"
+                ShowRegulation id ->
+                    "/regulations/" ++ (toString id)
 
-                Projects ->
-                    "/projects"
-
-                NewProject ->
-                    "/projects/new"
-
-                ShowProject id ->
-                    "/projects/" ++ (toString id)
-
-                EditProject id ->
-                    "/projects/" ++ (toString id) ++ "/edit"
-
-                Organizations ->
-                    "/organizations"
-
-                NewOrganization ->
-                    "/organizations/new"
-
-                ShowOrganization id ->
-                    "/organizations/" ++ (toString id)
-
-                EditOrganization id ->
-                    "/organizations/" ++ (toString id) ++ "/edit"
+                EditRegulation id ->
+                    "/regulations/" ++ (toString id) ++ "/edit"
     in
         "#" ++ url
 
@@ -127,62 +104,27 @@ locFor path =
                     [] ->
                         Just Home
 
-                    [ "users" ] ->
-                        Just Users
+                    [ "reports" ] ->
+                        Just Reports
 
-                    [ "users", "new" ] ->
-                        Just NewUser
+                    [ "regulations" ] ->
+                        Just Regulations
 
-                    [ "users", stringId ] ->
+                    [ "regulations", "new" ] ->
+                        Just NewRegulation
+
+                    [ "regulations", stringId ] ->
                         case String.toInt stringId of
                             Ok id ->
-                                Just (ShowUser id)
+                                Just (ShowRegulation id)
 
                             Err _ ->
                                 Nothing
 
-                    [ "users", stringId, "edit" ] ->
+                    [ "regulations", stringId, "edit" ] ->
                         String.toInt stringId
                             |> Result.toMaybe
-                            |> Maybe.map EditUser
-
-                    [ "projects" ] ->
-                        Just Projects
-
-                    [ "projects", "new" ] ->
-                        Just NewProject
-
-                    [ "projects", stringId ] ->
-                        case String.toInt stringId of
-                            Ok id ->
-                                Just (ShowProject id)
-
-                            Err _ ->
-                                Nothing
-
-                    [ "projects", stringId, "edit" ] ->
-                        String.toInt stringId
-                            |> Result.toMaybe
-                            |> Maybe.map EditProject
-
-                    [ "organizations" ] ->
-                        Just Organizations
-
-                    [ "organizations", "new" ] ->
-                        Just NewOrganization
-
-                    [ "organizations", stringId ] ->
-                        case String.toInt stringId of
-                            Ok id ->
-                                Just (ShowOrganization id)
-
-                            Err _ ->
-                                Nothing
-
-                    [ "organizations", stringId, "edit" ] ->
-                        String.toInt stringId
-                            |> Result.toMaybe
-                            |> Maybe.map EditOrganization
+                            |> Maybe.map EditRegulation
 
                     _ ->
                         let
