@@ -56,9 +56,7 @@ view model user =
                         ]
                     , appToolbar
                         [ id "profiletoolbar" ]
-                        [ node "ash-avatar" [ attribute "name" user.firstName ] []
-                        , text user.username
-                        ]
+                        [ text user.username ]
                     ]
                 , ironSelector
                     [ class "nav-menu"
@@ -66,7 +64,7 @@ view model user =
                     , attribute "selected" (selectedItem model)
                     ]
                     (List.map drawerMenuItem menuItems)
-                , node "iron-image"
+                , img
                     [ attribute "src" "/img/logo.png"
                     , id "drawerlogo"
                     ]
@@ -158,7 +156,7 @@ regulationsBody model =
 
 regulationsForm : Model -> Html Msg
 regulationsForm model =
-    node "iron-form"
+    div
         []
         -- TODO wire up a handler to save the data from these inputs into
         -- our model when they change
