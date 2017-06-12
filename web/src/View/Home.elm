@@ -165,9 +165,7 @@ regulationsForm model =
         , node "paper-textarea" [ attribute "label" "description" ] []
         , node "paper-button"
             [ attribute "raised" ""
-
-            -- TODO add a POST task to the Regulation type and fire it off
-            -- , onClick (Types.AuthenticationMsg Authentication.LogOut)
+            , onClick (Types.GetRegulations model)
             ]
             [ text "Add" ]
         ]

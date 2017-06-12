@@ -5,7 +5,7 @@ import Http
 import Keycloak
 import Navigation
 import Ports
-import Regulation.Rest exposing (getRegulations)
+import Regulation.Rest exposing (getRegulations, postRegulation)
 import Route
 import Types exposing (..)
 
@@ -50,6 +50,28 @@ update msg model =
                     Debug.log "UrlChange: " location.hash
             in
                 { model | route = Route.locFor (Just location) } ! []
+
+        GetRegulations model ->
+            let
+                _ =
+                    Debug.log "calling GetRegulations"
+            in
+                model ! [ postRegulation model ]
+
+        NewRegulation (Ok regulation) ->
+            let
+                _ =
+                    Debug.log "Saved a regulation via POST"
+            in
+                model ! []
+
+        NewRegulation (Err error) ->
+            -- TODO unify REST error handling
+            let
+                _ =
+                    Debug.log "DEBUG: error when POSTing regulation"
+            in
+                ( model, Cmd.none )
 
         NewRegulations (Ok regulations) ->
             let

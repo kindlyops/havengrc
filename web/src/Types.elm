@@ -20,4 +20,6 @@ type Msg
     = AuthenticationMsg Authentication.Msg
     | NavigateTo (Maybe Route.Location)
     | UrlChange Navigation.Location
+    | GetRegulations Model
     | NewRegulations (Result Http.Error (List Regulation.Types.Regulation))
+    | NewRegulation (Result Http.Error String)
