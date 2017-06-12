@@ -16,18 +16,12 @@ regulationDecoder =
         (field "description" Decode.string)
 
 
-dummyDescription : String
-dummyDescription =
-    """For God's sake, let us sit upon the ground. And tell
-sad stories of the death of Kings."""
-
-
 encodeRegulation : Model -> Encode.Value
 encodeRegulation model =
     Encode.object
-        [ ( "identifier", Encode.string "dummyID" )
-        , ( "uri", Encode.string "http://example.com" )
-        , ( "description", Encode.string dummyDescription )
+        [ ( "identifier", Encode.string model.newRegulation.identifier )
+        , ( "uri", Encode.string model.newRegulation.uri )
+        , ( "description", Encode.string model.newRegulation.description )
         ]
 
 

@@ -13,6 +13,7 @@ type alias Model =
     , route : Route.Model
     , selectedTab : Int
     , regulations : List Regulation.Types.Regulation
+    , newRegulation : Regulation.Types.Regulation
     }
 
 
@@ -23,3 +24,6 @@ type Msg
     | GetRegulations Model
     | NewRegulations (Result Http.Error (List Regulation.Types.Regulation))
     | NewRegulation (Result Http.Error String)
+    | SetRegulationURIInput String
+    | SetRegulationIDInput String
+    | SetRegulationDescriptionInput String

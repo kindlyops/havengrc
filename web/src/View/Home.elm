@@ -4,12 +4,14 @@ import Authentication
 import List exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onClick, onWithOptions)
+import Html.Events exposing (onClick, onWithOptions, on)
+import Json.Decode as Json
 import Keycloak
 import Route exposing (Location(..), locFor)
 import String exposing (toLower)
 import Types exposing (Model, Msg)
 import WebComponents.App exposing (appDrawer, appDrawerLayout, appToolbar, appHeader, appHeaderLayout, ironSelector)
+import WebComponents.Paper as Paper
 
 
 header : Model -> Html Msg
@@ -154,20 +156,41 @@ regulationsBody model =
         ]
 
 
+onValueChanged : (String -> msg) -> Html.Attribute msg
+onValueChanged tagger =
+    on "value-changed" (Json.map tagger Html.Events.targetValue)
+
+
 regulationsForm : Model -> Html Msg
 regulationsForm model =
     div
         []
         -- TODO wire up a handler to save the data from these inputs into
         -- our model when they change
-        [ node "paper-input" [ attribute "label" "URL" ] []
-        , node "paper-input" [ attribute "label" "identifier" ] []
-        , node "paper-textarea" [ attribute "label" "description" ] []
-        , node "paper-button"
+        [ Paper.input
+            [ attribute "label" "URI"
+            , onValueChanged Types.SetRegulationURIInput
+            , value model.newRegulation.uri
+            ]
+            []
+        , Paper.input
+            [ attribute "label" "identifier"
+            , onValueChanged Types.SetRegulationIDInput
+            , value model.newRegulation.identifier
+            ]
+            []
+        , Paper.textarea
+            [ attribute "label" "description"
+            , onValueChanged Types.SetRegulationDescriptionInput
+            , value model.newRegulation.description
+            ]
+            []
+        , Paper.button
             [ attribute "raised" ""
             , onClick (Types.GetRegulations model)
             ]
             [ text "Add" ]
+        , div [ class "debug" ] [ text ("DEBUG: " ++ toString model.newRegulation) ]
         ]
 
 

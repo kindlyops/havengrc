@@ -6,6 +6,7 @@ import Keycloak
 import Navigation
 import Ports
 import Regulation.Rest exposing (getRegulations, postRegulation)
+import Regulation.Types exposing (Regulation)
 import Route
 import Types exposing (..)
 
@@ -21,6 +22,7 @@ init initialUser location =
           , route = route
           , selectedTab = 0
           , regulations = []
+          , newRegulation = Regulation 0 "" "" ""
           }
         , Cmd.batch [ routeCmd, getRegulations ]
         )
@@ -58,12 +60,42 @@ update msg model =
             in
                 model ! [ postRegulation model ]
 
+        SetRegulationURIInput value ->
+            let
+                oldRegulation =
+                    model.newRegulation
+
+                updatedRegulation =
+                    { oldRegulation | uri = value }
+            in
+                ( { model | newRegulation = updatedRegulation }, Cmd.none )
+
+        SetRegulationIDInput value ->
+            let
+                oldRegulation =
+                    model.newRegulation
+
+                updatedRegulation =
+                    { oldRegulation | identifier = value }
+            in
+                ( { model | newRegulation = updatedRegulation }, Cmd.none )
+
+        SetRegulationDescriptionInput value ->
+            let
+                oldRegulation =
+                    model.newRegulation
+
+                updatedRegulation =
+                    { oldRegulation | description = value }
+            in
+                ( { model | newRegulation = updatedRegulation }, Cmd.none )
+
         NewRegulation (Ok regulation) ->
             let
                 _ =
                     Debug.log "Saved a regulation via POST"
             in
-                model ! []
+                { model | newRegulation = Regulation 0 "" "" "" } ! []
 
         NewRegulation (Err error) ->
             -- TODO unify REST error handling
