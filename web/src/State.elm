@@ -95,7 +95,9 @@ update msg model =
                 _ =
                     Debug.log "Saved a regulation via POST"
             in
-                { model | newRegulation = Regulation 0 "" "" "" } ! []
+                -- TODO we need a more sophisticated way to deal with loading
+                -- paginated data and not re-fetching data we already have
+                { model | newRegulation = Regulation 0 "" "" "" } ! [ getRegulations ]
 
         NewRegulation (Err error) ->
             -- TODO unify REST error handling
