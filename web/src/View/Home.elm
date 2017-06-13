@@ -1,12 +1,14 @@
 module View.Home exposing (view)
 
 import Authentication
+import Date
 import List exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onWithOptions, on)
 import Json.Decode as Json
 import Keycloak
+import View.LineChart as LineChart
 import Route exposing (Location(..), locFor)
 import String exposing (toLower)
 import Types exposing (Model, Msg)
@@ -194,7 +196,15 @@ regulationsForm model =
 
 activityBody : Model -> Html Msg
 activityBody model =
-    div [] [ text "This is the activity view" ]
+    let
+        data =
+            [ ( Date.fromTime 1448928000000, 2 )
+            , ( Date.fromTime 1451606400000, 2 )
+            , ( Date.fromTime 1454284800000, 1 )
+            , ( Date.fromTime 1456790400000, 1 )
+            ]
+    in
+        LineChart.view data
 
 
 notFoundBody : Model -> Html Msg
