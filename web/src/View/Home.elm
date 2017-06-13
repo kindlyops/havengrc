@@ -20,7 +20,8 @@ header model =
         []
         [ appHeader
             [ attribute "fixed" ""
-            , attribute "effects" "waterfall"
+            , attribute "slot" "header"
+            , class "main-header"
             ]
             [ appToolbar
                 [ classList [ ( "title-toolbar", True ), ( "nav-title-toolbar", True ) ] ]
@@ -51,7 +52,9 @@ view model user =
                     , attribute "slot" "header"
                     , class "main-header"
                     ]
-                    [ appToolbar [] []
+                    [ appToolbar
+                        []
+                        []
                     , appToolbar
                         [ id "profiletoolbar" ]
                         [ text user.username ]
@@ -115,10 +118,7 @@ body model =
 dashboardBody : Model -> Html Msg
 dashboardBody model =
     div
-        [ style
-            [ ( "min-height", "2000px" )
-            ]
-        ]
+        []
         [ text "This is the dashboard view"
         , div
             []
