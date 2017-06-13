@@ -33,7 +33,7 @@ specifically the [PolymerElements](https://www.webcomponents.org/author/PolymerE
 collections which are implementations of common elements that follow Material Design.
 
 Within the app we are using [SASS](http://sass-lang.com/), and the guidance from
-[Inverted Triangle CSS](https://www.xfive.co/blog/itcss-scalable-maintainable-css-architecture/) 
+[Inverted Triangle CSS](https://www.xfive.co/blog/itcss-scalable-maintainable-css-architecture/)
 and [Reasonable CSS](http://rscss.io/) to try and keep the CSS manageable.
 
 ## run the service
@@ -53,6 +53,7 @@ If you don't have docker running, use the instructions at https://docs.docker.co
 At the time of writing, this is working fine with docker 1.12.
 
 Create an .env file in the project root:
+
     touch .env
     echo KEYCLOAK_CLIENT_ID=havendev >> .env
 
@@ -116,6 +117,24 @@ Now run the keycloak server command with export strategies defined
 Sometimes messing with logins and cookies you get stuff corrupted and need
 to invalidate a session/drop some cookies/tokens that were in localstorage.
 Visit chrome://settings/cookies#cont and search for localhost.
+
+## Testing on a real mobile device
+
+It's often useful to test your dev code on a variety of real world phones
+and tablets so you can confirm UI behavior. The easiest way to do this is
+with a tool called [ngrok](https://ngrok.com). ngrok creates a public URL
+to a local webserver. If you use ngrok, it's worth signing up for the free
+plan at least. You will be able to inspect the traffic going over the tunnel,
+and use http auth credentials to protect access to your tunnel and those you
+share it with.
+
+If you have a free ngrok plan, something like this should work
+
+    ngrok http -auth "user:password" 2015
+
+If you have a paid ngrok plan, something like this should work
+
+    ngrok http -auth "user:password" -subdomain=$USER-haven 2015
 
 ## add a database migration
 

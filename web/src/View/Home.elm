@@ -1,15 +1,20 @@
 module View.Home exposing (view)
 
 import Authentication
+import View.Centroid as Centroid
+import Date
 import List exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onClick, onWithOptions)
+import Html.Events exposing (onClick, onWithOptions, on)
+import Json.Decode as Json
 import Keycloak
+import View.LineChart as LineChart
 import Route exposing (Location(..), locFor)
 import String exposing (toLower)
 import Types exposing (Model, Msg)
 import WebComponents.App exposing (appDrawer, appDrawerLayout, appToolbar, appHeader, appHeaderLayout, ironSelector)
+import WebComponents.Paper as Paper
 
 
 header : Model -> Html Msg
@@ -18,17 +23,18 @@ header model =
         []
         [ appHeader
             [ attribute "fixed" ""
-            , attribute "effects" "waterfall"
+            , attribute "slot" "header"
+            , class "main-header"
             ]
             [ appToolbar
                 [ classList [ ( "title-toolbar", True ), ( "nav-title-toolbar", True ) ] ]
-                [ node "paper-icon-button"
+                [ Paper.iconButton
                     [ attribute "icon" "menu"
                     , attribute "drawer-toggle" ""
-
-                    -- TODO fix main toolbar scrolling offscreen for dashboard with long content
                     ]
                     []
+                , div [ attribute "main-title" "" ] [ text "Haven GRC" ]
+                , Paper.iconButton [ attribute "icon" "search" ] []
                 ]
             ]
         ]
@@ -40,7 +46,7 @@ view model user =
         []
         [ appDrawer
             [ attribute "slot" "drawer"
-            , attribute "id" "drawer"
+            , id "drawer"
             ]
             [ appHeaderLayout
                 [ attribute "has-scrolling-region" "" ]
@@ -49,16 +55,12 @@ view model user =
                     , attribute "slot" "header"
                     , class "main-header"
                     ]
-                    [ appToolbar []
-                        [ div
-                            [ class "title" ]
-                            [ text "Haven GRC" ]
-                        ]
+                    [ appToolbar
+                        []
+                        []
                     , appToolbar
-                        [ attribute "id" "profiletoolbar" ]
-                        [ node "ash-avatar" [ attribute "name" user.firstName ] []
-                        , text user.username
-                        ]
+                        [ id "profiletoolbar" ]
+                        [ text user.username ]
                     ]
                 , ironSelector
                     [ class "nav-menu"
@@ -66,9 +68,9 @@ view model user =
                     , attribute "selected" (selectedItem model)
                     ]
                     (List.map drawerMenuItem menuItems)
-                , node "iron-image"
+                , img
                     [ attribute "src" "/img/logo.png"
-                    , attribute "id" "drawerlogo"
+                    , id "drawerlogo"
                     ]
                     []
                 ]
@@ -94,51 +96,54 @@ selectedItem model =
 
 body : Model -> Html Msg
 body model =
-    case model.route of
-        Nothing ->
-            dashboardBody model
+    div [ id "content" ]
+        [ case model.route of
+            Nothing ->
+                dashboardBody model
 
-        Just Home ->
-            dashboardBody model
+            Just Home ->
+                dashboardBody model
 
-        Just Reports ->
-            reportsBody model
+            Just Reports ->
+                reportsBody model
 
-        Just Regulations ->
-            regulationsBody model
+            Just Regulations ->
+                regulationsBody model
 
-        Just Activity ->
-            activityBody model
+            Just Activity ->
+                activityBody model
 
-        Just _ ->
-            notFoundBody model
+            Just _ ->
+                notFoundBody model
+        ]
 
 
 dashboardBody : Model -> Html Msg
 dashboardBody model =
-    div
-        [ style
-            [ ( "min-height", "2000px" )
-            ]
-        ]
-        [ text "This is the dashboard view"
-        , div
+    let
+        data =
+            [ 1, 1, 2, 3, 5, 8, 13 ]
+    in
+        div
             []
-            [ a [ href "/auth/realms/havendev/account/" ]
+            [ Centroid.view data
+            , div
+                []
+                [ a [ href "/auth/realms/havendev/account/" ]
+                    [ node "paper-button"
+                        [ attribute "raised" "" ]
+                        [ text "Edit account" ]
+                    ]
+                ]
+            , div
+                []
                 [ node "paper-button"
-                    [ attribute "raised" "" ]
-                    [ text "Edit account" ]
+                    [ attribute "raised" ""
+                    , onClick (Types.AuthenticationMsg Authentication.LogOut)
+                    ]
+                    [ text "Logout" ]
                 ]
             ]
-        , div
-            []
-            [ node "paper-button"
-                [ attribute "raised" ""
-                , onClick (Types.AuthenticationMsg Authentication.LogOut)
-                ]
-                [ text "Logout" ]
-            ]
-        ]
 
 
 reportsBody : Model -> Html Msg
@@ -156,26 +161,55 @@ regulationsBody model =
         ]
 
 
+onValueChanged : (String -> msg) -> Html.Attribute msg
+onValueChanged tagger =
+    on "value-changed" (Json.map tagger Html.Events.targetValue)
+
+
 regulationsForm : Model -> Html Msg
 regulationsForm model =
-    node "iron-form"
+    div
         []
-        [ node "paper-input" [ attribute "label" "URL" ] []
-        , node "paper-input" [ attribute "label" "identifier" ] []
-        , node "paper-textarea" [ attribute "label" "description" ] []
-        , node "paper-button"
+        -- TODO wire up a handler to save the data from these inputs into
+        -- our model when they change
+        [ Paper.input
+            [ attribute "label" "URI"
+            , onValueChanged Types.SetRegulationURIInput
+            , value model.newRegulation.uri
+            ]
+            []
+        , Paper.input
+            [ attribute "label" "identifier"
+            , onValueChanged Types.SetRegulationIDInput
+            , value model.newRegulation.identifier
+            ]
+            []
+        , Paper.textarea
+            [ attribute "label" "description"
+            , onValueChanged Types.SetRegulationDescriptionInput
+            , value model.newRegulation.description
+            ]
+            []
+        , Paper.button
             [ attribute "raised" ""
-
-            -- TODO add a POST task to the Regulation type and fire it off
-            -- , onClick (Types.AuthenticationMsg Authentication.LogOut)
+            , onClick (Types.GetRegulations model)
             ]
             [ text "Add" ]
+        , div [ class "debug" ] [ text ("DEBUG: " ++ toString model.newRegulation) ]
         ]
 
 
 activityBody : Model -> Html Msg
 activityBody model =
-    div [] [ text "This is the activity view" ]
+    let
+        data =
+            [ ( Date.fromTime 1448928000000, 2 )
+            , ( Date.fromTime 1451606400000, 2 )
+            , ( Date.fromTime 1454284800000, 1 )
+            , ( Date.fromTime 1456790400000, 1 )
+            ]
+    in
+        LineChart.view data
 
 
 notFoundBody : Model -> Html Msg

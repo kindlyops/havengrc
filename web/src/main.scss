@@ -28,6 +28,12 @@ app-toolbar {
   font-weight: 500;
 }
 
+#content {
+  padding: 16px;
+  margin: 24px;
+  border-radius: 5px;
+}
+
 #drawer > app-header-layout > iron-selector {
   cursor: pointer;
   > div > iron-icon {

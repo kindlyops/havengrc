@@ -37,7 +37,7 @@ module.exports = {
   },
   resolve: {
     modulesDirectories: [ 'node_modules' ],
-    extensions: [ '', '.js', '.elm' ]
+    extensions: [ '', '.js', '.elm', '.scss' ]
   },
   module: {
     noParse: /\.elm$/,

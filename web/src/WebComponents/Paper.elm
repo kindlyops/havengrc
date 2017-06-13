@@ -1,4 +1,4 @@
-module WebComponents.Paper exposing (input, button, iconButton, paperMenu, paperItem, paperCard, paperFab)
+module WebComponents.Paper exposing (..)
 
 import Html exposing (Html, Attribute, node)
 
@@ -6,6 +6,11 @@ import Html exposing (Html, Attribute, node)
 input : List (Attribute a) -> List (Html a) -> Html a
 input =
     node "paper-input"
+
+
+textarea : List (Attribute a) -> List (Html a) -> Html a
+textarea =
+    node "paper-textarea"
 
 
 button : List (Attribute a) -> List (Html a) -> Html a
@@ -16,6 +21,16 @@ button =
 iconButton : List (Attribute a) -> List (Html a) -> Html a
 iconButton =
     node "paper-icon-button"
+
+
+item : List (Attribute a) -> List (Html a) -> Html a
+item =
+    node "paper-item"
+
+
+itemBody : List (Attribute a) -> List (Html a) -> Html a
+itemBody =
+    node "paper-item-body"
 
 
 paperMenu : List (Attribute a) -> List (Html a) -> Html a

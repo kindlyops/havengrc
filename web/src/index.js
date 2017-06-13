@@ -64,4 +64,9 @@ window.addEventListener('WebComponentsReady', function() {
     keycloak.logout();
   });
 
+  // set the page title
+  elmApp.ports.setTitle.subscribe(function(title) {
+    document.title = title;
+  });
+
 });

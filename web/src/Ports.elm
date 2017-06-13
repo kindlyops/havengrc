@@ -10,3 +10,6 @@ port keycloakAuthResult : (RawAuthenticationResult -> msg) -> Sub msg
 
 
 port keycloakLogout : () -> Cmd msg
+
+
+port setTitle : String -> Cmd msg

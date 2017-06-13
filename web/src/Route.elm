@@ -21,7 +21,6 @@ type Location
     | Activity
     | Reports
     | Regulations
-    | NewRegulation
     | ShowRegulation Int
     | EditRegulation Int
 
@@ -53,6 +52,32 @@ init location =
                 ( route, Cmd.none )
 
 
+titleFor : Location -> String
+titleFor route =
+    "Haven GRC - "
+        ++ case route of
+            Login ->
+                "Login"
+
+            Home ->
+                "Home"
+
+            Activity ->
+                "Activity"
+
+            Reports ->
+                "Reports"
+
+            Regulations ->
+                "Regulations"
+
+            ShowRegulation _ ->
+                "Category"
+
+            EditRegulation _ ->
+                "Thread"
+
+
 urlFor : Location -> String
 urlFor loc =
     let
@@ -72,9 +97,6 @@ urlFor loc =
 
                 Regulations ->
                     "/regulations"
-
-                NewRegulation ->
-                    "/regulations/new"
 
                 ShowRegulation id ->
                     "/regulations/" ++ (toString id)
@@ -116,9 +138,6 @@ locFor path =
 
                     [ "regulations" ] ->
                         Just Regulations
-
-                    [ "regulations", "new" ] ->
-                        Just NewRegulation
 
                     [ "regulations", stringId ] ->
                         case String.toInt stringId of
