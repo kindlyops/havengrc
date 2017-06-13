@@ -53,6 +53,32 @@ init location =
                 ( route, Cmd.none )
 
 
+titleFor : Location -> String
+titleFor route =
+    "Haven GRC - "
+        ++ case route of
+            Login ->
+                "Login"
+
+            Home ->
+                "Home"
+
+            Activity ->
+                "Activity"
+
+            Reports ->
+                "Reports"
+
+            Regulations ->
+                "Regulations"
+
+            ShowRegulation _ ->
+                "Category"
+
+            EditRegulation _ ->
+                "Thread"
+
+
 urlFor : Location -> String
 urlFor loc =
     let

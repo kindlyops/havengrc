@@ -44,7 +44,10 @@ update msg model =
                     model ! []
 
                 Just location ->
-                    model ! [ Navigation.newUrl (Route.urlFor location) ]
+                    model
+                        ! [ Navigation.newUrl (Route.urlFor location)
+                          , Ports.setTitle (Route.titleFor location)
+                          ]
 
         UrlChange location ->
             let
