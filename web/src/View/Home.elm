@@ -24,13 +24,13 @@ header model =
             ]
             [ appToolbar
                 [ classList [ ( "title-toolbar", True ), ( "nav-title-toolbar", True ) ] ]
-                [ node "paper-icon-button"
+                [ Paper.iconButton
                     [ attribute "icon" "menu"
                     , attribute "drawer-toggle" ""
-
-                    -- TODO fix main toolbar scrolling offscreen for dashboard with long content
                     ]
                     []
+                , div [ attribute "main-title" "" ] [ text "Haven GRC" ]
+                , Paper.iconButton [ attribute "icon" "search" ] []
                 ]
             ]
         ]
@@ -51,11 +51,7 @@ view model user =
                     , attribute "slot" "header"
                     , class "main-header"
                     ]
-                    [ appToolbar []
-                        [ div
-                            [ class "title" ]
-                            [ text "Haven GRC" ]
-                        ]
+                    [ appToolbar [] []
                     , appToolbar
                         [ id "profiletoolbar" ]
                         [ text user.username ]
@@ -94,24 +90,26 @@ selectedItem model =
 
 body : Model -> Html Msg
 body model =
-    case model.route of
-        Nothing ->
-            dashboardBody model
+    div [ id "content" ]
+        [ case model.route of
+            Nothing ->
+                dashboardBody model
 
-        Just Home ->
-            dashboardBody model
+            Just Home ->
+                dashboardBody model
 
-        Just Reports ->
-            reportsBody model
+            Just Reports ->
+                reportsBody model
 
-        Just Regulations ->
-            regulationsBody model
+            Just Regulations ->
+                regulationsBody model
 
-        Just Activity ->
-            activityBody model
+            Just Activity ->
+                activityBody model
 
-        Just _ ->
-            notFoundBody model
+            Just _ ->
+                notFoundBody model
+        ]
 
 
 dashboardBody : Model -> Html Msg
