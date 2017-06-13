@@ -21,7 +21,6 @@ type Location
     | Activity
     | Reports
     | Regulations
-    | NewRegulation
     | ShowRegulation Int
     | EditRegulation Int
 
@@ -99,9 +98,6 @@ urlFor loc =
                 Regulations ->
                     "/regulations"
 
-                NewRegulation ->
-                    "/regulations/new"
-
                 ShowRegulation id ->
                     "/regulations/" ++ (toString id)
 
@@ -142,9 +138,6 @@ locFor path =
 
                     [ "regulations" ] ->
                         Just Regulations
-
-                    [ "regulations", "new" ] ->
-                        Just NewRegulation
 
                     [ "regulations", stringId ] ->
                         case String.toInt stringId of
