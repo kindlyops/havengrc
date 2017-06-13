@@ -1,6 +1,7 @@
 module View.Home exposing (view)
 
 import Authentication
+import View.Centroid as Centroid
 import Date
 import List exposing (..)
 import Html exposing (..)
@@ -119,26 +120,30 @@ body model =
 
 dashboardBody : Model -> Html Msg
 dashboardBody model =
-    div
-        []
-        [ text "This is the dashboard view"
-        , div
+    let
+        data =
+            [ 1, 1, 2, 3, 5, 8, 13 ]
+    in
+        div
             []
-            [ a [ href "/auth/realms/havendev/account/" ]
+            [ Centroid.view data
+            , div
+                []
+                [ a [ href "/auth/realms/havendev/account/" ]
+                    [ node "paper-button"
+                        [ attribute "raised" "" ]
+                        [ text "Edit account" ]
+                    ]
+                ]
+            , div
+                []
                 [ node "paper-button"
-                    [ attribute "raised" "" ]
-                    [ text "Edit account" ]
+                    [ attribute "raised" ""
+                    , onClick (Types.AuthenticationMsg Authentication.LogOut)
+                    ]
+                    [ text "Logout" ]
                 ]
             ]
-        , div
-            []
-            [ node "paper-button"
-                [ attribute "raised" ""
-                , onClick (Types.AuthenticationMsg Authentication.LogOut)
-                ]
-                [ text "Logout" ]
-            ]
-        ]
 
 
 reportsBody : Model -> Html Msg
