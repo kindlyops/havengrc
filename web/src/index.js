@@ -48,6 +48,21 @@ window.addEventListener('WebComponentsReady', function() {
     });
   };
 
+  keycloak.onAuthLogout = function() {
+    ///alert("got keycloak logout callback");
+    // send a null result to trigger our existing AuthResult code and logout.
+    var result = { err: null, ok: null };
+    ocalStorage.removeItem('profile');
+    localStorage.removeItem('token');
+    elmApp.ports.keycloakAuthResult.send(result);
+
+  };
+
+  keycloak.onTokenExpired = function() {
+    //alert("got keycloak token expired");
+    //elmApp.ports.keycloakLogoutHappened.send();
+  };
+
   elmApp.ports.keycloakShowLock.subscribe(function(opts) {
     console.log("calling login");
     keycloak.login().error(function(errorData) {
