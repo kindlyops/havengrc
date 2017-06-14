@@ -52,7 +52,18 @@ To check and see if you have docker available and set up
 If you don't have docker running, use the instructions at https://docs.docker.com/docker-for-mac/.
 At the time of writing, this is working fine with docker 1.12.
 
+#### Windows users:
+Before you continue, you need to configure git to auto-correct line ending formats:
+
+     git config --global core.autocrlf true
+
+<br><br/>
 Create an .env file in the project root:
+##### Windows:
+
+    echo.KEYCLOAK_CLIENT_ID=havendev >> .env
+
+##### Mac:
 
     touch .env
     echo KEYCLOAK_CLIENT_ID=havendev >> .env
