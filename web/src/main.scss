@@ -58,3 +58,40 @@ app-drawer-layout:not([narrow]) [drawer-toggle] {
 [hidden] {
   display: none;
 }
+
+/* ported from havengrc landing page, feel free to refactor */
+.jumbotron {
+  padding-bottom:150px;
+}
+
+#wireframe-container {
+  margin-bottom:20px;
+}
+
+#wireframe {
+margin-top: -150px;
+}
+
+#footer-lines-container {
+  overflow: hidden;
+}
+#footer-lines {
+  padding-top:80px;
+  margin-bottom:-63px;
+}
+
+footer {
+  font-family: "mr-eaves-modern",sans-serif;
+  background-color: #2fa09d;
+  color: #fff;
+  text-align: center;
+  height:55px;
+  padding:15px;
+}
+ footer a {
+   color: #fff;
+   text-decoration: underline;
+ }
+footer p {
+  margin-bottom:0px;
+}
