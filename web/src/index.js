@@ -59,6 +59,8 @@ window.addEventListener('WebComponentsReady', function() {
   };
 
   keycloak.onTokenExpired = function() {
+    // TODO: the initial token we get expires in 5 minutes (300 seconds)
+    // need to wire up token refresh based on user activity in the app.
     //alert("got keycloak token expired");
     //elmApp.ports.keycloakLogoutHappened.send();
   };
