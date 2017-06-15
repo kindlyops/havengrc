@@ -56,9 +56,6 @@ view model user =
                     , class "main-header"
                     ]
                     [ appToolbar
-                        []
-                        []
-                    , appToolbar
                         [ id "profiletoolbar" ]
                         [ text user.username ]
                     ]

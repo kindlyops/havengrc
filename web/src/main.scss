@@ -34,6 +34,18 @@ app-toolbar {
   border-radius: 5px;
 }
 
+.main-header{
+  left:0px !important;
+}
+
+#drawer {
+  top:64px;
+}
+
+#drawer > app-header-layout{
+  position: static;
+}
+
 #drawer > app-header-layout > iron-selector {
   cursor: pointer;
   > div > iron-icon {
@@ -51,8 +63,8 @@ app-drawer-layout:not([narrow]) [drawer-toggle] {
 
 #drawerlogo{
   position: absolute;
-  bottom: 5%;
-  left: 34%;
+  bottom: 150px;
+  left: 88px;
 }
 
 [hidden] {
