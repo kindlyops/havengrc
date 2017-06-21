@@ -59,19 +59,22 @@ view model user =
                         [ id "profiletoolbar" ]
                         [ text user.username
                         , div []
-                               [ node "paper-menu-button"
-                                  []
-                                  [ node "paper-icon-button"
-                                      [ attribute "icon" "expand-more"
-                                      , attribute "slot" "dropdown-trigger"
-                                      , attribute "alt" "menu"
-                                      ]
-                                      [ node "paper-listbox"
-                                          [ attribute "slot" "dropdown-content" ]
-                                          [ node "paper-item" [attribute "role" "option" ] [text "Logout"] ]
-                                      ]
-                                  ]
-                               ]
+                            [ node "paper-menu-button"
+                                []
+                                [ node "paper-icon-button"
+                                    [ attribute "icon" "expand-more"
+                                    , attribute "slot" "dropdown-trigger"
+                                    , attribute "alt" "menu"
+                                    ]
+                                    []
+                                , node "paper-listbox"
+                                    [ attribute "slot" "dropdown-content" ]
+                                    [ node "paper-item" [ attribute "role" "option" ] [ text "Logout" ]
+                                    , node "paper-item" [ attribute "role" "option" ] [ text "Test1" ]
+                                    , node "paper-item" [ attribute "role" "option" ] [ text "Test2" ]
+                                    ]
+                                ]
+                            ]
                         ]
                     ]
                 , ironSelector
@@ -89,7 +92,7 @@ view model user =
             ]
         , header model
         , body model
-      ]
+        ]
 
 
 selectedItem : Model -> String
