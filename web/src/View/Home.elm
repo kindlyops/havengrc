@@ -57,7 +57,12 @@ view model user =
                     ]
                     [ appToolbar
                         [ id "profiletoolbar" ]
-                        [ text user.username ]
+                        [ text user.username
+                        , node "iron-icon" [ attribute "icon" "icons:arrow-drop-down"
+                                           , class "user-menu"
+                                           ]
+                                           []
+                        ]
                     ]
                 , ironSelector
                     [ class "nav-menu"
@@ -74,7 +79,7 @@ view model user =
             ]
         , header model
         , body model
-        ]
+      ]
 
 
 selectedItem : Model -> String
