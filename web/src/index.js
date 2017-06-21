@@ -25,7 +25,7 @@ window.addEventListener('WebComponentsReady', function() {
   // unrecognized tags are simply rendered as an empty div by browers.
   var elmApp = Elm.Main.embed(document.getElementById('root'), authData);
 
-  options = { redirect_uri: 'http://localhost:2015/' };
+  options = { redirect_uri: 'https://emurphy-haven.ngrok.io/' };
   keycloak.init(options);
 
   keycloak.onAuthSuccess = function() {
