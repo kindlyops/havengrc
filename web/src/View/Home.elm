@@ -58,10 +58,20 @@ view model user =
                     [ appToolbar
                         [ id "profiletoolbar" ]
                         [ text user.username
-                        , node "iron-icon" [ attribute "icon" "icons:arrow-drop-down"
-                                           , class "user-menu"
-                                           ]
-                                           []
+                        , div []
+                               [ node "paper-menu-button"
+                                  []
+                                  [ node "paper-icon-button"
+                                      [ attribute "icon" "expand-more"
+                                      , attribute "slot" "dropdown-trigger"
+                                      , attribute "alt" "menu"
+                                      ]
+                                      [ node "paper-listbox"
+                                          [ attribute "slot" "dropdown-content" ]
+                                          [ node "paper-item" [attribute "role" "option" ] [text "Logout"] ]
+                                      ]
+                                  ]
+                               ]
                         ]
                     ]
                 , ironSelector
