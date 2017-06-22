@@ -66,6 +66,11 @@ app-drawer-layout:not([narrow]) [drawer-toggle] {
   position: absolute;
   right:10px;
   cursor: pointer;
+  color:#2FA09D;
+}
+
+.user-menu > paper-listbox{
+  min-width:150px !important;
 }
 
 #drawerlogo{

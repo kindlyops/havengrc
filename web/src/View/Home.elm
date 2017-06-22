@@ -57,22 +57,23 @@ view model user =
                     ]
                     [ appToolbar
                         [ id "profiletoolbar" ]
-                        [ text user.username
-                        , div []
-                            [ node "paper-menu-button"
+                        [ div [] [ text user.username ]
+                        , node "paper-menu-button"
+                            [ attribute "vertical-align" "top"
+                            , attribute "role" "group"
+                            , class "user-menu"
+                            ]
+                            [ node "paper-icon-button"
+                                [ attribute "icon" "expand-more"
+                                , attribute "slot" "dropdown-trigger"
+                                , attribute "alt" "menu"
+                                ]
                                 []
-                                [ node "paper-icon-button"
-                                    [ attribute "icon" "expand-more"
-                                    , attribute "slot" "dropdown-trigger"
-                                    , attribute "alt" "menu"
-                                    ]
-                                    []
-                                , node "paper-listbox"
-                                    [ attribute "slot" "dropdown-content" ]
-                                    [ node "paper-item" [ attribute "role" "option" ] [ text "Logout" ]
-                                    , node "paper-item" [ attribute "role" "option" ] [ text "Test1" ]
-                                    , node "paper-item" [ attribute "role" "option" ] [ text "Test2" ]
-                                    ]
+                            , node "paper-listbox"
+                                [ attribute "slot" "dropdown-content" ]
+                                [ a [ attribute "href" "#" ] [ node "paper-item" [ attribute "role" "option" ] [ text "Profile" ] ]
+                                , a [ attribute "href" "#" ] [ node "paper-item" [ attribute "role" "option" ] [ text "Settings" ] ]
+                                , a [ attribute "href" "#" ] [ node "paper-item" [ attribute "role" "option" ] [ text "Log Out" ] ]
                                 ]
                             ]
                         ]
