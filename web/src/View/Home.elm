@@ -60,20 +60,26 @@ view model user =
                         [ div [] [ text user.username ]
                         , node "paper-menu-button"
                             [ attribute "vertical-align" "top"
-                            , attribute "role" "group"
                             , class "user-menu"
                             ]
                             [ node "paper-icon-button"
                                 [ attribute "icon" "expand-more"
                                 , attribute "slot" "dropdown-trigger"
-                                , attribute "alt" "menu"
+                                , class "dropdown-trigger"
                                 ]
                                 []
                             , node "paper-listbox"
-                                [ attribute "slot" "dropdown-content" ]
-                                [ a [ attribute "href" "#" ] [ node "paper-item" [ attribute "role" "option" ] [ text "Profile" ] ]
-                                , a [ attribute "href" "#" ] [ node "paper-item" [ attribute "role" "option" ] [ text "Settings" ] ]
-                                , a [ attribute "href" "#" ] [ node "paper-item" [ attribute "role" "option" ] [ text "Log Out" ] ]
+                                [ attribute "slot" "dropdown-content"
+                                , class "user-menu-items"
+                                ]
+                                [ a [ href "/auth/realms/havendev/account/" ]
+                                    [ node "paper-item"
+                                      [] [ text "Edit Account" ]
+                                    ]
+                                , a [ href "#" ]
+                                    [ node "paper-item"
+                                      [ onClick (Types.AuthenticationMsg Authentication.LogOut) ] [ text "Log Out" ]
+                                    ]
                                 ]
                             ]
                         ]
