@@ -148,24 +148,7 @@ dashboardBody model =
     in
         div
             []
-            [ Centroid.view data
-            , div
-                []
-                [ a [ href "/auth/realms/havendev/account/" ]
-                    [ node "paper-button"
-                        [ attribute "raised" "" ]
-                        [ text "Edit account" ]
-                    ]
-                ]
-            , div
-                []
-                [ node "paper-button"
-                    [ attribute "raised" ""
-                    , onClick (Types.AuthenticationMsg Authentication.LogOut)
-                    ]
-                    [ text "Logout" ]
-                ]
-            ]
+            [ Centroid.view data ]
 
 
 reportsBody : Model -> Html Msg
