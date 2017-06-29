@@ -22,6 +22,9 @@
     "paper-icon-button": "^2.0.0",
     "iron-icons": "^2.0.0",
     "iron-selector": "PolymerElements/iron-selector#^2.0.0",
-    "paper-input": "PolymerElements/paper-input#^2.0.1"
+    "paper-input": "PolymerElements/paper-input#^2.0.1",
+    "paper-menu-button": "PolymerElements/paper-menu-button#^2.0.0",
+    "paper-listbox": "PolymerElements/paper-listbox#^2.0.0",
+    "paper-item": "PolymerElements/paper-item#^2.0.0"
   }
 }

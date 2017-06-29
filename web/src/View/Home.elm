@@ -57,7 +57,32 @@ view model user =
                     ]
                     [ appToolbar
                         [ id "profiletoolbar" ]
-                        [ text user.username ]
+                        [ div [] [ text user.username ]
+                        , node "paper-menu-button"
+                            [ attribute "vertical-align" "top"
+                            , class "user-menu"
+                            ]
+                            [ node "paper-icon-button"
+                                [ attribute "icon" "expand-more"
+                                , attribute "slot" "dropdown-trigger"
+                                , class "dropdown-trigger"
+                                ]
+                                []
+                            , node "paper-listbox"
+                                [ attribute "slot" "dropdown-content"
+                                , class "user-menu-items"
+                                ]
+                                [ a [ href "/auth/realms/havendev/account/" ]
+                                    [ node "paper-item"
+                                      [] [ text "Edit Account" ]
+                                    ]
+                                , a [ href "#" ]
+                                    [ node "paper-item"
+                                      [ onClick (Types.AuthenticationMsg Authentication.LogOut) ] [ text "Log Out" ]
+                                    ]
+                                ]
+                            ]
+                        ]
                     ]
                 , ironSelector
                     [ class "nav-menu"
@@ -123,24 +148,7 @@ dashboardBody model =
     in
         div
             []
-            [ Centroid.view data
-            , div
-                []
-                [ a [ href "/auth/realms/havendev/account/" ]
-                    [ node "paper-button"
-                        [ attribute "raised" "" ]
-                        [ text "Edit account" ]
-                    ]
-                ]
-            , div
-                []
-                [ node "paper-button"
-                    [ attribute "raised" ""
-                    , onClick (Types.AuthenticationMsg Authentication.LogOut)
-                    ]
-                    [ text "Logout" ]
-                ]
-            ]
+            [ Centroid.view data ]
 
 
 reportsBody : Model -> Html Msg

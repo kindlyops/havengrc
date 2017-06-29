@@ -62,6 +62,34 @@ app-drawer-layout:not([narrow]) [drawer-toggle] {
   background-color: #888;
 }
 
+.user-menu {
+  position: absolute;
+  right:10px;
+  cursor: pointer;
+  color:white;
+}
+
+.user-menu-items{
+  min-width:150px !important;
+  position: fixed; /* The position, top, and left makes user menu drop below the icon instead of on top */
+  top: 42px;
+  left:210px;
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
+              0 1px 5px 0 rgba(0, 0, 0, 0.12),
+              0 3px 1px -2px rgba(0, 0, 0, 0.2); /* box-shadow and border-radius overwrites design caused by position:fixed */
+  border-radius: 2px;
+}
+
+.user-menu-items > a:hover, .user-menu-items > a:active, .user-menu-items > a:focus{
+  outline:0;
+  text-decoration: none;
+}
+
+.user-menu-items paper-item:hover, .user-menu-items paper-item:active {
+  background-color: #f0f0f1;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1), 0 0px 1px 0 rgba(0, 0, 0, 0.12), 0 1px 1px -5px rgba(0, 0, 0, 0.2);
+}
+
 #drawerlogo{
   position: absolute;
   bottom: 150px;
