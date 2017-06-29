@@ -57,13 +57,23 @@ view model user =
                     ]
                     [ appToolbar
                         [ id "profiletoolbar" ]
-                        [ div [] [ text user.username ]
+                        [ div []
+                              [ node "paper-icon-item"
+                                  [ class "user-avatar-item" ]
+                                  [ node "paper-avatar"
+                                      [ attribute "item-icon" ""
+                                      , attribute "label" "user.username"
+                                      , class "user-avatar"
+                                      ] []
+                                  , text user.username
+                                  ]
+                              ]
                         , node "paper-menu-button"
                             [ attribute "vertical-align" "top"
                             , class "user-menu"
                             ]
                             [ node "paper-icon-button"
-                                [ attribute "icon" "expand-more"
+                                [ attribute "icon" "arrow-drop-down"
                                 , attribute "slot" "dropdown-trigger"
                                 , class "dropdown-trigger"
                                 ]
