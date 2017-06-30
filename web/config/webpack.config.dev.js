@@ -39,6 +39,9 @@ module.exports = {
     modulesDirectories: [ 'node_modules' ],
     extensions: [ '', '.js', '.elm', '.scss' ]
   },
+  devServer: {
+    disableHostCheck: true,  // That solved it
+  },
   module: {
     noParse: /\.elm$/,
     loaders: [
