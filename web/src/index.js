@@ -52,7 +52,7 @@ window.addEventListener('WebComponentsReady', function() {
     ///alert("got keycloak logout callback");
     // send a null result to trigger our existing AuthResult code and logout.
     var result = { err: null, ok: null };
-    ocalStorage.removeItem('profile');
+    localStorage.removeItem('profile');
     localStorage.removeItem('token');
     elmApp.ports.keycloakAuthResult.send(result);
 
