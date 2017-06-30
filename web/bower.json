@@ -25,7 +25,6 @@
     "paper-input": "PolymerElements/paper-input#^2.0.1",
     "paper-menu-button": "PolymerElements/paper-menu-button#^2.0.0",
     "paper-listbox": "PolymerElements/paper-listbox#^2.0.0",
-    "paper-item": "PolymerElements/paper-item#^2.0.0",
-    "paper-avatar": "Abe90/paper-avatar#^1.0.4"
+    "paper-item": "PolymerElements/paper-item#^2.0.0"
   }
 }
