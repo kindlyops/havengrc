@@ -64,7 +64,8 @@ const devServer = new WebpackDevServer(compiler, {
   hot: true,
   inline: true,
   publicPath: '/',
-  quiet: true
+  quiet: true,
+  disableHostCheck: true // https://github.com/webpack/webpack-dev-server/issues/883
 });
 
 // Launch WebpackDevServer.

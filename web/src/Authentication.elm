@@ -52,7 +52,7 @@ update msg model =
                             ( Keycloak.LoggedIn user, Nothing )
 
                         Err err ->
-                            ( model.state, Just err )
+                            ( Keycloak.LoggedOut, Just err )
             in
                 ( { model | state = newState, lastError = error }, Cmd.none )
 
