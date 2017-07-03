@@ -57,13 +57,21 @@ view model user =
                     ]
                     [ appToolbar
                         [ id "profiletoolbar" ]
-                        [ div [] [ text user.username ]
+                        [ div [ class "user-container" ]
+                              [ node "iron-image"
+                                  [
+                                    attribute "sizing" "contain"
+                                  , attribute "src" "http://lorempixel.com/400/400"
+                                  , class "user-avatar"
+                                  ] []
+                              , p [ class "user-name" ] [ text user.username ]
+                              ]
                         , node "paper-menu-button"
                             [ attribute "vertical-align" "top"
                             , class "user-menu"
                             ]
                             [ node "paper-icon-button"
-                                [ attribute "icon" "expand-more"
+                                [ attribute "icon" "arrow-drop-down"
                                 , attribute "slot" "dropdown-trigger"
                                 , class "dropdown-trigger"
                                 ]
@@ -84,17 +92,18 @@ view model user =
                             ]
                         ]
                     ]
-                , ironSelector
-                    [ class "nav-menu"
-                    , attribute "attr-for-selected" "name"
-                    , attribute "selected" (selectedItem model)
-                    ]
-                    (List.map drawerMenuItem menuItems)
-                , img
-                    [ attribute "src" "/img/logo.png"
-                    , id "drawerlogo"
-                    ]
-                    []
+                , div [ class "iron-selector-container" ]
+                      [ ironSelector
+                        [ class "nav-menu"
+                        , attribute "attr-for-selected" "name"
+                        , attribute "selected" (selectedItem model)
+                        ]
+                        (List.map drawerMenuItem menuItems)
+                      , div [ class "drawer-logo"]
+                        [ img
+                          [ attribute "src" "/img/logo.png" ] []
+                        ]
+                      ]
                 ]
             ]
         , header model
