@@ -9,7 +9,7 @@ if (process.env.APP_ENV === 'dev') {
 }
 /*global Keycloak*/
 var keycloak = Keycloak({
-    url: '/auth',
+    url: '/auth', // TODO: try full url for ngrok, client matching uses url
     realm: 'havendev',
     clientId: CLIENT_ID
 });

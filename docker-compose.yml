@@ -49,7 +49,8 @@ services:
     links:
       - db:postgres
     volumes:
-      - ./keycloak:/keycloak
+      - ./keycloak/themes/haven:/opt/jboss/keycloak/themes/haven
+      - ./keycloak/configuration/standalone.xml:/opt/jboss/keycloak/standalone/configuration/standalone.xml
   sqitch:
     build:
       context: .
