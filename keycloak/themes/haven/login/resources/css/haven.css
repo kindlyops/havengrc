@@ -1,1 +1,86 @@
-body { background-color: blue; }
+body {
+  --mdc-theme-primary:#2FA09D;
+  --mdc-theme-accent:#E86953;
+  --mdc-theme-background:#fff;
+  margin:auto;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
+
+#kc-container{
+	flex:1;
+	-webkit-box-flex: 1;
+	-ms-flex: 1;
+}
+
+.align-center{
+	text-align: center;
+}
+
+.header-container{
+	padding-top:24px;
+}
+
+.header{
+  font-family: "mr-eaves-modern", 'Roboto', sans-serif;
+  text-transform: uppercase;
+  font-weight:700;
+  color: var(--mdc-theme-accent);
+  letter-spacing: 1.2px;
+  font-size: 62px;
+  margin-top:27px;
+}
+
+.kc-feedback-text {
+	font-family: "mr-eaves-modern", 'Roboto', sans-serif;
+    color: #cc0000;
+	font-size: 1.1em;
+}
+
+label {
+  font-family: "ff-tisa-pro", serif;
+}
+
+.kc-form{
+	margin-top: 10px;
+}
+
+.login-btn{
+	padding: 10px 70px;
+	font-size: 13px;
+	line-height: 1.3333333;
+	border-radius: 25px;
+	margin-top:5px;
+	font-size: 12px;
+	font-weight: bold;
+}
+
+.bottom-container{
+	background-color:#f1f1f1;
+	overflow:hidden;
+	width:100%;
+	padding-top:40px;
+}
+
+footer{
+	--mdc-theme-background:#2FA09D;
+	font-family: "mr-eaves-modern", 'Roboto', sans-serif;
+	height: 55px;
+	padding: 15px;
+	justify-content: center !important;
+	font-weight: 600;
+	font-size: .9em;
+}
+
+footer a{
+	color:#fff;
+}
+
+#footer-lines{
+	padding-top: 80px;
+	margin-bottom: -63px;
+	width:248px;
+}
