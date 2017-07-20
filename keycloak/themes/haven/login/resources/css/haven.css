@@ -30,8 +30,8 @@ body {
   font-weight:700;
   color: var(--mdc-theme-accent);
   letter-spacing: 1.2px;
-  font-size: 62px;
-  margin-top:27px;
+  margin:27px auto;
+  font-size: 45px;
 }
 
 .kc-feedback-text {
@@ -83,4 +83,11 @@ footer a{
 	padding-top: 80px;
 	margin-bottom: -63px;
 	width:248px;
+}
+
+
+@media screen and (min-width: 768px){
+    .header{
+        font-size: 62px;
+    }
 }
