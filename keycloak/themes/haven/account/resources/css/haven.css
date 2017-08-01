@@ -1,0 +1,281 @@
+html{
+    height: 100%;
+}
+
+body {
+  --mdc-theme-primary:#2FA09D;
+  --mdc-theme-accent:#E86953;
+  --mdc-theme-background: #f0f0f1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100% !important;
+}
+
+header{
+    background-color: var(--mdc-theme-accent) !important;
+    color: var(--mdc-theme-text-primary-on-primary,#fff);
+}
+
+header > .mdc-toolbar__row{
+    min-height:64px;
+}
+
+header a{
+    color: var(--mdc-theme-text-primarymary-on-primary);
+}
+
+header a:hover, header a:focus{
+    color:#3f4145;
+    text-decoration: none;
+}
+
+h1.mdc-toolbar__title{
+    font-size: 20px;
+}
+
+.bs-sidebar{
+    background-color:#fff;
+    border-right-width: 2px;
+    width: 256px;
+}
+
+nav.mdc-list{
+    padding-top:0px;
+}
+
+nav.mdc-list > a{
+    font-family: serif !important;
+    font-size: 20px !important;
+    font-weight: 500 !important;
+    padding:29px 16px !important;
+}
+
+.bs-sidebar nav a.mdc-permanent-drawer--selected, .bs-sidebar nav a.mdc-permanent-drawer--selected:hover, .bs-sidebar nav a.mdc-permanent-drawer--selected:focus {
+    background-color:#888 !important;
+    color: #3F4145 !important;
+}
+
+.mdc-permanent-drawer .mdc-list-item__start-detail{
+    color:lightgray !important;
+}
+
+.bs-sidebar nav a.mdc-list-item:hover {
+    color: var(--mdc-theme-primary);
+}
+
+.mdc-permanent-drawer__content{
+    flex:1;
+}
+
+.drawer-logo{
+    text-align: center;
+    padding-bottom: 10px;
+}
+.content{
+    display: flex;
+    flex: 1 1 auto;
+    height: 100%;
+}
+
+.main{
+    width: 200vw;
+    background-color:var(--mdc-theme-background, #f0f0f1);
+    padding:30px;
+}
+
+h2{
+    font-family: 'Roboto', sans-serif !important;
+}
+
+a{
+    color:var(--mdc-theme-accent)
+}
+
+/* Material Icon Import */
+@font-face {
+  font-family: 'Material Icons';
+  font-style: normal;
+  font-weight: 400;
+  src: url(https://example.com/MaterialIcons-Regular.eot); /* For IE6-8 */
+  src: local('Material Icons'),
+    local('MaterialIcons-Regular'),
+    url(https://example.com/MaterialIcons-Regular.woff2) format('woff2'),
+    url(https://example.com/MaterialIcons-Regular.woff) format('woff'),
+    url(https://example.com/MaterialIcons-Regular.ttf) format('truetype');
+}
+
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;  /* Preferred icon size */
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+
+  /* Support for all WebKit browsers. */
+  -webkit-font-smoothing: antialiased;
+  /* Support for Safari and Chrome. */
+  text-rendering: optimizeLegibility;
+
+  /* Support for Firefox. */
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Support for IE. */
+  font-feature-settings: 'liga';
+}
+
+
+/* Brought in from account.css */
+.required {
+    color: #CB2915;
+}
+
+
+.alert {
+    margin-top: 30px;
+    margin-bottom: 0;
+}
+
+.feedback-aligner .alert {
+    background-position: 1.27273em center;
+    background-repeat: no-repeat;
+    border-radius: 2px;
+    border-width: 1px;
+    color: #4D5258;
+    display: inline-block;
+    font-size: 1.1em;
+    line-height: 1.4em;
+    margin: 0;
+    padding: 0.909091em 3.63636em;
+    position: relative;
+    text-align: left;
+}
+.alert.alert-success {
+    background-color: #E4F1E1;
+    border-color: #4B9E39;
+}
+.alert.alert-error {
+    background-color: #F8E7E7;
+    border-color: #B91415;
+}
+.alert.alert-warning {
+    background-color: #FEF1E9;
+    border-color: #F17528;
+}
+.alert.alert-info {
+    background-color: #E4F3FA;
+    border-color: #5994B2;
+}
+
+.form-horizontal {
+    border-top: 1px solid #E9E8E8;
+    padding-top: 23px;
+}
+
+.form-horizontal .control-label {
+    color: #909090;
+    line-height: 1.4em;
+    padding-top: 5px;
+    position: relative;
+    text-align: right;
+    width: 100%;
+}
+
+.form-group {
+    position: relative;
+}
+
+.control-label + .required {
+    position: absolute;
+    right: -2px;
+    top: 0;
+}
+
+#kc-form-buttons {
+    text-align: right;
+    margin-top: 10px;
+}
+
+#kc-form-buttons .btn-primary {
+    float: right;
+    margin-left: 8px;
+}
+
+/* Authenticator page */
+
+ol {
+    padding-left: 40px;
+}
+
+ol li {
+    font-size: 13px;
+    margin-bottom: 10px;
+    position: relative;
+}
+
+ol li img {
+    margin-top: 15px;
+    margin-bottom: 5px;
+    border: 1px solid #eee;
+}
+
+hr + .form-horizontal {
+    border: none;
+    padding-top: 0;
+}
+
+.kc-dropdown{
+    position: relative;
+}
+.kc-dropdown > a{
+    display:block;
+    padding: 11px 10px 12px;
+    line-height: 12px;
+    font-size: 12px;
+    color: #fff !important;
+    text-decoration: none;
+}
+.kc-dropdown > a::after{
+    content: "\2c5";
+    margin-left: 4px;
+}
+.kc-dropdown:hover > a{
+    background-color: rgba(0,0,0,0.2);
+}
+.kc-dropdown ul li a{
+    padding: 1px 11px;
+    font-size: 12px;
+    color: #000 !important;
+    border: 1px solid #fff;
+    text-decoration: none;
+    display:block;
+    line-height: 20px;
+}
+.kc-dropdown ul li a:hover{
+    color: #4d5258;
+    background-color: #d4edfa;
+    border-color: #b3d3e7;
+}
+.kc-dropdown ul{
+    position: absolute;
+    z-index: 2000;
+    list-style:none;
+    display:none;
+    padding: 5px 0px;
+    margin: 0px;
+    background-color: #fff !important;
+    border: 1px solid #b6b6b6;
+    border-radius: 1px;
+    -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+    background-clip: padding-box;
+    min-width: 100px;
+}
+.kc-dropdown:hover ul{
+    display:block;
+}
