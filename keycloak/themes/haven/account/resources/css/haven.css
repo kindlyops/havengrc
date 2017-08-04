@@ -91,7 +91,7 @@ nav.mdc-list > a{
 
 .main{
 /*    width: 200vw;     */
-    padding:30px;
+    padding:0px 30px;
 }
 
 h2{
@@ -100,6 +100,29 @@ h2{
 
 a{
     color:var(--mdc-theme-accent)
+}
+
+.heading{
+    border-bottom: 2px solid #e4e4e4;
+}
+.subtitle{
+    align-self: center;
+}
+
+#AccountForm > div{
+    margin-top:10px;
+}
+
+#AccountForm div.mdc-textfield{
+    width:100%;
+}
+
+#AccountForm input.mdc-textfield__input, #AccountForm label.mdc-textfield__label{
+    font-size: initial;
+}
+
+.form-btn{
+    float:right;
 }
 
 @media screen and (max-width:640px){

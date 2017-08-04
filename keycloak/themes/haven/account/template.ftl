@@ -110,6 +110,13 @@
         </main>
     </div>
     <script>mdc.drawer.MDCPersistentDrawer.attachTo(document.querySelector('.mdc-persistent-drawer'));</script>
+    <script>window.mdc.autoInit();</script>
+    <script>
+        mdc.textfield.MDCTextfield.attachTo(document.querySelector('.mdc-textfield'));
+    </script>
+    <script>
+        mdc.ripple.MDCRipple.attachTo(document.querySelector('.mdc-button'));
+    </script>
     <script>
         $(window).resize(function resize() {
         if ($(window).width() > 640) {
