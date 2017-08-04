@@ -6,8 +6,9 @@ body {
   --mdc-theme-primary:#2FA09D;
   --mdc-theme-accent:#E86953;
   --mdc-theme-background: #f0f0f1;
+  background-color:var(--mdc-theme-background, #f0f0f1);
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   min-height: 100% !important;
 }
 
@@ -27,6 +28,16 @@ header a{
 header a:hover, header a:focus{
     color:#3f4145;
     text-decoration: none;
+}
+
+section.mdc-toolbar__section--align-start{
+    flex: 2;
+    padding-left:16px;
+}
+
+button.menu{
+    display: none;
+    padding: 16px 0px;
 }
 
 h1.mdc-toolbar__title{
@@ -50,12 +61,12 @@ nav.mdc-list > a{
     padding:29px 16px !important;
 }
 
-.bs-sidebar nav a.mdc-permanent-drawer--selected, .bs-sidebar nav a.mdc-permanent-drawer--selected:hover, .bs-sidebar nav a.mdc-permanent-drawer--selected:focus {
+.bs-sidebar nav a.mdc-persistent-drawer--selected, .bs-sidebar nav a.mdc-persistent-drawer--selected:hover, .bs-sidebar nav a.mdc-persistent-drawer--selected:focus {
     background-color:#888 !important;
     color: #3F4145 !important;
 }
 
-.mdc-permanent-drawer .mdc-list-item__start-detail{
+.mdc-persistent-drawer .mdc-list-item__start-detail{
     color:lightgray !important;
 }
 
@@ -63,8 +74,8 @@ nav.mdc-list > a{
     color: var(--mdc-theme-primary);
 }
 
-.mdc-permanent-drawer__content{
-    flex:1;
+.nav-flex{
+    flex:1; /* keeps .drawer-logo at bottom and not overlaying rest of menu */
 }
 
 .drawer-logo{
@@ -72,14 +83,14 @@ nav.mdc-list > a{
     padding-bottom: 10px;
 }
 .content{
-    display: flex;
-    flex: 1 1 auto;
+    display: inline-flex;
+    flex-direction: column;
+    flex-grow: 1;
     height: 100%;
 }
 
 .main{
-    width: 200vw;
-    background-color:var(--mdc-theme-background, #f0f0f1);
+/*    width: 200vw;     */
     padding:30px;
 }
 
@@ -89,6 +100,58 @@ h2{
 
 a{
     color:var(--mdc-theme-accent)
+}
+
+@media screen and (max-width:640px){
+    button.menu{
+        display: inherit;
+    }
+
+    .sm-screen-drawer{
+        position: fixed;
+        top: 0;
+        left: 0;
+        overflow: hidden;
+        contain: strict;
+        z-index: 3;
+    }
+
+    .sm-screen-drawer.mdc-persistent-drawer--open {
+         width:100%;
+         height:100%;
+       }
+
+       .sm-screen-drawer .nav-flex {
+          overflow-y:scroll;
+        }
+
+    .mdc-persistent-drawer:before {
+        display: block;
+        top: 0;
+        width: 100%;
+        background: rgba(0,0,0,.6);
+        content: "";
+        opacity: 0;
+        will-change: opacity;
+    }
+
+    .mdc-persistent-drawer--open:before {
+        opacity: 1;
+    }
+
+    .mdc-persistent-drawer:before, .mdc-persistent-drawer__drawer {
+        position: absolute;
+        left: 0;
+        height: 100%;
+    }
+    .sm-screen-drawer.mdc-persistent-drawer--open {
+     width:100%;
+     height:100%;
+   }
+
+   .sm-screen-drawer .nav-flex {
+      overflow-y:scroll;
+    }
 }
 
 /* Material Icon Import */
