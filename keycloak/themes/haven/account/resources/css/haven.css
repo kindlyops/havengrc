@@ -113,12 +113,13 @@ a{
     margin-top:10px;
 }
 
-#AccountForm div.mdc-textfield, #AccountForm input, #PasswordForm div.mdc-textfield, #PasswordForm input{
+#AccountForm div.mdc-textfield, #AccountForm input, #PasswordForm div.mdc-textfield, #PasswordForm input, #TotpForm div.mdc-textfield, #TotpForm input {
     width:100%;
 }
 
 #AccountForm input.mdc-textfield__input, #AccountForm label.mdc-textfield__label,
-#PasswordForm input.mdc-textfield__input, #PasswordForm label.mdc-textfield__label
+#PasswordForm input.mdc-textfield__input, #PasswordForm label.mdc-textfield__label,
+#TotpForm input.mdc-textfield__input, #TotpForm label.mdc-textfield__label
 {
     font-size: initial;
 }
@@ -177,6 +178,13 @@ a{
 
    .sm-screen-drawer .nav-flex {
       overflow-y:scroll;
+    }
+}
+
+@media screen and (max-width: 330px) {
+    .form-btn button {
+        width:100%;
+        margin-bottom:15px;
     }
 }
 
@@ -298,7 +306,7 @@ a{
 /* Authenticator page */
 
 ol {
-    padding-left: 40px;
+    padding-left: 0px;
 }
 
 ol li {

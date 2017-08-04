@@ -4,7 +4,7 @@
         <div class="mdc-layout-grid heading">
             <div class="mdc-layout-grid__inner">
 
-                <h2 class="mdc-typography mdc-layout-grid__cell--span-8">${msg("changePasswordHtmlTitle")}</h2>
+                <h2 class="mdc-typography mdc-layout-grid__cell--span-8-desktop mdc-layout-grid__cell--span-4-phone mdc-layout-grid__cell--span-4-tablet">${msg("changePasswordHtmlTitle")}</h2>
                 <span class="subtitle mdc-layout-grid__cell mdc-layout-grid--align-right">${msg("allFieldsRequired")}</span>
             </div>
         </div>
