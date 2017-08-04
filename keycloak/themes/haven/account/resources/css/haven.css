@@ -113,16 +113,19 @@ a{
     margin-top:10px;
 }
 
-#AccountForm div.mdc-textfield{
+#AccountForm div.mdc-textfield, #AccountForm input, #PasswordForm div.mdc-textfield, #PasswordForm input{
     width:100%;
 }
 
-#AccountForm input.mdc-textfield__input, #AccountForm label.mdc-textfield__label{
+#AccountForm input.mdc-textfield__input, #AccountForm label.mdc-textfield__label,
+#PasswordForm input.mdc-textfield__input, #PasswordForm label.mdc-textfield__label
+{
     font-size: initial;
 }
 
 .form-btn{
     float:right;
+    margin-top:20px;
 }
 
 @media screen and (max-width:640px){
