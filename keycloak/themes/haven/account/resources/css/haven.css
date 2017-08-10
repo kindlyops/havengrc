@@ -94,6 +94,10 @@ nav.mdc-list > a{
     padding:0px 30px;
 }
 
+.container-margin{
+    margin:0px 10px;
+}
+
 h2{
     font-family: 'Roboto', sans-serif !important;
 }
@@ -102,11 +106,21 @@ a{
     color:var(--mdc-theme-accent)
 }
 
+a:hover, a:focus{
+    color: var(--mdc-theme-primary);
+}
+
 .heading{
     border-bottom: 2px solid #e4e4e4;
+    padding: 16px 5px;
 }
 .subtitle{
     align-self: center;
+}
+
+label {
+    font-family: "ff-tisa-pro", serif;
+    bottom:0px !important;
 }
 
 #AccountForm > div{
@@ -124,10 +138,29 @@ a{
     font-size: initial;
 }
 
+#TotpTable thead, #SessionsTable thead, #ApplicationsTable thead {
+    font-weight: 700;
+    font-size: 16px;
+    font-family: serif;
+    white-space: nowrap;
+}
+
+#TotpForm{
+    margin: -35px 0px 0px 15px;
+}
+
 .form-btn{
     float:right;
     margin-top:20px;
 }
+
+.table-scroll{
+    overflow-x: auto;
+}
+
+ol {
+    padding-left: 15px;
+} /* Authenticator Page */
 
 @media screen and (max-width:640px){
     button.menu{
@@ -181,53 +214,16 @@ a{
     }
 }
 
-@media screen and (max-width: 330px) {
-    .form-btn button {
-        width:100%;
-        margin-bottom:15px;
+@media screen and (max-width:330px){
+    .totp-img{
+        margin-left:-25px;
     }
 }
-
-/* Material Icon Import */
-@font-face {
-  font-family: 'Material Icons';
-  font-style: normal;
-  font-weight: 400;
-  src: local('Material Icons'),
-    local('MaterialIcons-Regular');
-}
-
-.material-icons {
-  font-family: 'Material Icons';
-  font-weight: normal;
-  font-style: normal;
-  font-size: 24px;  /* Preferred icon size */
-  display: inline-block;
-  line-height: 1;
-  text-transform: none;
-  letter-spacing: normal;
-  word-wrap: normal;
-  white-space: nowrap;
-  direction: ltr;
-
-  /* Support for all WebKit browsers. */
-  -webkit-font-smoothing: antialiased;
-  /* Support for Safari and Chrome. */
-  text-rendering: optimizeLegibility;
-
-  /* Support for Firefox. */
-  -moz-osx-font-smoothing: grayscale;
-
-  /* Support for IE. */
-  font-feature-settings: 'liga';
-}
-
 
 /* Brought in from account.css */
 .required {
     color: #CB2915;
 }
-
 
 .alert {
     margin-top: 30px;
@@ -265,63 +261,7 @@ a{
     border-color: #5994B2;
 }
 
-.form-horizontal {
-    border-top: 1px solid #E9E8E8;
-    padding-top: 23px;
-}
-
-.form-horizontal .control-label {
-    color: #909090;
-    line-height: 1.4em;
-    padding-top: 5px;
-    position: relative;
-    text-align: right;
-    width: 100%;
-}
-
-.form-group {
-    position: relative;
-}
-
-.control-label + .required {
-    position: absolute;
-    right: -2px;
-    top: 0;
-}
-
-#kc-form-buttons {
-    text-align: right;
-    margin-top: 10px;
-}
-
-#kc-form-buttons .btn-primary {
-    float: right;
-    margin-left: 8px;
-}
-
-/* Authenticator page */
-
-ol {
-    padding-left: 0px;
-}
-
-ol li {
-    font-size: 13px;
-    margin-bottom: 10px;
-    position: relative;
-}
-
-ol li img {
-    margin-top: 15px;
-    margin-bottom: 5px;
-    border: 1px solid #eee;
-}
-
-hr + .form-horizontal {
-    border: none;
-    padding-top: 0;
-}
-
+/* Bootstrap drowpdown used on template header */
 .kc-dropdown{
     position: relative;
 }

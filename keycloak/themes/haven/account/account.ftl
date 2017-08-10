@@ -12,7 +12,7 @@
     </div>
 
     <div class="mdc-layout-grid">
-        <div class="mdc-layout-grid__inner" style="margin: 0px 30px;">
+        <div class="mdc-layout-grid__inner container-margin">
             <form action="${url.accountUrl}" class="mdc-layout-grid__cell--span-12" id="AccountForm" method="post">
                 <input type="hidden" id="stateChecker" name="stateChecker" value="${stateChecker?html}">
 

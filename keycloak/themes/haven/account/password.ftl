@@ -10,7 +10,7 @@
         </div>
 
         <div class="mdc-layout-grid">
-            <div class="mdc-layout-grid__inner" style="margin: 0px 30px;">
+            <div class="mdc-layout-grid__inner container-margin">
                 <form action="${url.passwordUrl}" class="mdc-layout-grid__cell--span-12" id="PasswordForm" method="post">
                     <input type="text" readonly value="this is not a login form" style="display: none;">
                     <input type="password" readonly value="this is not a login form" style="display: none;">
