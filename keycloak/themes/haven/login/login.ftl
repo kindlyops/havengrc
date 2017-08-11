@@ -1,4 +1,3 @@
-<link href="https://fonts.googleapis.com/css?family=Roboto:400,700,900" rel="stylesheet">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <#import "template.ftl" as layout>
 <@layout.registrationLayout displayInfo=social.displayInfo; section>
@@ -7,7 +6,7 @@
 
     <#elseif section = "header">
         <img src="${url.resourcesPath}/img/logo@2x.png" width="82" height="71" />
-        <h1 class="mdc-typography header">${msg("loginTitleHtml",(realm.displayNameHtml!''))}</h1>
+        <h1 class="mdc-typography login-header">${msg("loginTitleHtml",(realm.displayNameHtml!''))}</h1>
     <#elseif section = "form">
         <#if realm.password>
             <form id="kc-form-login" action="${url.loginAction}" method="post">
@@ -75,7 +74,6 @@
 
     </#if> <#-- end section = "title" -->
 </@layout.registrationLayout>
-
 <div class="bottom-container align-center">
     <div>
         <img alt="Wireframe graphic of compliance and risk dashboard Haven GRC" data-rjs="2" id="footer-lines" src="/img/footer_lines@2x.png" data-rjs-processed="true" title="" >
@@ -88,11 +86,3 @@
         </div>
     </footer>
 </div>
-
-<script>window.mdc.autoInit();</script>
-<script>
-    mdc.textfield.MDCTextfield.attachTo(document.querySelector('.mdc-textfield'));
-</script>
-<script>
-    mdc.ripple.MDCRipple.attachTo(document.querySelector('.mdc-button'));
-</script>
