@@ -16,6 +16,7 @@
     <title><#nested "title"></title>
     <link rel="icon" href="${url.resourcesPath}/img/favicon.ico" />
     <link href="https://fonts.googleapis.com/css?family=Roboto:400,700,900" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <#if properties.styles?has_content>
         <#list properties.styles?split(' ') as style>
             <link href="${url.resourcesPath}/${style}" rel="stylesheet" />
@@ -61,33 +62,32 @@
         </div>
     </#if>
 
-    <div class="login-content-container align-center">
-
-        <#if displayMessage && message?has_content>
-            <div class="${properties.kcFeedbackAreaClass!}">
-                <div class="alert alert-${message.type}">
-                    <#if message.type = 'success'><span class="${properties.kcFeedbackSuccessIcon!}"></span></#if>
-                    <#if message.type = 'warning'><span class="${properties.kcFeedbackWarningIcon!}"></span></#if>
-                    <#if message.type = 'error'><span class="${properties.kcFeedbackErrorIcon!}"></span></#if>
-                    <#if message.type = 'info'><span class="${properties.kcFeedbackInfoIcon!}"></span></#if>
-                    <span class="kc-feedback-text">${message.summary}</span>
+    <div class="login-content-container align-center mdc-layout-grid">
+        <div class="mdc-layout-grid__inner">
+            <#if displayMessage && message?has_content>
+                <div class="mdc-layout-grid__cell--span-12">
+                    <div class="alert alert-${message.type}">
+                        <#if message.type = 'success'><i class="material-icons">check_circle</i></#if>
+                        <#if message.type = 'warning'><i class="material-icons">warning</i></#if>
+                        <#if message.type = 'error'><i class="material-icons">error</i></#if>
+                        <#if message.type = 'info'><i class="material-icons">info</i></#if>
+                        <span class="alert-text">${message.summary}</span>
+                    </div>
                 </div>
-            </div>
-        </#if>
+            </#if>
 
-        <div id="kc-form" class="${properties.kcFormAreaClass!}">
-            <div id="kc-form-wrapper" class="${properties.kcFormAreaWrapperClass!}">
+            <div id="kc-form" class="mdc-layout-grid__cell--span-12">
                 <#nested "form">
             </div>
-        </div>
 
-        <#if displayInfo>
-            <div id="kc-info" class="${properties.kcInfoAreaClass!}">
-                <div id="kc-info-wrapper" class="${properties.kcInfoAreaWrapperClass!}">
-                    <#nested "info">
+            <#if displayInfo>
+                <div id="kc-info" class="${properties.kcInfoAreaClass!}">
+                    <div id="kc-info-wrapper" class="${properties.kcInfoAreaWrapperClass!}">
+                        <#nested "info">
+                    </div>
                 </div>
-            </div>
-        </#if>
+            </#if>
+        </div>
     </div>
 
 

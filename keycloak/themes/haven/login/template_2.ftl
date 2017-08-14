@@ -15,7 +15,8 @@
     </#if>
     <title><#nested "title"></title>
     <link rel="icon" href="${url.resourcesPath}/img/favicon.ico" />
-    <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700,900" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700,900" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <#if properties.styles?has_content>
         <#list properties.styles?split(' ') as style>
             <link href="${url.resourcesPath}/${style}" rel="stylesheet" />
@@ -66,30 +67,29 @@
     </#if>
 
     <div class="content-container-other mdc-layout-grid">
-
-        <#if displayMessage && message?has_content>
-            <div class="align-center">
-                <div class="alert alert-${message.type}">
-                    <#if message.type = 'success'><span class="pficon pficon-ok"></span></#if>
-                    <#if message.type = 'warning'><span class="${properties.kcFeedbackWarningIcon!}"></span></#if>
-                    <#if message.type = 'error'><span class="pficon pficon-error-octagon"></span><span class="pficon pficon-error-exclamation"></span></span></#if>
-                    <#if message.type = 'info'><span class="${properties.kcFeedbackInfoIcon!}"></span></#if>
-                    <span class="kc-feedback-text">${message.summary}</span>
+        <div class="mdc-layout-grid__inner">
+            <#if displayMessage && message?has_content>
+                <div class="align-center mdc-layout-grid__cell--span-12">
+                    <div class="alert alert-${message.type}">
+                        <#if message.type = 'success'><i class="material-icons">check_circle</i></#if>
+                        <#if message.type = 'warning'><i class="material-icons">warning</i></#if>
+                        <#if message.type = 'error'><i class="material-icons">error</i></#if>
+                        <#if message.type = 'info'><i class="material-icons">info</i></#if>
+                        <span class="alert-text">${message.summary}</span>
+                    </div>
                 </div>
-            </div>
-        </#if>
+            </#if>
 
-            <div class="mdc-layout-grid__inner">
-                <#nested "form">
-            </div>
+                <div class="mdc-layout-grid__cell--span-12">
+                    <#nested "form">
+                </div>
 
-        <#if displayInfo>
-            <div id="kc-info" class="mdc-layout-grid__inner">
+            <#if displayInfo>
                 <div id="kc-info-wrapper" class="mdc-layout-grid__cell--span-12">
                     <#nested "info">
                 </div>
-            </div>
-        </#if>
+            </#if>
+        </div>
     </div>
 
 

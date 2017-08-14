@@ -5,7 +5,7 @@
     <#if section = "header">
         <h1 class="">${msg("loginTotpTitle")}</h1>
     <#elseif section = "form">
-    <ol id="kc-totp-settings" class="mdc-layout-grid__cell--span-12">
+    <ol id="kc-totp-settings">
         <li>
             <p>${msg("loginTotpStep1")}</p>
         </li>
@@ -20,13 +20,13 @@
     </ol>
     <form action="${url.loginAction}" class="mdc-layout-grid__cell--span-12" id="TotpForm" method="post">
         <div class="mdc-textfield">
-                <input type="text" id="totp" name="totp" autocomplete="off" class="mdc-textfield__input" />
+            <input type="text" id="totp" name="totp" autocomplete="off" class="mdc-textfield__input" />
             <input type="hidden" id="totpSecret" name="totpSecret" value="${totp.totpSecret}" />
             <label for="totp" class="mdc-textfield__label">${msg("authenticatorCode")}</label>
         </div>
         <div class="form-btn">
-        <button class="mdc-button mdc-button--raised mdc-button--primary" type="submit" value="Sumbit">${msg("doSubmit")}</button>
-        <button type="submit" class="mdc-button mdc-button--raised" name="submitAction" value="Cancel">${msg("doCancel")}</button>
+            <button class="mdc-button mdc-button--raised mdc-button--primary" type="submit" value="Sumbit">${msg("doSubmit")}</button>
+            <button type="submit" class="mdc-button mdc-button--raised" name="submitAction" value="Cancel">${msg("doCancel")}</button>
         </div>
     </form>
     </#if>
