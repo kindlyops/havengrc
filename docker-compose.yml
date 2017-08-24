@@ -36,7 +36,7 @@ services:
   #   ports:
   #     - "5000:2015"
   keycloak:
-    image: havengrc-docker.jfrog.io/jboss/keycloak-postgres:3.0.0.Final
+    image: havengrc-docker.jfrog.io/jboss/keycloak-postgres:3.2.1.Final
     environment:
       - POSTGRES_DATABASE=mappamundi_dev
       - POSTGRES_USER=postgres
@@ -60,7 +60,7 @@ services:
     links:
       - db
   api:
-    image: havengrc-docker.jfrog.io/begriffs/postgrest:v0.4.0.0
+    image: havengrc-docker.jfrog.io/begriffs/postgrest:v0.4.2.0
     command: [postgrest, "/config"]
     ports:
       - "3001:3000"
@@ -76,7 +76,7 @@ services:
     volumes:
       - ./swagger/index.html:/usr/share/nginx/html/index.html
   db:
-    image: postgres:9.6.2
+    image: postgres:9.6.4
     ports:
       - "5434:5432"
     environment:

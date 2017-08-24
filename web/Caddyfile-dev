@@ -9,6 +9,7 @@ proxy / localhost:2016 {
 
 proxy /auth keycloak:8080 {
   transparent
+  header_upstream -Authorization
 }
 
 log / stdout "{combined}"
