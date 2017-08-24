@@ -20,6 +20,7 @@
         </#list>
     </#if>
     <link href="https://fonts.googleapis.com/css?family=Roboto:400,700,900" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Slab:400,700" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body class="admin-console user ${bodyClass} mdc-typography">
@@ -101,9 +102,9 @@
         <main class="main">
             <#if message?has_content>
                 <div class="alert alert-${message.type}">
-                    <#if message.type=='success' ><span class="pficon pficon-ok"></span></#if>
-                    <#if message.type=='error' ><span class="pficon pficon-error-octagon"></span><span class="pficon pficon-error-exclamation"></span></#if>
-                    ${message.summary}
+                    <#if message.type=='success' ><i class="material-icons">check_circle</i></#if>
+                    <#if message.type=='error' ><i class="material-icons">error</i></#if>
+                    <span class="alert-text">${message.summary}</span>
                 </div>
             </#if>
             <#nested "content">

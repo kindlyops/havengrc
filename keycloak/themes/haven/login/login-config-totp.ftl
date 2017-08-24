@@ -3,7 +3,7 @@
 <@layout.registrationLayout displayInfo=true; section>
 
     <#if section = "header">
-        <h1 class="">${msg("loginTotpTitle")}</h1>
+        <h2>${msg("loginTotpTitle")}</h2>
     <#elseif section = "form">
     <ol id="kc-totp-settings">
         <li>
@@ -26,7 +26,7 @@
         </div>
         <div class="form-btn">
             <button class="mdc-button mdc-button--raised mdc-button--primary" type="submit" value="Sumbit">${msg("doSubmit")}</button>
-            <button type="submit" class="mdc-button mdc-button--raised" name="submitAction" value="Cancel">${msg("doCancel")}</button>
+            <button class="mdc-button mdc-button--raised" type="submit" value="Cancel">${msg("doCancel")}</button>
         </div>
     </form>
     </#if>

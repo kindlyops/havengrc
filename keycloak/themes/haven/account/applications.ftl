@@ -8,13 +8,13 @@
         </div>
 
 
-        <div class="mdc-layout-grid table-scroll">
-            <div class="mdc-layout-grid__inner container-margin">
+        <div class="mdc-layout-grid">
+            <div class="mdc-layout-grid__inner container-margin table-scroll">
                 <form action="${url.revokeClientUrl}" method="post" class="mdc-layout-grid__cell--span-12">
                     <input type="hidden" id="stateChecker" name="stateChecker" value="${stateChecker?html}">
                     <input type="hidden" id="referrer" name="referrer" value="${stateChecker?html}">
 
-                    <table class="table table-striped table-bordered" id="ApplicationsTable">
+                    <table class="table table-striped table-bordered table-hover" id="ApplicationsTable">
                         <thead>
                             <tr>
                                 <td>${msg("application")}</td>

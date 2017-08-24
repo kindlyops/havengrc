@@ -3,7 +3,7 @@
     <#if section = "title">
         ${msg("loginTitle",realm.displayName)}
     <#elseif section = "header">
-        <h1>${msg("loginTitleHtml",realm.displayNameHtml)}</h1>
+        <h2>${msg("loginTitleHtml",realm.displayNameHtml)}</h2>
     <#elseif section = "form">
         <form id="LoginTotpForm" class="align-center" action="${url.loginAction}" method="post">
             <div class="mdc-textfield">

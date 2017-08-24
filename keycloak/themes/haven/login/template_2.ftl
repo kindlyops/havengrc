@@ -16,6 +16,7 @@
     <title><#nested "title"></title>
     <link rel="icon" href="${url.resourcesPath}/img/favicon.ico" />
     <link href="https://fonts.googleapis.com/css?family=Roboto:400,700,900" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Slab:400,700" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <#if properties.styles?has_content>
         <#list properties.styles?split(' ') as style>

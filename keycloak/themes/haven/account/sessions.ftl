@@ -7,10 +7,10 @@
             </div>
         </div>
 
-        <div class="mdc-layout-grid table-scroll">
-            <div class="mdc-layout-grid__inner container-margin">
+        <div class="mdc-layout-grid">
+            <div class="mdc-layout-grid__inner container-margin table-scroll">
                 <div class="mdc-layout-grid__cell--span-12">
-                    <table class="table table-striped table-bordered" id="SessionsTable">
+                    <table class="table table-striped table-bordered table-hover" id="SessionsTable">
                         <thead>
                             <tr>
                                 <td>${msg("ip")}</td>
