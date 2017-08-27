@@ -3,3 +3,4 @@
 .npm-debug.log
 web/*.js
 postgresql-data/*
+mailhog/*

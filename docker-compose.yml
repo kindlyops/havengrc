@@ -40,6 +40,11 @@ services:
     ports:
       - "8025:8025"
       - "1025:1025"
+    environment:
+      - MH_STORAGE=maildir
+      - MH_MAILDIR_PATH=/maildir
+    volumes:
+      - ./mailhog/maildir:/maildir
   keycloak:
     image: havengrc-docker.jfrog.io/jboss/keycloak-postgres:3.2.1.Final
     environment:
