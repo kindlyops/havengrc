@@ -35,6 +35,11 @@ services:
   #     dockerfile: ./marketing/Dockerfile
   #   ports:
   #     - "5000:2015"
+  mailhog:
+    image: mailhog/mailhog:v1.0.0
+    ports:
+      - "8025:8025"
+      - "1025:1025"
   keycloak:
     image: havengrc-docker.jfrog.io/jboss/keycloak-postgres:3.2.1.Final
     environment:
