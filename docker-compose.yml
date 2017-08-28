@@ -35,6 +35,11 @@ services:
   #     dockerfile: ./marketing/Dockerfile
   #   ports:
   #     - "5000:2015"
+  start_dependencies:
+    image: dadarek/wait-for-dependencies
+    depends_on:
+      - db
+    command: db:5432
   mailhog:
     image: mailhog/mailhog:v1.0.0
     ports:
@@ -46,6 +51,8 @@ services:
     volumes:
       - ./mailhog/maildir:/maildir
   keycloak:
+    depends_on:
+      - start_dependencies
     image: havengrc-docker.jfrog.io/jboss/keycloak-postgres:3.2.1.Final
     environment:
       - POSTGRES_DATABASE=mappamundi_dev
@@ -61,6 +68,8 @@ services:
     volumes:
       - ./keycloak/themes/haven:/opt/jboss/keycloak/themes/haven
       - ./keycloak/configuration/standalone.xml:/opt/jboss/keycloak/standalone/configuration/standalone.xml
+      - ./keycloak/data:/keycloak
+    command: ["-b", "0.0.0.0", "-Dkeycloak.migration.file=/keycloak/havendev-realm.json", "-Dkeycloak.migration.strategy=IGNORE_EXISTING", "-Dkeycloak.migration.provider=singleFile", "-Dkeycloak.migration.action=import"]
   sqitch:
     build:
       context: .
@@ -68,7 +77,10 @@ services:
     volumes:
       - .:/src
     links:
-      - db
+      - keycloak
+    depends_on:
+      - start_dependencies
+    command: [deploy]
   api:
     image: havengrc-docker.jfrog.io/begriffs/postgrest:v0.4.2.0
     command: [postgrest, "/config"]
@@ -76,7 +88,8 @@ services:
       - "3001:3000"
     links:
       - db
-    env_file: .env
+    depends_on:
+      - sqitch
     volumes:
       - ./postgrest/config:/config
   swagger:
@@ -107,4 +120,5 @@ services:
     ports:
       - "2015:2015"
     command: [/code/installrun.sh]
-    env_file: .env
+    environment:
+      - KEYCLOAK_CLIENT_ID=havendev

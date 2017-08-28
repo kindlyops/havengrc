@@ -36,7 +36,7 @@ Within the app we are using [SASS](http://sass-lang.com/), and the guidance from
 [Inverted Triangle CSS](https://www.xfive.co/blog/itcss-scalable-maintainable-css-architecture/)
 and [Reasonable CSS](http://rscss.io/) to try and keep the CSS manageable.
 
-## run the service
+## setting up the dev environment
 
 The db schema and migrations are managed using sqitch.
 The postgresql server, the postgrest API server, and the sqitch tool
@@ -57,32 +57,12 @@ Before you continue, you need to configure git to auto-correct line ending forma
 
      git config --global core.autocrlf true
 
-<br><br/>
-Create an .env file in the project root:
-##### Windows:
+## running the service 
 
-    echo.KEYCLOAK_CLIENT_ID=havendev >> .env
+You will normally run all the services using:
 
-##### Mac:
-
-    touch .env
-    echo KEYCLOAK_CLIENT_ID=havendev >> .env
-
-Once you have docker set up, you will need to run these commands the first
-time just to initialize the database:
-
-    docker-compose up -d db
-    docker-compose run sqitch deploy
-
-Then you will normally run all the services using:
-
+    docker-compose run start_dependencies
     docker-compose up
-
-The first time you bring the services up, you will want to import some test
-users and groups. Open http://localhost:8080/auth, sign in with admin/admin.
-Then go to 'add-realm' menu at the top right corner next to 'master', and import
-the ./keycloak/havendev-realm.json file from this repo. Select to import the
-havendev realm, and make sure it is enabled.
 
 From this point on, you just just be able to use docker-compose up/down normally.
 Move on to access the main webUI in the next section.
