@@ -113,6 +113,10 @@ Open http://localhost:5000/
 
     curl -s http://localhost:3001/ | jq
 
+# to see emails sent from Haven / keycloak
+
+Open http://localhost:8025, you can use mailhog to see messages stored in memory
+
 ## to export keycloak realm data (to refresh the dev users)
 
 First enter the keycloak container
