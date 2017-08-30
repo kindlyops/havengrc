@@ -89,6 +89,10 @@ Open http://localhost:8080/, you can sign in with admin/admin
 
 Open http://localhost:5000/
 
+## to access the GitBook documentation site
+
+Open http://localhost:4000/
+
 ## to see the REST API
 
     curl -s http://localhost:3001/ | jq
