@@ -122,3 +122,14 @@ services:
     command: [/code/installrun.sh]
     environment:
       - KEYCLOAK_CLIENT_ID=havendev
+  docs:
+    working_dir: /docs
+    volumes:
+      - ./docs:/docs
+      - /docs/node_modules
+    build:
+      context: .
+      dockerfile: ./docs/Dockerfile
+    ports:
+      - "4000:4000"
+    command: [serve]
