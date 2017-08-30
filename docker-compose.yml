@@ -81,6 +81,18 @@ services:
     depends_on:
       - start_dependencies
     command: [deploy]
+  apitest:
+    build:
+      context: .
+      dockerfile: ./apitest/Dockerfile
+    working_dir: /usr/src/app
+    volumes:
+      - ./apitest:/usr/src/app
+    links:
+      - api
+    depends_on:
+      - start_dependencies
+    command: [behave]
   api:
     image: havengrc-docker.jfrog.io/begriffs/postgrest:v0.4.2.0
     command: [postgrest, "/config"]
