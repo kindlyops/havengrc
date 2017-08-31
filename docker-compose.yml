@@ -92,12 +92,15 @@ services:
       - api
     depends_on:
       - start_dependencies
-    command: [behave]
+    command: [cucumber]
+    environment:
+      - endpoint=http://api/
+      - resource_single=true
   api:
     image: havengrc-docker.jfrog.io/begriffs/postgrest:v0.4.2.0
     command: [postgrest, "/config"]
     ports:
-      - "3001:3000"
+      - "3001:80"
     links:
       - db
     depends_on:

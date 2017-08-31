@@ -6,3 +6,4 @@ postgresql-data/*
 mailhog/*
 docs/node_modules/*
 docs/_book/*
+.vscode/*
