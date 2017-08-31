@@ -34,7 +34,7 @@ dependencies:
 
 test:
   override:
-    - docker-compose run sqitch deploy
+    - ./test
     - ./vendor/linux/hugo:
         pwd:
           marketing

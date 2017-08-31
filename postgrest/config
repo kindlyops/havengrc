@@ -4,7 +4,7 @@ db-anon-role = "postgres"
 db-pool = 10
 
 server-host = "*4"
-server-port = 3000
+server-port = 80
 
 ## base url for swagger output
 # server-proxy-uri = ""
