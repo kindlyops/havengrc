@@ -1,3 +1,6 @@
+html{
+    height:100%;
+}
 body {
   --mdc-theme-primary:#2FA09D;
   --mdc-theme-accent:#E86953;
@@ -8,6 +11,8 @@ body {
   -webkit-box-direction: normal;
   -ms-flex-direction: column;
   flex-direction: column;
+  font-family: 'Roboto Slab', serif;
+  min-height: 100%;
 }
 
 /* ---------- MS Edge browser support ---------- */
@@ -69,9 +74,28 @@ label {
     -webkit-box-flex: 2;
     -ms-flex: 2;
     padding-top:0px;
+    margin: 0 !important;
 }
 
-.login-btn{
+.login-box{
+    text-align: right;
+    border-right: 2px solid #87898C;
+    padding-right: 50px;
+    margin-right:-16px;
+}
+
+.forgot-password{
+    margin-right:84px;
+    margin-bottom: 20px;
+    font-size:13px;
+}
+
+.registration-link{
+    display: flex;
+    padding-left:30px;
+}
+
+.btn-primary{
     height: 42px !important;
     width: 200px !important;
     background-color: #2fa09d;
@@ -79,6 +103,7 @@ label {
 	line-height: 1.3333333;
 	border-radius: 25px;
 	margin-top:5px;
+    margin-bottom: 20px;
 	font-size: 12px;
 	font-weight: bold;
 }
@@ -87,6 +112,10 @@ label {
 	background-color:#f1f1f1;
 	overflow:hidden;
 	width:100%;
+}
+
+.bottom-container a:hover{
+    color: white;
 }
 
 .alert{
@@ -209,7 +238,7 @@ h2{
 }
 
 #TotpForm{
-    margin:-20px 0px 0px 40px;
+    margin-top:-20px;
 }
 
 .form-btn{
@@ -230,6 +259,22 @@ h2{
 }
 
 /* */
+
+@media screen and (max-width:479px){
+    .login-box{
+        border-right:0px;
+        border-bottom: 2px solid #87898C;
+        text-align: center;
+        padding-right:0px;
+        margin-right: 0;
+    }
+
+    .registration-link{
+        display: inline;
+        padding-left:0px;
+        text-align: center;
+    }
+}
 
 @media screen and (min-width: 768px){
     .login-header{

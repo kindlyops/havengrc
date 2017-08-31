@@ -42,6 +42,7 @@
     <div class="mdc-layout-grid">
         <div id="kc-header-wrapper" class="mdc-layout-grid__inner header-container align-center">
             <div class="mdc-layout-grid__cell--span-12">
+                <img src="${url.resourcesPath}/img/logo@2x.png" width="82" height="71" />
                 <#nested "header">
             </div>
         </div>
@@ -61,35 +62,43 @@
             </div>
         </div>
     </#if>
-
-    <div class="login-content-container align-center mdc-layout-grid">
-        <div class="mdc-layout-grid__inner">
-            <#if displayMessage && message?has_content>
-                <div class="mdc-layout-grid__cell--span-12">
-                    <div class="alert alert-${message.type}">
-                        <#if message.type = 'success'><i class="material-icons">check_circle</i></#if>
-                        <#if message.type = 'warning'><i class="material-icons">warning</i></#if>
-                        <#if message.type = 'error'><i class="material-icons">error</i></#if>
-                        <#if message.type = 'info'><i class="material-icons">info</i></#if>
-                        <span class="alert-text">${message.summary}</span>
-                    </div>
-                </div>
-            </#if>
-
-            <div id="kc-form" class="mdc-layout-grid__cell--span-12">
-                <#nested "form">
+    <#if displayMessage && message?has_content>
+<div class="mdc-layout-grid" style="max-width:550px; padding-top:0;">
+    <div class="mdc-layout-grid__inner">
+        <div class="mdc-layout-grid__cell--span-12 align-center">
+            <div class="alert alert-${message.type}">
+                <#if message.type = 'success'><i class="material-icons">check_circle</i></#if>
+                <#if message.type = 'warning'><i class="material-icons">warning</i></#if>
+                <#if message.type = 'error'><i class="material-icons">error</i></#if>
+                <#if message.type = 'info'><i class="material-icons">info</i></#if>
+                <span class="alert-text">${message.summary}</span>
             </div>
+        </div>
+    </div>
+</div>
+
+    </#if>
+    <div class="login-content-container mdc-layout-grid">
+        <div class="mdc-layout-grid__inner">
+                <#nested "form">
 
             <#if displayInfo>
-                <div id="kc-info" class="${properties.kcInfoAreaClass!}">
-                    <div id="kc-info-wrapper" class="${properties.kcInfoAreaWrapperClass!}">
                         <#nested "info">
-                    </div>
-                </div>
             </#if>
         </div>
     </div>
-
+    <div class="bottom-container align-center">
+        <div>
+            <img alt="Wireframe graphic of compliance and risk dashboard Haven GRC" data-rjs="2" id="footer-lines" src="/img/footer_lines@2x.png" data-rjs-processed="true" title="" >
+        </div>
+        <footer class="mdc-toolbar align-center">
+            <div class="mdc-toolbar__row">
+                <section class="mdc-toolbar__section" style="align-items:center !important;">
+                    <span>© 2017 <a href="https://kindlyops.com" title="Kindly Ops Website">KINDLY OPS</a></span>
+                </section>
+            </div>
+        </footer>
+    </div>
 
     <script>window.mdc.autoInit();</script>
     <script>

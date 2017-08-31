@@ -5,9 +5,9 @@
         ${msg("loginTitle",(realm.displayName!''))}
 
     <#elseif section = "header">
-        <img src="${url.resourcesPath}/img/logo@2x.png" width="82" height="71" />
         <h1 class="mdc-typography login-header">${msg("loginTitleHtml",(realm.displayNameHtml!''))}</h1>
     <#elseif section = "form">
+    <div class="mdc-layout-grid__cell--span-4-tablet mdc-layout-grid__cell--span-6-phone mdc-layout-grid__cell--span-6-desktop login-box">
         <#if realm.password>
             <form id="kc-form-login" action="${url.loginAction}" method="post">
                 <div>
@@ -30,9 +30,15 @@
                             <label for="password" class="mdc-textfield__label">${msg("password")}</label>
                         </div>
                     </div>
+                    <div class="forgot-password">
+                        <#if realm.resetPasswordAllowed>
+                            <a href="${url.loginResetCredentialsUrl}">${msg("doForgotPassword")}</a>
+                        </#if>
+                    </div>
                 </div>
 
                 <div class="${properties.kcFormGroupClass!}">
+                    <button class="mdc-button mdc-button--primary mdc-button--raised btn-primary" name="login" id="kc-login" type="submit" value="${msg(" doLogIn")}">Log in</button>
                     <div id="kc-form-options" class="${properties.kcFormOptionsClass!}">
                         <#if realm.rememberMe && !usernameEditDisabled??>
                             <div class="checkbox">
@@ -45,19 +51,15 @@
                                 </label>
                             </div>
                         </#if>
-                        <div class="${properties.kcFormOptionsWrapperClass!}">
-                            <#if realm.resetPasswordAllowed>
-                                <span><a href="${url.loginResetCredentialsUrl}">${msg("doForgotPassword")}</a></span>
-                            </#if>
-                        </div>
                     </div>
-                    <button class="mdc-button mdc-button--primary mdc-button--raised login-btn" name="login" id="kc-login" type="submit" value="${msg(" doLogIn")}">Log in</button>
                 </div>
             </form>
         </#if>
+    </div>
     <#elseif section = "info" >
+    <div class="mdc-layout-grid__cell--span-6-desktop mdc-layout-grid__cell--span-4-tablet mdc-layout-grid__cell--span-6-phone registration-link">
         <#if realm.password && realm.registrationAllowed && !usernameEditDisabled??>
-            <div id="kc-registration">
+            <div id="Registration" style="align-self:center;">
                 <span>${msg("noAccount")} <a href="${url.registrationUrl}">${msg("doRegister")}</a></span>
             </div>
         </#if>
@@ -71,18 +73,6 @@
                 </ul>
             </div>
         </#if>
-
+    </div>
     </#if> <#-- end section = "title" -->
 </@layout.registrationLayout>
-<div class="bottom-container align-center">
-    <div>
-        <img alt="Wireframe graphic of compliance and risk dashboard Haven GRC" data-rjs="2" id="footer-lines" src="/img/footer_lines@2x.png" data-rjs-processed="true" title="" >
-    </div>
-    <footer class="mdc-toolbar align-center">
-        <div class="mdc-toolbar__row">
-            <section class="mdc-toolbar__section" style="align-items:center !important;">
-                <span>© 2017 <a href="https://kindlyops.com" title="Kindly Ops Website">KINDLY OPS</a></span>
-            </section>
-        </div>
-    </footer>
-</div>
