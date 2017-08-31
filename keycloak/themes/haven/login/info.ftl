@@ -5,7 +5,7 @@
     <#elseif section = "header">
     <h2>${message.summary}</h2>
     <#elseif section = "form">
-    <div id="kc-info-message">
+    <div id="kc-info-message" class="align-center">
         <p class="instruction">${message.summary}<#if requiredActions??><#list requiredActions>: <b><#items as reqActionItem>${msg("requiredAction.${reqActionItem}")}<#sep>, </#items></b></#list><#else></#if></p>
         <#if skipLink??>
         <#else>

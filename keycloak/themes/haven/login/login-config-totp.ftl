@@ -17,17 +17,17 @@
         <li>
             <p>${msg("loginTotpStep3")}</p>
         </li>
+        <form action="${url.loginAction}" class="mdc-layout-grid__cell--span-12" id="TotpForm" method="post">
+            <div class="mdc-textfield">
+                <input type="text" id="totp" name="totp" autocomplete="off" class="mdc-textfield__input" />
+                <input type="hidden" id="totpSecret" name="totpSecret" value="${totp.totpSecret}" />
+                <label for="totp" class="mdc-textfield__label">${msg("authenticatorCode")}</label>
+            </div>
+            <div class="form-btn">
+                <button class="mdc-button mdc-button--raised mdc-button--primary" type="submit" value="Sumbit">${msg("doSubmit")}</button>
+                <button class="mdc-button mdc-button--raised" type="submit" value="Cancel">${msg("doCancel")}</button>
+            </div>
+        </form>
     </ol>
-    <form action="${url.loginAction}" class="mdc-layout-grid__cell--span-12" id="TotpForm" method="post">
-        <div class="mdc-textfield">
-            <input type="text" id="totp" name="totp" autocomplete="off" class="mdc-textfield__input" />
-            <input type="hidden" id="totpSecret" name="totpSecret" value="${totp.totpSecret}" />
-            <label for="totp" class="mdc-textfield__label">${msg("authenticatorCode")}</label>
-        </div>
-        <div class="form-btn">
-            <button class="mdc-button mdc-button--raised mdc-button--primary" type="submit" value="Sumbit">${msg("doSubmit")}</button>
-            <button class="mdc-button mdc-button--raised" type="submit" value="Cancel">${msg("doCancel")}</button>
-        </div>
-    </form>
     </#if>
 </@layout.registrationLayout>
