@@ -7,7 +7,6 @@ jobs:
       - run:
           name: Check docker compose version
           command: docker-compose -v
-      - setup_remote_docker
       - run:
           name: Build images
           command: docker-compose build
@@ -55,6 +54,8 @@ jobs:
     docker:
       - image: circleci/node:6.10-browsers
     steps:
+      - checkout
+      - setup_remote_docker
       - deploy:
           name: Prerelease
           command: |
