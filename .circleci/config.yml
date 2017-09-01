@@ -32,7 +32,7 @@ jobs:
           working_directory: web
       - run: 
           name: Install Web Components with bower
-          command: bower install
+          command: ./node_modules/bower/bin/bower install
           no_output_timeout: 15m
           working_directory: web
       - run: docker-compose run start_dependencies
