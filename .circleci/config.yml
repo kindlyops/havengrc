@@ -27,20 +27,28 @@ jobs:
             make && make install;
             cd ..;
           fi
-      - run: npm install --only=dev:
+      - run:
+          name: Install Elm system with npm
+          command: npm install --only=dev
           no_output_timeout: 15m
           working_directory: web
-      - run: bower install:
+      - run: 
+          name: Install Web Components with bower
+          command: bower install
           no_output_timeout: 15m
           working_directory: web
       - run: docker-compose run start_dependencies
       - run: docker-compose run sqitch
       - run: ./test
-      - run: ./vendor/linux/hugo:
+      - run:
+          name: Build marketing site with hugo
+          command: ./vendor/linux/hugo
           working_directory: marketing
       - run: docker build --rm=false -t kindlyops/complianceopsmarketing -f marketing/Dockerfile .
       - run: docker build --rm=false -t kindlyops/mappamundi .
-      - run: $HOME/$CIRCLE_PROJECT_REPONAME/sysconfcpus/bin/sysconfcpus -n 2 npm run-script build:
+      - run:
+          name: compile Elm project 
+          command: npm run-script build
           no_output_timeout: 15m
           working_directory: web
       - run: docker build --rm=false -t kindlyops/havenweb web
