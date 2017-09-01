@@ -56,7 +56,7 @@ jobs:
 
   deployment:
     steps:
-      deploy:
+      - deploy:
         name: Prerelease
         command: |
           if [ "${CIRCLE_BRANCH" == "master" ]; then
