@@ -6,13 +6,8 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Check if docker compose
+          name: Check docker compose version
           command: docker-compose -v
-      - run: 
-          name: Install Docker Compose
-          command: |
-            sudo curl -L https://github.com/docker/compose/releases/download/1.14.0/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
-            chmod +x /usr/local/bin/docker-compose
       - setup_remote_docker
       - run:
           name: Build images
