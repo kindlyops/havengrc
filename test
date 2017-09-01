@@ -1,4 +1,3 @@
 #!/bin/bash
 set -x
-docker-compose start start_dependencies 
 docker-compose run apitest
