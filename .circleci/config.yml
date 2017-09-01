@@ -1,8 +1,7 @@
 version: 2
 jobs:
   build:
-    docker:
-      - image: circleci/node:6.10-browsers
+    machine: true
     steps:
       - checkout
       - run:
@@ -13,7 +12,7 @@ jobs:
           name: Build images
           command: docker-compose build
       - restore_cache:
-          key: sysconfcpus-{{ checksum "sysconfcpus/bin/sysconfcpus" }}
+          key: sysconfcpus
       - run:
           name: Install sysconfcpus
           command: |
