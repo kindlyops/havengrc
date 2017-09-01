@@ -35,7 +35,6 @@ dependencies:
 test:
   override:
     - docker-compose run start_dependencies
-    - docker-compose start start_dependencies
     - docker-compose run sqitch
     - ./test
     - ./vendor/linux/hugo:
