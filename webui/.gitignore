@@ -1,5 +1,6 @@
 # Distribution
 dist/
+build/
 
 # elm-package generated files
 elm-stuff
@@ -14,3 +15,4 @@ bower_components
 # Desktop Services Store on macOS
 .DS_Store
 
+npm-debug.log

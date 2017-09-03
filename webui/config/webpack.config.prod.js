@@ -39,10 +39,6 @@ const extractTextPluginOptions = shouldUseRelativeAssetPaths
 module.exports = {
   // Don't attempt to continue if there are any errors.
   bail: true,
-  entry: [
-    paths.entry
-  ],
-  output: {
 
   entry: [paths.appIndexJs],
 
@@ -57,73 +53,138 @@ module.exports = {
     pathinfo: true,
 
     // Generated JS files.
-    filename: 'js/[name].[chunkhash:8].js'
+    filename: 'static/js/[name].[chunkhash:8].js'
   },
-  resolveLoader: {
 
-    // Look for loaders in own ./node_modules
-    root: paths.ownModules,
-    moduleTemplates: [ '*-loader' ]
-  },
   resolve: {
-    modulesDirectories: [ 'node_modules' ],
-    extensions: [ '', '.js', '.elm' ]
+    modules: ['node_modules'],
+    extensions: ['.js', '.elm']
   },
+
   module: {
     noParse: /\.elm$/,
-    loaders: [
+
+    rules: [
+      {
+        test: /\.js$/,
+        exclude: [/elm-stuff/, /node_modules/],
+        loader: require.resolve('babel-loader'),
+        query: {
+          presets: [
+            require.resolve('babel-preset-es2015'),
+            require.resolve('babel-preset-es2016'),
+            require.resolve('babel-preset-es2017')
+          ]
+        }
+      },
+
       {
         test: /\.elm$/,
-        exclude: [ /elm-stuff/, /node_modules/ ],
-
-        // Use the local installation of elm-make
-        loader: 'elm-webpack',
-        query: {
-          pathToMake: paths.elmMake
-        }
+        exclude: [/elm-stuff/, /node_modules/],
+        use: [
+          // string-replace-loader works as InterpolateHtmlPlugin for Elm,
+          // it replaces all of the %PUBLIC_URL% with the URL of your
+          // application, so you could serve static assets outside of the
+          // module system.
+          {
+            loader: require.resolve('string-replace-loader'),
+            query: {
+                  search: '%PUBLIC_URL%',
+                  replace: publicUrl
+            }
+          },
+          {
+            // Use the local installation of elm-make
+            loader: require.resolve('elm-webpack-loader'),
+            options: {
+              pathToMake: paths.elmMake
+            }
+          }
+        ]
       },
       {
         test: /\.scss$/,
-        loader: ExtractTextPlugin.extract('style', 'css?-autoprefixer!postcss!sass!import-glob')
+        use: ExtractTextPlugin.extract(
+          Object.assign(
+            {
+              fallback: require.resolve('style-loader'),
+              use: [
+                {
+                  loader: require.resolve('css-loader'),
+                  options: {
+                    minimize: true
+                  }
+                },
+                {
+                  loader: require.resolve('postcss-loader'),
+                  options: {
+                    ident: 'postcss', // https://webpack.js.org/guides/migrating/#complex-options
+                    plugins: () => [
+                      autoprefixer({
+                        browsers: [
+                          '>1%',
+                          'last 4 versions',
+                          'Firefox ESR',
+                          'not ie < 9'
+                        ]
+                      })
+                    ]
+                  }
+                },
+                require.resolve('sass-loader'),
+              ]
+            },
+            extractTextPluginOptions
+          )
+        )
       },
       {
-        test: /\.(ico|jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2)(\?.*)?$/,
-        exclude: /\/favicon.ico$/,
-        loader: 'file',
-        query: {
+        test: /\.html$/, // handles web components <link rel="import" href="path.html">
+        use: [
+          {
+            loader: require.resolve('wc-loader'),
+            options: { 
+              minify: true,
+              root: paths.appPath
+            }
+          }
+        ]
+      },
+      {
+        exclude: [/\.html$/, /\.js$/, /\.elm$/, /\.scss$/, /\.json$/, /\.svg$/],
+        loader: require.resolve('url-loader'),
+        options: {
+          limit: 10000,
+          name: 'static/media/[name].[hash:8].[ext]'
+      }
+      },
+      // "file" loader for svg
+      {
+        test: /\.svg$/,
+        loader: require.resolve('file-loader'),
+        options: {
+          name: 'static/media/[name].[hash:8].[ext]'
+        }
+      },
+      {
+        test: /\.eot$/,
+        loader: require.resolve('file-loader'),
+        options: {
           name: 'static/media/[name].[hash:8].[ext]'
         }
       }
     ]
   },
-  postcss: function() {
-    return [
-      autoprefixer({
-        browsers: [
-          '>1%',
-          'last 4 versions',
-          'Firefox ESR',
-          'not ie < 9'
-        ]
-      })
-    ];
-  },
-  plugins: [
 
-    // Remove the content of the ./dist/ folder.
-    new CleanWebpackPlugin([ 'dist' ], {
-      root: root,
-      verbose: true,
-      dry: false
-    }),
-    new webpack.DefinePlugin({
-      'process.env': {
-          APP_ENV: JSON.stringify('docker')
-      }
-    }),
+  plugins: [
+    new AssetsPlugin({ path: paths.appBuild }),
+
+    new DefinePlugin(env.stringified),
+
+    new InterpolateHtmlPlugin(env.raw),
 
     // Minify the compiled JavaScript.
-    new webpack.optimize.UglifyJsPlugin({
+    new UglifyJsPlugin({
       compress: {
         warnings: false
       },
@@ -134,8 +195,7 @@ module.exports = {
 
     new HtmlWebpackPlugin({
       inject: true,
-      template: paths.template,
-      favicon: paths.favicon,
+      template: paths.appHtml,
       minify: {
         removeComments: true,
         collapseWhitespace: true,
@@ -150,6 +210,9 @@ module.exports = {
       }
     }),
 
-    new ExtractTextPlugin('css/[name].[contenthash:8].css')
+    // Note: this won't work without ExtractTextPlugin.extract(..) in `loaders`.
+    new ExtractTextPlugin({
+      filename: cssFilename
+    })
   ]
 };

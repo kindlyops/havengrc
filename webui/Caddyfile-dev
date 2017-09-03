@@ -4,7 +4,7 @@ startup npm run-script start &
 proxy / localhost:2015 {
   transparent
   websocket
-  except /js /css /img /bower_components
+  except /js /css /fonts /img /bower_components
 }
 
 proxy /auth keycloak:8080 {
