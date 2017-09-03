@@ -63,11 +63,11 @@ module.exports = {
 
   resolve: {
     modules: ['node_modules'],
-    extensions: ['.js', '.elm', '.scss']
+    extensions: ['.js', '.elm']
   },
 
   module: {
-    noParse: /\.elm$/,
+    noParse: [ /\.elm$/ ],
 
     rules: [
       {
@@ -122,36 +122,37 @@ module.exports = {
       // In production, we use a plugin to extract that CSS to a file, but
       // in development "style" loader enables hot editing of CSS.
       {
-        test: /\.css$/,
+        test: /\.scss$/,
         use: [
-          require.resolve('style-loader'),
           {
-            loader: require.resolve('css-loader'),
+          loader: require.resolve('style-loader') // creates style nodes from JS strings
+          }, 
+          {
+            loader: require.resolve('css-loader'), // translates CSS into CommonJS
             options: {
               importLoaders: 1
             }
-          },
-          {
+          }, {
             loader: require.resolve('postcss-loader'),
             options: {
               ident: 'postcss', // https://webpack.js.org/guides/migrating/#complex-options
               plugins: () => [
-      autoprefixer({
-        browsers: [
-          '>1%',
-          'last 4 versions',
-          'Firefox ESR',
-          'not ie < 9'
-        ]
-      })
+                autoprefixer({
+                  browsers: [
+                    '>1%',
+                    'last 4 versions',
+                    'Firefox ESR',
+                    'not ie < 9'
+                  ]
+                })
               ]
             }
-          }
+          },
+          require.resolve('sass-loader') // compiles Sass to CSS
         ]
       },
-
       {
-        exclude: [/\.html$/, /\.js$/, /\.elm$/, /\.css$/, /\.json$/, /\.svg$/],
+        exclude: [/\.html$/, /\.js$/, /\.elm$/, /\.scss$/, /\.json$/, /\.svg$/],
         loader: require.resolve('url-loader'),
         options: {
           limit: 10000,

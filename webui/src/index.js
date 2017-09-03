@@ -1,6 +1,5 @@
-require('./main.scss');
-
-var Elm = require('./Main.elm');
+import './main.scss';
+import { Main } from './Main.elm';
 
 if (process.env.NODE_ENV === 'development') {
   var CLIENT_ID = process.env.ELM_APP_KEYCLOAK_CLIENT_ID;
@@ -24,7 +23,7 @@ window.addEventListener('WebComponentsReady', function() {
   // We delay Elm.Main.embed because of a problem with flickering caused by elm
   // emitting webcomponent tags before the webcomponent system is ready.
   // unrecognized tags are simply rendered as an empty div by browers.
-  var elmApp = Elm.Main.embed(document.getElementById('root'), authData);
+  var elmApp = Main.embed(document.getElementById('root'), authData);
 
   keycloak.init();
 
