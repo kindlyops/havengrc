@@ -124,19 +124,19 @@ services:
   webui:
     working_dir: /code
     volumes:
-      - ./web:/code
+      - ./webui:/code
       - /code/node_modules
     build:
       context: .
-      dockerfile: ./web/Dockerfile-hotreload
+      dockerfile: ./webui/Dockerfile-hotreload
     links:
       - api
       - keycloak
     ports:
-      - "2015:2015"
+      - "2015:2016"
     command: [/code/installrun.sh]
     environment:
-      - KEYCLOAK_CLIENT_ID=havendev
+      - ELM_APP_KEYCLOAK_CLIENT_ID=havendev
   docs:
     working_dir: /docs
     volumes:

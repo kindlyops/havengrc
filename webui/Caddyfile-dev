@@ -1,0 +1,16 @@
+0.0.0.0:2016 
+startup npm run-script start &
+
+proxy / localhost:2015 {
+  transparent
+  websocket
+  except /js /css /img /bower_components
+}
+
+proxy /auth keycloak:8080 {
+  transparent
+  header_upstream -Authorization
+}
+
+log / stdout "{combined}"
+errors stdout
