@@ -27,12 +27,12 @@ jobs:
           name: Install Elm system with npm
           command: npm install --only=dev
           no_output_timeout: 15m
-          working_directory: web
+          working_directory: webui
       - run: 
           name: Install Web Components with bower
           command: ./node_modules/bower/bin/bower install
           no_output_timeout: 15m
-          working_directory: web
+          working_directory: webui
       - run: docker-compose run start_dependencies
       - run: docker-compose run sqitch
       - run: ./test
