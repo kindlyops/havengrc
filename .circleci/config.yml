@@ -46,8 +46,8 @@ jobs:
           name: compile Elm project 
           command: npm run-script build
           no_output_timeout: 15m
-          working_directory: web
-      - run: docker build --rm=false -t kindlyops/havenweb web
+          working_directory: webui
+      - run: docker build --rm=false -t kindlyops/havenweb webui
 
 
   deployment:
