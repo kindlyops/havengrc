@@ -18,7 +18,7 @@ view model =
                     [ span [ class "text-success" ]
                         [ text "Compliance" ]
                     , span [ class "text-primary" ]
-                        [ text " + " ]
+                        [ text " & " ]
                     , span [ class "text-success" ]
                         [ text "Risk " ]
                     , text "Dashboard"
