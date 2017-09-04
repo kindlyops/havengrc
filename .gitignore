@@ -10,3 +10,4 @@ webui/elm-stuff/*
 webui/bower_components/*
 docs/_book/*
 .vscode/*
+npm-debug.log
