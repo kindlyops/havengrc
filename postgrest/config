@@ -1,6 +1,6 @@
 db-uri = "postgres://postgres@db/mappamundi_dev"
 db-schema = "1"
-db-anon-role = "postgres"
+db-anon-role = "anonymous"
 db-pool = 10
 
 server-host = "*4"
@@ -9,8 +9,8 @@ server-proxy-uri = "http://localhost:3001"
 
 ## choose a secret to enable JWT auth
 ## (use "@filename" to load from separate file)
-# jwt-secret = "foo"
-# secret-is-base64 = false
+jwt-secret = "DfWbWFIdCyk4bFZi6iW4Gi3sZtqmmazG2F4PPRqf4Ek="
+secret-is-base64 = true
 
 ## limit rows in response
 # max-rows = 1000

@@ -2,5 +2,5 @@
 %project=mappamundi
 %uri=https://github.com/kindlyops/mappamundi/
 
+roles 2016-08-04T19:57:33Z root <root@565bd8155434> # Add user roles
 dev 2016-09-21T15:21:22Z root <root@b9e980eb9b93> # Adding initial schema.
-roles 2016-10-04T19:57:33Z root <root@565bd8155434> # Add user roles
