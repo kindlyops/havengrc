@@ -7,3 +7,4 @@ mailhog/*
 docs/node_modules/*
 docs/_book/*
 .vscode/*
+docs/plantuml/*.png
