@@ -242,6 +242,7 @@ label {
 
 .table-scroll{
     overflow-x: auto;
+    padding-bottom: 25px;
 }
 
 #TotpForm{
