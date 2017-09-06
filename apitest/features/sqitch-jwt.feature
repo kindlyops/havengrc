@@ -17,6 +17,10 @@ Feature: Basic sqitch API interaction with JWT
         # this JWT secret was generated for testing purposes using `openssl rand -base64 32`
         # the same JWT secret is specified in postgrest/config so that auth will work.
         # TODO: figure out how to share a secret between keycloak so the Elm UI can authenticate
+        # here is how to get a token using curl
+        # http://blog.keycloak.org/2015/10/getting-started-with-keycloak-securing.html
+        # RESULT=`curl --data "grant_type=password&client_id=curl&username=user&password=password" http://localhost:8180/auth/realms/master/protocol/openid-connect/token`
+        # TOKEN=`echo $RESULT | sed 's/.*access_token":"//g' | sed 's/".*//g'`
 
     Scenario: Add/update a comment
         When I request to create a comment with:
