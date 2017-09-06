@@ -37,7 +37,7 @@ getRegulations =
             Debug.log "getRegulations called"
     in
         (Decode.list regulationDecoder)
-            |> Http.get regulationsUrl
+            |> Http.get regulationsUrl -- add Authorization header
             |> Http.send NewRegulations
 
 
@@ -57,7 +57,7 @@ postRegulation model =
         request =
             Http.request
                 { method = "POST"
-                , headers = []
+                , headers = [] -- add Authorization: Bearer $TOKEN
                 , url = url
                 , body = body
                 , expect = Http.expectString
