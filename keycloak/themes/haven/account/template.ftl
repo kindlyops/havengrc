@@ -24,7 +24,7 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body class="admin-console user ${bodyClass} mdc-typography">
-    <aside class="mdc-persistent-drawer mdc-typography sm-screen-drawer" id="aside">
+    <aside class="mdc-persistent-drawer mdc-typography sm-screen-drawer lg-screen-drawer" id="aside">
         <nav class="mdc-persistent-drawer__drawer bs-sidebar">
             <div class="nav-flex">
                 <div class="mdc-persistent-drawer__toolbar-spacer"></div>
@@ -117,15 +117,6 @@
     </script>
     <script>
         mdc.ripple.MDCRipple.attachTo(document.querySelector('.mdc-button'));
-    </script>
-    <script>
-        $(window).resize(function resize() {
-        if ($(window).width() > 640) {
-        return $('#aside').addClass('mdc-persistent-drawer--open');
-        }
-
-        $('#aside').removeClass('mdc-persistent-drawer--open');
-        }).trigger('resize');
     </script>
     <script>
         let drawer = new mdc.drawer.MDCPersistentDrawer(document.querySelector('.mdc-persistent-drawer'));
