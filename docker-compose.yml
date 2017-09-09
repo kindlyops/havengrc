@@ -148,3 +148,11 @@ services:
     ports:
       - "4000:4000"
     command: [serve]
+  plantuml:
+    working_dir: /docs
+    volumes:
+      - ./docs:/docs
+    build:
+      context: .
+      dockerfile: ./docs/plantuml/Dockerfile
+    command: [-v, /docs/plantuml/*.puml]

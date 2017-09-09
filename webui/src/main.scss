@@ -1,6 +1,12 @@
 body {
   /* No margin on body so toolbar can span the screen */
   margin: 0;
+  --mdc-theme-primary:#2FA09D;
+  --mdc-theme-accent:#E86953;
+  background-color:#f0f0f1;
+  font-family: "ff-tisa-web-pro",serif;
+  font-size: 16px;
+  color: #3f4145;
 }
 
 .elm-overlay {
@@ -124,17 +130,73 @@ right:45px;
   display: none;
 }
 
-/* ported from havengrc landing page, feel free to refactor */
-.jumbotron {
-  padding-bottom:150px;
+/* landing page */
+.header-container{
+  background-color:#fff;
+  padding-top:48px;
+  padding-bottom: 150px;
 }
 
-#wireframe-container {
-  margin-bottom:20px;
+.login-header{
+  text-transform: uppercase;
+  font-family: "mr-eaves-modern",sans-serif;
+  margin-top: 27px;
 }
 
-#wireframe {
-margin-top: -150px;
+.text-success{
+  color: var(--mdc-theme-accent,#E86953);
+}
+
+.text-primary{
+  color: var(--mdc-theme-primary,#2FA09D);
+}
+
+.login-btn{
+  height: 38px;
+  width: 180px;
+  border-radius: 25px;
+  font-size: 13px;
+  font-family: "mr-eaves-modern",sans-serif;
+  margin-bottom: 20px;
+}
+
+#wireframe-container{
+  margin-top: -150px;
+}
+
+.img-sm, .img-lg{
+  max-width: 100%;
+}
+
+.advantages-container{
+  max-width: 1170px;
+}
+
+.advantages-list h2{
+  text-transform: uppercase;
+  font-family: "mr-eaves-modern",sans-serif;
+  margin-bottom: 13px;
+  margin-top: 27px;
+}
+
+.advantages-list p{
+  line-height: 1.6875;
+  margin-top: 0;
+}
+
+footer {
+  font-family: "mr-eaves-modern",sans-serif;
+  height:55px;
+  padding:15px;
+  justify-content: center !important;
+}
+ footer a {
+   color: #fff;
+   text-decoration: underline;
+ }
+
+.align-center{
+  text-align:center;
 }
 
 #footer-lines-container {
@@ -142,21 +204,22 @@ margin-top: -150px;
 }
 #footer-lines {
   padding-top:80px;
-  margin-bottom:-63px;
+  margin-bottom:-68px;
+  width: 248px;
 }
 
-footer {
-  font-family: "mr-eaves-modern",sans-serif;
-  background-color: #2fa09d;
-  color: #fff;
-  text-align: center;
-  height:55px;
-  padding:15px;
+@media screen and (min-width: 768px) {
+  h1.login-header {
+      font-size: 72px;
+  }
+  .img-sm{
+    display: none;
+  }
+
 }
- footer a {
-   color: #fff;
-   text-decoration: underline;
- }
-footer p {
-  margin-bottom:0px;
+
+@media screen and (max-width: 767px){
+  .img-lg{
+    display: none;
+  }
 }
