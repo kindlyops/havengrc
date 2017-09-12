@@ -131,7 +131,9 @@ module.exports = {
                     ]
                   }
                 },
-                require.resolve('sass-loader'),
+                {
+                  loader: require.resolve('sass-loader')
+                }
               ]
             },
             extractTextPluginOptions
@@ -185,6 +187,11 @@ module.exports = {
         comments: false
       }
     }),
+
+    // TODO: with the html-webpack-plugin present, we are getting a crash
+    // during build. commenting out this plugin avoids the crash, but then
+    // we don't get a generated index.html with the appropriate links
+    // injected to load the compiled css and js bundles.
 
     new HtmlWebpackPlugin({
       inject: true,

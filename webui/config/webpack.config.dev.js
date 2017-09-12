@@ -148,7 +148,9 @@ module.exports = {
               ]
             }
           },
-          require.resolve('sass-loader') // compiles Sass to CSS
+          {
+            loader: require.resolve('sass-loader') // compiles Sass to CSS
+          }
         ]
       },
       {
