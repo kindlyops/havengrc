@@ -1,10 +1,14 @@
 .env
 .DS_Store
 .npm-debug.log
-web/*.js
 postgresql-data/*
 mailhog/*
 docs/node_modules/*
+webui/node_modules/*
+webui/public/node_modules/*
+webui/elm-stuff/*
+webui/bower_components/*
 docs/_book/*
 .vscode/*
+npm-debug.log
 docs/plantuml/*.png

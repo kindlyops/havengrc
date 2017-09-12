@@ -1,0 +1,18 @@
+# Distribution
+dist/
+build/
+
+# elm-package generated files
+elm-stuff
+
+# elm-repl generated files
+repl-temp-*
+
+# Dependency directories
+node_modules
+bower_components
+
+# Desktop Services Store on macOS
+.DS_Store
+
+npm-debug.log
