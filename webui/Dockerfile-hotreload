@@ -3,5 +3,4 @@ MAINTAINER  Kindly Ops, LLC <support@kindlyops.com>
 RUN mkdir /code
 WORKDIR /code
 COPY ./webui/package.json /code
-COPY ./webui/bower.json /code
-RUN npm install && node_modules/bower/bin/bower install --allow-root
+RUN npm install
