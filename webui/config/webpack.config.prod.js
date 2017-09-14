@@ -141,19 +141,6 @@ module.exports = {
         )
       },
       {
-        test: /\.html$/, // handles web components <link rel="import" href="path.html">
-        exclude: paths.appHtml,
-        use: [
-          {
-            loader: require.resolve('wc-loader'),
-            options: { 
-              minify: true,
-              root: paths.appPath
-            }
-          }
-        ]
-      },
-      {
         exclude: [/\.html$/, /\.js$/, /\.elm$/, /\.scss$/, /\.json$/, /\.svg$/],
         loader: require.resolve('url-loader'),
         options: {
