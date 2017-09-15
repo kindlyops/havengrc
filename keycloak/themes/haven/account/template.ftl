@@ -19,11 +19,11 @@
             <script type="text/javascript" src="${url.resourcesPath}/${script}"></script>
         </#list>
     </#if>
-    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700,900" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Roboto+Slab:400,700" rel="stylesheet">
+    <script src="https://use.typekit.net/fru8myg.js"></script>
+    <script>try{Typekit.load({ async: true });}catch(e){}</script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
-<body class="admin-console user ${bodyClass} mdc-typography">
+<body class="admin-console user ${bodyClass}">
     <aside class="mdc-persistent-drawer mdc-typography sm-screen-drawer lg-screen-drawer" id="aside">
         <nav class="mdc-persistent-drawer__drawer bs-sidebar">
             <div class="nav-flex">

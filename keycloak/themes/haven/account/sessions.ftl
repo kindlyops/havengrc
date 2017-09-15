@@ -8,8 +8,8 @@
         </div>
 
         <div class="mdc-layout-grid">
-            <div class="mdc-layout-grid__inner container-margin table-scroll">
-                <div class="mdc-layout-grid__cell--span-12">
+            <div class="mdc-layout-grid__inner container-margin">
+                <div class="mdc-layout-grid__cell--span-12 table-scroll">
                     <table class="table table-striped table-bordered table-hover" id="SessionsTable">
                         <thead>
                             <tr>
@@ -38,6 +38,8 @@
                         </tbody>
 
                     </table>
+                </div>
+                <div class="mdc-layout-grid__cell">
                     <a id="logout-all-sessions" href="${url.sessionsLogoutUrl}">${msg("doLogOutAllSessions")}</a>
                 </div>
             </div>

@@ -3,7 +3,7 @@
     <#if section = "title">
         ${msg("errorTitle")}
     <#elseif section = "header">
-        <h2 style="font-weight:600;">${msg("errorTitleHtml")}</h2>
+        <h2>${msg("errorTitleHtml")}</h2>
     <#elseif section = "form">
         <div class="align-center">
             <p class="instruction">${message.summary}</p>
