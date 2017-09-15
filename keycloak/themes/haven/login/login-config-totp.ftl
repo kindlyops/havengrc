@@ -12,7 +12,7 @@
         <li>
             <p>${msg("loginTotpStep2")}</p>
             <img id="kc-totp-secret-qr-code" src="data:image/png;base64, ${totp.totpSecretQrCode}" alt="Figure: Barcode"><br/>
-            <span class="code">${totp.totpSecretEncoded}</span>
+            <p class="code">${totp.totpSecretEncoded}</p>
         </li>
         <li>
             <p>${msg("loginTotpStep3")}</p>

@@ -10,8 +10,8 @@ body {
   display: flex;
   flex-direction: row;
   min-height: 100% !important;
-  font-size: 14px;
-  font-family: 'Roboto Slab', serif !important;
+
+  font-family:"ff-tisa-web-pro",serif ;
   margin: auto;
 }
 
@@ -64,8 +64,8 @@ nav.mdc-list{
 }
 
 nav.mdc-list > a{
-    font-family: 'Roboto Slab', serif !important;
-    font-size: 19px !important;
+    font-family:"ff-tisa-web-pro",serif !important;
+    font-size: 20px !important;
     padding:8px 16px !important;
 }
 
@@ -106,9 +106,8 @@ a.mdc-list-item:focus, a.mdc-list-item:active{
 }
 
 h2{
-    font-family: 'Roboto', sans-serif;
-    font-size: 22px;
-    font-weight: 300;
+    font-family: "mr-eaves-modern", sans-serif;
+    font-size: 28px;
 }
 
 a{
@@ -125,11 +124,11 @@ a:hover, a:focus{
 }
 .subtitle{
     align-self: center;
-    font-family: 'Roboto', sans-serif;
+    font-family: "mr-eaves-modern", sans-serif;
 }
 
 label {
-    font-family: 'Roboto Slab', serif;
+    font-family:"ff-tisa-web-pro",serif ;
 }
 
 .required {
@@ -139,7 +138,7 @@ label {
 .alert{
     border:2px solid transparent;
     padding: 7px;
-	font-family: "mr-eaves-modern", 'Roboto', sans-serif;
+	  font-family: "mr-eaves-modern", sans-serif;
     margin-top: 30px;
     margin-bottom: 0;
 }
@@ -177,10 +176,9 @@ label {
 }
 
 .form-btn button {
-    font-size: 12px;
-    font-weight: bold;
+    font-size: 13px;
     border-radius: 5px;
-    font-family: 'Roboto', sans-serif;
+    font-family: "mr-eaves-modern", sans-serif;
 }
 
 #AccountForm div.mdc-textfield, #AccountForm input, #PasswordForm div.mdc-textfield, #PasswordForm input, #TotpForm div.mdc-textfield, #TotpForm input {
@@ -203,7 +201,7 @@ label {
     background-repeat: repeat-x;
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fffafafa', endColorstr='#ffededed', GradientType=0);
     font-weight: 700;
-    font-family: 'Roboto', sans-serif;
+    font-family: "mr-eaves-modern", sans-serif;
     white-space: nowrap;
 }
 
@@ -238,7 +236,6 @@ label {
 
 .table-scroll{
     overflow-x: auto;
-    padding-bottom: 25px;
 }
 
 #TotpForm{
@@ -250,7 +247,7 @@ ol {
 } /* Authenticator Page */
 
 .code{
-    font-family: 'Roboto', sans-serif;
+    font-family: "mr-eaves-modern", sans-serif;
 }
 
 @media screen and (min-width:640px) {

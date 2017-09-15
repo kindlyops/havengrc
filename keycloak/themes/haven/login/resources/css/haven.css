@@ -11,7 +11,7 @@ body {
   -webkit-box-direction: normal;
   -ms-flex-direction: column;
   flex-direction: column;
-  font-family: 'Roboto Slab', serif;
+  font-family:"ff-tisa-web-pro",serif ;
   min-height: 100%;
 }
 
@@ -50,23 +50,21 @@ body {
 }
 
 .login-header{
-  font-family: "mr-eaves-modern", 'Roboto', sans-serif;
+  font-family: "mr-eaves-modern", sans-serif;
   text-transform: uppercase;
-  font-weight:700;
   color: var(--mdc-theme-accent);
-  letter-spacing: 1.2px;
   margin:27px auto;
-  font-size: 45px;
+  font-size: 58px;
 }
 
 .kc-feedback-text {
-	font-family: "mr-eaves-modern", 'Roboto', sans-serif;
+	font-family: "mr-eaves-modern", sans-serif;
     color: #cc0000;
 	font-size: 1.1em;
 }
 
 label {
-  font-family: 'Roboto Slab', serif;
+  font-family: "ff-tisa-web-pro",serif ;
 }
 
 .login-content-container{
@@ -85,7 +83,7 @@ label {
 }
 
 .forgot-password{
-    margin-right:84px;
+    margin-right:93px;
     margin-bottom: 20px;
     font-size:13px;
 }
@@ -96,7 +94,7 @@ label {
 }
 
 .btn-primary{
-    height: 42px !important;
+    height: 40px !important;
     width: 200px !important;
     background-color: #2fa09d;
     color: white;
@@ -104,8 +102,8 @@ label {
 	border-radius: 25px;
 	margin-top:5px;
     margin-bottom: 20px;
-	font-size: 12px;
-	font-weight: bold;
+	font-size: 13px;
+  font-family: "mr-eaves-modern", sans-serif;
 }
 
 .bottom-container{
@@ -121,7 +119,7 @@ label {
 .alert{
     border:2px solid transparent;
     padding: 7px;
-	font-family: "mr-eaves-modern", 'Roboto', sans-serif;
+	font-family: "mr-eaves-modern", sans-serif;
 }
 
 .alert i{
@@ -171,7 +169,7 @@ label {
 
 footer{
 	--mdc-theme-background:#2FA09D;
-	font-family: "mr-eaves-modern", 'Roboto', sans-serif;
+	font-family: "mr-eaves-modern", sans-serif;
 	height: 55px;
 	padding: 15px;
 	justify-content: center !important;
@@ -215,7 +213,7 @@ header.header{
 }
 
 .heading h1{
-    font-family: 'Roboto', sans-serif;
+    font-family: "mr-eaves-modern", sans-serif;
     color: #3f4145;
     font-weight: normal;
 }
@@ -226,11 +224,12 @@ header.header{
 }
 
 p{
-    font-family: 'Roboto Slab', serif;
+    font-family: "ff-tisa-web-pro",serif ;
 }
 
 h2{
-    font-weight: normal;
+  font-family: "mr-eaves-modern", sans-serif;
+  font-size: 28px;
 }
 
 #TotpForm div.mdc-textfield, #TotpForm input {
@@ -241,19 +240,24 @@ h2{
     margin-top:-20px;
 }
 
+.code{
+  font-family: "mr-eaves-modern", sans-serif;
+  font-size: 16px;
+}
+
 .form-btn{
     float:right;
     margin-top:20px;
 }
 
 .form-btn button {
-    font-size: 12px;
-    font-weight: bold;
+    font-size: 13px;
+    font-family: "mr-eaves-modern", sans-serif;
     border-radius: 5px;
 }
 
 @media screen and (max-width:330px){
-    #kc-totp-secret-qr-code{
+    #kc-totp-secret-qr-code, .code{
         margin-left:-25px;
     }
 }
@@ -278,6 +282,6 @@ h2{
 
 @media screen and (min-width: 768px){
     .login-header{
-        font-size: 62px;
+        font-size: 72px;
     }
 }
