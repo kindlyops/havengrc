@@ -333,7 +333,7 @@
     "username" : "user1@havengrc.com",
     "enabled" : true,
     "totp" : false,
-    "emailVerified" : false,
+    "emailVerified" : true,
     "firstName" : "User1",
     "lastName" : "One",
     "credentials" : [ {
@@ -349,7 +349,7 @@
       "config" : { }
     } ],
     "disableableCredentialTypes" : [ "password" ],
-    "requiredActions" : [ "VERIFY_EMAIL" ],
+    "requiredActions" : [ ],
     "realmRoles" : [ "uma_authorization", "offline_access" ],
     "clientRoles" : {
       "account" : [ "view-profile", "manage-account" ]
