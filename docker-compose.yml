@@ -97,7 +97,7 @@ services:
       - endpoint=http://api/
       - resource_single=true
   api:
-    image: havengrc-docker.jfrog.io/begriffs/postgrest:v0.4.2.0
+    image: havengrc-docker.jfrog.io/postgrest/postgrest:v0.4.3.0
     command: [postgrest, "/config"]
     ports:
       - "3001:80"

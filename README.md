@@ -194,7 +194,15 @@ A tutorial is available here. http://blog.jonharrington.org/postgrest-introducti
 ## Authentication with JWT and Keycloak
 
 TODO: explain how Keycloak realms, roles, users, and groups are configured
-and how to extract a JWT token for manually hitting the UI.
+
+In order to be able to get a token for a user, the user must have no pending actions in keycloak (like email verification or password change). To exchange a username and password for a Keycloak JWT token with curl:
+
+    $ TOKEN=`curl -s --data "grant_type=password&client_id=havendev&scope=openid%20username=user1@havengrc.com&password=password" http://localhost:2015/auth/realms/havendev/protocol/openid-connect/token | jq -r '.access_token'`
+
+TODO: figure out how to modify the scope claim and user configuration so that we can get a role claim in the token that postgrest will be able to use. We will probably need an upgraded version of postgrest with a fix for https://github.com/begriffs/postgrest/issues/906
+
+You can decode the token to inspect the contents at jwt.io. You will need to get the public cert from
+the Keycloak Admin interface: Havendev->Realm Settings->Keys->Public Key and enter it into the jwt.io page to decode the token.
 
 ## Deploying with kubernetes
 
