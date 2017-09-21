@@ -108,6 +108,7 @@ services:
     volumes:
       - ./postgrest/config:/config
       - ./postgrest/keycloak-dev-public-key.json:/keycloak-dev-public-key.json
+      - ./postgrest/vendor/postgrest:/usr/local/bin/postgrest
   swagger:
     image: havengrc-docker.jfrog.io/swaggerapi/swagger-ui:v3.0.2
     ports:
