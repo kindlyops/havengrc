@@ -19,8 +19,12 @@ server-proxy-uri = "http://localhost:3001"
 
 ## choose a secret to enable JWT auth
 ## (use "@filename" to load from separate file)
-jwt-secret = "DfWbWFIdCyk4bFZi6iW4Gi3sZtqmmazG2F4PPRqf4Ek="
-secret-is-base64 = true
+## The contents of the key file for keycloak were retrieved from keycloak using:
+## curl http://localhost:8080/auth/realms/havendev/protocol/openid-connect/certs | jq '.'
+jwt-secret = "@/keycloak-dev-public-key.json"
+jwt-aud = "havendev"
+
+# secret-is-base64 = false
 
 ## limit rows in response
 # max-rows = 1000
