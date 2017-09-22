@@ -90,6 +90,7 @@ services:
       - ./apitest:/usr/src/app
     links:
       - api
+      - keycloak
     depends_on:
       - start_dependencies
     command: [cucumber]
