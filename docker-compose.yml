@@ -40,6 +40,11 @@ services:
     depends_on:
       - db
     command: db:5432
+  start_keycloak:
+    image: dadarek/wait-for-dependencies
+    depends_on:
+      - keycloak
+    command: keycloak:8080
   mailhog:
     image: mailhog/mailhog:v1.0.0
     ports:
