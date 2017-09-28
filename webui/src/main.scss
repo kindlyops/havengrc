@@ -1,12 +1,15 @@
+html, body, #root, .container {
+  height:100%;
+}
+
 body {
-  /* No margin on body so toolbar can span the screen */
-  margin: 0;
   --mdc-theme-primary:#2FA09D;
   --mdc-theme-accent:#E86953;
-  background-color:#f0f0f1;
+  --mdc-theme-background: #f0f0f1;
+  background-color:var(--mdc-theme-background, #f0f0f1);
   font-family: "ff-tisa-web-pro",serif;
   font-size: 16px;
-  color: #3f4145;
+  margin:auto;
 }
 
 .elm-overlay {
@@ -14,121 +17,125 @@ body {
   z-index: 999;
 }
 
-app-toolbar {
-  /* Toolbar is the main header, so give it some color */
-  background-color: #E86953;
-  font-family: 'Roboto', Helvetica, sans-serif;
-  color: white;
-  --app-toolbar-font-size: 24px;
+.container{
+  display: flex;
 }
 
-#profiletoolbar {
-  background-color: #333333;
-  font-size: 15px;
-  min-height: 80px;
+.header{
+  background-color: var(--mdc-theme-accent) !important;
+  color: var(--mdc-theme-text-primary-on-primary,#fff);
 }
 
-.nav-menu > div {
-  display: block;
-  padding: 12px 16px;
-  font-size: 20px;
-  font-weight: 500;
+section.mdc-toolbar__section--align-start{
+  padding-left:16px;
+}
+
+button.menu{
+  display: none;
+  padding: 16px 0px;
+}
+
+.sidebar{
+    background-color:#fff;
+    border-right-width: 2px;
+    width: 256px;
+    overflow: inherit;
+}
+
+nav.mdc-list{
+    padding-top:0px;
+    overflow: scroll;
+}
+
+nav.mdc-list > a{
+    font-family:"ff-tisa-web-pro",serif !important;
+    font-size: 20px !important;
+    padding:8px 16px !important;
+    cursor: pointer;
+}
+
+.mdc-persistent-drawer .mdc-list-item__start-detail{
+    color:lightgray !important;
+}
+
+a.mdc-list-item:focus, a.mdc-list-item:active,
+button.user-menu-btn:active, button.user-menu-btn:focus{
+    -webkit-tap-highlight-color:transparent;
+}
+
+a.mdc-persistent-drawer--selected {
+    background-color:#888;
+    color: #3F4145 !important;
+}
+
+.nav-flex{
+    flex:1; /* keeps .drawer-logo at bottom and not overlaying rest of menu */
 }
 
 #content {
-  padding: 16px;
-  margin: 24px;
-  border-radius: 5px;
+  padding: 40px;
 }
 
-.main-header{
-  left:0px !important;
+.mdc-persistent-drawer__toolbar-spacer {
+    height: 56px;
 }
 
-#drawer {
-  top:64px;
-  box-shadow: #DBDBDC 5px 8px 18px;
-}
-
-#drawer > app-header-layout{
-  position: static;
-}
-
-#drawer > app-header-layout > div > iron-selector {
-  cursor: pointer;
-  > div > iron-icon {
-    color: lightgray;
-  }
-}
-
-app-drawer-layout:not([narrow]) [drawer-toggle] {
-  display: none;
-}
-
-.iron-selector-container{
-  display:flex;
-  flex-direction:column;
-  height:100%;
-}
-
-.nav-menu{
-  display:block;
-  flex:1;
-}
-
-.nav-menu > div.iron-selected {
-  background-color: #888;
+.user-container{
+  background-color: #333333;
+  color: white;
+  padding:20px 5px 5px 5px;
+  position: relative;
 }
 
 .user-avatar{
   width:55px;
   height: 55px;
   border-radius: 50%;
-  position: absolute;
-  bottom: 10px;
-  left:5px;
+  vertical-align: middle;
 }
 
 .user-name{
-position: absolute;
-right:45px;
+  margin-left: 15px;
+  vertical-align: sub;
 }
 
-.user-menu {
-  position: absolute;
-  right:0px;
-  bottom:0px;
+.user-container > .mdc-menu-anchor{
+  float: right;
+  top: 17px;
 }
 
-.user-menu-items{
-  min-width:125px !important;
-  position: fixed; /* The position, top, and left makes user menu drop below the icon instead of on top */
-  top: 65px;
-  right:-40px;
-  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
-              0 1px 5px 0 rgba(0, 0, 0, 0.12),
-              0 3px 1px -2px rgba(0, 0, 0, 0.2); /* box-shadow and border-radius overwrites design caused by position:fixed */
-  border-radius: 2px;
+.user-menu-btn{
+  color: white;
+  border: none;
+  background: none;
+  outline: none;
+  cursor: pointer;
 }
 
-.user-menu-items > a:hover, .user-menu-items > a:active, .user-menu-items > a:focus{
-  outline:0;
-  text-decoration: none;
+#UserDropdownMenu{
+  top:25px !important;
+  left: 5px !important;
 }
 
-.user-menu-items paper-item:hover, .user-menu-items paper-item:active {
-  background-color: #f0f0f1;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1), 0 0px 1px 0 rgba(0, 0, 0, 0.12), 0 1px 1px -5px rgba(0, 0, 0, 0.2);
+#UserDropdownMenu .mdc-list-item:hover,
+nav.mdc-list a:not(.mdc-persistent-drawer--selected):hover {
+  background-color: #F0F0F1;
+}
+
+#UserDropdownMenu > ul > a {
+    color: #3f4145;
+    text-decoration: none;
 }
 
 .drawer-logo{
   text-align:center;
-  padding-bottom:130px;
+  padding-bottom:30px;
+}
+.drawer-logo img {
+  height:71px;
+  width:82px;
 }
 
-[hidden] {
-  display: none;
-}
 
 /* landing page */
 .header-container{
@@ -203,10 +210,72 @@ footer {
 #footer-lines-container {
   overflow: hidden;
 }
+
 #footer-lines {
   padding-top:80px;
   margin-bottom:-68px;
   width: 248px;
+}
+
+@media screen and (max-width:400px){
+  #UserDropdownMenu{
+    right: 0px !important;
+    left: auto !important;
+  }
+}
+
+@media screen and (min-width:640px) {
+    .lg-screen-drawer{
+        width: 240px;
+        pointer-events: auto;
+    }
+    .lg-screen-drawer .mdc-persistent-drawer__drawer{
+        -webkit-transform: none;
+        transform: none;
+    }
+}
+
+@media screen and (max-width:640px){
+  button.menu{
+      display: inherit;
+  }
+
+  .sm-screen-drawer{
+      position: fixed;
+      top: 0;
+      left: 0;
+      contain: strict;
+      z-index: 3;
+  }
+
+  .sm-screen-drawer.mdc-persistent-drawer--open {
+       width:100%;
+       height:100%;
+     }
+
+     .sm-screen-drawer .nav-flex {
+
+      }
+
+  .mdc-persistent-drawer:before {
+      display: block;
+      top: 0;
+      width: 100%;
+      background: rgba(0,0,0,.6);
+      content: "";
+      opacity: 0;
+      will-change: opacity;
+  }
+
+  .mdc-persistent-drawer--open:before {
+      opacity: 1;
+  }
+
+  .mdc-persistent-drawer:before, .mdc-persistent-drawer__drawer {
+      position: absolute;
+      left: 0;
+      height: 100%;
+  }
 }
 
 @media screen and (min-width: 768px) {
