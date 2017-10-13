@@ -14,8 +14,6 @@ import View.LineChart as LineChart
 import Route exposing (Location(..), locFor)
 import String exposing (toLower)
 import Types exposing (Model, Msg)
-import WebComponents.App exposing (appDrawer, appDrawerLayout, appToolbar, appHeader, appHeaderLayout, ironSelector)
-import WebComponents.Paper as Paper
 
 
 header : Model -> Html Msg
@@ -53,49 +51,51 @@ view model user =
           , class "mdc-persistent-drawer mdc-typography sm-screen-drawer lg-screen-drawer"
           ]
         [ nav [ class "mdc-persistent-drawer__drawer sidebar" ]
-            [ div [ class "nav-flex" ]
-                [ div [ class "mdc-persistent-drawer__toolbar-spacer" ]
+            [ div [ class "mdc-persistent-drawer__toolbar-spacer" ]
+                []
+            , div [ class "user-container" ]
+                [ img [ attribute "sizing" "contain"
+                      , attribute "src" (getGravatar user.username)
+                      , class "user-avatar"
+                      ]
                     []
-                , div [ class "user-container" ]
-                    [ img [ attribute "sizing" "contain"
-                          , attribute "src" (getGravatar user.username)
-                          , class "user-avatar"
+                , span [ class "user-name" ]
+                    [ text user.firstName ]
+                , div [ class "mdc-menu-anchor" ]
+                    [ button [ id "UserDropdownButton"
+                        , class "user-menu-btn"
+                        ]
+                        [ i [ class "material-icons" ]
+                            [ text "arrow_drop_down"]
+                        ]
+                    , div [ id "UserDropdownMenu"
+                          , class "mdc-simple-menu"
+                          , attribute "tabindex" "-1"
                           ]
-                        []
-                    , span [ class "user-name" ]
-                        [ text user.firstName ]
-                    , div [ class "mdc-menu-anchor" ]
-                        [ button [ id "UserDropdownButton"
-                            , class "user-menu-btn"
-                            ]
-                            [ i [ class "material-icons" ]
-                                [ text "arrow_drop_down"]
-                            ]
-                        , div [ id "UserDropdownMenu"
-                              , class "mdc-simple-menu"
-                              , attribute "tabindex" "-1"
-                              ]
-                            [ ul [ class "mdc-simple-menu__items mdc-list" ]
-                                [ a [ class "mdc-list-item"
-                                    , href "/auth/realms/havendev/account/"
-                                    , attribute "tabindex" "0"
-                                    ]
-                                    [ text "Edit Account" ]
-                                , li [ class "mdc-list-item"
-                                     , onClick (Types.AuthenticationMsg Authentication.LogOut)
-                                     , attribute "tabindex" "0"
-                                     ]
-                                    [ text "Log Out" ]
+                        [ ul [ class "mdc-simple-menu__items mdc-list" ]
+                            [ a [ class "mdc-list-item"
+                                , href "/auth/realms/havendev/account/"
+                                , attribute "tabindex" "0"
                                 ]
+                                [ text "Edit Account" ]
+                            , li [ class "mdc-list-item"
+                                 , onClick (Types.AuthenticationMsg Authentication.LogOut)
+                                 , attribute "tabindex" "0"
+                                 ]
+                                [ text "Log Out" ]
                             ]
                         ]
                     ]
-                , nav [ class "mdc-persistent-drawer__content mdc-list" ]
-                      (List.map (\item -> drawerMenuItem model item) menuItems)
                 ]
-            , div [ class "drawer-logo" ]
-                [ img [ attribute "src" "%PUBLIC_URL%/img/logo@2x.png" ]
-                    []
+            , div [ class "nav-list-container" ] 
+                [ div [ class "nav-flex" ]
+                    [ nav [ class "mdc-persistent-drawer__content mdc-list" ]
+                          (List.map (\item -> drawerMenuItem model item) menuItems)
+                    ]
+                , div [ class "drawer-logo" ]
+                    [ img [ attribute "src" "%PUBLIC_URL%/img/logo@2x.png" ]
+                        []
+                    ]
                 ]
             ]
         ]
@@ -177,31 +177,50 @@ onValueChanged tagger =
 regulationsForm : Model -> Html Msg
 regulationsForm model =
     div
-        []
+        [ id "Regulations" ]
         -- TODO wire up a handler to save the data from these inputs into
         -- our model when they change
-        [ Paper.input
-            [ attribute "label" "URI"
-            , onValueChanged Types.SetRegulationURIInput
-            , value model.newRegulation.uri
+        [ div []
+            [ div [ class "mdc-textfield"
+                    , attribute "data-mdc-auto-init" "MDCTextfield"
+                    ]
+                  [ input [ class "mdc-textfield__input"
+                          , onValueChanged Types.SetRegulationURIInput
+                          , value model.newRegulation.uri
+                          ]
+                      []
+                  , label [ class "mdc-textfield__label" ] [ text "URI" ]
+                  ]
+              ]
+        , div []
+            [ div [ class "mdc-textfield"
+                  , attribute "data-mdc-auto-init" "MDCTextfield"
+                  ]
+                [ input [ class "mdc-textfield__input"
+                        , onValueChanged Types.SetRegulationIDInput
+                        , value model.newRegulation.identifier
+                        ]
+                    []
+                , label [ class "mdc-textfield__label" ] [ text "identifier" ]
+                ]
             ]
-            []
-        , Paper.input
-            [ attribute "label" "identifier"
-            , onValueChanged Types.SetRegulationIDInput
-            , value model.newRegulation.identifier
+        , div []
+            [ div [ class "mdc-textfield mdc-textfield--multiline"
+                  , attribute "data-mdc-auto-init" "MDCTextfield"
+                  ]
+                [ textarea [ class "mdc-textfield__input"
+                           , onValueChanged Types.SetRegulationDescriptionInput
+                           , value model.newRegulation.description
+                           , rows 4
+                           ]
+                    []
+                , label [ class "mdc-textfield__label" ] [ text "description" ]
+                ]
             ]
-            []
-        , Paper.textarea
-            [ attribute "label" "description"
-            , onValueChanged Types.SetRegulationDescriptionInput
-            , value model.newRegulation.description
-            ]
-            []
-        , Paper.button
-            [ attribute "raised" ""
-            , onClick (Types.GetRegulations model)
-            ]
+        , button [ class "mdc-button mdc-button--raised mdc-button--primary"
+                 , attribute "data-mdc-auto-init" "MDCRipple"
+                 , onClick (Types.GetRegulations model)
+                 ]
             [ text "Add" ]
         , div [ class "debug" ] [ text ("DEBUG: " ++ toString model.newRegulation) ]
         ]

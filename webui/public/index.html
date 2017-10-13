@@ -37,11 +37,6 @@
     <link href="%PUBLIC_URL%/css/material-components-web.min.css" rel="stylesheet">
     <script src="%PUBLIC_URL%/auth/js/keycloak.js"></script>
 
-    <script>
-      window.Polymer = {
-        dom: 'shadow'
-      };
-    </script>
 
 </head>
 <body>
@@ -58,8 +53,12 @@
         let menu = new mdc.menu.MDCSimpleMenu(document.getElementById('UserDropdownMenu'));
         document.getElementById('UserDropdownButton').addEventListener('click', () => menu.open = !menu.open);
 
+        mdc.textfield.MDCTextfield.attachTo(document.querySelector('.mdc-textfield'));
+
         window.mdc.autoInit();
-      }, 1500);
+
+      }, 500);
+
     </script>
 </body>
 </html>

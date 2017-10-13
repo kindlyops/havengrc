@@ -1,4 +1,4 @@
-html, body, #root, .container {
+html, .container {
   height:100%;
 }
 
@@ -10,6 +10,8 @@ body {
   font-family: "ff-tisa-web-pro",serif;
   font-size: 16px;
   margin:auto;
+  display: flex;
+  min-height: 100%;
 }
 
 .elm-overlay {
@@ -35,6 +37,10 @@ button.menu{
   padding: 16px 0px;
 }
 
+#MenuDrawer{
+  z-index: 3;
+}
+
 .sidebar{
     background-color:#fff;
     border-right-width: 2px;
@@ -44,7 +50,6 @@ button.menu{
 
 nav.mdc-list{
     padding-top:0px;
-    overflow: scroll;
 }
 
 nav.mdc-list > a{
@@ -66,6 +71,13 @@ button.user-menu-btn:active, button.user-menu-btn:focus{
 a.mdc-persistent-drawer--selected {
     background-color:#888;
     color: #3F4145 !important;
+}
+
+.nav-list-container { /* excludes user-container. This is to have scroll on the nav and fixes user menu from being hidden in sidebar. Possible mdc fix later. */
+    overflow-y: overlay;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 .nav-flex{
@@ -130,12 +142,29 @@ nav.mdc-list a:not(.mdc-persistent-drawer--selected):hover {
 .drawer-logo{
   text-align:center;
   padding-bottom:30px;
+  margin-top:24px;
 }
 .drawer-logo img {
   height:71px;
   width:82px;
 }
 
+#Regulations div.mdc-textfield, #Regulations .mdc-textfield__input{
+  width:300px;
+}
+
+#Regulations .mdc-textfield--multiline{
+  margin-top:35px;
+  margin-bottom: 20px;
+}
+
+#Regulations textarea{
+  font-family: inherit;
+}
+
+#Regulations .mdc-textfield--multiline > label.mdc-textfield__label--float-above{
+  left: 0px;
+}
 
 /* landing page */
 .header-container{
@@ -253,10 +282,6 @@ footer {
        height:100%;
      }
 
-     .sm-screen-drawer .nav-flex {
-
-      }
-
   .mdc-persistent-drawer:before {
       display: block;
       top: 0;
@@ -276,6 +301,11 @@ footer {
       left: 0;
       height: 100%;
   }
+
+  #Regulations div.mdc-textfield, #Regulations .mdc-textfield__input {
+    width: 200px;
+  }
+
 }
 
 @media screen and (min-width: 768px) {
