@@ -41,24 +41,5 @@
 </head>
 <body>
     <div id="root"></div>
-    <script>
-      setTimeout(function() {
-        mdc.drawer.MDCPersistentDrawer.attachTo(document.getElementById('MenuDrawer'));
-        let drawer = new mdc.drawer.MDCPersistentDrawer(document.getElementById('MenuDrawer'));
-        document.getElementById('MenuButton').addEventListener('click', function() {
-          drawer.open = !drawer.open;
-        });
-
-        mdc.menu.MDCSimpleMenu.attachTo(document.getElementById('UserDropdownMenu'));
-        let menu = new mdc.menu.MDCSimpleMenu(document.getElementById('UserDropdownMenu'));
-        document.getElementById('UserDropdownButton').addEventListener('click', () => menu.open = !menu.open);
-
-        mdc.textfield.MDCTextfield.attachTo(document.querySelector('.mdc-textfield'));
-
-        window.mdc.autoInit();
-
-      }, 500);
-
-    </script>
 </body>
 </html>
