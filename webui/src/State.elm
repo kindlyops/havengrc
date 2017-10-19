@@ -24,7 +24,7 @@ init initialUser location =
           , regulations = []
           , newRegulation = Regulation 0 "" "" ""
           }
-        , Cmd.batch [ routeCmd, getRegulations, Ports.applyMDC () ]
+        , Cmd.batch [ routeCmd, getRegulations ]
         )
 
 
@@ -47,7 +47,6 @@ update msg model =
                     model
                         ! [ Navigation.newUrl (Route.urlFor location)
                           , Ports.setTitle (Route.titleFor location)
-                          , Ports.applyMDC ()
                           ]
 
         UrlChange location ->

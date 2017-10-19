@@ -20,6 +20,24 @@ var elmApp = Main.embed(document.getElementById('root'), authData);
 
 keycloak.init();
 
+document.arrive(".mdc-textfield", function(){
+  window.mdc.autoInit(document, () => { });
+});
+
+document.arrive("#MenuButton", function(){
+  let drawer = new mdc.drawer.MDCPersistentDrawer(document.getElementById('MenuDrawer'));
+  document.getElementById('MenuButton').addEventListener('click', function () {
+    drawer.open = !drawer.open;
+  });
+});
+
+document.arrive("#UserDropdownMenu", function(){
+  let menu = new mdc.menu.MDCSimpleMenu(document.getElementById('UserDropdownMenu'));
+  document.getElementById('UserDropdownButton').addEventListener('click', () => menu.open = !menu.open);
+});
+
+
+
 keycloak.onAuthSuccess = function() {
   console.log("success from keycloak login");
   var result = { err: null, ok: null };
@@ -76,19 +94,4 @@ elmApp.ports.keycloakLogout.subscribe(function() {
 // set the page title
 elmApp.ports.setTitle.subscribe(function(title) {
   document.title = title;
-});
-
-// set MDC autoInit
-elmApp.ports.applyMDC.subscribe(function() {
-  let drawer = new mdc.drawer.MDCPersistentDrawer(document.getElementById('MenuDrawer'));
-  document.getElementById('MenuButton').addEventListener('click', function() {
-    drawer.open = !drawer.open;
-  });
-
-  let menu = new mdc.menu.MDCSimpleMenu(document.getElementById('UserDropdownMenu'));
-  document.getElementById('UserDropdownButton').addEventListener('click', () => menu.open = !menu.open);
-
-  mdc.textfield.MDCTextfield.attachTo(document.querySelector('.mdc-textfield'));
-
-  window.mdc.autoInit();
 });
