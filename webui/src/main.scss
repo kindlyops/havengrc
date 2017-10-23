@@ -14,6 +14,10 @@ body {
   min-height: 100%;
 }
 
+#root{
+  flex: 1;
+}
+
 .elm-overlay {
   /* make sure the elm time-travel control is on top */
   z-index: 999;
