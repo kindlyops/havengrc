@@ -14,32 +14,22 @@ import View.LineChart as LineChart
 import Route exposing (Location(..), locFor)
 import String exposing (toLower)
 import Types exposing (Model, Msg)
-import WebComponents.App exposing (appDrawer, appDrawerLayout, appToolbar, appHeader, appHeaderLayout, ironSelector)
-import WebComponents.Paper as Paper
 
 
 header : Model -> Html Msg
 header model =
-    appHeaderLayout
-        []
-        [ appHeader
-            [ attribute "fixed" ""
-            , attribute "slot" "header"
-            , class "main-header"
-            ]
-            [ appToolbar
-                [ classList [ ( "title-toolbar", True ), ( "nav-title-toolbar", True ) ] ]
-                [ Paper.iconButton
-                    [ attribute "icon" "menu"
-                    , attribute "drawer-toggle" ""
-                    ]
-                    []
-                , div [ attribute "main-title" "" ] [ text "Haven GRC" ]
-                , Paper.iconButton [ attribute "icon" "search" ] []
-                ]
-            ]
-        ]
-
+  div [ class "mdc-toolbar mdc-toolbar--fixed header" ]
+    [ div [ class "mdc-toolbar__row" ]
+       [ section [ class "mdc-toolbar__section mdc-toolbar__section--align-start" ]
+         [ button [ id "MenuButton"
+                  , class "menu material-icons mdc-toolbar__icon--menu"
+                  ]
+           [ text "menu" ]
+         , h1 [ class "mdc-toolbar__title" ]
+           [ text "Haven GRC" ]
+         ]
+       ]
+    ]
 
 getGravatar : String -> String
 getGravatar email =
@@ -56,77 +46,64 @@ getGravatar email =
 
 view : Model -> Keycloak.UserProfile -> Html Msg
 view model user =
-    appDrawerLayout
-        []
-        [ appDrawer
-            [ attribute "slot" "drawer"
-            , id "drawer"
-            ]
-            [ appHeaderLayout
-                [ attribute "has-scrolling-region" "" ]
-                [ appHeader
-                    [ attribute "fixed" ""
-                    , attribute "slot" "header"
-                    , class "main-header"
-                    ]
-                    [ appToolbar
-                        [ id "profiletoolbar" ]
-                        [ div [ class "user-container" ]
-                            [ node "iron-image"
-                                [ attribute "sizing" "contain"
-                                , attribute "src" (getGravatar user.username)
-                                , class "user-avatar"
-                                ]
-                                []
-                            , p [ class "user-name" ] [ text user.username ]
-                            ]
-                        , node "paper-menu-button"
-                            [ attribute "vertical-align" "top"
-                            , class "user-menu"
-                            ]
-                            [ node "paper-icon-button"
-                                [ attribute "icon" "arrow-drop-down"
-                                , attribute "slot" "dropdown-trigger"
-                                , class "dropdown-trigger"
-                                ]
-                                []
-                            , node "paper-listbox"
-                                [ attribute "slot" "dropdown-content"
-                                , class "user-menu-items"
-                                ]
-                                [ a [ href "/auth/realms/havendev/account/" ]
-                                    [ node "paper-item"
-                                        []
-                                        [ text "Edit Account" ]
-                                    ]
-                                , a [ href "#" ]
-                                    [ node "paper-item"
-                                        [ onClick (Types.AuthenticationMsg Authentication.LogOut) ]
-                                        [ text "Log Out" ]
-                                    ]
-                                ]
-                            ]
+  div [ class "container" ]
+    [ div [ id "MenuDrawer"
+          , class "mdc-persistent-drawer mdc-typography sm-screen-drawer lg-screen-drawer"
+          ]
+        [ nav [ class "mdc-persistent-drawer__drawer sidebar" ]
+            [ div [ class "mdc-persistent-drawer__toolbar-spacer" ]
+                []
+            , div [ class "user-container" ]
+                [ img [ attribute "sizing" "contain"
+                      , attribute "src" (getGravatar user.username)
+                      , class "user-avatar"
+                      ]
+                    []
+                , span [ class "user-name" ]
+                    [ text user.firstName ]
+                , div [ class "mdc-menu-anchor" ]
+                    [ button [ id "UserDropdownButton"
+                        , class "user-menu-btn"
                         ]
-                    ]
-                , div [ class "iron-selector-container" ]
-                    [ ironSelector
-                        [ class "nav-menu"
-                        , attribute "attr-for-selected" "name"
-                        , attribute "selected" (selectedItem model)
+                        [ i [ class "material-icons" ]
+                            [ text "arrow_drop_down"]
                         ]
-                        (List.map drawerMenuItem menuItems)
-                    , div [ class "drawer-logo" ]
-                        [ img
-                            [ attribute "src" "/img/logo.png" ]
-                            []
+                    , div [ id "UserDropdownMenu"
+                          , class "mdc-simple-menu"
+                          , attribute "tabindex" "-1"
+                          ]
+                        [ ul [ class "mdc-simple-menu__items mdc-list" ]
+                            [ a [ class "mdc-list-item"
+                                , href "/auth/realms/havendev/account/"
+                                , attribute "tabindex" "0"
+                                ]
+                                [ text "Edit Account" ]
+                            , li [ class "mdc-list-item"
+                                 , onClick (Types.AuthenticationMsg Authentication.LogOut)
+                                 , attribute "tabindex" "0"
+                                 ]
+                                [ text "Log Out" ]
+                            ]
                         ]
                     ]
                 ]
+            , div [ class "nav-list-container" ] 
+                [ div [ class "nav-flex" ]
+                    [ nav [ class "mdc-persistent-drawer__content mdc-list" ]
+                          (List.map (\item -> drawerMenuItem model item) menuItems)
+                    ]
+                , div [ class "drawer-logo" ]
+                    [ img [ attribute "src" "%PUBLIC_URL%/img/logo@2x.png" ]
+                        []
+                    ]
+                ]
             ]
-        , header model
-        , body model
         ]
-
+        , div [ class "mdc-toolbar-fixed-adjust" ]
+            [ header model
+            , body model
+            ]
+    ]
 
 selectedItem : Model -> String
 selectedItem model =
@@ -200,31 +177,50 @@ onValueChanged tagger =
 regulationsForm : Model -> Html Msg
 regulationsForm model =
     div
-        []
+        [ id "Regulations" ]
         -- TODO wire up a handler to save the data from these inputs into
         -- our model when they change
-        [ Paper.input
-            [ attribute "label" "URI"
-            , onValueChanged Types.SetRegulationURIInput
-            , value model.newRegulation.uri
+        [ div []
+            [ div [ class "mdc-textfield"
+                    , attribute "data-mdc-auto-init" "MDCTextfield"
+                    ]
+                  [ input [ class "mdc-textfield__input"
+                          , onValueChanged Types.SetRegulationURIInput
+                          , value model.newRegulation.uri
+                          ]
+                      []
+                  , label [ class "mdc-textfield__label" ] [ text "URI" ]
+                  ]
+              ]
+        , div []
+            [ div [ class "mdc-textfield"
+                  , attribute "data-mdc-auto-init" "MDCTextfield"
+                  ]
+                [ input [ class "mdc-textfield__input"
+                        , onValueChanged Types.SetRegulationIDInput
+                        , value model.newRegulation.identifier
+                        ]
+                    []
+                , label [ class "mdc-textfield__label" ] [ text "identifier" ]
+                ]
             ]
-            []
-        , Paper.input
-            [ attribute "label" "identifier"
-            , onValueChanged Types.SetRegulationIDInput
-            , value model.newRegulation.identifier
+        , div []
+            [ div [ class "mdc-textfield mdc-textfield--multiline"
+                  , attribute "data-mdc-auto-init" "MDCTextfield"
+                  ]
+                [ textarea [ class "mdc-textfield__input"
+                           , onValueChanged Types.SetRegulationDescriptionInput
+                           , value model.newRegulation.description
+                           , rows 4
+                           ]
+                    []
+                , label [ class "mdc-textfield__label" ] [ text "description" ]
+                ]
             ]
-            []
-        , Paper.textarea
-            [ attribute "label" "description"
-            , onValueChanged Types.SetRegulationDescriptionInput
-            , value model.newRegulation.description
-            ]
-            []
-        , Paper.button
-            [ attribute "raised" ""
-            , onClick (Types.GetRegulations model)
-            ]
+        , button [ class "mdc-button mdc-button--raised mdc-button--primary"
+                 , attribute "data-mdc-auto-init" "MDCRipple"
+                 , onClick (Types.GetRegulations model)
+                 ]
             [ text "Add" ]
         , div [ class "debug" ] [ text ("DEBUG: " ++ toString model.newRegulation) ]
         ]
@@ -257,19 +253,22 @@ type alias MenuItem =
 
 menuItems : List MenuItem
 menuItems =
-    [ { text = "Dashboard", iconName = "icons:dashboard", route = Just Home }
-    , { text = "Activity", iconName = "icons:history", route = Just Activity }
-    , { text = "Reports", iconName = "av:library-books", route = Just Reports }
-    , { text = "Regulations", iconName = "icons:gavel", route = Just Regulations }
+    [ { text = "Dashboard", iconName = "dashboard", route = Just Home }
+    , { text = "Activity", iconName = "history", route = Just Activity }
+    , { text = "Reports", iconName = "library_books", route = Just Reports }
+    , { text = "Regulations", iconName = "gavel", route = Just Regulations }
     ]
 
 
-drawerMenuItem : MenuItem -> Html Msg
-drawerMenuItem menuItem =
-    div
-        [ attribute "name" (toLower menuItem.text)
-        , onClick <| Types.NavigateTo <| menuItem.route
-        ]
-        [ node "iron-icon" [ attribute "icon" menuItem.iconName ] []
-        , text (" " ++ menuItem.text)
-        ]
+drawerMenuItem : Model -> MenuItem -> Html Msg
+drawerMenuItem model menuItem =
+    a
+      [ attribute "name" (toLower menuItem.text)
+      , onClick <| Types.NavigateTo <| menuItem.route
+      , classList [ ("mdc-list-item", True)
+                  , ("mdc-persistent-drawer--selected", (toLower menuItem.text) == (selectedItem model) )
+                  ]
+      ]
+      [ i [ class "material-icons mdc-list-item__start-detail" ] [ text menuItem.iconName ]
+      , text menuItem.text
+      ]
