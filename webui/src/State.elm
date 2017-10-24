@@ -16,15 +16,18 @@ init initialUser location =
     let
         ( route, routeCmd ) =
             Route.init (Just location)
+
+        model =
+            { count = 0
+            , authModel = (Authentication.init Ports.keycloakShowLock Ports.keycloakLogout initialUser)
+            , route = route
+            , selectedTab = 0
+            , regulations = []
+            , newRegulation = Regulation 0 "" "" ""
+            }
     in
-        ( { count = 0
-          , authModel = (Authentication.init Ports.keycloakShowLock Ports.keycloakLogout initialUser)
-          , route = route
-          , selectedTab = 0
-          , regulations = []
-          , newRegulation = Regulation 0 "" "" ""
-          }
-        , Cmd.batch [ routeCmd, getRegulations ]
+        ( model
+        , Cmd.batch [ routeCmd, getRegulations model ]
         )
 
 
@@ -100,7 +103,7 @@ update msg model =
             in
                 -- TODO we need a more sophisticated way to deal with loading
                 -- paginated data and not re-fetching data we already have
-                { model | newRegulation = Regulation 0 "" "" "" } ! [ getRegulations ]
+                { model | newRegulation = Regulation 0 "" "" "" } ! [ getRegulations model ]
 
         NewRegulation (Err error) ->
             -- TODO unify REST error handling

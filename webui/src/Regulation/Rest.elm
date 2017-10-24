@@ -3,6 +3,7 @@ module Regulation.Rest exposing (..)
 import Http
 import Json.Decode as Decode exposing (Decoder, field, succeed)
 import Json.Encode as Encode
+import Keycloak
 import Regulation.Types exposing (..)
 import Types exposing (..)
 
@@ -30,15 +31,39 @@ regulationsUrl =
     "http://localhost:3001/regulation"
 
 
-getRegulations : Cmd Msg
-getRegulations =
+getRegulations : Model -> Cmd Msg
+getRegulations model =
     let
-        _ =
-            Debug.log "getRegulations called"
+        request =
+            Http.request
+                { method = "GET"
+                , headers = tryGetAuthHeader model
+                , url = regulationsUrl
+                , body = Http.emptyBody
+                , expect = Http.expectJson (Decode.list regulationDecoder)
+                , timeout = Nothing
+                , withCredentials = True
+                }
     in
-        (Decode.list regulationDecoder)
-            |> Http.get regulationsUrl -- add Authorization header
-            |> Http.send NewRegulations
+        Http.send NewRegulations request
+
+
+tryGetAuthHeader : Model -> List Http.Header
+tryGetAuthHeader model =
+    case model.authModel.state of
+        Keycloak.LoggedIn user ->
+            let
+                _ =
+                    Debug.log ("user token is: " ++ user.token)
+            in
+                [ (Http.header "Authorization" ("Bearer " ++ user.token)) ]
+
+        Keycloak.LoggedOut ->
+            let
+                _ =
+                    Debug.log "didn't get a user token"
+            in
+                []
 
 
 postRegulation : Model -> Cmd Msg
@@ -57,12 +82,12 @@ postRegulation model =
         request =
             Http.request
                 { method = "POST"
-                , headers = [] -- add Authorization: Bearer $TOKEN
+                , headers = tryGetAuthHeader model
                 , url = url
                 , body = body
                 , expect = Http.expectString
                 , timeout = Nothing
-                , withCredentials = False
+                , withCredentials = True
                 }
     in
         Http.send NewRegulation request
