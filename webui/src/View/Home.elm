@@ -7,7 +7,7 @@ import Date
 import List exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onClick, onWithOptions, on)
+import Html.Events exposing (onClick, onInput, onWithOptions, on)
 import Json.Decode as Json
 import Keycloak
 import View.LineChart as LineChart
@@ -18,18 +18,20 @@ import Types exposing (Model, Msg)
 
 header : Model -> Html Msg
 header model =
-  div [ class "mdc-toolbar mdc-toolbar--fixed header" ]
-    [ div [ class "mdc-toolbar__row" ]
-       [ section [ class "mdc-toolbar__section mdc-toolbar__section--align-start" ]
-         [ button [ id "MenuButton"
-                  , class "menu material-icons mdc-toolbar__icon--menu"
-                  ]
-           [ text "menu" ]
-         , h1 [ class "mdc-toolbar__title" ]
-           [ text "Haven GRC" ]
-         ]
-       ]
-    ]
+    div [ class "mdc-toolbar mdc-toolbar--fixed header" ]
+        [ div [ class "mdc-toolbar__row" ]
+            [ section [ class "mdc-toolbar__section mdc-toolbar__section--align-start" ]
+                [ button
+                    [ id "MenuButton"
+                    , class "menu material-icons mdc-toolbar__icon--menu"
+                    ]
+                    [ text "menu" ]
+                , h1 [ class "mdc-toolbar__title" ]
+                    [ text "Haven GRC" ]
+                ]
+            ]
+        ]
+
 
 getGravatar : String -> String
 getGravatar email =
@@ -46,64 +48,71 @@ getGravatar email =
 
 view : Model -> Keycloak.UserProfile -> Html Msg
 view model user =
-  div [ class "container" ]
-    [ div [ id "MenuDrawer"
-          , class "mdc-persistent-drawer mdc-typography sm-screen-drawer lg-screen-drawer"
-          ]
-        [ nav [ class "mdc-persistent-drawer__drawer sidebar" ]
-            [ div [ class "mdc-persistent-drawer__toolbar-spacer" ]
-                []
-            , div [ class "user-container" ]
-                [ img [ attribute "sizing" "contain"
-                      , attribute "src" (getGravatar user.username)
-                      , class "user-avatar"
-                      ]
+    div [ class "container" ]
+        [ div
+            [ id "MenuDrawer"
+            , class "mdc-persistent-drawer mdc-typography sm-screen-drawer lg-screen-drawer"
+            ]
+            [ nav [ class "mdc-persistent-drawer__drawer sidebar" ]
+                [ div [ class "mdc-persistent-drawer__toolbar-spacer" ]
                     []
-                , span [ class "user-name" ]
-                    [ text user.firstName ]
-                , div [ class "mdc-menu-anchor" ]
-                    [ button [ id "UserDropdownButton"
-                        , class "user-menu-btn"
+                , div [ class "user-container" ]
+                    [ img
+                        [ attribute "sizing" "contain"
+                        , attribute "src" (getGravatar user.username)
+                        , class "user-avatar"
                         ]
-                        [ i [ class "material-icons" ]
-                            [ text "arrow_drop_down"]
-                        ]
-                    , div [ id "UserDropdownMenu"
-                          , class "mdc-simple-menu"
-                          , attribute "tabindex" "-1"
-                          ]
-                        [ ul [ class "mdc-simple-menu__items mdc-list" ]
-                            [ a [ class "mdc-list-item"
-                                , href "/auth/realms/havendev/account/"
-                                , attribute "tabindex" "0"
+                        []
+                    , span [ class "user-name" ]
+                        [ text user.firstName ]
+                    , div [ class "mdc-menu-anchor" ]
+                        [ button
+                            [ id "UserDropdownButton"
+                            , class "user-menu-btn"
+                            ]
+                            [ i [ class "material-icons" ]
+                                [ text "arrow_drop_down" ]
+                            ]
+                        , div
+                            [ id "UserDropdownMenu"
+                            , class "mdc-simple-menu"
+                            , attribute "tabindex" "-1"
+                            ]
+                            [ ul [ class "mdc-simple-menu__items mdc-list" ]
+                                [ a
+                                    [ class "mdc-list-item"
+                                    , href "/auth/realms/havendev/account/"
+                                    , attribute "tabindex" "0"
+                                    ]
+                                    [ text "Edit Account" ]
+                                , li
+                                    [ class "mdc-list-item"
+                                    , onClick (Types.AuthenticationMsg Authentication.LogOut)
+                                    , attribute "tabindex" "0"
+                                    ]
+                                    [ text "Log Out" ]
                                 ]
-                                [ text "Edit Account" ]
-                            , li [ class "mdc-list-item"
-                                 , onClick (Types.AuthenticationMsg Authentication.LogOut)
-                                 , attribute "tabindex" "0"
-                                 ]
-                                [ text "Log Out" ]
                             ]
                         ]
                     ]
-                ]
-            , div [ class "nav-list-container" ] 
-                [ div [ class "nav-flex" ]
-                    [ nav [ class "mdc-persistent-drawer__content mdc-list" ]
-                          (List.map (\item -> drawerMenuItem model item) menuItems)
-                    ]
-                , div [ class "drawer-logo" ]
-                    [ img [ attribute "src" "%PUBLIC_URL%/img/logo@2x.png" ]
-                        []
+                , div [ class "nav-list-container" ]
+                    [ div [ class "nav-flex" ]
+                        [ nav [ class "mdc-persistent-drawer__content mdc-list" ]
+                            (List.map (\item -> drawerMenuItem model item) menuItems)
+                        ]
+                    , div [ class "drawer-logo" ]
+                        [ img [ attribute "src" "%PUBLIC_URL%/img/logo@2x.png" ]
+                            []
+                        ]
                     ]
                 ]
             ]
-        ]
         , div [ class "mdc-toolbar-fixed-adjust" ]
             [ header model
             , body model
             ]
-    ]
+        ]
+
 
 selectedItem : Model -> String
 selectedItem model =
@@ -181,46 +190,53 @@ regulationsForm model =
         -- TODO wire up a handler to save the data from these inputs into
         -- our model when they change
         [ div []
-            [ div [ class "mdc-textfield"
-                    , attribute "data-mdc-auto-init" "MDCTextfield"
+            [ div
+                [ class "mdc-textfield"
+                , attribute "data-mdc-auto-init" "MDCTextfield"
+                ]
+                [ input
+                    [ class "mdc-textfield__input"
+                    , onInput Types.SetRegulationURIInput
+                    , value model.newRegulation.uri
                     ]
-                  [ input [ class "mdc-textfield__input"
-                          , onValueChanged Types.SetRegulationURIInput
-                          , value model.newRegulation.uri
-                          ]
-                      []
-                  , label [ class "mdc-textfield__label" ] [ text "URI" ]
-                  ]
-              ]
+                    []
+                , label [ class "mdc-textfield__label" ] [ text "URI" ]
+                ]
+            ]
         , div []
-            [ div [ class "mdc-textfield"
-                  , attribute "data-mdc-auto-init" "MDCTextfield"
-                  ]
-                [ input [ class "mdc-textfield__input"
-                        , onValueChanged Types.SetRegulationIDInput
-                        , value model.newRegulation.identifier
-                        ]
+            [ div
+                [ class "mdc-textfield"
+                , attribute "data-mdc-auto-init" "MDCTextfield"
+                ]
+                [ input
+                    [ class "mdc-textfield__input"
+                    , onInput Types.SetRegulationIDInput
+                    , value model.newRegulation.identifier
+                    ]
                     []
                 , label [ class "mdc-textfield__label" ] [ text "identifier" ]
                 ]
             ]
         , div []
-            [ div [ class "mdc-textfield mdc-textfield--multiline"
-                  , attribute "data-mdc-auto-init" "MDCTextfield"
-                  ]
-                [ textarea [ class "mdc-textfield__input"
-                           , onValueChanged Types.SetRegulationDescriptionInput
-                           , value model.newRegulation.description
-                           , rows 4
-                           ]
+            [ div
+                [ class "mdc-textfield mdc-textfield--multiline"
+                , attribute "data-mdc-auto-init" "MDCTextfield"
+                ]
+                [ textarea
+                    [ class "mdc-textfield__input"
+                    , onInput Types.SetRegulationDescriptionInput
+                    , value model.newRegulation.description
+                    , rows 4
+                    ]
                     []
                 , label [ class "mdc-textfield__label" ] [ text "description" ]
                 ]
             ]
-        , button [ class "mdc-button mdc-button--raised mdc-button--primary"
-                 , attribute "data-mdc-auto-init" "MDCRipple"
-                 , onClick (Types.GetRegulations model)
-                 ]
+        , button
+            [ class "mdc-button mdc-button--raised mdc-button--primary"
+            , attribute "data-mdc-auto-init" "MDCRipple"
+            , onClick (Types.GetRegulations model)
+            ]
             [ text "Add" ]
         , div [ class "debug" ] [ text ("DEBUG: " ++ toString model.newRegulation) ]
         ]
@@ -263,12 +279,13 @@ menuItems =
 drawerMenuItem : Model -> MenuItem -> Html Msg
 drawerMenuItem model menuItem =
     a
-      [ attribute "name" (toLower menuItem.text)
-      , onClick <| Types.NavigateTo <| menuItem.route
-      , classList [ ("mdc-list-item", True)
-                  , ("mdc-persistent-drawer--selected", (toLower menuItem.text) == (selectedItem model) )
-                  ]
-      ]
-      [ i [ class "material-icons mdc-list-item__start-detail" ] [ text menuItem.iconName ]
-      , text menuItem.text
-      ]
+        [ attribute "name" (toLower menuItem.text)
+        , onClick <| Types.NavigateTo <| menuItem.route
+        , classList
+            [ ( "mdc-list-item", True )
+            , ( "mdc-persistent-drawer--selected", (toLower menuItem.text) == (selectedItem model) )
+            ]
+        ]
+        [ i [ class "material-icons mdc-list-item__start-detail" ] [ text menuItem.iconName ]
+        , text menuItem.text
+        ]
