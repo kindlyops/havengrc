@@ -141,8 +141,8 @@ body model =
             Just Reports ->
                 reportsBody model
 
-            Just Regulations ->
-                regulationsBody model
+            Just Comments ->
+                commentsBody model
 
             Just Activity ->
                 activityBody model
@@ -168,13 +168,13 @@ reportsBody model =
     div [] [ text "This is the reports view" ]
 
 
-regulationsBody : Model -> Html Msg
-regulationsBody model =
+commentsBody : Model -> Html Msg
+commentsBody model =
     div []
-        [ text "This is the regulations view"
+        [ text "This is the comments view"
         , ul []
-            (List.map (\l -> li [] [ text l.description ]) model.regulations)
-        , regulationsForm model
+            (List.map (\l -> li [] [ text (l.message ++ " - " ++ l.user_email ++ " posted at " ++ l.time) ]) model.comments)
+        , commentsForm model
         ]
 
 
@@ -183,10 +183,10 @@ onValueChanged tagger =
     on "value-changed" (Json.map tagger Html.Events.targetValue)
 
 
-regulationsForm : Model -> Html Msg
-regulationsForm model =
+commentsForm : Model -> Html Msg
+commentsForm model =
     div
-        [ id "Regulations" ]
+        [ id "Comments" ]
         -- TODO wire up a handler to save the data from these inputs into
         -- our model when they change
         [ div []
@@ -196,49 +196,20 @@ regulationsForm model =
                 ]
                 [ input
                     [ class "mdc-textfield__input"
-                    , onInput Types.SetRegulationURIInput
-                    , value model.newRegulation.uri
+                    , onInput Types.SetCommentMessageInput
+                    , value model.newComment.message
                     ]
                     []
-                , label [ class "mdc-textfield__label" ] [ text "URI" ]
-                ]
-            ]
-        , div []
-            [ div
-                [ class "mdc-textfield"
-                , attribute "data-mdc-auto-init" "MDCTextfield"
-                ]
-                [ input
-                    [ class "mdc-textfield__input"
-                    , onInput Types.SetRegulationIDInput
-                    , value model.newRegulation.identifier
-                    ]
-                    []
-                , label [ class "mdc-textfield__label" ] [ text "identifier" ]
-                ]
-            ]
-        , div []
-            [ div
-                [ class "mdc-textfield mdc-textfield--multiline"
-                , attribute "data-mdc-auto-init" "MDCTextfield"
-                ]
-                [ textarea
-                    [ class "mdc-textfield__input"
-                    , onInput Types.SetRegulationDescriptionInput
-                    , value model.newRegulation.description
-                    , rows 4
-                    ]
-                    []
-                , label [ class "mdc-textfield__label" ] [ text "description" ]
+                , label [ class "mdc-textfield__label" ] [ text "Comment" ]
                 ]
             ]
         , button
             [ class "mdc-button mdc-button--raised mdc-button--primary"
             , attribute "data-mdc-auto-init" "MDCRipple"
-            , onClick (Types.GetRegulations model)
+            , onClick (Types.AddComment model)
             ]
             [ text "Add" ]
-        , div [ class "debug" ] [ text ("DEBUG: " ++ toString model.newRegulation) ]
+        , div [ class "debug" ] [ text ("DEBUG: " ++ toString model.newComment) ]
         ]
 
 
@@ -272,7 +243,7 @@ menuItems =
     [ { text = "Dashboard", iconName = "dashboard", route = Just Home }
     , { text = "Activity", iconName = "history", route = Just Activity }
     , { text = "Reports", iconName = "library_books", route = Just Reports }
-    , { text = "Regulations", iconName = "gavel", route = Just Regulations }
+    , { text = "Comments", iconName = "gavel", route = Just Comments }
     ]
 
 

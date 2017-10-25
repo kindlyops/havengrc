@@ -20,9 +20,9 @@ type Location
     | Home
     | Activity
     | Reports
-    | Regulations
-    | ShowRegulation Int
-    | EditRegulation Int
+    | Comments
+    | ShowComment Int
+    | EditComment Int
 
 
 type alias Model =
@@ -68,13 +68,13 @@ titleFor route =
             Reports ->
                 "Reports"
 
-            Regulations ->
-                "Regulations"
+            Comments ->
+                "Comments"
 
-            ShowRegulation _ ->
-                "Category"
+            ShowComment _ ->
+                "Comment"
 
-            EditRegulation _ ->
+            EditComment _ ->
                 "Thread"
 
 
@@ -95,14 +95,14 @@ urlFor loc =
                 Activity ->
                     "/activity"
 
-                Regulations ->
-                    "/regulations"
+                Comments ->
+                    "/comments"
 
-                ShowRegulation id ->
-                    "/regulations/" ++ (toString id)
+                ShowComment id ->
+                    "/comments/" ++ (toString id)
 
-                EditRegulation id ->
-                    "/regulations/" ++ (toString id) ++ "/edit"
+                EditComment id ->
+                    "/comments/" ++ (toString id) ++ "/edit"
     in
         "#" ++ url
 
@@ -136,21 +136,21 @@ locFor path =
                     [ "reports" ] ->
                         Just Reports
 
-                    [ "regulations" ] ->
-                        Just Regulations
+                    [ "comments" ] ->
+                        Just Comments
 
-                    [ "regulations", stringId ] ->
+                    [ "comments", stringId ] ->
                         case String.toInt stringId of
                             Ok id ->
-                                Just (ShowRegulation id)
+                                Just (ShowComment id)
 
                             Err _ ->
                                 Nothing
 
-                    [ "regulations", stringId, "edit" ] ->
+                    [ "comments", stringId, "edit" ] ->
                         String.toInt stringId
                             |> Result.toMaybe
-                            |> Maybe.map EditRegulation
+                            |> Maybe.map EditComment
 
                     _ ->
                         let

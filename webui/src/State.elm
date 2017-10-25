@@ -5,8 +5,8 @@ import Http
 import Keycloak
 import Navigation
 import Ports
-import Regulation.Rest exposing (getRegulations, postRegulation)
-import Regulation.Types exposing (Regulation)
+import Comment.Rest exposing (getComments, postComment)
+import Comment.Types exposing (Comment, emptyNewComment)
 import Route
 import Types exposing (..)
 
@@ -22,12 +22,12 @@ init initialUser location =
             , authModel = (Authentication.init Ports.keycloakShowLock Ports.keycloakLogout initialUser)
             , route = route
             , selectedTab = 0
-            , regulations = []
-            , newRegulation = Regulation 0 "" "" ""
+            , comments = []
+            , newComment = emptyNewComment
             }
     in
         ( model
-        , Cmd.batch [ routeCmd, getRegulations model ]
+        , Cmd.batch [ routeCmd, getComments model ]
         )
 
 
@@ -59,68 +59,51 @@ update msg model =
             in
                 { model | route = Route.locFor (Just location) } ! []
 
-        GetRegulations model ->
+        AddComment model ->
+            { model | newComment = emptyNewComment } ! [ postComment model ]
+
+        GetComments model ->
             let
                 _ =
-                    Debug.log "calling GetRegulations"
+                    Debug.log "calling GetComments"
             in
-                model ! [ postRegulation model ]
+                model ! [ getComments model ]
 
-        SetRegulationURIInput value ->
+        SetCommentMessageInput value ->
             let
-                oldRegulation =
-                    model.newRegulation
+                oldComment =
+                    model.newComment
 
-                updatedRegulation =
-                    { oldRegulation | uri = value }
+                updatedComment =
+                    { oldComment | message = value }
             in
-                ( { model | newRegulation = updatedRegulation }, Cmd.none )
+                ( { model | newComment = updatedComment }, Cmd.none )
 
-        SetRegulationIDInput value ->
-            let
-                oldRegulation =
-                    model.newRegulation
-
-                updatedRegulation =
-                    { oldRegulation | identifier = value }
-            in
-                ( { model | newRegulation = updatedRegulation }, Cmd.none )
-
-        SetRegulationDescriptionInput value ->
-            let
-                oldRegulation =
-                    model.newRegulation
-
-                updatedRegulation =
-                    { oldRegulation | description = value }
-            in
-                ( { model | newRegulation = updatedRegulation }, Cmd.none )
-
-        NewRegulation (Ok regulation) ->
+        NewComment (Ok comment) ->
             let
                 _ =
-                    Debug.log "Saved a regulation via POST"
+                    Debug.log "Saved a comment via POST"
             in
                 -- TODO we need a more sophisticated way to deal with loading
                 -- paginated data and not re-fetching data we already have
-                { model | newRegulation = Regulation 0 "" "" "" } ! [ getRegulations model ]
+                { model | newComment = Comment "" "" "" "" } ! [ getComments model ]
 
-        NewRegulation (Err error) ->
+        NewComment (Err error) ->
             -- TODO unify REST error handling
             let
                 _ =
-                    Debug.log "DEBUG: error when POSTing regulation"
+                    Debug.log "DEBUG: error when POSTing comment"
             in
                 ( model, Cmd.none )
 
-        NewRegulations (Ok regulations) ->
+        NewComments (Ok comments) ->
             let
                 _ =
                     Debug.log "SUCCESS: got it"
             in
-                { model | regulations = regulations } ! []
+                { model | comments = comments } ! []
 
-        NewRegulations (Err error) ->
+        NewComments (Err error) ->
             let
                 errorMessage =
                     case error of

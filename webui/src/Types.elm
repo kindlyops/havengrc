@@ -3,7 +3,7 @@ module Types exposing (..)
 import Authentication
 import Http
 import Navigation
-import Regulation.Types
+import Comment.Types
 import Route
 
 
@@ -12,8 +12,8 @@ type alias Model =
     , authModel : Authentication.Model
     , route : Route.Model
     , selectedTab : Int
-    , regulations : List Regulation.Types.Regulation
-    , newRegulation : Regulation.Types.Regulation
+    , comments : List Comment.Types.Comment
+    , newComment : Comment.Types.Comment
     }
 
 
@@ -21,9 +21,8 @@ type Msg
     = AuthenticationMsg Authentication.Msg
     | NavigateTo (Maybe Route.Location)
     | UrlChange Navigation.Location
-    | GetRegulations Model
-    | NewRegulations (Result Http.Error (List Regulation.Types.Regulation))
-    | NewRegulation (Result Http.Error String)
-    | SetRegulationURIInput String
-    | SetRegulationIDInput String
-    | SetRegulationDescriptionInput String
+    | GetComments Model
+    | AddComment Model
+    | NewComments (Result Http.Error (List Comment.Types.Comment))
+    | NewComment (Result Http.Error String)
+    | SetCommentMessageInput String

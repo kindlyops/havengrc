@@ -1,51 +1,48 @@
-module Regulation.Rest exposing (..)
+module Comment.Rest exposing (..)
 
 import Http
 import Json.Decode as Decode exposing (Decoder, field, succeed)
 import Json.Encode as Encode
 import Keycloak
-import Regulation.Types exposing (..)
+import Comment.Types exposing (..)
 import Types exposing (..)
 
 
-regulationDecoder : Decoder Regulation
-regulationDecoder =
-    Decode.map4 Regulation
-        (field "id" Decode.int)
-        (field "identifier" Decode.string)
-        (field "uri" Decode.string)
-        (field "description" Decode.string)
+commentDecoder : Decoder Comment
+commentDecoder =
+    Decode.map4 Comment
+        (field "uuid" Decode.string)
+        (field "time" Decode.string)
+        (field "user_email" Decode.string)
+        (field "message" Decode.string)
 
 
-encodeRegulation : Model -> Encode.Value
-encodeRegulation model =
+encodeComment : Comment -> Encode.Value
+encodeComment comment =
     Encode.object
-        [ ( "identifier", Encode.string model.newRegulation.identifier )
-        , ( "uri", Encode.string model.newRegulation.uri )
-        , ( "description", Encode.string model.newRegulation.description )
-        ]
+        [ ( "message", Encode.string comment.message ) ]
 
 
-regulationsUrl : String
-regulationsUrl =
-    "http://localhost:3001/regulation"
+commentsUrl : String
+commentsUrl =
+    "http://localhost:3001/comment"
 
 
-getRegulations : Model -> Cmd Msg
-getRegulations model =
+getComments : Model -> Cmd Msg
+getComments model =
     let
         request =
             Http.request
                 { method = "GET"
                 , headers = tryGetAuthHeader model
-                , url = regulationsUrl
+                , url = commentsUrl
                 , body = Http.emptyBody
-                , expect = Http.expectJson (Decode.list regulationDecoder)
+                , expect = Http.expectJson (Decode.list commentDecoder)
                 , timeout = Nothing
                 , withCredentials = True
                 }
     in
-        Http.send NewRegulations request
+        Http.send NewComments request
 
 
 tryGetAuthHeader : Model -> List Http.Header
@@ -66,28 +63,25 @@ tryGetAuthHeader model =
                 []
 
 
-postRegulation : Model -> Cmd Msg
-postRegulation model =
+postComment : Model -> Cmd Msg
+postComment model =
     let
-        url =
-            "http://localhost:3001/regulation"
-
         body =
-            encodeRegulation model
+            encodeComment model.newComment
                 |> Http.jsonBody
 
         _ =
-            Debug.log "postRegulation called"
+            Debug.log "postComment called"
 
         request =
             Http.request
                 { method = "POST"
                 , headers = tryGetAuthHeader model
-                , url = url
+                , url = commentsUrl
                 , body = body
                 , expect = Http.expectString
                 , timeout = Nothing
                 , withCredentials = True
                 }
     in
-        Http.send NewRegulation request
+        Http.send NewComment request

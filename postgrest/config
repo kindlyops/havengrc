@@ -2,7 +2,7 @@ db-uri = "postgres://postgres@db/mappamundi_dev"
 db-schema = "1"
 # in dev, the swagger UI introspects without providing auth.
 # Because postgrest uses the role of the user when determining
-# how much of the API to show, we need to make the anon role 
+# how much of the API to show, we need to make the anon role
 # have elevated permissions,
 # even though we definitely don't want to allow this in production.
 # track https://github.com/begriffs/postgrest/issues/954 to see if this changes
