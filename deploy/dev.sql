@@ -21,10 +21,23 @@ GRANT usage ON schema "1" to member;
 CREATE OR REPLACE FUNCTION mappa.override_server_columns()
 RETURNS TRIGGER AS $$
 BEGIN
+  IF NEW.uuid IS NOT NULL THEN
+    RAISE EXCEPTION 'You must not send uuid field';
+  ELSE
     NEW.uuid = uuid_generate_v4();
+  END IF;
+  IF NEW.created_at IS NOT NULL THEN
+    RAISE EXCEPTION 'You must not send created_at field';
+  ELSE
     NEW.created_at = now();
+  END IF;
+  IF NEW.user_email IS NOT NULL THEN
+    RAISE EXCEPTION 'You must not send user_email field';
+  ELSE
     NEW.user_email = current_setting('request.jwt.claim.email', true);
-    RETURN NEW;
+  END IF;
+
+  RETURN NEW;
 END;
 $$ language 'plpgsql';
 
