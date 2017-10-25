@@ -57,7 +57,7 @@ Before you continue, you need to configure git to auto-correct line ending forma
 
      git config --global core.autocrlf true
 
-## running the service 
+## running the service
 
 You will normally run all the services using:
 
@@ -212,13 +212,13 @@ which realm to use during authentication?
 
 In order to be able to get a token for a user, the user must have no pending actions in keycloak (like email verification or password change). To exchange a username and password for a Keycloak JWT token with curl:
 
-    $ TOKEN=`curl -s --data "grant_type=password&client_id=havendev&scope=openid%20username=user1@havengrc.com&password=password" http://localhost:2015/auth/realms/havendev/protocol/openid-connect/token | jq -r '.access_token'`
+    $ TOKEN=`curl -s --data "grant_type=password&client_id=havendev&scope=openid&username=user1@havengrc.com&password=password" http://localhost:2015/auth/realms/havendev/protocol/openid-connect/token | jq -r '.access_token'`
 
 Then you can use that token by passing it in an Authorization header:
 
     $ curl -v -H "Authorization: Bearer \$TOKEN" http://localhost:3001/comment
 
-TODO: We will need an upgraded version of postgrest with a fix for https://github.com/begriffs/postgrest/issues/906. 
+TODO: We will need an upgraded version of postgrest with a fix for https://github.com/begriffs/postgrest/issues/906.
 We also need to modify the user signup process to set up the roles correctly.
 
 You can decode the token to inspect the contents at jwt.io. You will need to get the public cert from
