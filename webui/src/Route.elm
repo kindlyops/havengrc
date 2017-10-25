@@ -155,6 +155,6 @@ locFor path =
                     _ ->
                         let
                             _ =
-                                Debug.log "Route.locFor resolved wildcard, location Nothing"
+                                Debug.log "Route.locFor resolved wildcard, location Nothing" ""
                         in
                             Nothing

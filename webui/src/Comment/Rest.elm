@@ -51,16 +51,21 @@ tryGetAuthHeader model =
         Keycloak.LoggedIn user ->
             let
                 _ =
-                    Debug.log ("user token is: " ++ user.token)
+                    Debug.log "user token is: " user.token
             in
                 [ (Http.header "Authorization" ("Bearer " ++ user.token)) ]
 
         Keycloak.LoggedOut ->
             let
                 _ =
-                    Debug.log "didn't get a user token"
+                    Debug.log "didn't get a user token" ""
             in
                 []
+
+
+getReturnHeaders : List Http.Header
+getReturnHeaders =
+    [ (Http.header "Prefer" "return=representation") ]
 
 
 postComment : Model -> Cmd Msg
@@ -70,16 +75,19 @@ postComment model =
             encodeComment model.newComment
                 |> Http.jsonBody
 
+        headers =
+            (tryGetAuthHeader model) ++ getReturnHeaders
+
         _ =
-            Debug.log "postComment called"
+            Debug.log "postComment called with " model.newComment.message
 
         request =
             Http.request
                 { method = "POST"
-                , headers = tryGetAuthHeader model
+                , headers = headers
                 , url = commentsUrl
                 , body = body
-                , expect = Http.expectString
+                , expect = Http.expectJson (Decode.list commentDecoder)
                 , timeout = Nothing
                 , withCredentials = True
                 }

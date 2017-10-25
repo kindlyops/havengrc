@@ -60,14 +60,10 @@ update msg model =
                 { model | route = Route.locFor (Just location) } ! []
 
         AddComment model ->
-            { model | newComment = emptyNewComment } ! [ postComment model ]
+            model ! [ postComment model ]
 
         GetComments model ->
-            let
-                _ =
-                    Debug.log "calling GetComments"
-            in
-                model ! [ getComments model ]
+            model ! [ getComments model ]
 
         SetCommentMessageInput value ->
             let
@@ -81,27 +77,23 @@ update msg model =
 
         NewComment (Ok comment) ->
             let
-                _ =
-                    Debug.log "Saved a comment via POST"
+                morecomments =
+                    model.comments ++ comment
             in
                 -- TODO we need a more sophisticated way to deal with loading
                 -- paginated data and not re-fetching data we already have
-                { model | newComment = Comment "" "" "" "" } ! [ getComments model ]
+                { model | newComment = emptyNewComment, comments = morecomments } ! []
 
         NewComment (Err error) ->
-            -- TODO unify REST error handling
+            -- TODO display the error in the UI
             let
                 _ =
-                    Debug.log "DEBUG: error when POSTing comment"
+                    Debug.log "DEBUG: error when POSTing comment " error
             in
                 ( model, Cmd.none )
 
         NewComments (Ok comments) ->
-            let
-                _ =
-                    Debug.log "SUCCESS: got it"
-            in
-                { model | comments = comments } ! []
+            { model | comments = comments } ! []
 
         NewComments (Err error) ->
             let

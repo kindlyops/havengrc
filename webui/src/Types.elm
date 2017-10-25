@@ -24,5 +24,5 @@ type Msg
     | GetComments Model
     | AddComment Model
     | NewComments (Result Http.Error (List Comment.Types.Comment))
-    | NewComment (Result Http.Error String)
+    | NewComment (Result Http.Error (List Comment.Types.Comment))
     | SetCommentMessageInput String
