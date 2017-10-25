@@ -2,12 +2,10 @@
 
 BEGIN;
 
-REVOKE member, admin, superadmin, anonymous FROM authenticator;
+REVOKE member, admin, anonymous FROM postgres;
 
-DROP USER authenticator;
 DROP ROLE anonymous;
 DROP ROLE admin;
-DROP ROLE superadmin;
 DROP ROLE member;
 
 COMMIT;

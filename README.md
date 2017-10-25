@@ -57,7 +57,7 @@ Before you continue, you need to configure git to auto-correct line ending forma
 
      git config --global core.autocrlf true
 
-## running the service 
+## running the service
 
 You will normally run all the services using:
 
@@ -193,8 +193,36 @@ A tutorial is available here. http://blog.jonharrington.org/postgrest-introducti
 
 ## Authentication with JWT and Keycloak
 
-TODO: explain how Keycloak realms, roles, users, and groups are configured
-and how to extract a JWT token for manually hitting the UI.
+### roles and permissions
+
+Keycloak has very complex and sophisticated support for realms, roles, client roles, and custom mappers.
+For now, we use a simple scheme of a custom user attribute called role. role must be set to "member" or
+"admin", and a custom mapper has been configured so that a role claim will be included in the JWT access
+token. PostgREST will check the role claim and switch to the member or admin role defined in PostgREST.
+Inside the database, fields can access other parts of the JWT to store user identity.
+
+### multi-tenancy
+
+Multi-tenancy is still a work in progress, with the main question being how do we model organizations
+in keycloak? Do we use a single keycloak realm, or a different realm per organization. If a different
+realm per organization, how does the signup and login flow need to change to accomodate figuring out
+which realm to use during authentication?
+
+### Low level JWT interactions
+
+In order to be able to get a token for a user, the user must have no pending actions in keycloak (like email verification or password change). To exchange a username and password for a Keycloak JWT token with curl:
+
+    $ TOKEN=`curl -s --data "grant_type=password&client_id=havendev&scope=openid&username=user1@havengrc.com&password=password" http://localhost:2015/auth/realms/havendev/protocol/openid-connect/token | jq -r '.access_token'`
+
+Then you can use that token by passing it in an Authorization header:
+
+    $ curl -v -H "Authorization: Bearer \$TOKEN" http://localhost:3001/comment
+
+TODO: We will need an upgraded version of postgrest with a fix for https://github.com/begriffs/postgrest/issues/906.
+We also need to modify the user signup process to set up the roles correctly.
+
+You can decode the token to inspect the contents at jwt.io. You will need to get the public cert from
+the Keycloak Admin interface: Havendev->Realm Settings->Keys->Public Key and enter it into the jwt.io page to decode the token.
 
 ## Deploying with kubernetes
 

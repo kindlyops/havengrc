@@ -2,12 +2,10 @@
 
 BEGIN;
 
-CREATE USER authenticator NOINHERIT;
-CREATE ROLE anonymous;
-CREATE ROLE admin;
-CREATE ROLE superadmin;
-CREATE ROLE member;
+CREATE ROLE anonymous nologin;
+CREATE ROLE admin nologin;
+CREATE ROLE member nologin;
 
-GRANT member, admin, superadmin, anonymous TO authenticator;
+GRANT member, admin, anonymous TO postgres;
 
 COMMIT;

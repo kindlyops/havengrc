@@ -1,5 +1,15 @@
 db-uri = "postgres://postgres@db/mappamundi_dev"
 db-schema = "1"
+# in dev, the swagger UI introspects without providing auth.
+# Because postgrest uses the role of the user when determining
+# how much of the API to show, we need to make the anon role
+# have elevated permissions,
+# even though we definitely don't want to allow this in production.
+# track https://github.com/begriffs/postgrest/issues/954 to see if this changes
+# a possible way to handle this would be to embed the swagger viewing inside
+# our webapp and find a way to give the swagger requests the JWT from the logged
+# in user rather than being anonymous.
+# db-anon-role = "anonymous"
 db-anon-role = "postgres"
 db-pool = 10
 
@@ -9,7 +19,11 @@ server-proxy-uri = "http://localhost:3001"
 
 ## choose a secret to enable JWT auth
 ## (use "@filename" to load from separate file)
-# jwt-secret = "foo"
+## The contents of the key file for keycloak were retrieved from keycloak using:
+## curl http://localhost:8080/auth/realms/havendev/protocol/openid-connect/certs | jq '.'
+jwt-secret = "@/keycloak-dev-public-key.json"
+jwt-aud = "havendev"
+
 # secret-is-base64 = false
 
 ## limit rows in response

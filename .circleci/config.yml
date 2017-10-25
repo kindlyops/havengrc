@@ -30,6 +30,8 @@ jobs:
           working_directory: webui
       - run: docker-compose run start_dependencies
       - run: docker-compose run sqitch
+      - run: docker-compose run start_keycloak
+      - run: sleep 60
       - run: ./test
       - run:
           name: Build marketing site with hugo

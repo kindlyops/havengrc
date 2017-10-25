@@ -40,6 +40,11 @@ services:
     depends_on:
       - db
     command: db:5432
+  start_keycloak:
+    image: dadarek/wait-for-dependencies
+    depends_on:
+      - keycloak
+    command: keycloak:8080
   mailhog:
     image: mailhog/mailhog:v1.0.0
     ports:
@@ -90,6 +95,7 @@ services:
       - ./apitest:/usr/src/app
     links:
       - api
+      - keycloak
     depends_on:
       - start_dependencies
     command: [cucumber]
@@ -97,7 +103,7 @@ services:
       - endpoint=http://api/
       - resource_single=true
   api:
-    image: havengrc-docker.jfrog.io/begriffs/postgrest:v0.4.2.0
+    image: havengrc-docker.jfrog.io/postgrest/postgrest:v0.4.3.0
     command: [postgrest, "/config"]
     ports:
       - "3001:80"
@@ -107,6 +113,8 @@ services:
       - sqitch
     volumes:
       - ./postgrest/config:/config
+      - ./postgrest/keycloak-dev-public-key.json:/keycloak-dev-public-key.json
+      - ./postgrest/vendor/postgrest:/usr/local/bin/postgrest
   swagger:
     image: havengrc-docker.jfrog.io/swaggerapi/swagger-ui:v3.0.2
     ports:

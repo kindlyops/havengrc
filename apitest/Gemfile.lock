@@ -64,6 +64,7 @@ PLATFORMS
 
 DEPENDENCIES
   cucumber
+  cucumber-api
   cucumber-rest-bdd
 
 BUNDLED WITH

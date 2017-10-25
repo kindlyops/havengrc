@@ -5,8 +5,8 @@ import Http
 import Keycloak
 import Navigation
 import Ports
-import Regulation.Rest exposing (getRegulations, postRegulation)
-import Regulation.Types exposing (Regulation)
+import Comment.Rest exposing (getComments, postComment)
+import Comment.Types exposing (Comment, emptyNewComment)
 import Route
 import Types exposing (..)
 
@@ -16,15 +16,18 @@ init initialUser location =
     let
         ( route, routeCmd ) =
             Route.init (Just location)
+
+        model =
+            { count = 0
+            , authModel = (Authentication.init Ports.keycloakShowLock Ports.keycloakLogout initialUser)
+            , route = route
+            , selectedTab = 0
+            , comments = []
+            , newComment = emptyNewComment
+            }
     in
-        ( { count = 0
-          , authModel = (Authentication.init Ports.keycloakShowLock Ports.keycloakLogout initialUser)
-          , route = route
-          , selectedTab = 0
-          , regulations = []
-          , newRegulation = Regulation 0 "" "" ""
-          }
-        , Cmd.batch [ routeCmd, getRegulations ]
+        ( model
+        , Cmd.batch [ routeCmd, getComments model ]
         )
 
 
@@ -56,68 +59,43 @@ update msg model =
             in
                 { model | route = Route.locFor (Just location) } ! []
 
-        GetRegulations model ->
+        AddComment model ->
+            model ! [ postComment model ]
+
+        GetComments model ->
+            model ! [ getComments model ]
+
+        SetCommentMessageInput value ->
             let
-                _ =
-                    Debug.log "calling GetRegulations"
+                oldComment =
+                    model.newComment
+
+                updatedComment =
+                    { oldComment | message = value }
             in
-                model ! [ postRegulation model ]
+                ( { model | newComment = updatedComment }, Cmd.none )
 
-        SetRegulationURIInput value ->
+        NewComment (Ok comment) ->
             let
-                oldRegulation =
-                    model.newRegulation
-
-                updatedRegulation =
-                    { oldRegulation | uri = value }
-            in
-                ( { model | newRegulation = updatedRegulation }, Cmd.none )
-
-        SetRegulationIDInput value ->
-            let
-                oldRegulation =
-                    model.newRegulation
-
-                updatedRegulation =
-                    { oldRegulation | identifier = value }
-            in
-                ( { model | newRegulation = updatedRegulation }, Cmd.none )
-
-        SetRegulationDescriptionInput value ->
-            let
-                oldRegulation =
-                    model.newRegulation
-
-                updatedRegulation =
-                    { oldRegulation | description = value }
-            in
-                ( { model | newRegulation = updatedRegulation }, Cmd.none )
-
-        NewRegulation (Ok regulation) ->
-            let
-                _ =
-                    Debug.log "Saved a regulation via POST"
+                morecomments =
+                    model.comments ++ comment
             in
                 -- TODO we need a more sophisticated way to deal with loading
                 -- paginated data and not re-fetching data we already have
-                { model | newRegulation = Regulation 0 "" "" "" } ! [ getRegulations ]
+                { model | newComment = emptyNewComment, comments = morecomments } ! []
 
-        NewRegulation (Err error) ->
-            -- TODO unify REST error handling
+        NewComment (Err error) ->
+            -- TODO display the error in the UI
             let
                 _ =
-                    Debug.log "DEBUG: error when POSTing regulation"
+                    Debug.log "DEBUG: error when POSTing comment " error
             in
                 ( model, Cmd.none )
 
-        NewRegulations (Ok regulations) ->
-            let
-                _ =
-                    Debug.log "SUCCESS: got it"
-            in
-                { model | regulations = regulations } ! []
+        NewComments (Ok comments) ->
+            { model | comments = comments } ! []
 
-        NewRegulations (Err error) ->
+        NewComments (Err error) ->
             let
                 errorMessage =
                     case error of
