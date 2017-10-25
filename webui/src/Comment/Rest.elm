@@ -12,7 +12,7 @@ commentDecoder : Decoder Comment
 commentDecoder =
     Decode.map4 Comment
         (field "uuid" Decode.string)
-        (field "time" Decode.string)
+        (field "created_at" Decode.string)
         (field "user_email" Decode.string)
         (field "message" Decode.string)
 
