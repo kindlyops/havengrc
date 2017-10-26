@@ -26,8 +26,11 @@ document.arrive(".mdc-textfield", function(){
 
 
 elmApp.ports.showError.subscribe(function(messageString) {
-  let snack = mdc.snackbar.MDCSnackbar.attachTo(document.querySelector('.mdc-snackbar'));
-  snack.show({ message: messageString });
+  let item = document.querySelector('.mdc-snackbar');
+  if (item !== null) {
+    let snack = mdc.snackbar.MDCSnackbar.attachTo();
+    snack.show({ message: messageString });
+  }
 });
 
 document.arrive("#MenuButton", function(){
