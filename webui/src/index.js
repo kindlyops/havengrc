@@ -24,6 +24,12 @@ document.arrive(".mdc-textfield", function(){
   window.mdc.autoInit(document, () => { });
 });
 
+
+elmApp.ports.showError.subscribe(function(messageString) {
+  let snack = mdc.snackbar.MDCSnackbar.attachTo(document.querySelector('.mdc-snackbar'));
+  snack.show({ message: messageString });
+});
+
 document.arrive("#MenuButton", function(){
   let drawer = new mdc.drawer.MDCPersistentDrawer(document.getElementById('MenuDrawer'));
   document.getElementById('MenuButton').addEventListener('click', function () {

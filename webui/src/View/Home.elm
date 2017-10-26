@@ -128,6 +128,22 @@ selectedItem model =
                 String.toLower item.text
 
 
+snackBar : Model -> Html Msg
+snackBar model =
+    div
+        [ id "error-snackbar"
+        , class "mdc-snackbar"
+        , attribute "aria-live" "assertive"
+        , attribute "aria-atomic" "true"
+        , attribute "aria-hidden" "true"
+          -- , onClick (Types.ShowError "this is an error message")
+        ]
+        [ div [ class "mdc-snackbar__text" ] []
+        , div [ class "mdc-snackbar__action-wrapper" ]
+            [ button [ class "mdc-snackbar__action-button" ] [] ]
+        ]
+
+
 body : Model -> Html Msg
 body model =
     div [ id "content" ]
@@ -149,6 +165,7 @@ body model =
 
             Just _ ->
                 notFoundBody model
+        , snackBar model
         ]
 
 
@@ -160,7 +177,15 @@ dashboardBody model =
     in
         div
             []
-            [ Centroid.view data ]
+            [ Centroid.view data
+            , br [] []
+            , button
+                [ class "mdc-button mdc-button--raised mdc-button--primary"
+                , attribute "data-mdc-auto-init" "MDCRipple"
+                , onClick (Types.ShowError "this is an error message")
+                ]
+                [ text "Show Error" ]
+            ]
 
 
 reportsBody : Model -> Html Msg
@@ -187,8 +212,6 @@ commentsForm : Model -> Html Msg
 commentsForm model =
     div
         [ id "Comments" ]
-        -- TODO wire up a handler to save the data from these inputs into
-        -- our model when they change
         [ div []
             [ div
                 [ class "mdc-textfield"

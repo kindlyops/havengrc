@@ -31,6 +31,22 @@ init initialUser location =
         )
 
 
+getHTTPErrorMessage : Http.Error -> String
+getHTTPErrorMessage error =
+    case error of
+        Http.NetworkError ->
+            "Is the server running?"
+
+        Http.BadStatus response ->
+            (toString response.status)
+
+        Http.BadPayload message _ ->
+            "Decoding Failed: " ++ message
+
+        _ ->
+            (toString error)
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -85,36 +101,16 @@ update msg model =
                 { model | newComment = emptyNewComment, comments = morecomments } ! []
 
         NewComment (Err error) ->
-            -- TODO display the error in the UI
-            let
-                _ =
-                    Debug.log "DEBUG: error when POSTing comment " error
-            in
-                ( model, Cmd.none )
+            model ! [ Ports.showError (getHTTPErrorMessage error) ]
 
         NewComments (Ok comments) ->
             { model | comments = comments } ! []
 
         NewComments (Err error) ->
-            let
-                errorMessage =
-                    case error of
-                        Http.NetworkError ->
-                            "Is the server running?"
+            model ! [ Ports.showError (getHTTPErrorMessage error) ]
 
-                        Http.BadStatus response ->
-                            (toString response.status)
-
-                        Http.BadPayload message _ ->
-                            "Decoding Failed: " ++ message
-
-                        _ ->
-                            (toString error)
-
-                _ =
-                    Debug.log "DEBUG: " errorMessage
-            in
-                ( model, Cmd.none )
+        ShowError value ->
+            model ! [ Ports.showError value ]
 
 
 subscriptions : a -> Sub Msg
