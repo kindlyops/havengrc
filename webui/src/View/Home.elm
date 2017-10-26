@@ -180,7 +180,7 @@ dashboardBody model =
             [ Centroid.view data
             , br [] []
             , button
-                [ class "mdc-button mdc-button--raised mdc-button--primary"
+                [ class "mdc-button mdc-button--raised mdc-button--accent"
                 , attribute "data-mdc-auto-init" "MDCRipple"
                 , onClick (Types.ShowError "this is an error message")
                 ]
@@ -208,6 +208,11 @@ onValueChanged tagger =
     on "value-changed" (Json.map tagger Html.Events.targetValue)
 
 
+showDebugData : record -> Html Msg
+showDebugData record =
+    div [ class "debug" ] [ text ("DEBUG: " ++ toString record) ]
+
+
 commentsForm : Model -> Html Msg
 commentsForm model =
     div
@@ -227,12 +232,12 @@ commentsForm model =
                 ]
             ]
         , button
-            [ class "mdc-button mdc-button--raised mdc-button--primary"
+            [ class "mdc-button mdc-button--raised mdc-button--accent"
             , attribute "data-mdc-auto-init" "MDCRipple"
             , onClick (Types.AddComment model)
             ]
             [ text "Add" ]
-        , div [ class "debug" ] [ text ("DEBUG: " ++ toString model.newComment) ]
+        , showDebugData model.newComment
         ]
 
 
