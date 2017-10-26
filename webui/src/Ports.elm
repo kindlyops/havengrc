@@ -15,4 +15,4 @@ port keycloakLogout : () -> Cmd msg
 port setTitle : String -> Cmd msg
 
 
-port applyMDC : () -> Cmd msg
+port showError : String -> Cmd msg

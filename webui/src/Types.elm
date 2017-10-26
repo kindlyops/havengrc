@@ -26,3 +26,4 @@ type Msg
     | NewComments (Result Http.Error (List Comment.Types.Comment))
     | NewComment (Result Http.Error (List Comment.Types.Comment))
     | SetCommentMessageInput String
+    | ShowError String

@@ -116,6 +116,9 @@ update msg model =
             in
                 ( model, Cmd.none )
 
+        ShowError value ->
+            model ! [ Ports.showError value ]
+
 
 subscriptions : a -> Sub Msg
 subscriptions model =
