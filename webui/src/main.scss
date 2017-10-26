@@ -4,6 +4,7 @@ html, .container {
 
 body {
   --mdc-theme-primary:#2FA09D;
+  --mdc-theme-secondary:#E86953;
   --mdc-theme-accent:#E86953;
   --mdc-theme-background: #f0f0f1;
   background-color:var(--mdc-theme-background, #f0f0f1);
@@ -28,7 +29,7 @@ body {
 }
 
 .header{
-  background-color: var(--mdc-theme-accent) !important;
+  background-color: var(--mdc-theme-primary);
   color: var(--mdc-theme-text-primary-on-primary,#fff);
 }
 
