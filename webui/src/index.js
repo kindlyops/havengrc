@@ -18,19 +18,8 @@ var authData = storedProfile && storedToken ? { profile: JSON.parse(storedProfil
 
 var elmApp = Main.embed(document.getElementById('root'), authData);
 
-keycloak.init();
-
 document.arrive(".mdc-textfield", function(){
   window.mdc.autoInit(document, () => { });
-});
-
-
-elmApp.ports.showError.subscribe(function(messageString) {
-  let item = document.querySelector('.mdc-snackbar');
-  if (item !== null) {
-    let snack = mdc.snackbar.MDCSnackbar.attachTo();
-    snack.show({ message: messageString });
-  }
 });
 
 document.arrive("#MenuButton", function(){
@@ -46,28 +35,25 @@ document.arrive("#UserDropdownMenu", function(){
 });
 
 
+function sendElmKeycloakToken() {
+  localStorage.setItem('profile', JSON.stringify(keycloak.profile));
+  localStorage.setItem('token', keycloak.token);
+  var result = { err: null, ok: null };
+  result.ok = { profile: keycloak.profile, token: keycloak.token };
+  elmApp.ports.keycloakAuthResult.send(result);
+}
+
 
 keycloak.onAuthSuccess = function() {
-  console.log("success from keycloak login");
-  var result = { err: null, ok: null };
-  keycloak.loadUserProfile().success(function() {
-        console.log("success from keycloak.loadUserProfile");
-        console.log(keycloak.profile);
-        localStorage.setItem('profile', JSON.stringify(keycloak.profile));
-        localStorage.setItem('token', keycloak.token);
-        result.ok = { profile: keycloak.profile, token: keycloak.token };
-        console.log("sending result ");
-        console.log(result);
-        elmApp.ports.keycloakAuthResult.send(result);
-    }).error(function(/*errorData*/) {
-        result.err = { name: "unknown error" };
-        // check for error, error_description
-        // https://github.com/keycloak/keycloak-js-bower/blob/master/dist/keycloak.js#L506
-        elmApp.ports.keycloakAuthResult.send(result);
+  keycloak.loadUserProfile().success(sendElmKeycloakToken).error(function(/*errorData*/) {
+    var result = { err: { name: "unknown error" }, ok: null };
+    // TODO check for error, error_description
+    // https://github.com/keycloak/keycloak-js-bower/blob/master/dist/keycloak.js#L506
+    elmApp.ports.keycloakAuthResult.send(result);
   });
 };
 
-keycloak.onAuthLogout = function() {
+function tellElmLogout() {
   ///alert("got keycloak logout callback");
   // send a null result to trigger our existing AuthResult code and logout.
   var result = { err: null, ok: null };
@@ -77,15 +63,20 @@ keycloak.onAuthLogout = function() {
 
 };
 
+keycloak.onAuthLogout = tellElmLogout;
+
+keycloak.onAuthRefreshSuccess = sendElmKeycloakToken;
+
+keycloak.onAuthRefreshError = tellElmLogout;
+
 keycloak.onTokenExpired = function() {
-  // TODO: the initial token we get expires in 5 minutes (300 seconds)
-  // need to wire up token refresh based on user activity in the app.
-  //alert("got keycloak token expired");
-  //elmApp.ports.keycloakLogoutHappened.send();
+  console.log("got keycloak token expired");
+  keycloak.updateToken(300);
 };
 
-elmApp.ports.keycloakShowLock.subscribe(function() {
-  console.log("calling login");
+keycloak.init();
+
+elmApp.ports.keycloakLogin.subscribe(function() {
   keycloak.login().error(function(/*errorData*/) {
     alert('failed to initialize'); // TODO polish this error case
     // check for error, error_description
@@ -103,4 +94,12 @@ elmApp.ports.keycloakLogout.subscribe(function() {
 // set the page title
 elmApp.ports.setTitle.subscribe(function(title) {
   document.title = title;
+});
+
+elmApp.ports.showError.subscribe(function(messageString) {
+  let item = document.querySelector('.mdc-snackbar');
+  if (item) {
+    let snack = mdc.snackbar.MDCSnackbar.attachTo(item);
+    snack.show({ message: messageString });
+  }
 });

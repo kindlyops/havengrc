@@ -15,13 +15,13 @@ import Keycloak
 type alias Model =
     { state : Keycloak.AuthenticationState
     , lastError : Maybe Keycloak.AuthenticationError
-    , showLock : Keycloak.Options -> Cmd Msg
+    , logIn : Keycloak.Options -> Cmd Msg
     , logOut : () -> Cmd Msg
     }
 
 
 init : (Keycloak.Options -> Cmd Msg) -> (() -> Cmd Msg) -> Maybe Keycloak.LoggedInUser -> Model
-init showLock logOut initialData =
+init logIn logOut initialData =
     { state =
         case initialData of
             Just user ->
@@ -30,7 +30,7 @@ init showLock logOut initialData =
             Nothing ->
                 Keycloak.LoggedOut
     , lastError = Nothing
-    , showLock = showLock
+    , logIn = logIn
     , logOut = logOut
     }
 
@@ -57,7 +57,7 @@ update msg model =
                 ( { model | state = newState, lastError = error }, Cmd.none )
 
         ShowLogIn ->
-            ( model, model.showLock Keycloak.defaultOpts )
+            ( model, model.logIn Keycloak.defaultOpts )
 
         LogOut ->
             ( { model | state = Keycloak.LoggedOut }, model.logOut () )

@@ -19,7 +19,7 @@ init initialUser location =
 
         model =
             { count = 0
-            , authModel = (Authentication.init Ports.keycloakShowLock Ports.keycloakLogout initialUser)
+            , authModel = (Authentication.init Ports.keycloakLogin Ports.keycloakLogout initialUser)
             , route = route
             , selectedTab = 0
             , comments = []
