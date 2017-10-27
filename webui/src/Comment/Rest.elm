@@ -49,11 +49,7 @@ tryGetAuthHeader : Model -> List Http.Header
 tryGetAuthHeader model =
     case model.authModel.state of
         Keycloak.LoggedIn user ->
-            let
-                _ =
-                    Debug.log "user token is: " user.token
-            in
-                [ (Http.header "Authorization" ("Bearer " ++ user.token)) ]
+            [ (Http.header "Authorization" ("Bearer " ++ user.token)) ]
 
         Keycloak.LoggedOut ->
             let

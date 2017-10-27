@@ -35,27 +35,25 @@ document.arrive("#UserDropdownMenu", function(){
 });
 
 
-keycloak.onAuthSuccess = function() {
-  console.log("success from keycloak login");
+function sendElmKeycloakToken() {
+  localStorage.setItem('profile', JSON.stringify(keycloak.profile));
+  localStorage.setItem('token', keycloak.token);
   var result = { err: null, ok: null };
-  keycloak.loadUserProfile().success(function() {
-        console.log("success from keycloak.loadUserProfile");
-        console.log(keycloak.profile);
-        localStorage.setItem('profile', JSON.stringify(keycloak.profile));
-        localStorage.setItem('token', keycloak.token);
-        result.ok = { profile: keycloak.profile, token: keycloak.token };
-        console.log("sending result ");
-        console.log(result);
-        elmApp.ports.keycloakAuthResult.send(result);
-    }).error(function(/*errorData*/) {
-        result.err = { name: "unknown error" };
-        // check for error, error_description
-        // https://github.com/keycloak/keycloak-js-bower/blob/master/dist/keycloak.js#L506
-        elmApp.ports.keycloakAuthResult.send(result);
+  result.ok = { profile: keycloak.profile, token: keycloak.token };
+  elmApp.ports.keycloakAuthResult.send(result);
+}
+
+
+keycloak.onAuthSuccess = function() {
+  keycloak.loadUserProfile().success(sendElmKeycloakToken).error(function(/*errorData*/) {
+    var result = { err: { name: "unknown error" }, ok: null };
+    // TODO check for error, error_description
+    // https://github.com/keycloak/keycloak-js-bower/blob/master/dist/keycloak.js#L506
+    elmApp.ports.keycloakAuthResult.send(result);
   });
 };
 
-keycloak.onAuthLogout = function() {
+function tellElmLogout() {
   ///alert("got keycloak logout callback");
   // send a null result to trigger our existing AuthResult code and logout.
   var result = { err: null, ok: null };
@@ -65,17 +63,20 @@ keycloak.onAuthLogout = function() {
 
 };
 
+keycloak.onAuthLogout = tellElmLogout;
+
+keycloak.onAuthRefreshSuccess = sendElmKeycloakToken;
+
+keycloak.onAuthRefreshError = tellElmLogout;
+
 keycloak.onTokenExpired = function() {
-  // TODO: the initial token we get expires in 5 minutes (300 seconds)
-  // need to wire up token refresh based on user activity in the app.
-  //alert("got keycloak token expired");
-  //elmApp.ports.keycloakLogoutHappened.send();
+  console.log("got keycloak token expired");
+  keycloak.updateToken(300);
 };
 
 keycloak.init();
 
 elmApp.ports.keycloakLogin.subscribe(function() {
-  console.log("calling login");
   keycloak.login().error(function(/*errorData*/) {
     alert('failed to initialize'); // TODO polish this error case
     // check for error, error_description
