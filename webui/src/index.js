@@ -18,19 +18,8 @@ var authData = storedProfile && storedToken ? { profile: JSON.parse(storedProfil
 
 var elmApp = Main.embed(document.getElementById('root'), authData);
 
-keycloak.init();
-
 document.arrive(".mdc-textfield", function(){
   window.mdc.autoInit(document, () => { });
-});
-
-
-elmApp.ports.showError.subscribe(function(messageString) {
-  let item = document.querySelector('.mdc-snackbar');
-  if (item !== null) {
-    let snack = mdc.snackbar.MDCSnackbar.attachTo();
-    snack.show({ message: messageString });
-  }
 });
 
 document.arrive("#MenuButton", function(){
@@ -44,7 +33,6 @@ document.arrive("#UserDropdownMenu", function(){
   let menu = new mdc.menu.MDCSimpleMenu(document.getElementById('UserDropdownMenu'));
   document.getElementById('UserDropdownButton').addEventListener('click', () => menu.open = !menu.open);
 });
-
 
 
 keycloak.onAuthSuccess = function() {
@@ -84,7 +72,9 @@ keycloak.onTokenExpired = function() {
   //elmApp.ports.keycloakLogoutHappened.send();
 };
 
-elmApp.ports.keycloakShowLock.subscribe(function() {
+keycloak.init();
+
+elmApp.ports.keycloakLogin.subscribe(function() {
   console.log("calling login");
   keycloak.login().error(function(/*errorData*/) {
     alert('failed to initialize'); // TODO polish this error case
@@ -103,4 +93,12 @@ elmApp.ports.keycloakLogout.subscribe(function() {
 // set the page title
 elmApp.ports.setTitle.subscribe(function(title) {
   document.title = title;
+});
+
+elmApp.ports.showError.subscribe(function(messageString) {
+  let item = document.querySelector('.mdc-snackbar');
+  if (item) {
+    let snack = mdc.snackbar.MDCSnackbar.attachTo(item);
+    snack.show({ message: messageString });
+  }
 });
