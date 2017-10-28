@@ -10,7 +10,10 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput, onWithOptions, on)
 import Json.Decode as Json
 import Keycloak
+import Misc exposing (showDebugData)
+import Page.Comments
 import View.LineChart as LineChart
+import View.Spinner exposing (spinner)
 import Route exposing (Location(..), locFor)
 import String exposing (toLower)
 import Types exposing (Model, Msg)
@@ -155,10 +158,11 @@ body model =
                 dashboardBody model
 
             Just Reports ->
-                reportsBody model
+                -- reportsBody model
+                spinner
 
             Just Comments ->
-                commentsBody model
+                Page.Comments.view model
 
             Just Activity ->
                 activityBody model
@@ -193,52 +197,9 @@ reportsBody model =
     div [] [ text "This is the reports view" ]
 
 
-commentsBody : Model -> Html Msg
-commentsBody model =
-    div []
-        [ text "This is the comments view"
-        , ul []
-            (List.map (\l -> li [] [ text (l.message ++ " - " ++ l.user_email ++ " posted at " ++ l.created_at) ]) model.comments)
-        , commentsForm model
-        ]
-
-
 onValueChanged : (String -> msg) -> Html.Attribute msg
 onValueChanged tagger =
     on "value-changed" (Json.map tagger Html.Events.targetValue)
-
-
-showDebugData : record -> Html Msg
-showDebugData record =
-    div [ class "debug" ] [ text ("DEBUG: " ++ toString record) ]
-
-
-commentsForm : Model -> Html Msg
-commentsForm model =
-    div
-        [ id "Comments" ]
-        [ div []
-            [ div
-                [ class "mdc-textfield"
-                , attribute "data-mdc-auto-init" "MDCTextfield"
-                ]
-                [ input
-                    [ class "mdc-textfield__input"
-                    , onInput Types.SetCommentMessageInput
-                    , value model.newComment.message
-                    ]
-                    []
-                , label [ class "mdc-textfield__label" ] [ text "Comment" ]
-                ]
-            ]
-        , button
-            [ class "mdc-button mdc-button--raised mdc-button--accent"
-            , attribute "data-mdc-auto-init" "MDCRipple"
-            , onClick (Types.AddComment model)
-            ]
-            [ text "Add" ]
-        , showDebugData model.newComment
-        ]
 
 
 activityBody : Model -> Html Msg
