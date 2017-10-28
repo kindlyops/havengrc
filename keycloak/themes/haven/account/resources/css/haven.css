@@ -16,7 +16,7 @@ body {
 }
 
 header{
-    background-color: var(--mdc-theme-accent) !important;
+    background-color: var(--mdc-theme-primary) !important;
     color: var(--mdc-theme-text-primary-on-primary,#fff);
 }
 

@@ -52,7 +52,7 @@ body {
 .login-header{
   font-family: "mr-eaves-modern", sans-serif;
   text-transform: uppercase;
-  color: var(--mdc-theme-accent);
+  color: var(--mdc-theme-primary);
   margin:27px auto;
   font-size: 58px;
 }
