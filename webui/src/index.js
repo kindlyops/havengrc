@@ -34,6 +34,27 @@ document.arrive("#UserDropdownMenu", function(){
   document.getElementById('UserDropdownButton').addEventListener('click', () => menu.open = !menu.open);
 });
 
+document.arrive("#VideoPlayer", function(){
+  videojs('VideoPlayer', {
+    controls: true
+  });
+})
+
+document.arrive(".tooltip-button", function(){
+  let button = document.querySelector('.tooltip-button');
+  button.onclick = function(){
+    document.getElementsByClassName('tooltip-wrapper')[0].classList.toggle('hidden');
+
+    var hasClass = document.querySelector('div.tooltip-wrapper').classList.contains('hidden');
+    var player = videojs('VideoPlayer');
+    if (hasClass === true)
+      {
+        player.pause();
+      };
+  };
+
+});
+
 
 function sendElmKeycloakToken() {
   localStorage.setItem('profile', JSON.stringify(keycloak.profile));

@@ -123,6 +123,9 @@ a.mdc-persistent-drawer--selected {
 
 .user-menu-btn{
   color: white;
+}
+
+.user-menu-btn, .tooltip-button{
   border: none;
   background: none;
   outline: none;
@@ -154,21 +157,29 @@ nav.mdc-list a:not(.mdc-persistent-drawer--selected):hover {
   width:82px;
 }
 
-#Regulations div.mdc-textfield, #Regulations .mdc-textfield__input{
-  width:300px;
+.hidden{
+  height: 0px !important;
 }
 
-#Regulations .mdc-textfield--multiline{
-  margin-top:35px;
-  margin-bottom: 20px;
+.tooltip-button i{
+  font-size: 16px;
+  vertical-align: text-top;
 }
 
-#Regulations textarea{
-  font-family: inherit;
+.tooltip-wrapper, .tooltip-content{
+  transition: height 1000ms ease-in-out;
+  overflow: hidden;
 }
 
-#Regulations .mdc-textfield--multiline > label.mdc-textfield__label--float-above{
-  left: 0px;
+.tooltip-content{
+  border: 1px solid #888;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 16px;
+}
+
+.tooltip-wrapper{
+  height: 450px;
 }
 
 /* landing page */
