@@ -36,6 +36,11 @@ BEGIN
   ELSE
     NEW.user_email = current_setting('request.jwt.claim.email', true);
   END IF;
+  IF NEW.user_id IS NOT NULL THEN
+    RAISE EXCEPTION 'You must not send the user_id field';
+  ELSE
+    NEW.user_id = current_setting('request.jwt.claim.sub', true);
+  END IF;
 
   RETURN NEW;
 END;
@@ -45,13 +50,14 @@ CREATE TABLE mappa.comment (
   uuid        UUID        UNIQUE,
   created_at  TIMESTAMPTZ,
   user_email  NAME,
+  user_id     UUID,
   message     TEXT
 );
 
 CREATE TRIGGER override_comment_cols BEFORE INSERT ON mappa.comment FOR EACH ROW EXECUTE PROCEDURE mappa.override_server_columns();
 
 CREATE OR REPLACE VIEW "1".comment as
-  SELECT uuid, user_email, created_at, message from mappa.comment;
+  SELECT uuid, user_email, user_id, created_at, message from mappa.comment;
 
 GRANT SELECT, INSERT ON mappa.comment to member;
 GRANT all ON "1".comment to member;

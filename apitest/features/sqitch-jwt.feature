@@ -14,9 +14,10 @@ Feature: Basic sqitch API interaction with JWT
         Then the request is successful and a comment was created
         Then the response is a list of 1 comment
         Then one item has the following attributes:
-            | attribute  | type     | value                     |
-            | user_email | string   | user1@havengrc.com        |
-            | message    | string   | The system must be tested |
+            | attribute  | type     | value                                |
+            | user_email | string   | user1@havengrc.com                   |
+            | user_id    | string   | 90920d91-3090-4b4a-ae2a-2377cfa06ecd |
+            | message    | string   | The system must be tested            |
 
 
     Scenario: Search for all comments
