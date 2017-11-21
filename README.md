@@ -218,6 +218,14 @@ Then you can use that token by passing it in an Authorization header:
 
     $ curl -v -H "Authorization: Bearer \$TOKEN" http://localhost:3001/comment
 
+To read a file from the database:
+
+    $ curl -H "Authorization: Bearer $TOKEN" -H "Accept: application/octet-stream" http://localhost:3001/file?select=file --output result.pdf
+
+To upload a base64 encoded file to the database:
+
+    $ curl -X POST -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' http://localhost:3001/file -d '{"file": "'"$(base64 apitest/features/example.pdf)"'"}'
+
 TODO: We will need an upgraded version of postgrest with a fix for https://github.com/begriffs/postgrest/issues/906.
 We also need to modify the user signup process to set up the roles correctly.
 
