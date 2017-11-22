@@ -39,6 +39,7 @@ jobs:
           working_directory: marketing
       - run: docker build --rm=false -t kindlyops/complianceopsmarketing -f marketing/Dockerfile .
       - run: docker build --rm=false -t kindlyops/mappamundi .
+      - run: docker build --rm=false -t kindlyops/havenapi havenapi/
       - run:
           name: compile Elm project 
           command: npm run-script build
