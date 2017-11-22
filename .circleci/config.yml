@@ -1,11 +1,10 @@
 version: 2
 jobs:
   build:
-    machine: true
+    machine:
+      image: circleci/classic:edge
     steps:
       - checkout
-      - setup_remote_docker:
-          version: 17.10.0-ce
       - run:
           name: Check docker compose version
           command: docker-compose -v
