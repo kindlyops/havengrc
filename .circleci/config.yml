@@ -4,6 +4,8 @@ jobs:
     machine: true
     steps:
       - checkout
+      - setup_remote_docker:
+          version: 17.10.0-ce
       - run:
           name: Check docker compose version
           command: docker-compose -v
