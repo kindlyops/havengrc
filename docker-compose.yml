@@ -66,6 +66,7 @@ services:
       - POSTGRES_PORT_5432_TCP_ADDR=postgres
       - KEYCLOAK_USER=admin
       - KEYCLOAK_PASSWORD=admin
+      - PROXY_ADDRESS_FORWARDING=true
     ports:
       - "8080:8080"
     links:
