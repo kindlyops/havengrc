@@ -129,6 +129,17 @@ services:
       - POSTGRES_DB=mappamundi_dev
     volumes:
       - ./postgresql-data:/var/lib/postgresql
+  newapi:
+    working_dir: /go/src/github.com/kindlyops/mappamundi/havenapi
+    volumes:
+      - ./havenapi:/go/src/github.com/kindlyops/mappamundi/havenapi
+    build:
+      context: .
+      dockerfile: ./havenapi/Dockerfile-hotreload
+    links:
+      - db
+    ports:
+      - "3000:3000"
   webui:
     working_dir: /code
     volumes:

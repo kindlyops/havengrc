@@ -39,7 +39,6 @@ func App() *buffalo.App {
 		}
 
 		app.GET("/", HomeHandler)
-		app.GET("/foo", HomeHandler)
 
 	}
 

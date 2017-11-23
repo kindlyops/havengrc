@@ -1,0 +1,10 @@
+FROM gobuffalo/buffalo:v0.10.1
+
+RUN mkdir -p $GOPATH/src/github.com/kindlyops/mappamundi/havenapi
+WORKDIR $GOPATH/src/github.com/kindlyops/mappamundi/havenapi
+ADD ./havenapi/ $GOPATH/src/github.com/kindlyops/mappamundi/havenapi
+RUN dep ensure
+
+EXPOSE 3000
+ENV ADDR 0.0.0.0
+CMD exec buffalo dev
