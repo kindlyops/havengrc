@@ -133,6 +133,7 @@ services:
     working_dir: /go/src/github.com/kindlyops/mappamundi/havenapi
     volumes:
       - ./havenapi:/go/src/github.com/kindlyops/mappamundi/havenapi
+      - /go/src/github.com/kindlyops/mappamundi/havenapi/vendor
     build:
       context: .
       dockerfile: ./havenapi/Dockerfile-hotreload
