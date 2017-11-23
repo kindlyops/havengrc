@@ -32,8 +32,6 @@ jobs:
       - run: docker-compose run start_dependencies
       - run: docker-compose run sqitch
       - run: docker-compose run start_keycloak
-      - run: sleep 60
-      - run: ./test
       - run:
           name: Build marketing site with hugo
           command: ./vendor/linux/hugo
@@ -42,11 +40,12 @@ jobs:
       - run: docker build --rm=false -t kindlyops/mappamundi .
       - run: docker build --rm=false -t kindlyops/havenapi havenapi/
       - run:
-          name: compile Elm project 
+          name: compile Elm project
           command: npm run-script build
           no_output_timeout: 15m
           working_directory: webui
       - run: docker build --rm=false -t kindlyops/havenweb webui
+      - run: ./test
 
 
   deployment:
