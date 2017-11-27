@@ -39,4 +39,12 @@
 
 [[constraint]]
   branch = "master"
+  name = "github.com/markbates/grift"
+
+[[constraint]]
+  name = "github.com/markbates/pop"
+  version = "3.41.1"
+
+[[constraint]]
+  branch = "master"
   name = "github.com/unrolled/secure"
