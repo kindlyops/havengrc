@@ -15,7 +15,7 @@ func HomeHandler(c buffalo.Context) error {
 		return c.Error(500, fmt.Errorf("Database error: %s", err.Error()))
 	}
 	var count int
-	err = models.DB.Store.Get(&count, "select count(*) from comment")
+	err = models.DB.Store.Get(&count, models.Q["commentcount"])
 	if err != nil {
 		return c.Error(500, fmt.Errorf("Database error: %s", err.Error()))
 	}
