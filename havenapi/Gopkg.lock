@@ -242,6 +242,12 @@
   version = "v3.0"
 
 [[projects]]
+  name = "github.com/nleof/goyesql"
+  packages = ["."]
+  revision = "736fe14cafb0b195a659821fb90ecfa9226441b5"
+  version = "v1.0.1"
+
+[[projects]]
   name = "github.com/pkg/errors"
   packages = ["."]
   revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
@@ -388,6 +394,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "01f72e902dd338508385a368f7d79bc6f35943ff05bddeb9df15399913bc07c4"
+  inputs-digest = "c0a082551cb1aa0b34ea9902a525a1c80ea910c04acb206b78e762f711cefc08"
   solver-name = "gps-cdcl"
   solver-version = 1
