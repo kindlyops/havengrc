@@ -221,7 +221,7 @@ commentsBody model =
     div []
         [ text "This is the comments view"
         , ul []
-            (List.map (\l -> li [] [ text (l.message ++ " - " ++ l.user_email ++ " posted at " ++ l.created_at) ]) model.comments)
+            (List.map (\l -> li [] [ text (l.message ++ " - " ++ l.user_email ++ "(" ++ l.user_id ++ ")" ++ " posted at " ++ l.created_at) ]) model.comments)
         , commentsForm model
         ]
 
