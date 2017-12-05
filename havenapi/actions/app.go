@@ -32,13 +32,14 @@ func App() *buffalo.App {
 		}))
 
 		// Set the request content type to JSON
-		app.Use(middleware.SetContentType("application/json"))
+		//app.Use(middleware.SetContentType("application/json"))
 
 		if ENV == "development" {
 			app.Use(middleware.ParameterLogger)
 		}
 
 		app.GET("/", HomeHandler)
+		app.POST("/api/files", UploadHandler)
 
 	}
 
