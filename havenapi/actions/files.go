@@ -11,7 +11,7 @@ import (
 
 // UploadHandler accepts a file upload
 func UploadHandler(c buffalo.Context) error {
-	err := models.DB.RawQuery("set search_path to 'mappa'").Exec()
+	err := models.DB.RawQuery("set local search_path to mappa, public").Exec()
 	if err != nil {
 		return c.Error(500, fmt.Errorf("Database error: %s", err.Error()))
 	}
@@ -28,7 +28,7 @@ func UploadHandler(c buffalo.Context) error {
 	log.Info("the file we got is named %s and is %d bytes long", header.Filename, header.Size)
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(file)
-	err = models.DB.RawQuery("insert into mappa.files (name, file) VALUES($1, $2) RETURNING uuid", header.Filename, buf.Bytes()).Exec()
+	err = models.DB.RawQuery("insert into mappa.files (name, file) VALUES($1, $2)", header.Filename, buf.Bytes()).Exec()
 	if err != nil {
 		return c.Error(500, fmt.Errorf("error inserting file to database: %s", err.Error()))
 	}
