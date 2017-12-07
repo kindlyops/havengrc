@@ -28,7 +28,7 @@ func UploadHandler(c buffalo.Context) error {
 	log.Info("the file we got is named %s and is %d bytes long", header.Filename, header.Size)
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(file)
-	err = models.DB.RawQuery("insert into mappa.files (name, file) VALUES($1, $2)", header.Filename, buf.Bytes()).Exec()
+	err = models.DB.RawQuery(models.Q["insertfile"], header.Filename, buf.Bytes()).Exec()
 	if err != nil {
 		return c.Error(500, fmt.Errorf("error inserting file to database: %s", err.Error()))
 	}

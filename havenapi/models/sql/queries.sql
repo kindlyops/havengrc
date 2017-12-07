@@ -4,3 +4,6 @@
 -- name: commentcount
 select count(*)
   from mappa.comment;
+
+-- name: insertfile
+insert into mappa.files (name, file) values($1, $2);
