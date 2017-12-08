@@ -3,7 +3,7 @@
 
 -- name: commentcount
 select count(*)
-  from mappa.comment;
+  from mappa.comments;
 
 -- name: insertfile
 insert into mappa.files (name, file) values($1, $2);

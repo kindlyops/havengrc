@@ -45,7 +45,7 @@ jobs:
           no_output_timeout: 15m
           working_directory: webui
       - run: docker build --rm=false -t kindlyops/havenweb webui
-      - run: docker-compose build newapi
+      - run: docker-compose build havenapi
       - run: ./test
 
 
