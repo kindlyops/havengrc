@@ -2,6 +2,7 @@ package actions
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/deis/helm/log"
@@ -21,7 +22,7 @@ var ENV = envy.Get("GO_ENV", "development")
 
 // TODO mappamundi/postgrest/keycloak-dev-public-key.json should be
 // the JWK and will need to be mounted into the havenapi container
-var KEY = envy.Get("HAVEN_JWK_PATH", "/etc/haven/haven.jwk")
+var KEY = envy.Get("HAVEN_JWK_PATH", "")
 
 var key *jose.JsonWebKey
 var app *buffalo.App
@@ -45,13 +46,16 @@ func App() *buffalo.App {
 		// Set the request content type to JSON
 		//app.Use(middleware.SetContentType("application/json"))
 
-		// TODO
-		// rawKey := read the file from KEY
+		rawKey, err := ioutil.ReadFile(KEY)
+		if err != nil {
+			panic("could not read the JWK")
+		}
+		log.Info("Loaded JWK: %s", rawKey)
 		// https://godoc.org/gopkg.in/square/go-jose.v1#JsonWebKey.UnmarshalJSON
-		// key, err := UnmarshalJSON(rawKey)
-		// if err != nil {
-		// 	return nil
-		// }
+		err = key.UnmarshalJSON(rawKey)
+		if err != nil {
+			panic("could not unmarshal the JWK")
+		}
 
 		if ENV == "development" {
 			app.Use(middleware.ParameterLogger)

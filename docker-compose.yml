@@ -102,6 +102,9 @@ services:
     volumes:
       - ./havenapi:/go/src/github.com/kindlyops/mappamundi/havenapi
       - /go/src/github.com/kindlyops/mappamundi/havenapi/vendor
+      - ./postgrest/keycloak-dev-public-key.json:/keycloak-dev-public-key.json
+    environment:
+      - HAVEN_JWK_PATH=/keycloak-dev-public-key.json
     build:
       context: .
       dockerfile: ./havenapi/Dockerfile-hotreload
