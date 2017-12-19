@@ -1,18 +1,29 @@
 package actions
 
 import (
+	"fmt"
+	"net/http"
+
+	"github.com/deis/helm/log"
 	"github.com/gobuffalo/buffalo"
 	"github.com/gobuffalo/buffalo/middleware"
 	"github.com/gobuffalo/buffalo/middleware/ssl"
 	"github.com/gobuffalo/envy"
+	"github.com/gobuffalo/x/sessions"
 	"github.com/unrolled/secure"
 
-	"github.com/gobuffalo/x/sessions"
+	"gopkg.in/square/go-jose.v1"
 )
 
 // ENV is used to help switch settings based on where the
 // application is being run. Default is "development".
 var ENV = envy.Get("GO_ENV", "development")
+
+// TODO mappamundi/postgrest/keycloak-dev-public-key.json should be
+// the JWK and will need to be mounted into the havenapi container
+var KEY = envy.Get("HAVEN_JWK_PATH", "/etc/haven/haven.jwk")
+
+var key *jose.JsonWebKey
 var app *buffalo.App
 
 // App is where all routes and middleware for buffalo
@@ -34,14 +45,42 @@ func App() *buffalo.App {
 		// Set the request content type to JSON
 		//app.Use(middleware.SetContentType("application/json"))
 
+		// TODO
+		// rawKey := read the file from KEY
+		// https://godoc.org/gopkg.in/square/go-jose.v1#JsonWebKey.UnmarshalJSON
+		// key, err := UnmarshalJSON(rawKey)
+		// if err != nil {
+		// 	return nil
+		// }
+
 		if ENV == "development" {
 			app.Use(middleware.ParameterLogger)
 		}
 
 		app.GET("/", HomeHandler)
-		app.POST("/api/files", UploadHandler)
+		api := app.Group("/api/")
+		api.Use(JwtMiddleware)
+		api.POST("files", UploadHandler)
 
 	}
 
 	return app
+}
+
+// validate JWT and set context compatible with PostgREST
+func JwtMiddleware(next buffalo.Handler) buffalo.Handler {
+	return func(c buffalo.Context) error {
+		token := c.Request().Header.Get("Authorization")
+
+		if len(token) <= len("Bearer SOMETOKEN") {
+			return c.Error(http.StatusUnauthorized, fmt.Errorf("Must provide Authorization token"))
+		}
+		log.Info("Authorization token is '%s'", token)
+
+		//c.Set("user", u)
+
+		return c.Error(http.StatusUnauthorized, fmt.Errorf("Failed to validate token"))
+
+		//return next(c)
+	}
 }

@@ -26,6 +26,18 @@
   revision = "805cee6e0d43c72ba1d4e3275965ff41e0da068a"
 
 [[projects]]
+  name = "github.com/deis/helm"
+  packages = ["log"]
+  revision = "e4b3983bd8dc5b8682de168a322c20a941b49aa3"
+  version = "0.8.1"
+
+[[projects]]
+  name = "github.com/deis/pkg"
+  packages = ["prettyprint"]
+  revision = "d8ef2e67e88941808f1bfcf28d0a91a122718459"
+  version = "v0.5.0"
+
+[[projects]]
   branch = "master"
   name = "github.com/dustin/go-humanize"
   packages = ["."]
@@ -386,6 +398,12 @@
   revision = "82aafbf43bf885069dc71b7e7c2f9d7a614d47da"
 
 [[projects]]
+  name = "gopkg.in/square/go-jose.v1"
+  packages = [".","cipher","json"]
+  revision = "aa2e30fdd1fe9dd3394119af66451ae790d50e0d"
+  version = "v1.1.0"
+
+[[projects]]
   branch = "v2"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
@@ -394,6 +412,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "c0a082551cb1aa0b34ea9902a525a1c80ea910c04acb206b78e762f711cefc08"
+  inputs-digest = "cee2a200159967298b89805c65c7565b9aeca6ffc4da7250ff9646ddc3665a4b"
   solver-name = "gps-cdcl"
   solver-version = 1
