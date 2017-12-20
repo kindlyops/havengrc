@@ -4,16 +4,15 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 
-	"github.com/deis/helm/log"
 	"github.com/gobuffalo/buffalo"
 	"github.com/gobuffalo/buffalo/middleware"
 	"github.com/gobuffalo/buffalo/middleware/ssl"
 	"github.com/gobuffalo/envy"
 	"github.com/gobuffalo/x/sessions"
 	"github.com/unrolled/secure"
-
-	"gopkg.in/square/go-jose.v1"
+	jose "gopkg.in/square/go-jose.v1"
 )
 
 // ENV is used to help switch settings based on where the
@@ -24,7 +23,7 @@ var ENV = envy.Get("GO_ENV", "development")
 // the JWK and will need to be mounted into the havenapi container
 var KEY = envy.Get("HAVEN_JWK_PATH", "")
 
-var key *jose.JsonWebKey
+var key jose.JsonWebKey
 var app *buffalo.App
 
 // App is where all routes and middleware for buffalo
@@ -43,14 +42,11 @@ func App() *buffalo.App {
 			SSLProxyHeaders: map[string]string{"X-Forwarded-Proto": "https"},
 		}))
 
-		// Set the request content type to JSON
-		//app.Use(middleware.SetContentType("application/json"))
-
 		rawKey, err := ioutil.ReadFile(KEY)
 		if err != nil {
 			panic("could not read the JWK")
 		}
-		log.Info("Loaded JWK: %s", rawKey)
+		//log.Info("Loaded JWK: %s", rawKey)
 		// https://godoc.org/gopkg.in/square/go-jose.v1#JsonWebKey.UnmarshalJSON
 		err = key.UnmarshalJSON(rawKey)
 		if err != nil {
@@ -74,13 +70,18 @@ func App() *buffalo.App {
 // validate JWT and set context compatible with PostgREST
 func JwtMiddleware(next buffalo.Handler) buffalo.Handler {
 	return func(c buffalo.Context) error {
-		token := c.Request().Header.Get("Authorization")
+		header := c.Request().Header.Get("Authorization")
+		parts := strings.Split(header, "Bearer ")
+		token := parts[1]
 
-		if len(token) <= len("Bearer SOMETOKEN") {
+		if len(token) == 0 {
 			return c.Error(http.StatusUnauthorized, fmt.Errorf("Must provide Authorization token"))
 		}
-		log.Info("Authorization token is '%s'", token)
 
+		// TODO validate token using key
+
+		// TODO: build up a set of claims to set locally in DB transaction
+		// at a minimum set 'request.jwt.claim.email' and 'request.jwt.claim.sub'
 		//c.Set("user", u)
 
 		return c.Error(http.StatusUnauthorized, fmt.Errorf("Failed to validate token"))
