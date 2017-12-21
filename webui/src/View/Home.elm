@@ -192,27 +192,7 @@ reportsBody : Model -> Html Msg
 reportsBody model =
     div []
         [ div []
-              [ text "This is the reports view"
-               , button
-                    [ class "tooltip-button info-tip-btn" ]
-                    [ i [ class "material-icons tooltip-button" ]
-                        [ text "info_outline" ]
-                    ]
-               , div
-                    [ class "hidden tooltip-wrapper info-tooltip-wrapper" ]
-                    [ div
-                        [ class "tooltip-content" ]
-                        [ video [ id "VideoPlayer"
-                                , class "video-js"
-                                ]
-                            [ source [ src "http://vjs.zencdn.net/v/oceans.mp4"
-                                     , type_ "video/mp4"
-                                     ]
-                                []
-                            ]
-                        ]
-                    ]
-              ]
+              [ text "This is the reports view" ]
         ]
 
 
@@ -276,27 +256,7 @@ activityBody model =
     in
         div []
             [ div []
-                  [ text "What is Risk Management?"
-                  , button
-                       [ class "tooltip-button risk-tip-btn" ]
-                       [ i [ class "material-icons tooltip-button" ]
-                           [ text "help_outline" ]
-                       ]
-                  , div
-                       [ class "hidden tooltip-wrapper risk-tooltip-wrapper" ]
-                       [ div
-                           [ class "tooltip-content" ]
-                           [ video [ id "VideoPlayer"
-                                   , class "video-js"
-                                   ]
-                               [ source [ src "http://vjs.zencdn.net/v/oceans.webm"
-                               , type_ "video/webm"
-                               ]
-                                   []
-                               ]
-                           ]
-                       ]
-                  ]
+                  [ text "What is Risk Management?" ]
             ,  LineChart.view data
             ]
 

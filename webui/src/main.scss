@@ -157,31 +157,6 @@ nav.mdc-list a:not(.mdc-persistent-drawer--selected):hover {
   width:82px;
 }
 
-.hidden{
-  height: 0px !important;
-}
-
-.tooltip-button i{
-  font-size: 16px;
-  vertical-align: text-top;
-}
-
-.tooltip-wrapper, .tooltip-content{
-  transition: height 1000ms ease-in-out;
-  overflow: hidden;
-}
-
-.tooltip-content{
-  border: 1px solid #888;
-  border-radius: 8px;
-  padding: 16px;
-  margin-top: 16px;
-}
-
-.tooltip-wrapper{
-  height: 450px;
-}
-
 /* landing page */
 .header-container{
   background-color:#fff;
