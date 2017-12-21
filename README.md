@@ -85,6 +85,10 @@ Open http://localhost:3000/, you can sign in with admin/admin in the dev env.
 
 Open http://localhost:8080/, you can sign in with admin/admin
 
+## to access the marketing site
+
+Open http://localhost:5000/
+
 ## to access the GitBook documentation site
 
 Open http://localhost:4000/

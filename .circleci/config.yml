@@ -33,9 +33,14 @@ jobs:
       - run: docker-compose run start_keycloak
       - run: sleep 60
       - run: ./test
+      - run:
+          name: Build marketing site with hugo
+          command: ./vendor/linux/hugo
+          working_directory: marketing
+      - run: docker build --rm=false -t kindlyops/complianceopsmarketing -f marketing/Dockerfile .
       - run: docker build --rm=false -t kindlyops/mappamundi .
       - run:
-          name: compile Elm project
+          name: compile Elm project 
           command: npm run-script build
           no_output_timeout: 15m
           working_directory: webui
@@ -54,8 +59,10 @@ jobs:
             if [ "${CIRCLE_BRANCH" == "master" ]; then
               docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
               docker tag kindlyops/mappamundi kindlyops/mappamundi:$CIRCLE_SHA1
+              docker tag kindlyops/complianceopsmarketing kindlyops/complianceopsmarketing:$CIRCLE_SHA1
               docker tag kindlyops/havenweb kindlyops/havenweb:$CIRCLE_SHA1
               docker push kindlyops/mappamundi:$CIRCLE_SHA1
+              docker push kindlyops/complianceopsmarketing:$CIRCLE_SHA1
               docker push kindlyops/havenweb:$CIRCLE_SHA1
             else
               echo "Not master branch so not deploying"
@@ -67,10 +74,14 @@ jobs:
       #   commands:
       #     - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
       #     - docker tag kindlyops/mappamundi kindlyops/mappamundi:$CIRCLE_TAG
+      #     - docker tag kindlyops/complianceopsmarketing kindlyops/complianceopsmarketing:$CIRCLE_TAG
       #     - docker tag kindlyops/havenweb kindlyops/havenweb:$CIRCLE_TAG
       #     - docker tag kindlyops/mappamundi kindlyops/mappamundi:$CIRCLE_SHA1
+      #     - docker tag kindlyops/complianceopsmarketing kindlyops/complianceopsmarketing:$CIRCLE_SHA1
       #     - docker tag kindlyops/havenweb kindlyops/havenweb:$CIRCLE_SHA1
       #     - docker push kindlyops/mappamundi:$CIRCLE_TAG
       #     - docker push kindlyops/havenweb:$CIRCLE_TAG
+      #     - docker push kindlyops/complianceopsmarketing:$CIRCLE_TAG
+      #     - docker push kindlyops/complianceopsmarketing:$CIRCLE_SHA1
       #     - docker push kindlyops/mappamundi:$CIRCLE_SHA1
       #     - docker push kindlyops/havenweb:$CIRCLE_SHA1
