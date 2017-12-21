@@ -77,10 +77,6 @@ you to configure 2Factor authentication.
 
 Open http://localhost:3002/
 
-## to access tellform
-
-Open http://localhost:3000/, you can sign in with admin/admin in the dev env.
-
 ## to access keycloak
 
 Open http://localhost:8080/, you can sign in with admin/admin
