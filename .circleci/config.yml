@@ -40,12 +40,6 @@ jobs:
           no_output_timeout: 15m
           working_directory: webui
       - run: docker build --rm=false -t kindlyops/havenweb webui
-  deployment:
-    docker:
-      - image: circleci/node:6.10-browsers
-    steps:
-      - checkout
-      - setup_remote_docker
       - deploy:
           name: Prerelease
           command: |
@@ -58,6 +52,7 @@ jobs:
             else
               echo "Not master branch so not deploying"
             fi
+
       # TODO: port to circle 2.0
       # release:
       #   tag: /v[0-9]+(\.[0-9]+)*/
