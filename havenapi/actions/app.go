@@ -12,7 +12,10 @@ import (
 	"github.com/gobuffalo/envy"
 	"github.com/gobuffalo/x/sessions"
 	"github.com/unrolled/secure"
-	jose "gopkg.in/square/go-jose.v1"
+	jose "gopkg.in/square/go-jose.v2"
+	jwt "gopkg.in/square/go-jose.v2/jwt"
+
+	"github.com/kindlyops/mappamundi/havenapi/models"
 )
 
 // ENV is used to help switch settings based on where the
@@ -23,7 +26,7 @@ var ENV = envy.Get("GO_ENV", "development")
 // the JWK and will need to be mounted into the havenapi container
 var KEY = envy.Get("HAVEN_JWK_PATH", "")
 
-var key jose.JsonWebKey
+var key jose.JSONWebKey
 var app *buffalo.App
 
 // App is where all routes and middleware for buffalo
@@ -46,8 +49,7 @@ func App() *buffalo.App {
 		if err != nil {
 			panic("could not read the JWK")
 		}
-		//log.Info("Loaded JWK: %s", rawKey)
-		// https://godoc.org/gopkg.in/square/go-jose.v1#JsonWebKey.UnmarshalJSON
+
 		err = key.UnmarshalJSON(rawKey)
 		if err != nil {
 			panic("could not unmarshal the JWK")
@@ -78,14 +80,35 @@ func JwtMiddleware(next buffalo.Handler) buffalo.Handler {
 			return c.Error(http.StatusUnauthorized, fmt.Errorf("Must provide Authorization token"))
 		}
 
-		// TODO validate token using key
+		tok, err := jwt.ParseSigned(token)
+		if err != nil {
+			return c.Error(http.StatusUnauthorized, err)
+		}
 
-		// TODO: build up a set of claims to set locally in DB transaction
+		// build up a set of claims to set locally in DB transaction
 		// at a minimum set 'request.jwt.claim.email' and 'request.jwt.claim.sub'
+		allClaims := make(map[string]interface{})
+		if err := tok.Claims(key, &allClaims); err != nil {
+			return c.Error(http.StatusUnauthorized, err)
+		}
+		fmt.Printf("claims: %+v\n", allClaims)
+
+		// TODO: check if token is expired
+
+		// TODO: set user, email, sub in buffalog request context
 		//c.Set("user", u)
 
-		return c.Error(http.StatusUnauthorized, fmt.Errorf("Failed to validate token"))
+		email := allClaims["email"]
+		sub := allClaims["sub"]
+		err = models.DB.RawQuery(models.Q["setemailclaim"], email).Exec()
+		if err != nil {
+			return c.Error(500, fmt.Errorf("error setting JWT claims in GUC: %s", err.Error()))
+		}
+		err = models.DB.RawQuery(models.Q["setsubclaim"], sub).Exec()
+		if err != nil {
+			return c.Error(500, fmt.Errorf("error setting JWT claims in GUC: %s", err.Error()))
+		}
 
-		//return next(c)
+		return next(c)
 	}
 }

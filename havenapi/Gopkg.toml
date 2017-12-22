@@ -60,3 +60,7 @@
 [[constraint]]
   name = "gopkg.in/square/go-jose.v1"
   version = "1.1.0"
+
+[[constraint]]
+  name = "gopkg.in/square/go-jose.v2"
+  version = "2.1.3"
