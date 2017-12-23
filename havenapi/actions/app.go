@@ -14,6 +14,9 @@ import (
 	"github.com/unrolled/secure"
 	jose "gopkg.in/square/go-jose.v2"
 	jwt "gopkg.in/square/go-jose.v2/jwt"
+	"io/ioutil"
+	"net/http"
+	"strings"
 
 	"github.com/kindlyops/mappamundi/havenapi/models"
 )
@@ -44,6 +47,9 @@ func App() *buffalo.App {
 			SSLRedirect:     ENV == "production",
 			SSLProxyHeaders: map[string]string{"X-Forwarded-Proto": "https"},
 		}))
+
+		// TODO refactor to use dependency injection instead of a package global
+		app.Use(middleware.PopTransaction(models.DB))
 
 		rawKey, err := ioutil.ReadFile(KEY)
 		if err != nil {
