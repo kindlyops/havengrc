@@ -9,7 +9,7 @@ select count(*)
 insert into mappa.files (name, file) values($1, $2);
 
 -- name: setemailclaim
-set local request.jwt.claim.email to $1;
+select set_config('request.jwt.claim.email', $1, true);
 
 -- name: setsubclaim
-set local request.jwt.claim.sub to $1;
+select set_config('request.jwt.claim.sub', $1, true);

@@ -2,10 +2,7 @@ package actions
 
 import (
 	"fmt"
-	"io/ioutil"
-	"net/http"
-	"strings"
-
+	"github.com/deis/helm/log"
 	"github.com/gobuffalo/buffalo"
 	"github.com/gobuffalo/buffalo/middleware"
 	"github.com/gobuffalo/buffalo/middleware/ssl"
@@ -93,19 +90,26 @@ func JwtMiddleware(next buffalo.Handler) buffalo.Handler {
 
 		// build up a set of claims to set locally in DB transaction
 		// at a minimum set 'request.jwt.claim.email' and 'request.jwt.claim.sub'
+		validClaims := jwt.Claims{}
 		allClaims := make(map[string]interface{})
-		if err := tok.Claims(key, &allClaims); err != nil {
+		if err := tok.Claims(key, &validClaims, &allClaims); err != nil {
 			return c.Error(http.StatusUnauthorized, err)
 		}
 		fmt.Printf("claims: %+v\n", allClaims)
 
-		// TODO: check if token is expired
+		// check if token is expired and from a valid issuer
+		// TODO: the issuer needs to be configurable to handle on-prem deployments
+		iss := "http://localhost:2015/auth/realms/havendev"
+		err = validClaims.Validate(jwt.Expected{Issuer: iss})
+		if err != nil {
+			return c.Error(401, fmt.Errorf("invalid token: %s", err.Error()))
+		}
 
 		// TODO: set user, email, sub in buffalog request context
 		//c.Set("user", u)
-
-		email := allClaims["email"]
-		sub := allClaims["sub"]
+		log.Info("The email in the token was: %s", allClaims["email"])
+		email := "foo" // allClaims["email"]
+		sub := "bar"   // TODO: allClaims["sub"]
 		err = models.DB.RawQuery(models.Q["setemailclaim"], email).Exec()
 		if err != nil {
 			return c.Error(500, fmt.Errorf("error setting JWT claims in GUC: %s", err.Error()))
