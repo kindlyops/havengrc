@@ -28,6 +28,13 @@ jobs:
           command: npm install --only=dev
           no_output_timeout: 15m
           working_directory: webui
+      - run:
+          name: Install OpenShift client
+          command: |
+            wget https://github.com/openshift/origin/releases/download/v3.7.0/openshift-origin-client-tools-v3.7.0-7ed6862-linux-64bit.tar.gz
+            tar xvzf openshift-origin-client-tools-v3.7.0-7ed6862-linux-64bit.tar.gz
+            sudo mv openshift-origin-client-tools-v3.7.0-7ed6862-linux-64bit/oc /usr/local/bin/oc
+            oc version
       - run: docker-compose run start_dependencies
       - run: docker-compose run sqitch
       - run: docker-compose run start_keycloak
