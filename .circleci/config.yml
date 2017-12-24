@@ -36,6 +36,8 @@ jobs:
             sudo mv openshift-origin-client-tools-v3.7.0-7ed6862-linux-64bit/oc /usr/local/bin/oc
             oc version
             # todo: authenticate
+            oc login --token=$OPENSHIFT_TOKEN
+            oc project haven-production
       - run: docker-compose run start_dependencies
       - run: docker-compose run sqitch
       - run: docker-compose run start_keycloak
