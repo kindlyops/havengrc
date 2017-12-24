@@ -28,6 +28,16 @@ jobs:
           command: npm install --only=dev
           no_output_timeout: 15m
           working_directory: webui
+      - run:
+          name: Install OpenShift client
+          command: |
+            wget https://github.com/openshift/origin/releases/download/v3.7.0/openshift-origin-client-tools-v3.7.0-7ed6862-linux-64bit.tar.gz
+            tar xvzf openshift-origin-client-tools-v3.7.0-7ed6862-linux-64bit.tar.gz
+            sudo mv openshift-origin-client-tools-v3.7.0-7ed6862-linux-64bit/oc /usr/local/bin/oc
+            oc version
+            # todo: authenticate
+            oc login https://console.pro-us-east-1.openshift.com/ --token=$OPENSHIFT_TOKEN
+            oc project haven-production
       - run: docker-compose run start_dependencies
       - run: docker-compose run sqitch
       - run: docker-compose run start_keycloak
@@ -47,8 +57,11 @@ jobs:
               docker login -u $DOCKER_USER -p $DOCKER_PASS
               docker tag kindlyops/mappamundi kindlyops/mappamundi:$CIRCLE_SHA1
               docker tag kindlyops/havenweb kindlyops/havenweb:$CIRCLE_SHA1
+              docker tag kindlyops/havenweb kindlyops/havenweb:latest
               docker push kindlyops/mappamundi:$CIRCLE_SHA1
               docker push kindlyops/havenweb:$CIRCLE_SHA1
+              docker push kindlyops/havenweb:latest
+              oc import-image havenweb --from=docker.io/kindlyops/havenweb:latest --confirm
             else
               echo "Not master branch so not deploying"
             fi
