@@ -50,18 +50,24 @@ jobs:
           no_output_timeout: 15m
           working_directory: webui
       - run: docker build --rm=false -t kindlyops/havenweb webui
+      - run: docker build --rm=false -t kindlyops/havensqitch sqitch
       - deploy:
           name: Prerelease
           command: |
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
               docker login -u $DOCKER_USER -p $DOCKER_PASS
               docker tag kindlyops/mappamundi kindlyops/mappamundi:$CIRCLE_SHA1
+              docker tag kindlyops/havensqitch kindlyops/havensqitch:$CIRCLE_SHA1
+              docker tag kindlyops/havensqitch kindlyops/havensqitch:latest
               docker tag kindlyops/havenweb kindlyops/havenweb:$CIRCLE_SHA1
               docker tag kindlyops/havenweb kindlyops/havenweb:latest
               docker push kindlyops/mappamundi:$CIRCLE_SHA1
+              docker push kindlyops/havensqitch:$CIRCLE_SHA1
+              docker push kindlyops/havensqitch:latest
               docker push kindlyops/havenweb:$CIRCLE_SHA1
               docker push kindlyops/havenweb:latest
-              oc import-image havenweb --from=docker.io/kindlyops/havenweb:latest --confirm
+              oc import-image havenweb --from=docker.io/kindlyops/havenweb:latest
+              oc import-image havensqitch --from=docker.io/kindlyops/havensqitch:latest
             else
               echo "Not master branch so not deploying"
             fi
