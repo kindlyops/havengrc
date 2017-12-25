@@ -110,29 +110,37 @@ func JwtMiddleware(next buffalo.Handler) buffalo.Handler {
 		sub := allClaims["sub"]
 		log.Info("The sub in the token was: %s", sub)
 		email := allClaims["email"]
-		err = models.DB.RawQuery(models.Q["setemailclaim"], email).Exec()
-		if err != nil {
-			return c.Error(500, fmt.Errorf("error setting JWT claims in GUC: %s", err.Error()))
-		}
+		tx := models.DB
+		//err = models.DB.RawQuery(models.Q["setemailclaim"], email).Exec()
+		tx.RawQuery("BEGIN;")
+		emailQuery := fmt.Sprint("set local request.jwt.claim.email = '",email,"'")
+		tx.RawQuery(emailQuery)
+		//if err != nil {
+		//	return c.Error(500, fmt.Errorf("error setting JWT claims email in GUC: %s", err.Error()))
+		//}
 		// TODO: figure out why when we set this GUC that it causes an error from pq in the triger
 		// 'error inserting file to database: pq: invalid input syntax for uuid: ""'
 		// select set_config('request.jwt.claim.sub', $1, true);
-		err = models.DB.RawQuery("set search_path to mappa, public").Exec()
-		if err != nil {
-			return c.Error(500, fmt.Errorf("Database error: %s", err.Error()))
-		}
+		///err = models.DB.RawQuery("set local search_path to mappa, public")
+		tx.RawQuery("set local search_path to mappa, public")
+	//	if err != nil {
+	//		return c.Error(500, fmt.Errorf("Database error: %s", err.Error()))
+	//	}
 		// SET LOCAL 'request.jwt.claim.sub' = $1;
-		err = models.DB.RawQuery("select set_config('request.jwt.claim.sub', $1, true);", sub).Exec()
-		if err != nil {
-			return c.Error(500, fmt.Errorf("error setting JWT claims in GUC: %s", err.Error()))
-		}
+		//err = models.DB.RawQuery("select set_config('request.jwt.claim.sub', $1, true);", sub).Exec()
+		subQuery := fmt.Sprint("set local request.jwt.claim.sub = '",sub,"'")
+		tx.RawQuery(subQuery)
+		//if err != nil {
+		//	return c.Error(500, fmt.Errorf("error setting JWT claims in GUC: %s", err.Error()))
+		//}
 
-		var newsub string
-		err = models.DB.Store.Get(&newsub, "select current_setting('request.jwt.claim.sub', true);")
-		if err != nil {
-			return c.Error(500, fmt.Errorf("error reading JWT claims in GUC: %s", err.Error()))
-		}
-		log.Info("The sub after reading it back was: '%s'", newsub)
+		tx.RawQuery("END;")
+		//var newsub string
+		//err = models.DB.Store.Get(&newsub,"select current_setting('request.jwt.claim.sub', true);")
+		//if err != nil {
+		//	return c.Error(500, fmt.Errorf("error reading JWT claims in GUC: %s", err.Error()))
+		//}
+		//log.Info("The sub after reading it back was: '%s'", newsub)
 
 		return next(c)
 	}
