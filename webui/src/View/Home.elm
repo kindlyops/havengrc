@@ -190,7 +190,10 @@ dashboardBody model =
 
 reportsBody : Model -> Html Msg
 reportsBody model =
-    div [] [ text "This is the reports view" ]
+    div []
+        [ div []
+              [ text "This is the reports view" ]
+        ]
 
 
 commentsBody : Model -> Html Msg
@@ -251,7 +254,11 @@ activityBody model =
             , ( Date.fromTime 1456790400000, 1 )
             ]
     in
-        LineChart.view data
+        div []
+            [ div []
+                  [ text "What is Risk Management?" ]
+            ,  LineChart.view data
+            ]
 
 
 notFoundBody : Model -> Html Msg

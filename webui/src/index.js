@@ -22,16 +22,46 @@ document.arrive(".mdc-textfield", function(){
   window.mdc.autoInit(document, () => { });
 });
 
+document.arrive(".nav-flex .mdc-list-item", function(element) {
+  element.addEventListener('click', function() {
+    let drawer = new mdc.drawer.MDCPersistentDrawer(document.getElementById('MenuDrawer'));
+    drawer.open = false;
+
+    let menu = new mdc.menu.MDCSimpleMenu(document.getElementById('UserDropdownMenu'));
+    menu.open = false;
+  });
+});
+
 document.arrive("#MenuButton", function(){
-  let drawer = new mdc.drawer.MDCPersistentDrawer(document.getElementById('MenuDrawer'));
-  document.getElementById('MenuButton').addEventListener('click', function () {
-    drawer.open = !drawer.open;
+  var menuDrawerElement = document.getElementById('MenuDrawer');
+  let drawer = new mdc.drawer.MDCPersistentDrawer(menuDrawerElement);
+  let menu = new mdc.menu.MDCSimpleMenu(document.getElementById('UserDropdownMenu'));
+  document.getElementById('MenuButton').addEventListener('click', function (e) {
+    drawer.open = !menuDrawerElement.classList.contains('mdc-persistent-drawer--open');
+    menu.open = false;
+    e.stopPropagation();
   });
 });
 
 document.arrive("#UserDropdownMenu", function(){
+  let userMenuElement = document.getElementById('UserDropdownMenu');
+  let menu = new mdc.menu.MDCSimpleMenu(userMenuElement);
+  document.getElementById('UserDropdownButton').addEventListener('click', function (e) {
+    menu.open = !userMenuElement.classList.contains('mdc-simple-menu--open');
+    e.stopPropagation();
+  });
+});
+
+document.addEventListener('click', function(e){
+  let drawer = new mdc.drawer.MDCPersistentDrawer(document.getElementById('MenuDrawer'));
+  if (drawer.open) {
+    drawer.open = false;
+  };
+
   let menu = new mdc.menu.MDCSimpleMenu(document.getElementById('UserDropdownMenu'));
-  document.getElementById('UserDropdownButton').addEventListener('click', () => menu.open = !menu.open);
+  if (menu.open) {
+    menu.open = false;
+  };
 });
 
 
