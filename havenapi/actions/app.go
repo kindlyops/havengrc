@@ -105,19 +105,26 @@ func JwtMiddleware(next buffalo.Handler) buffalo.Handler {
 			return c.Error(401, fmt.Errorf("invalid token: %s", err.Error()))
 		}
 
-		// TODO: set user, email, sub in buffalog request context
+		// TODO: set user, email, sub in buffalo request context
 		//c.Set("user", u)
-		log.Info("The email in the token was: %s", allClaims["email"])
-		email := "foo" // allClaims["email"]
-		sub := "bar"   // TODO: allClaims["sub"]
+		sub := allClaims["sub"]
+		log.Info("The sub in the token was: %s", sub)
+		email := allClaims["email"]
 		err = models.DB.RawQuery(models.Q["setemailclaim"], email).Exec()
 		if err != nil {
 			return c.Error(500, fmt.Errorf("error setting JWT claims in GUC: %s", err.Error()))
 		}
-		err = models.DB.RawQuery(models.Q["setsubclaim"], sub).Exec()
-		if err != nil {
-			return c.Error(500, fmt.Errorf("error setting JWT claims in GUC: %s", err.Error()))
-		}
+		// TODO: figure out why when we set this GUC that it causes an error from pq in the triger
+		// 'error inserting file to database: pq: invalid input syntax for uuid: ""'
+		// select set_config('request.jwt.claim.sub', $1, true);
+		//err = models.DB.RawQuery("set search_path to mappa, public").Exec()
+		//if err != nil {
+		//	return c.Error(500, fmt.Errorf("Database error: %s", err.Error()))
+		//}
+		//err = models.DB.RawQuery(models.Q["setsubclaim"], sub).Exec()
+		//if err != nil {
+		//	return c.Error(500, fmt.Errorf("error setting JWT claims in GUC: %s", err.Error()))
+		//}
 
 		return next(c)
 	}

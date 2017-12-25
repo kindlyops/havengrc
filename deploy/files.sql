@@ -22,7 +22,7 @@ BEGIN
   IF NEW.user_id IS NOT NULL THEN
     RAISE EXCEPTION 'You must not send the user_id field';
   ELSE
-    NEW.user_id = current_setting('request.jwt.claim.sub', true);
+    NEW.user_id = current_setting('request.jwt.claim.sub', true)::uuid;
   END IF;
 
   RETURN NEW;
