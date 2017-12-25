@@ -228,19 +228,25 @@ To upload a file to the database via havenapi:
 You can decode the token to inspect the contents at jwt.io. You will need to get the public cert from
 the Keycloak Admin interface: Havendev->Realm Settings->Keys->Public Key and enter it into the jwt.io page to decode the token.
 
-## Deploying with kubernetes
+## Deploying with kubernetes / OpenShift
 
-To create a new release, go to https://github.com/kindlyops/mappamundi/releases
-and click 'Draft a new release'. Put a tag in incrementing the version. The
-new tag will create a release and will trigger a CircleCI release build, which
-will push a new container tagged with the version of the release.
+Branches merged to master will push new docker images to the OpenShift cluster.
 
-You can see the available container tags at https://hub.docker.com/r/kindlyops/havenweb/tags/
+To set up helm:
 
-Then tell kubernetes to update the image used by the havenweb deployment to the
-new tag
-    kubectl set image deployment/havenweb-deployment havenweb=kindlyops/havenweb:v0.0.2
+		# download and unpack the current helm release
+		# make sure your openshift client is authenticated to haven-production
+		$ oc whoami
+		$ oc project
+		$ export TILLER_NAMESPACE=haven-tiller
+    $ helm init --client-only
+		$ helm version
 
-You can check on the progress of the deployment
+### Database resource
 
-    kubectl rollout status deployment/havenweb-deployment
+In your Kubernetes cluster there must be an ExternalName Service defined named `db`. If your administrator has
+alread set this up, you can see the endpoint by running:
+
+    $ oc get services
+	
+There must also be secrets set up with the DB credentials.
