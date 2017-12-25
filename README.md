@@ -232,6 +232,19 @@ the Keycloak Admin interface: Havendev->Realm Settings->Keys->Public Key and ent
 
 Branches merged to master will push new docker images to the OpenShift cluster.
 
+### Using OpenShift
+
+Talk to your administrator about getting an OpenShift account set up. Once you have
+access to Kubernetes / OpenShift, you can use the `oc` command to interact with the
+platform and update Haven GRC deployments.
+
+To get useful information to get oriented and find out what is happening:
+
+    $ oc whoami
+		$ oc project
+		$ oc status -v
+		$ oc get events
+
 ### Using helm
 
 To set up helm:

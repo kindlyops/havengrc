@@ -10,4 +10,9 @@ test:
   url: {{envOr "TEST_DATABASE_URL" "postgres://postgres:postgres@db:5432/mappamundi_test?sslmode=disable"}}
 
 production:
-  url: {{envOr "DATABASE_URL" "postgres://postgres:postgres@127.0.0.1:5432/mappamundi_production?sslmode=disable"}}
+  host: {{envOr "DATABASE_HOST" "db"}}
+  user: {{envOr "DATABASE_USER" "postgres"}}
+  password: {{env "DATABASE_PASSWORD"}}
+  database: havenprod
+  pool: 20
+  dialect: postgres
