@@ -2,7 +2,7 @@
 
 BEGIN;
 
-DROP VIEW "1".file;
-DROP TABLE mappa.file CASCADE;
+DROP VIEW "1".files;
+DROP TABLE mappa.files CASCADE;
 
 COMMIT;

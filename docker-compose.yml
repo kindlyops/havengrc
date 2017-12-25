@@ -34,6 +34,7 @@ services:
       - POSTGRES_PORT_5432_TCP_ADDR=postgres
       - KEYCLOAK_USER=admin
       - KEYCLOAK_PASSWORD=admin
+      - PROXY_ADDRESS_FORWARDING=true
     ports:
       - "8080:8080"
     links:
@@ -69,7 +70,6 @@ services:
     command: [cucumber]
     environment:
       - endpoint=http://api/
-      - resource_single=true
   api:
     image: havengrc-docker.jfrog.io/postgrest/postgrest:v0.4.3.0
     command: [postgrest, "/config"]
@@ -97,6 +97,21 @@ services:
       - POSTGRES_DB=mappamundi_dev
     volumes:
       - ./postgresql-data:/var/lib/postgresql
+  havenapi:
+    working_dir: /go/src/github.com/kindlyops/mappamundi/havenapi
+    volumes:
+      - ./havenapi:/go/src/github.com/kindlyops/mappamundi/havenapi
+      - /go/src/github.com/kindlyops/mappamundi/havenapi/vendor
+      - ./postgrest/keycloak-dev-public-key.json:/keycloak-dev-public-key.json
+    environment:
+      - HAVEN_JWK_PATH=/keycloak-dev-public-key.json
+    build:
+      context: .
+      dockerfile: ./havenapi/Dockerfile-hotreload
+    links:
+      - db
+    ports:
+      - "3000:3000"
   webui:
     working_dir: /code
     volumes:

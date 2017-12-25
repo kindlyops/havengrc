@@ -1,7 +1,8 @@
 version: 2
 jobs:
   build:
-    machine: true
+    machine:
+      image: circleci/classic:edge
     steps:
       - checkout
       - run:
@@ -41,16 +42,15 @@ jobs:
       - run: docker-compose run start_dependencies
       - run: docker-compose run sqitch
       - run: docker-compose run start_keycloak
-      - run: sleep 60
-      - run: ./test
       - run: docker build --rm=false -t kindlyops/mappamundi .
+      - run: docker build --rm=false -t kindlyops/havenapi havenapi/
       - run:
           name: compile Elm project
           command: npm run-script build
           no_output_timeout: 15m
           working_directory: webui
       - run: docker build --rm=false -t kindlyops/havenweb webui
-      - run: docker build --rm=false -t kindlyops/havensqitch sqitch
+      - run: ./test
       - deploy:
           name: Prerelease
           command: |

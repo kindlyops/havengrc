@@ -16,30 +16,34 @@ BEGIN
   ELSE
     NEW.created_at = now();
   END IF;
+  IF NEW.name IS NULL THEN
+    RAISE EXCEPTION 'Must specify file name';
+  END IF;
   IF NEW.user_id IS NOT NULL THEN
     RAISE EXCEPTION 'You must not send the user_id field';
   ELSE
-    NEW.user_id = current_setting('request.jwt.claim.sub', true);
+    NEW.user_id = current_setting('request.jwt.claim.sub', true)::uuid;
   END IF;
 
   RETURN NEW;
 END;
 $$ language 'plpgsql';
 
-CREATE TABLE mappa.file (
+CREATE TABLE mappa.files (
   uuid        UUID        UNIQUE,
   created_at  TIMESTAMPTZ,
   user_id     UUID,
-  file        TEXT
+  name        TEXT,
+  file        BYTEA
 );
 
-CREATE TRIGGER override_file_cols BEFORE INSERT ON mappa.file FOR EACH ROW EXECUTE PROCEDURE mappa.func_override_file_columns();
+CREATE TRIGGER override_file_cols BEFORE INSERT ON mappa.files FOR EACH ROW EXECUTE PROCEDURE mappa.func_override_file_columns();
 
-CREATE OR REPLACE VIEW "1".file as
-  SELECT uuid, user_id, created_at, file from mappa.file;
+CREATE OR REPLACE VIEW "1".files as
+  SELECT uuid, user_id, created_at, name, file from mappa.files;
 
-GRANT SELECT, INSERT ON mappa.file to member;
-GRANT all ON "1".file to member;
+GRANT SELECT, INSERT ON mappa.files to member;
+GRANT all ON "1".files to member;
 
 
 COMMIT;

@@ -46,7 +46,7 @@ BEGIN
 END;
 $$ language 'plpgsql';
 
-CREATE TABLE mappa.comment (
+CREATE TABLE mappa.comments (
   uuid        UUID        UNIQUE,
   created_at  TIMESTAMPTZ,
   user_email  NAME,
@@ -54,12 +54,12 @@ CREATE TABLE mappa.comment (
   message     TEXT
 );
 
-CREATE TRIGGER override_comment_cols BEFORE INSERT ON mappa.comment FOR EACH ROW EXECUTE PROCEDURE mappa.override_server_columns();
+CREATE TRIGGER override_comment_cols BEFORE INSERT ON mappa.comments FOR EACH ROW EXECUTE PROCEDURE mappa.override_server_columns();
 
-CREATE OR REPLACE VIEW "1".comment as
-  SELECT uuid, user_email, user_id, created_at, message from mappa.comment;
+CREATE OR REPLACE VIEW "1".comments as
+  SELECT uuid, user_email, user_id, created_at, message from mappa.comments;
 
-GRANT SELECT, INSERT ON mappa.comment to member;
-GRANT all ON "1".comment to member;
+GRANT SELECT, INSERT ON mappa.comments to member;
+GRANT all ON "1".comments to member;
 
 COMMIT;
