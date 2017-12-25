@@ -44,6 +44,7 @@ jobs:
       - run: docker-compose run start_keycloak
       - run: docker build --rm=false -t kindlyops/mappamundi .
       - run: docker build --rm=false -t kindlyops/havenapi havenapi/
+      - run: docker build --rm=false -t kindlyops/havensqitch sqitch/
       - run:
           name: compile Elm project
           command: npm run-script build
