@@ -232,15 +232,26 @@ the Keycloak Admin interface: Havendev->Realm Settings->Keys->Public Key and ent
 
 Branches merged to master will push new docker images to the OpenShift cluster.
 
+### Using helm
+
 To set up helm:
 
 		# download and unpack the current helm release
 		# make sure your openshift client is authenticated to haven-production
 		$ oc whoami
 		$ oc project
-		$ export TILLER_NAMESPACE=haven-tiller
+		$ export TILLER_NAMESPACE=haven-tiller # this will be unique to your OpenShift cluster
     $ helm init --client-only
 		$ helm version
+
+To update the deployment of helm to a new version, you must edit the tag used
+and then apply the update.
+
+    $ oc project $TILLER_NAMESPACE # switch to your tiller project
+		$ vim k8s/tiller-template.yaml # edit the tiller image tag to the desired version
+		$ oc process -f k8s/tiller-template.yaml -p TILLER_NAMESPACE="${TILLER_NAMESPACE}" | oc replace -f -
+		$ oc rollout status deployment tiller # watch the status of the rollout
+		$ helm versions # confirm the version change took effect.
 
 ### Database resource
 
