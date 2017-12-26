@@ -2,12 +2,12 @@ package actions
 
 import (
 	"fmt"
-	"github.com/deis/helm/log"
 	"github.com/gobuffalo/buffalo"
 	"github.com/gobuffalo/buffalo/middleware"
 	"github.com/gobuffalo/buffalo/middleware/ssl"
 	"github.com/gobuffalo/envy"
 	"github.com/gobuffalo/x/sessions"
+	"github.com/markbates/pop"
 	"github.com/unrolled/secure"
 	jose "gopkg.in/square/go-jose.v2"
 	jwt "gopkg.in/square/go-jose.v2/jwt"
@@ -77,8 +77,12 @@ func JwtMiddleware(next buffalo.Handler) buffalo.Handler {
 	return func(c buffalo.Context) error {
 		header := c.Request().Header.Get("Authorization")
 		parts := strings.Split(header, "Bearer ")
-		token := parts[1]
 
+		if len(parts) < 2 {
+			return c.Error(http.StatusUnauthorized, fmt.Errorf("Must provide Authorization token"))
+		}
+
+		token := parts[1]
 		if len(token) == 0 {
 			return c.Error(http.StatusUnauthorized, fmt.Errorf("Must provide Authorization token"))
 		}
@@ -95,7 +99,6 @@ func JwtMiddleware(next buffalo.Handler) buffalo.Handler {
 		if err := tok.Claims(key, &validClaims, &allClaims); err != nil {
 			return c.Error(http.StatusUnauthorized, err)
 		}
-		fmt.Printf("claims: %+v\n", allClaims)
 
 		// check if token is expired and from a valid issuer
 		// TODO: the issuer needs to be configurable to handle on-prem deployments
@@ -105,34 +108,27 @@ func JwtMiddleware(next buffalo.Handler) buffalo.Handler {
 			return c.Error(401, fmt.Errorf("invalid token: %s", err.Error()))
 		}
 
-		// TODO: set user, email, sub in buffalo request context
-		//c.Set("user", u)
 		sub := allClaims["sub"]
-		log.Info("The sub in the token was: %s", sub)
+		c.Set("sub", sub)
+
 		email := allClaims["email"]
-		err = models.DB.RawQuery(models.Q["setemailclaim"], email).Exec()
+		c.Set("email", email)
+
+		tx := c.Value("tx").(*pop.Connection)
+		err = tx.RawQuery(models.Q["setemailclaim"], email).Exec()
 		if err != nil {
-			return c.Error(500, fmt.Errorf("error setting JWT claims in GUC: %s", err.Error()))
-		}
-		// TODO: figure out why when we set this GUC that it causes an error from pq in the triger
-		// 'error inserting file to database: pq: invalid input syntax for uuid: ""'
-		// select set_config('request.jwt.claim.sub', $1, true);
-		err = models.DB.RawQuery("set search_path to mappa, public").Exec()
-		if err != nil {
-			return c.Error(500, fmt.Errorf("Database error: %s", err.Error()))
-		}
-		// SET LOCAL 'request.jwt.claim.sub' = $1;
-		err = models.DB.RawQuery("select set_config('request.jwt.claim.sub', $1, true);", sub).Exec()
-		if err != nil {
-			return c.Error(500, fmt.Errorf("error setting JWT claims in GUC: %s", err.Error()))
+			return c.Error(500, fmt.Errorf("error setting JWT claims email in GUC: %s", err.Error()))
 		}
 
-		var newsub string
-		err = models.DB.Store.Get(&newsub, "select current_setting('request.jwt.claim.sub', true);")
+		err = tx.RawQuery("set local search_path to mappa, public").Exec()
 		if err != nil {
-			return c.Error(500, fmt.Errorf("error reading JWT claims in GUC: %s", err.Error()))
+			return c.Error(500, fmt.Errorf("Database error setting search path: %s", err.Error()))
 		}
-		log.Info("The sub after reading it back was: '%s'", newsub)
+
+		err = tx.RawQuery(models.Q["setsubclaim"], sub).Exec()
+		if err != nil {
+			return c.Error(500, fmt.Errorf("error setting JWT claims in GUC: %s", err.Error()))
+		}
 
 		return next(c)
 	}
