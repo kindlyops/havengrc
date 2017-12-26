@@ -14,8 +14,7 @@ spec:
     spec:
       containers:
         - name: havenapi
-          image: havenapi:0.0.1
-          command: ["/bin/sh", "-c", "cat /etc/haven-credentials/*"]
+          image: kindlyops/havenapi:0.0.5
           env:
             - name: GO_ENV
               value: "production"
@@ -32,14 +31,20 @@ spec:
                   name: haven-database-credentials
                   key: password
             - name: HAVEN_JWK_PATH
-              value: "/etc/blah"
+              value: "/etc/haven-credentials/jwk.json"
           volumeMounts:
             - name: secret-volume
-              mountPath: /etc/haven-credentials/jwk.json
+              mountPath: /etc/haven-credentials/
               readOnly: true
           ports:
             - containerPort: 3000
               protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 3000
+            initialDelaySeconds: 1
+            periodSeconds: 5
       volumes:
         - name: secret-volume
           secret:

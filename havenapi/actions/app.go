@@ -39,14 +39,6 @@ func App() *buffalo.App {
 			SessionStore: sessions.Null{},
 			SessionName:  "_havenapi_session",
 		})
-		// Automatically redirect to SSL
-		app.Use(ssl.ForceSSL(secure.Options{
-			SSLRedirect:     ENV == "production",
-			SSLProxyHeaders: map[string]string{"X-Forwarded-Proto": "https"},
-		}))
-
-		// TODO refactor to use dependency injection instead of a package global
-		app.Use(middleware.PopTransaction(models.DB))
 
 		rawKey, err := ioutil.ReadFile(KEY)
 		if err != nil {
@@ -62,8 +54,16 @@ func App() *buffalo.App {
 			app.Use(middleware.ParameterLogger)
 		}
 
-		app.GET("/", HomeHandler)
+		app.GET("/healthz", HealthzHandler)
+
 		api := app.Group("/api/")
+		// Automatically redirect to SSL
+		api.Use(ssl.ForceSSL(secure.Options{
+			SSLRedirect:     ENV == "production",
+			SSLProxyHeaders: map[string]string{"X-Forwarded-Proto": "https"},
+		}))
+		// TODO refactor to use dependency injection instead of a package global
+		api.Use(middleware.PopTransaction(models.DB))
 		api.Use(JwtMiddleware)
 		api.POST("files", UploadHandler)
 

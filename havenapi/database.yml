@@ -11,7 +11,7 @@ test:
 
 production:
   host: {{envOr "DATABASE_HOST" "db"}}
-  user: {{envOr "DATABASE_USER" "postgres"}}
+  user: {{envOr "DATABASE_USERNAME" "postgres"}}
   password: {{env "DATABASE_PASSWORD"}}
   database: havenprod
   pool: 20
