@@ -7,17 +7,12 @@ import (
 	"github.com/deis/helm/log"
 	"github.com/gobuffalo/buffalo"
 	"github.com/kindlyops/mappamundi/havenapi/models"
+	"github.com/markbates/pop"
 )
 
 // UploadHandler accepts a file upload
 func UploadHandler(c buffalo.Context) error {
-	tx := models.DB
-	tx.RawQuery("BEGIN;")
-	tx.RawQuery("set local search_path to mappa, public;")
-//	err := models.DB.RawQuery("set local search_path to mappa, public").Exec()
-	//if err != nil {
-//		return c.Error(500, fmt.Errorf("Database error: %s", err.Error()))
-//	}
+	tx := c.Value("tx").(*pop.Connection)
 	request := c.Request()
 	err := request.ParseMultipartForm(1024 * 1024 * 10) // 10MB
 	if err != nil {
