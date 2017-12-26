@@ -18,9 +18,9 @@ commit message with a name and email that matches your git config. For example:
 
 Signed-off-by: Elliot Murphy <statik@users.noreply.com>
 
-One way to add this line is to use the [dco] tool to add a commit-msg hook
-to your repo configuration. This is handy if you use an IDE or GUI tool to
-make your git commits.
+One way to add this line is to use the [dco](https://github.com/coderanger/dco)
+tool to add a commit-msg hook to your repo configuration. 
+This is handy if you use an IDE or GUI tool to make your git commits.
 
 If you use git from the command line, another way is to set up a template
 for the git commit message that has this line already in id.
@@ -28,7 +28,7 @@ For example, if you already have your name and email set, this will
 generate the correct file:
 
     $ echo "Signed-off-by: `git config --get user.name` <`git config --get user.email`>" > $HOME/.gitmessage
-		$ git config --global --add commit.template '~/.gitmessage'
+    $ git config --global --add commit.template '~/.gitmessage'
 
 You can also use the -s option to git commit.
 
