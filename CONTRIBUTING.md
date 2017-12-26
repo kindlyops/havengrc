@@ -22,16 +22,25 @@ One way to add this line is to use the [dco] tool to add a commit-msg hook
 to your repo configuration. This is handy if you use an IDE or GUI tool to
 make your git commits.
 
-If you use git from the command line, another way is to edit the .gitmessage
-file. For example, if you already have your name and email set, this will
+If you use git from the command line, another way is to set up a template
+for the git commit message that has this line already in id.
+For example, if you already have your name and email set, this will
 generate the correct file:
 
     $ echo "Signed-off-by: `git config --get user.name` <`git config --get user.email`>" > $HOME/.gitmessage
+		$ git config --global --add commit.template '~/.gitmessage'
+
+You can also use the -s option to git commit.
 
 However you do it, the Signed-off-by line is essential, and commits that
 are not signed off cannot be accepted into the project. This is some
 extra work the first time you set it up. Please know that we appreciate
 your contribution, and don't hesitate to ask if you need help.
+
+If you already have a commit that you forgot to sign off, you can 
+adjust it with
+
+    $ git commit --amend -s
 
 ## Getting Started
 
