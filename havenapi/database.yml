@@ -13,6 +13,6 @@ production:
   host: {{envOr "DATABASE_HOST" "db"}}
   user: {{envOr "DATABASE_USERNAME" "postgres"}}
   password: {{env "DATABASE_PASSWORD"}}
-  database: havenprod
+  database: {{envOr "DATABASE_NAME" "havenstage" }}
   pool: 20
   dialect: postgres

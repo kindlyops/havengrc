@@ -18,6 +18,8 @@ spec:
           env:
             - name: GO_ENV
               value: "production"
+            - name: DATABASE_NAME
+              value: "havenstage"
             - name: DATABASE_HOST
               value: "db"
             - name: DATABASE_USERNAME
