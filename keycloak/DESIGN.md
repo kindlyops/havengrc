@@ -1,10 +1,21 @@
-## Design a multi-tenant application with Keycloak
+# Design a multi-tenant application with Keycloak
 
 Below is the inital process we should use for a multi-tenant application using keycloak.
 
-# On user signup prompt for Company/Realm name.
+On user signup prompt for Company/Realm name.
 
-# Add the realm via admin api
+## Get the token for the admin api
+
+```
+export TKN=$(curl -X POST 'http://localhost:8080/auth/realms/master/protocol/openid-connect/token' \
+ -H "Content-Type: application/x-www-form-urlencoded" \
+ -d "username=admin" \
+ -d 'password=admin' \
+ -d 'grant_type=password' \
+ -d 'client_id=admin-cli' | jq -r '.access_token')
+```
+
+## Add the realm via admin api
 Below is an example of adding the example realm from the keycloak examples folder. It will fail if it exists already.
 ```
 curl -X POST \
@@ -52,5 +63,11 @@ curl -X POST \
     ]
 }'
 ```
+If the realm exists already alert the user that the companyname / realm is unavilable.
 
-# If the realm exists already alert the user that the companyname / realm is unavilable.
+The following is helpful for testing to list realms:
+```
+curl -X GET 'http://localhost:8080/auth/admin/realms' \
+-H "Accept: application/json" \
+-H "Authorization: Bearer $TKN" | jq .
+```
