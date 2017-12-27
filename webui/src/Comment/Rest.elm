@@ -26,7 +26,7 @@ encodeComment comment =
 
 commentsUrl : String
 commentsUrl =
-    "http://localhost:3001/comment"
+    "/api/comments"
 
 
 getComments : Model -> Cmd Msg

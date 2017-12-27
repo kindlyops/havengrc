@@ -5,6 +5,19 @@ redir 301 {
   / https://{host}{uri}
 }
 
+proxy /auth keycloak:8080 {
+  transparent
+}
+
+proxy /api api:80 {
+  without /api
+  transparent
+}
+
+proxy /api/files havenapi:3000 {
+  transparent
+}
+
 log / stdout "{combined}"
 
 templates /js .js

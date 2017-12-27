@@ -51,6 +51,7 @@ jobs:
           no_output_timeout: 15m
           working_directory: webui
       - run: docker build --rm=false -t kindlyops/havenweb webui
+      - run: docker build --rm=false -t kindlyops/keycloak -f keycloak/Dockerfile .
       - run: ./test
       - deploy:
           name: Prerelease
@@ -64,6 +65,8 @@ jobs:
               docker tag kindlyops/havensqitch kindlyops/havenapi:latest
               docker tag kindlyops/havenweb kindlyops/havenweb:$CIRCLE_SHA1
               docker tag kindlyops/havenweb kindlyops/havenweb:latest
+              docker tag kindlyops/keycloak kindlyops/keycloak:$CIRCLE_SHA1
+              docker tag kindlyops/keycloak kindlyops/keycloak:latest
               docker push kindlyops/mappamundi:$CIRCLE_SHA1
               docker push kindlyops/havensqitch:$CIRCLE_SHA1
               docker push kindlyops/havensqitch:latest
@@ -71,9 +74,9 @@ jobs:
               docker push kindlyops/havenapi:latest
               docker push kindlyops/havenweb:$CIRCLE_SHA1
               docker push kindlyops/havenweb:latest
-              oc import-image havenweb --from=docker.io/kindlyops/havenweb:latest
-              oc import-image havensqitch --from=docker.io/kindlyops/havensqitch:latest
-              oc import-image havenapi --from=docker.io/kindlyops/havenapi:latest
+              docker push kindlyops/keycloak:$CIRCLE_SHA1
+              docker push kindlyops/keycloak:latest
+              oc set image deployment/havenapi havenapi=havengrc-docker.jfrog.io/kindlyops/havenapi:$CIRCLE_SHA1
             else
               echo "Not master branch so not deploying"
             fi

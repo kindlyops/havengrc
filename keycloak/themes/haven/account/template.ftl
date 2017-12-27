@@ -63,7 +63,7 @@
                                 ${msg("log")}
                             </a>
                     </#if>
-                    <a href="http://localhost:2015/" class="<#if active==''>mdc-persistent-drawer--selected</#if> mdc-list-item">
+                    <a href="/" class="<#if active==''>mdc-persistent-drawer--selected</#if> mdc-list-item">
                         <i class="material-icons mdc-list-item__start-detail">arrow_back</i>
                         Return
                     </a>
