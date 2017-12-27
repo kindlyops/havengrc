@@ -22,7 +22,7 @@
                         </div>
                     </#if>
 
-                    <input type="hidden" id="stateChecker" name="stateChecker" value="${stateChecker?html}">
+                    <input type="hidden" id="stateChecker" name="stateChecker" value="${stateChecker}">
 
                     <div class="mdc-textfield" data-mdc-auto-init="MDCTextfield">
                         <input type="password" class="mdc-textfield__input" id="password-new" name="password-new" autocomplete="off" required />

@@ -13,26 +13,26 @@
           <#if !realm.registrationEmailAsUsername>
           <div>
             <div class="mdc-textfield" data-mdc-auto-init="MDCTextfield">
-                    <input type="text" id="username" class="mdc-textfield__input" name="username" value="${(register.formData.username!'')?html}" required autofocus />
+                    <input type="text" id="username" class="mdc-textfield__input" name="username" value="${(register.formData.username!'')}" required autofocus />
                     <label for="username" class="mdc-textfield__label">${msg("username")}</label>
             </div>
            </div>
           </#if>
           <div>
             <div class="mdc-textfield" data-mdc-auto-init="MDCTextfield">
-                    <input type="text" id="firstName" class="mdc-textfield__input" name="firstName" value="${(register.formData.firstName!'')?html}" required />
+                    <input type="text" id="firstName" class="mdc-textfield__input" name="firstName" value="${(register.formData.firstName!'')}" required />
                     <label for="firstName" class="mdc-textfield__label">${msg("firstName")}</label>
             </div>
            </div>
            <div>
             <div class="mdc-textfield" data-mdc-auto-init="MDCTextfield">
-                    <input type="text" id="lastName" class="mdc-textfield__input" name="lastName" value="${(register.formData.lastName!'')?html}" required />
+                    <input type="text" id="lastName" class="mdc-textfield__input" name="lastName" value="${(register.formData.lastName!'')}" required />
                     <label for="lastName" class="mdc-textfield__label">${msg("lastName")}</label>
             </div>
            </div>
            <div>
             <div class="mdc-textfield" data-mdc-auto-init="MDCTextfield">
-                    <input type="text" id="email" class="mdc-textfield__input" name="email" value="${(register.formData.email!'')?html}" required />
+                    <input type="text" id="email" class="mdc-textfield__input" name="email" value="${(register.formData.email!'')}" required />
                     <label for="email" class="mdc-textfield__label">${msg("email")}</label>
             </div>
            </div>
