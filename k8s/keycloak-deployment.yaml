@@ -2,7 +2,7 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: havenapi
+  name: keycloak
 spec:
   replicas: 1
   template:
@@ -10,45 +10,49 @@ spec:
       annotations:
         alpha.image.policy.openshift.io/resolve-names: '*'
       labels:
-        service: havenapi
+        service: keycloak
     spec:
       containers:
-        - name: havenapi
-          image: kindlyops/havenapi:0.0.5
+        - name: keycloak
+          image: kindlyops/keycloak:latest
           env:
-            - name: GO_ENV
-              value: "production"
-            - name: DATABASE_HOST
-              value: "db"
-            - name: DATABASE_USERNAME
+            - name: POSTGRES_DATABASE
+              value: "havenstage"
+            - name: POSTGRES_USER
               valueFrom:
                 secretKeyRef:
                   name: haven-database-credentials
                   key: username
-            - name: DATABASE_PASSWORD
+            - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: haven-database-credentials
                   key: password
-            - name: HAVEN_JWK_PATH
-              value: "/etc/haven-credentials/jwk.json"
-          volumeMounts:
-            - name: secret-volume
-              mountPath: /etc/haven-credentials/
-              readOnly: true
+            - name: POSTGRES_PORT_5432_TCP_ADDR
+              value: "db"
+            - name: KEYCLOAK_USER
+              value: "admin"
+            - name: KEYCLOAK_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: haven-database-credentials
+                  key: password
+            - name: PROXY_ADDRESS_FORWARDING
+              value: "true"
           ports:
-            - containerPort: 3000
+            - containerPort: 8080
               protocol: TCP
+          resources:
+            limits:
+              memory: 512Mi
+            requests:
+              memory: 256Mi
           livenessProbe:
             httpGet:
-              path: /healthz
-              port: 3000
-            initialDelaySeconds: 1
+              path: /
+              port: 8080
+            initialDelaySeconds: 5
             periodSeconds: 5
-      volumes:
-        - name: secret-volume
-          secret:
-            secretName: haven-database-credentials
       restartPolicy: Always
   strategy:
     type: "Recreate"
