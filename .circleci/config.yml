@@ -61,8 +61,8 @@ jobs:
               docker tag kindlyops/mappamundi kindlyops/mappamundi:$CIRCLE_SHA1
               docker tag kindlyops/havensqitch kindlyops/havensqitch:$CIRCLE_SHA1
               docker tag kindlyops/havensqitch kindlyops/havensqitch:latest
-              docker tag kindlyops/havensqitch kindlyops/havenapi:$CIRCLE_SHA1
-              docker tag kindlyops/havensqitch kindlyops/havenapi:latest
+              docker tag kindlyops/havenapi kindlyops/havenapi:$CIRCLE_SHA1
+              docker tag kindlyops/havenapi kindlyops/havenapi:latest
               docker tag kindlyops/havenweb kindlyops/havenweb:$CIRCLE_SHA1
               docker tag kindlyops/havenweb kindlyops/havenweb:latest
               docker tag kindlyops/keycloak kindlyops/keycloak:$CIRCLE_SHA1
