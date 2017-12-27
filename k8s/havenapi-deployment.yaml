@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: havenapi
-          image: kindlyops/havenapi:0.0.5
+          image: havengrc-docker.jfrog.io/kindlyops/havenapi:0.0.5
           env:
             - name: GO_ENV
               value: "production"
