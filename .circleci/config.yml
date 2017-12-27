@@ -6,8 +6,8 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Check docker compose version
-          command: docker-compose -v
+          name: Check docker-compose and docker version
+          command: docker-compose -v && docker -v
       - run:
           name: Build images
           command: docker-compose build
