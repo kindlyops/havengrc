@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: havenweb
+spec:
+  selector:
+    service: havenweb
+  ports:
+  - nodePort: 0
+    port: 2015
+    protocol: TCP
+    targetPort: 2015
