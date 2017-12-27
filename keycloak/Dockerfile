@@ -1,4 +1,4 @@
-FROM        havengrc-docker.jfrog.io/jboss/keycloak-postgres:3.2.1.Final
+FROM        havengrc-docker.jfrog.io/jboss/keycloak:3.4.2.Final
 MAINTAINER  Kindly Ops, LLC <support@kindlyops.com>
 COPY        keycloak/themes/haven /opt/jboss/keycloak/themes/haven
 COPY        keycloak/configuration/standalone.xml /opt/jboss/keycloak/standalone/configuration/standalone.xml
