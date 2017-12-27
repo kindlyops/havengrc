@@ -21,6 +21,11 @@ spec:
           ports:
             - containerPort: 2015
               protocol: TCP
+          resources:
+              limits:
+                memory: 256Mi
+              requests:
+                memory: 128Mi
       restartPolicy: Always
   strategy:
     type: "Recreate"
