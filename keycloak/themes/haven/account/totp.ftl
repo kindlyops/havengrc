@@ -21,7 +21,8 @@
                                 <tr>
                                     <td class="provider">${msg("mobile")}</td>
                                     <td class="action">
-                                        <a id="remove-mobile" href="${url.totpRemoveUrl}"><i class="material-icons">delete</i></a>
+																		    <input type="hidden" id="submitAction" name="submitAction" value="Delete">
+                                        <a id="remove-mobile" href="${url.totpUrl}"><i class="material-icons">delete</i></a>
                                     </td>
                                 </tr>
                             </tbody>

@@ -29,7 +29,6 @@ services:
     build:
       context: .
       dockerfile: ./keycloak/Dockerfile
-    image: havengrc-docker.jfrog.io/jboss/keycloak:3.4.2.Final
     environment:
       - POSTGRES_DATABASE=mappamundi_dev
       - POSTGRES_USER=postgres
