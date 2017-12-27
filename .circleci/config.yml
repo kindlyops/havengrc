@@ -51,7 +51,7 @@ jobs:
           no_output_timeout: 15m
           working_directory: webui
       - run: docker build --rm=false -t kindlyops/havenweb webui
-      - run: docker build --rm=false -t kindlyops/keycloak keycloak
+      - run: docker build --rm=false -t kindlyops/keycloak -f keycloak/Dockerfile .
       - run: ./test
       - deploy:
           name: Prerelease
