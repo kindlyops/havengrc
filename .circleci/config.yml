@@ -71,9 +71,6 @@ jobs:
               docker push kindlyops/havenapi:latest
               docker push kindlyops/havenweb:$CIRCLE_SHA1
               docker push kindlyops/havenweb:latest
-              oc import-image havenweb --from=docker.io/kindlyops/havenweb:latest
-              oc import-image havensqitch --from=docker.io/kindlyops/havensqitch:latest
-              oc import-image havenapi --from=docker.io/kindlyops/havenapi:latest
             else
               echo "Not master branch so not deploying"
             fi
