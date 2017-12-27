@@ -1,0 +1,30 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: havenweb
+spec:
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+        alpha.image.policy.openshift.io/resolve-names: '*'
+      labels:
+        service: havenweb
+    spec:
+      containers:
+        - name: havenweb
+          image: havengrc-docker.jfrog.io/kindlyops/havenweb:latest
+          env:
+            - name: ELM_APP_KEYCLOAK_CLIENT_ID
+              value: "havendev"
+          ports:
+            - containerPort: 2015
+              protocol: TCP
+      restartPolicy: Always
+  strategy:
+    type: "Recreate"
+  paused: false
+  revisionHistoryLimit: 2
+  minReadySeconds: 0
+status: {}
