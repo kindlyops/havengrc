@@ -122,6 +122,7 @@ services:
       dockerfile: ./webui/Dockerfile-hotreload
     links:
       - api
+      - havenapi
       - keycloak
     ports:
       - "2015:2016"
