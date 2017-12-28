@@ -1,0 +1,54 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: api
+spec:
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+        alpha.image.policy.openshift.io/resolve-names: '*'
+      labels:
+        service: api
+    spec:
+      containers:
+        - name: api
+          image: havengrc-docker.jfrog.io/postgrest/postgrest:latest
+          args:
+            - postgrest
+            - /config
+          volumeMounts:
+            - name: secret-volume
+              mountPath: /etc/haven-credentials/
+              readOnly: true
+            - mountPath: /config
+              name: api-claim0
+            - mountPath: /keycloak-dev-public-key.json
+              name: api-claim1
+            - mountPath: /usr/local/bin/postgrest
+              name: api-claim2
+          ports:
+            - containerPort: 3001
+              protocol: TCP
+              targetPort: 80
+      volumes:
+        - name: secret-volume
+          secret:
+            secretName: haven-database-credentials
+        - name: api-claim0
+          persistentVolumeClaim:
+            claimName: api-claim0
+        - name: api-claim1
+          persistentVolumeClaim:
+            claimName: api-claim1
+        - name: api-claim2
+          persistentVolumeClaim:
+            claimName: api-claim2
+      restartPolicy: Always
+  strategy:
+    type: "Recreate"
+  paused: false
+  revisionHistoryLimit: 2
+  minReadySeconds: 0
+status: {}

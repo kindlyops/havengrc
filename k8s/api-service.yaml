@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: api
+spec:
+  selector:
+    service: api
+  ports:
+  - nodePort: 0
+    port: 3001
+    protocol: TCP
+    targetPort: 80
