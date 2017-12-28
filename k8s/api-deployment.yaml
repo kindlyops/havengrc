@@ -22,12 +22,6 @@ spec:
             - name: secret-volume
               mountPath: /etc/haven-credentials/
               readOnly: true
-            - mountPath: /config
-              name: api-claim0
-            - mountPath: /keycloak-dev-public-key.json
-              name: api-claim1
-            - mountPath: /usr/local/bin/postgrest
-              name: api-claim2
           ports:
             - containerPort: 3001
               protocol: TCP
@@ -36,15 +30,6 @@ spec:
         - name: secret-volume
           secret:
             secretName: haven-database-credentials
-        - name: api-claim0
-          persistentVolumeClaim:
-            claimName: api-claim0
-        - name: api-claim1
-          persistentVolumeClaim:
-            claimName: api-claim1
-        - name: api-claim2
-          persistentVolumeClaim:
-            claimName: api-claim2
       restartPolicy: Always
   strategy:
     type: "Recreate"
