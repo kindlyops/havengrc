@@ -49,7 +49,7 @@
 
                 <div class="form-btn">
                     <#if url.referrerURI??><a href="${url.referrerURI}">${msg("backToApplication")}/a></#if>
-                    <button type="submit" class="mdc-button mdc-button--raised mdc-button--primary" name="submitAction" value="Save">${msg("doSave")}</button>
+                    <button type="submit" class="mdc-button mdc-button--raised mdc-button--accent" name="submitAction" value="Save">${msg("doSave")}</button>
                     <button type="submit" class="mdc-button mdc-button--raised" name="submitAction" value="Cancel">${msg("doCancel")}</button>
                 </div>
 

@@ -15,10 +15,6 @@ body {
   margin: auto;
 }
 
-header{
-    background-color: var(--mdc-theme-accent) !important;
-    color: var(--mdc-theme-text-primary-on-primary,#fff);
-}
 
 header > .mdc-toolbar__row{
     min-height:64px;
@@ -106,8 +102,9 @@ a.mdc-list-item:focus, a.mdc-list-item:active{
 }
 
 h2{
-    font-family: "mr-eaves-modern", sans-serif;
+    font-family: "ff-tisa-web-pro", serif;
     font-size: 28px;
+    font-weight: 500;
 }
 
 a{
@@ -138,7 +135,7 @@ label {
 .alert{
     border:2px solid transparent;
     padding: 7px;
-	  font-family: "mr-eaves-modern", sans-serif;
+	  font-family: "Arial", sans-serif;
     margin-top: 30px;
     margin-bottom: 0;
 }
@@ -175,12 +172,6 @@ label {
     margin-top:20px;
 }
 
-.form-btn button {
-    font-size: 13px;
-    border-radius: 5px;
-    font-family: "mr-eaves-modern", sans-serif;
-}
-
 #AccountForm div.mdc-textfield, #AccountForm input, #PasswordForm div.mdc-textfield, #PasswordForm input, #TotpForm div.mdc-textfield, #TotpForm input {
     width:100%;
 }
@@ -208,8 +199,11 @@ label {
 .table tr > th, .table tr > td {
     text-align: left;
     padding: 6px 10px;
-    vertical-align: top;
     border-top: 0;
+}
+
+tbody tr > td{
+  font-family: Arial;
 }
 
 .table-bordered{
@@ -218,11 +212,11 @@ label {
     border-spacing: 0;
 }
 
-.table-bordered > thead > tr > th, .table-bordered > tbody > tr > th, .table-bordered > thead > tr > td, .table-bordered > tbody > tr > td{
+.table-bordered > thead > tr > th, .table-bordered > tbody > tr > td{
     border: 1px solid #d1d1d1;
 }
 
-.table-bordered > thead > tr > th, .table-bordered > thead > tr > td{
+.table-bordered > thead > tr > th{
     border-bottom:2px solid #d1d1d1;
 }
 
@@ -232,6 +226,17 @@ label {
 
 .table-hover > tbody > tr:hover {
     background-color:#E0E0E0;
+}
+
+.invisible-btn{
+  background-color: transparent;
+  border: none;
+  color: var(--mdc-theme-accent);
+}
+
+.invisible-btn:hover, .invisible-btn:focus{
+  color: var(--mdc-theme-primary);
+  outline: none;
 }
 
 .table-scroll{
