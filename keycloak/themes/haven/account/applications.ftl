@@ -10,9 +10,9 @@
 
         <div class="mdc-layout-grid">
             <div class="mdc-layout-grid__inner container-margin table-scroll">
-                <form action="${url.revokeClientUrl}" method="post" class="mdc-layout-grid__cell--span-12">
-                    <input type="hidden" id="stateChecker" name="stateChecker" value="${stateChecker?html}">
-                    <input type="hidden" id="referrer" name="referrer" value="${stateChecker?html}">
+                <form action="${url.applicationsUrl}" method="post" class="mdc-layout-grid__cell--span-12">
+                    <input type="hidden" id="stateChecker" name="stateChecker" value="${stateChecker}">
+                    <input type="hidden" id="referrer" name="referrer" value="${stateChecker}">
 
                     <table class="table table-striped table-bordered table-hover" id="ApplicationsTable">
                         <thead>

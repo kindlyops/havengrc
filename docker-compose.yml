@@ -43,7 +43,6 @@ services:
       - db:postgres
     volumes:
       - ./keycloak/themes/haven:/opt/jboss/keycloak/themes/haven
-      - ./keycloak/configuration/standalone.xml:/opt/jboss/keycloak/standalone/configuration/standalone.xml
       - ./keycloak/data:/keycloak
     command: ["-b", "0.0.0.0", "-Dkeycloak.migration.file=/keycloak/havendev-realm.json", "-Dkeycloak.migration.strategy=IGNORE_EXISTING", "-Dkeycloak.migration.provider=singleFile", "-Dkeycloak.migration.action=import"]
   sqitch:

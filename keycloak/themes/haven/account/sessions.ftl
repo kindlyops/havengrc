@@ -40,7 +40,7 @@
                     </table>
                 </div>
                 <div class="mdc-layout-grid__cell">
-                    <a id="logout-all-sessions" href="${url.sessionsLogoutUrl}">${msg("doLogOutAllSessions")}</a>
+                    <a id="logout-all-sessions" href="${url.sessionsUrl}">${msg("doLogOutAllSessions")}</a>
                 </div>
             </div>
         </div>
