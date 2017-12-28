@@ -15,9 +15,33 @@ spec:
       containers:
         - name: api
           image: havengrc-docker.jfrog.io/postgrest/postgrest:latest
-          args:
-            - postgrest
-            - /config
+          env:
+            - name: PGRST_DB_URI
+              value: "postgres://${DATABASE_USERNAME}:${DATABASE_PASSWORD}@db/havenstage"
+            - name: DATABASE_HOST
+              value: "db"
+            - name: PGRST_DB_SCHEMA
+              value: "1"
+            - name: DATABASE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: haven-database-credentials
+                  key: username
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: haven-database-credentials
+                  key: password
+            - name: PGRST_JWT_AUD
+              value: "havendev"
+            - name: PGRST_JWT_SECRET
+              value: "@/etc/haven-credentials/jwk.json"
+            - name: PGRST_SERVER_PORT
+              value: "80"
+            - name: PGRST_SERVER_PROXY_URI
+              value: "https://staging.havengrc.com/api"
+            - name: PGRST_DB_POOL
+              value: "10"
           volumeMounts:
             - name: secret-volume
               mountPath: /etc/haven-credentials/
