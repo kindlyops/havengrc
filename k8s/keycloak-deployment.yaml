@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: keycloak
-          image: kindlyops/keycloak:latest
+          image: havengrc-docker.jfrog.io/kindlyops/keycloak:3.4.2.Final.1
           env:
             - name: POSTGRES_DATABASE
               value: "havenstage"
