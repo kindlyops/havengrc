@@ -18,4 +18,5 @@ ENV         POSTGRES_PORT_5432_TCP_ADDR postgres
 ENV         KEYCLOAK_USER admin
 ENV         KEYCLOAK_PASSWORD admin
 ENV         PROXY_ADDRESS_FORWARDING true
+EXPOSE 8443
 CMD         ["-b", "0.0.0.0"]

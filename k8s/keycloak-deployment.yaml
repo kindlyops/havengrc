@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: keycloak
-          image: havengrc-docker.jfrog.io/kindlyops/keycloak:3.4.2.Final.1
+          image: havengrc-docker.jfrog.io/kindlyops/keycloak:3.4.2.Final.2
           env:
             - name: POSTGRES_DATABASE
               value: "havenstage"
@@ -40,7 +40,7 @@ spec:
             - name: PROXY_ADDRESS_FORWARDING
               value: "true"
           ports:
-            - containerPort: 8080
+            - containerPort: 8443
               protocol: TCP
           resources:
             limits:
@@ -50,7 +50,7 @@ spec:
           livenessProbe:
             httpGet:
               path: /
-              port: 8080
+              port: 8443
             initialDelaySeconds: 30
             periodSeconds: 5
       restartPolicy: Always
