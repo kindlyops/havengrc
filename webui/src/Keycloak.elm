@@ -33,7 +33,7 @@ type alias UserProfile =
     , emailVerified : Bool
     , firstName : String
     , lastName : String
-    , id : String
+    , email : String
     }
 
 

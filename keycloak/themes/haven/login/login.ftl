@@ -14,10 +14,10 @@
                     <div class="mdc-form-field">
                         <div class="mdc-textfield" data-mdc-auto-init="MDCTextfield">
                             <#if usernameEditDisabled??>
-                                <input id="username" class="mdc-textfield__input" name="username" value="${(login.username!'')?html}" type="text" disabled required />
+                                <input id="username" class="mdc-textfield__input" name="username" value="${(login.username!'')}" type="text" disabled required />
                                 <label for="username" class=" mdc-textfield__label"><#if !realm.loginWithEmailAllowed>${msg("username")}<#elseif !realm.registrationEmailAsUsername>${msg("usernameOrEmail")}<#else>${msg("email")}</#if></label>
                                 <#else>
-                                    <input id="username" class="mdc-textfield__input" name="username" value="${(login.username!'')?html}" type="text" autofocus autocomplete="off" required />
+                                    <input id="username" class="mdc-textfield__input" name="username" value="${(login.username!'')}" type="text" autofocus autocomplete="off" required />
                                     <label for="username" class="mdc-textfield__label"><#if !realm.loginWithEmailAllowed>${msg("username")}<#elseif !realm.registrationEmailAsUsername>${msg("usernameOrEmail")}<#else>${msg("email")}</#if></label>
                             </#if>
                         </div>

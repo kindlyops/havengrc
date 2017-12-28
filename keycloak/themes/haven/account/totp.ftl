@@ -21,7 +21,8 @@
                                 <tr>
                                     <td class="provider">${msg("mobile")}</td>
                                     <td class="action">
-                                        <a id="remove-mobile" href="${url.totpRemoveUrl}"><i class="material-icons">delete</i></a>
+																		    <input type="hidden" id="submitAction" name="submitAction" value="Delete">
+                                        <a id="remove-mobile" href="${url.totpUrl}"><i class="material-icons">delete</i></a>
                                     </td>
                                 </tr>
                             </tbody>
@@ -55,7 +56,7 @@
                        </ol>
 
                         <form action="${url.totpUrl}" class="mdc-layout-grid__cell--span-8" id="TotpForm" method="post">
-                            <input type="hidden" id="stateChecker" name="stateChecker" value="${stateChecker?html}" />
+                            <input type="hidden" id="stateChecker" name="stateChecker" value="${stateChecker}" />
                             <div class="mdc-textfield">
                                 <input type="text" class="mdc-textfield__input" id="totp" name="totp" autocomplete="off" />
                                 <input type="hidden" id="totpSecret" name="totpSecret" value="${totp.totpSecret}" />
