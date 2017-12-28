@@ -119,7 +119,7 @@ label {
 .alert{
     border:2px solid transparent;
     padding: 7px;
-	font-family: "mr-eaves-modern", sans-serif;
+	font-family: "Arial", sans-serif;
 }
 
 .alert i{
@@ -202,7 +202,6 @@ a:hover, a:focus{
 }
 
 header.header{
-    background-color: var(--mdc-theme-accent);
     height: 64px;
 }
 
@@ -248,12 +247,6 @@ h2{
 .form-btn{
     float:right;
     margin-top:20px;
-}
-
-.form-btn button {
-    font-size: 13px;
-    font-family: "mr-eaves-modern", sans-serif;
-    border-radius: 5px;
 }
 
 @media screen and (max-width:330px){

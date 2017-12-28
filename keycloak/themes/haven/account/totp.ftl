@@ -14,15 +14,18 @@
                         <table class="table table-bordered table-striped table-hover" id="TotpTable">
                             <thead>
                                 <tr>
-                                    <td colspan="2">${msg("configureAuthenticators")}</td>
+                                    <th colspan="2">${msg("configureAuthenticators")}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
                                     <td class="provider">${msg("mobile")}</td>
                                     <td class="action">
-																		    <input type="hidden" id="submitAction" name="submitAction" value="Delete">
-                                        <a id="remove-mobile" href="${url.totpUrl}"><i class="material-icons">delete</i></a>
+                                      <form action="${url.totpUrl}" method="post" class="form-inline">
+                                        <input type="hidden" id="stateChecker" name="stateChecker" value="${stateChecker}">
+                                        <input type="hidden" id="submitAction" name="submitAction" value="Delete">
+                                        <button id="remove-mobile" class="invisible-btn"><i class="material-icons">delete</i></button>
+                                      </form>
                                     </td>
                                 </tr>
                             </tbody>
@@ -63,7 +66,7 @@
                                 <label for="totp" class="mdc-textfield__label">${msg("authenticatorCode")}</label>
                             </div>
                             <div class="form-btn">
-                                <button type="submit" class="mdc-button mdc-button--raised mdc-button--primary" name="submitAction" value="Save">${msg("doSave")}</button>
+                                <button type="submit" class="mdc-button mdc-button--raised mdc-button--accent" name="submitAction" value="Save">${msg("doSave")}</button>
                                 <button type="submit" class="mdc-button mdc-button--raised" name="submitAction" value="Cancel">${msg("doCancel")}</button>
                             </div>
                         </form>

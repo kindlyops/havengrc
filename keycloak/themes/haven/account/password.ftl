@@ -35,7 +35,7 @@
                     </div>
 
                     <div class="form-btn">
-                        <button type="submit" class="mdc-button mdc-button--raised mdc-button--primary" name="submitAction" value="Save">${msg("doSave")}</button>
+                        <button type="submit" class="mdc-button mdc-button--raised mdc-button--accent" name="submitAction" value="Save">${msg("doSave")}</button>
                         <button type="submit" class="mdc-button mdc-button--raised" name="submitAction" value="Cancel">${msg("doCancel")}</button>
                     </div>
                 </form>

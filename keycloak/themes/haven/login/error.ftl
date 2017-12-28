@@ -7,6 +7,7 @@
     <#elseif section = "form">
         <div class="align-center">
             <p class="instruction">${message.summary}</p>
+            <span><a id="backToApplication" href="${client.baseUrl}">${msg("backToApplication")}</a></span>
             <#if client?? && client.baseUrl?has_content>
                 <p><a id="backToApplication" href="${client.baseUrl}">${msg("backToApplication")}</a></p>
             </#if>
