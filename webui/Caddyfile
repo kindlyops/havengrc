@@ -1,4 +1,6 @@
-0.0.0.0
+:8443
+
+tls /certs/fullchain.pem /certs/privkey.pem
 
 redir 301 {
   if {>X-Forwarded-Proto} is http
