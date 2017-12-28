@@ -245,6 +245,8 @@ To get useful information to get oriented and find out what is happening:
 		$ oc status -v
 		$ oc get events
 
+OpenShift CLI versions vary depending on where you installed from. Installing via homebrew `brew install openshift-cli` on macOS is fresher than installing from the link in OpenShift web console. (We ran into a difference in command flags needed with different versions of `oc`). 
+
 ### Using helm
 
 To set up helm:
@@ -272,5 +274,5 @@ In your Kubernetes cluster there must be an ExternalName Service defined named `
 alread set this up, you can see the endpoint by running:
 
     $ oc get services
-	
+
 There must also be secrets set up with the DB credentials.
