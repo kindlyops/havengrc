@@ -1,0 +1,43 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: havenweb
+spec:
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+        alpha.image.policy.openshift.io/resolve-names: '*'
+      labels:
+        service: havenweb
+    spec:
+      containers:
+        - name: havenweb
+          image: havengrc-docker.jfrog.io/kindlyops/havenweb:latest
+          env:
+            - name: ELM_APP_KEYCLOAK_CLIENT_ID
+              value: "havendev"
+          ports:
+            - containerPort: 8443
+              protocol: TCP
+          volumeMounts:
+            - name: secret-volume
+              mountPath: /certs/
+              readOnly: true
+          resources:
+              limits:
+                memory: 256Mi
+              requests:
+                memory: 128Mi
+      volumes:
+        - name: secret-volume
+          secret:
+            secretName: haven-tls
+      restartPolicy: Always
+  strategy:
+    type: "Recreate"
+  paused: false
+  revisionHistoryLimit: 2
+  minReadySeconds: 0
+status: {}
