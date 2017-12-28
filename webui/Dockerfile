@@ -15,4 +15,4 @@ EXPOSE 8080
 EXPOSE 8443
 USER havenuser
 ENTRYPOINT  ["/home/havenuser/caddy"]
-CMD         ["-agree", "-http-port", "8080", "-https-port", "8443", "-ca", "https://acme-staging.api.letsencrypt.org/directory"]
+CMD         ["-agree", "-http-port", "8080", "-https-port", "8443" ]
