@@ -6,7 +6,7 @@ spec:
   selector:
     service: havenweb
   ports:
-  - nodePort: 0
-    port: 443
+  - name: https
     protocol: TCP
-    targetPort: 2015
+    port: 443
+    targetPort: 8443
