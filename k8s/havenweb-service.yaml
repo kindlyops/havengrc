@@ -7,6 +7,6 @@ spec:
     service: havenweb
   ports:
   - nodePort: 0
-    port: 2015
+    port: 443
     protocol: TCP
     targetPort: 2015
