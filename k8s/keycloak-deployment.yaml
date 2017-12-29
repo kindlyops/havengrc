@@ -40,18 +40,20 @@ spec:
             - name: PROXY_ADDRESS_FORWARDING
               value: "true"
           ports:
+            - containerPort: 8080
+              protocol: TCP
             - containerPort: 8443
               protocol: TCP
           resources:
             limits:
-              memory: 512Mi
+              memory: 764Mi
             requests:
-              memory: 256Mi
+              memory: 512Mi
           livenessProbe:
             httpGet:
               path: /
-              port: 8443
-            initialDelaySeconds: 30
+              port: 8080
+            initialDelaySeconds: 75
             periodSeconds: 5
       restartPolicy: Always
   strategy:

@@ -19,4 +19,5 @@ ENV         KEYCLOAK_USER admin
 ENV         KEYCLOAK_PASSWORD admin
 ENV         PROXY_ADDRESS_FORWARDING true
 EXPOSE 8443
+EXPOSE 8080
 CMD         ["-b", "0.0.0.0"]
