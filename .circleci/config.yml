@@ -68,8 +68,8 @@ jobs:
               docker tag kindlyops/havenweb kindlyops/havenweb:latest
               docker tag kindlyops/keycloak kindlyops/keycloak:$CIRCLE_SHA1
               docker tag kindlyops/keycloak kindlyops/keycloak:latest
-              docker tag kindlyops/postgrest kindlyops/postgres:$CIRCLE_SHA1
-              docker tag kindlyops/postgrest kindlyops/postgres:latest
+              docker tag kindlyops/postgrest kindlyops/postgrest:$CIRCLE_SHA1
+              docker tag kindlyops/postgrest kindlyops/postgrest:latest
               docker push kindlyops/mappamundi:$CIRCLE_SHA1
               docker push kindlyops/havensqitch:$CIRCLE_SHA1
               docker push kindlyops/havensqitch:latest
