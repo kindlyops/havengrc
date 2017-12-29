@@ -101,7 +101,7 @@ First enter the keycloak container
 
 Now run the keycloak server command with export strategies defined
 
-    /opt/jboss/keycloak/bin/standalone.sh -Dkeycloak.migration.action=export -Dkeycloak.migration.provider=dir -Dkeycloak.migration.dir=/keycloak -Dkeycloak.migration.usersExportStrategy=REALM_FILE -Dkeycloak.migration.realmName=havendev
+    /opt/jboss/keycloak/bin/standalone.sh -Dkeycloak.migration.action=export -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.file=havendev-realm.json -Djboss.http.port=8888 -Djboss.https.port=9999 -Djboss.management.http.port=7777
 
 ## To clear local storage in Chrome for your local site
 
