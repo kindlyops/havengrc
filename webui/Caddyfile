@@ -22,6 +22,6 @@ proxy /api/files havenapi:3000 {
 
 log / stdout "{combined}"
 
-templates /js .js
+templates /static/js/ .js
 
 errors stdout
