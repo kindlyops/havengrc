@@ -11,7 +11,7 @@ proxy /auth keycloak:8080 {
   transparent
 }
 
-proxy /api api:80 {
+proxy /api api:8180 {
   without /api
   transparent
 }

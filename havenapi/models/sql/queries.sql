@@ -13,3 +13,6 @@ select set_config('request.jwt.claim.email', $1, true);
 
 -- name: setsubclaim
 select set_config('request.jwt.claim.sub', $1, true);
+
+-- name: setorgclaim
+select set_config('request.jwt.claim.org', $1, true);

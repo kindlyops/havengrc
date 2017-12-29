@@ -2,6 +2,7 @@ package actions
 
 import (
 	"fmt"
+	"encoding/json"
 	"github.com/gobuffalo/buffalo"
 	"github.com/gobuffalo/buffalo/middleware"
 	"github.com/gobuffalo/buffalo/middleware/ssl"
@@ -114,6 +115,10 @@ func JwtMiddleware(next buffalo.Handler) buffalo.Handler {
 		email := allClaims["email"]
 		c.Set("email", email)
 
+		org :=  allClaims["org"]
+		c.Set("org", org)
+		enc, _ := json.Marshal(org)
+
 		tx := c.Value("tx").(*pop.Connection)
 		err = tx.RawQuery(models.Q["setemailclaim"], email).Exec()
 		if err != nil {
@@ -127,7 +132,12 @@ func JwtMiddleware(next buffalo.Handler) buffalo.Handler {
 
 		err = tx.RawQuery(models.Q["setsubclaim"], sub).Exec()
 		if err != nil {
-			return c.Error(500, fmt.Errorf("error setting JWT claims in GUC: %s", err.Error()))
+			return c.Error(500, fmt.Errorf("error setting JWT claims sub in GUC: %s", err.Error()))
+		}
+
+		err = tx.RawQuery(models.Q["setorgclaim"], string(enc)).Exec()
+		if err != nil {
+			return c.Error(500, fmt.Errorf("error setting JWT claims org in GUC: %s", err.Error()))
 		}
 
 		return next(c)

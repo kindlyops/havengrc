@@ -24,6 +24,11 @@ BEGIN
   ELSE
     NEW.user_id = current_setting('request.jwt.claim.sub', true)::uuid;
   END IF;
+  IF NEW.org IS NOT NULL THEN
+    RAISE EXCEPTION 'You must not send the org field';
+  ELSE
+    NEW.org = current_setting('request.jwt.claim.org', true);
+  END IF;
 
   RETURN NEW;
 END;
@@ -34,13 +39,14 @@ CREATE TABLE mappa.files (
   created_at  TIMESTAMPTZ,
   user_id     UUID,
   name        TEXT,
+  org         JSONB,
   file        BYTEA
 );
 
 CREATE TRIGGER override_file_cols BEFORE INSERT ON mappa.files FOR EACH ROW EXECUTE PROCEDURE mappa.func_override_file_columns();
 
 CREATE OR REPLACE VIEW "1".files as
-  SELECT uuid, user_id, created_at, name, file from mappa.files;
+  SELECT uuid, user_id, org, created_at, name, file from mappa.files;
 
 GRANT SELECT, INSERT ON mappa.files to member;
 GRANT all ON "1".files to member;

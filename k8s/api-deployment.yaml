@@ -1,0 +1,66 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: api
+spec:
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+        alpha.image.policy.openshift.io/resolve-names: '*'
+      labels:
+        service: api
+    spec:
+      containers:
+        - name: api
+          image: havengrc-docker.jfrog.io/kindlyops/postgrest:latest
+          args:
+          - postgrest
+          - /config
+          env:
+            - name: DATABASE_HOST
+              value: "db"
+            - name: DATABASE_NAME
+              value: "havenstage"
+            - name: PGRST_DB_SCHEMA
+              value: "1"
+            - name: DATABASE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: haven-database-credentials
+                  key: username
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: haven-database-credentials
+                  key: password
+            - name: HAVEN_JWK_PATH
+              value: "/etc/haven-credentials/jwk.json"
+            - name: PGRST_JWT_AUD
+              value: "havendev"
+            - name: PGRST_JWT_SECRET
+              value: "/haven-credentials/jwk.json"
+            - name: PGRST_SERVER_PORT
+              value: "8180"
+            - name: PGRST_SERVER_PROXY_URI
+              value: "https://staging.havengrc.com/api"
+          volumeMounts:
+            - name: secret-volume
+              mountPath: /etc/haven-credentials/
+              readOnly: true
+          ports:
+            - containerPort: 3001
+              protocol: TCP
+              targetPort: 8180
+      volumes:
+        - name: secret-volume
+          secret:
+            secretName: haven-database-credentials
+      restartPolicy: Always
+  strategy:
+    type: "Recreate"
+  paused: false
+  revisionHistoryLimit: 2
+  minReadySeconds: 0
+status: {}
