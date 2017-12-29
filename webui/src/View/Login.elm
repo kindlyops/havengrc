@@ -74,7 +74,7 @@ view model =
                 [ div [ class "mdc-toolbar__row" ]
                     [ section [ class "mdc-toolbar__section" ]
                       [ span []
-                            [ text "© 2017 "
+                            [ text "© 2018 "
                             , a [ href "https://kindlyops.com", title "Kindly Ops Website" ]
                                 [ text "KINDLY OPS" ]
                             ]
