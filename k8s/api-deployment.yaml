@@ -15,9 +15,14 @@ spec:
       containers:
         - name: api
           image: havengrc-docker.jfrog.io/kindlyops/postgrest:latest
+          args:
+          - postgrest
+          - /config
           env:
             - name: DATABASE_HOST
               value: "db"
+            - name: DATABASE_NAME
+              value: "havenstage"
             - name: PGRST_DB_SCHEMA
               value: "1"
             - name: DATABASE_USERNAME
@@ -30,6 +35,8 @@ spec:
                 secretKeyRef:
                   name: haven-database-credentials
                   key: password
+            - name: HAVEN_JWK_PATH
+              value: "/etc/haven-credentials/jwk.json"
             - name: PGRST_JWT_AUD
               value: "havendev"
             - name: PGRST_JWT_SECRET
