@@ -14,10 +14,12 @@ spec:
     spec:
       containers:
         - name: havenapi
-          image: havengrc-docker.jfrog.io/kindlyops/havenapi:0.0.5
+          image: havengrc-docker.jfrog.io/kindlyops/havenapi:latest
           env:
             - name: GO_ENV
               value: "production"
+            - name: DATABASE_NAME
+              value: "havenstage"
             - name: DATABASE_HOST
               value: "db"
             - name: DATABASE_USERNAME
@@ -39,6 +41,11 @@ spec:
           ports:
             - containerPort: 3000
               protocol: TCP
+          resources:
+            limits:
+              memory: 256Mi
+            requests:
+              memory: 128Mi
           livenessProbe:
             httpGet:
               path: /healthz

@@ -2,6 +2,14 @@ FROM        havengrc-docker.jfrog.io/jboss/keycloak:3.4.2.Final
 MAINTAINER  Kindly Ops, LLC <support@kindlyops.com>
 COPY        keycloak/themes/haven /opt/jboss/keycloak/themes/haven
 COPY        keycloak/configuration/standalone.xml /opt/jboss/keycloak/standalone/configuration/standalone.xml
+USER root
+RUN chown -R jboss:0 $JBOSS_HOME/standalone && \
+    chmod -R g+rw $JBOSS_HOME/standalone && \
+    chown -R jboss:0 $JBOSS_HOME/modules/system/layers/base && \
+		chmod -R g+rw $JBOSS_HOME/modules/system/layers/base && \
+		chown -R jboss:0 /tmp && \
+		chmod -R g+rw /tmp
+USER 1000
 ENV         ENV_VERBOSITY 无
 ENV         POSTGRES_DATABASE mappamundi_dev
 ENV         POSTGRES_USER postgres
@@ -10,4 +18,6 @@ ENV         POSTGRES_PORT_5432_TCP_ADDR postgres
 ENV         KEYCLOAK_USER admin
 ENV         KEYCLOAK_PASSWORD admin
 ENV         PROXY_ADDRESS_FORWARDING true
+EXPOSE 8443
+EXPOSE 8080
 CMD         ["-b", "0.0.0.0"]
