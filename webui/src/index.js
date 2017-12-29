@@ -52,6 +52,10 @@ document.arrive("#UserDropdownMenu", function(){
   });
 });
 
+document.arrive(".pdf-viewer", function(){
+  
+})
+
 document.addEventListener('click', function(e){
   let drawer = new mdc.drawer.MDCPersistentDrawer(document.getElementById('MenuDrawer'));
   if (drawer.open) {
