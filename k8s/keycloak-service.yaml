@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: keycloak      
+  name: keycloak
 spec:
-  selector:                  
+  selector:
     service: keycloak
   ports:
-  - nodePort: 0
-    port: 8080               
+  - name: https
     protocol: TCP
+    port: 8080
     targetPort: 8080
