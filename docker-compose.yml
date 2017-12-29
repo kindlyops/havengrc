@@ -72,18 +72,26 @@ services:
     environment:
       - endpoint=http://api/
   api:
-    image: havengrc-docker.jfrog.io/postgrest/postgrest:v0.4.3.0
+    build:
+      dockerfile: ./postgrest/Dockerfile
+      context: .
     command: [postgrest, "/config"]
+    environment:
+      - DATABASE_NAME=mappamundi_dev
+      - DATABASE_USERNAME=postgres
+      - DATABASE_PASSWORD=postgres
+      - DATABASE_HOST=db
+      - HAVEN_JWK_PATH=/keycloak-dev-public-key.json
+      - PGRST_JWT_AUD_CLAIM=havendev
+      - PGRST_SERVER_PROXY_URI=http://localhost:8180
+    volumes:
+      - ./postgrest/keycloak-dev-public-key.json:/keycloak-dev-public-key.json
     ports:
-      - "3001:80"
+      - "3001:8180"
     links:
       - db
     depends_on:
       - sqitch
-    volumes:
-      - ./postgrest/config:/config
-      - ./postgrest/keycloak-dev-public-key.json:/keycloak-dev-public-key.json
-      - ./postgrest/vendor/postgrest:/usr/local/bin/postgrest
   swagger:
     image: havengrc-docker.jfrog.io/swaggerapi/swagger-ui:v3.0.2
     ports:

@@ -1,4 +1,4 @@
-db-uri = "postgres://postgres@db/mappamundi_dev"
+db-uri = "postgres://$(DATABASE_USERNAME):$(DATABASE_PASSWORD)@$(DATABASE_HOST)/$(DATABASE_NAME)"
 db-schema = "1"
 # in dev, the swagger UI introspects without providing auth.
 # Because postgrest uses the role of the user when determining
@@ -9,20 +9,19 @@ db-schema = "1"
 # a possible way to handle this would be to embed the swagger viewing inside
 # our webapp and find a way to give the swagger requests the JWT from the logged
 # in user rather than being anonymous.
-# db-anon-role = "anonymous"
-db-anon-role = "postgres"
+db-anon-role = "anonymous"
 db-pool = 10
 
 server-host = "*4"
-server-port = 80
-server-proxy-uri = "http://localhost:3001"
+server-port = 8180
+server-proxy-uri = "$(PGRST_SERVER_PROXY_URI)"
 
 ## choose a secret to enable JWT auth
 ## (use "@filename" to load from separate file)
 ## The contents of the key file for keycloak were retrieved from keycloak using:
 ## curl http://localhost:8080/auth/realms/havendev/protocol/openid-connect/certs | jq '.'
-jwt-secret = "@/keycloak-dev-public-key.json"
-jwt-aud = "havendev"
+jwt-secret = "@$(HAVEN_JWK_PATH)"
+jwt-aud = "$(PGRST_JWT_AUD_CLAIM)"
 
 # secret-is-base64 = false
 
