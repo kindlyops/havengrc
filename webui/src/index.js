@@ -10,7 +10,7 @@ if (process.env.NODE_ENV === 'development') {
 var keycloak = Keycloak({
     url: '/auth', // TODO: try full url for ngrok, client matching uses url
     realm: 'havendev',
-    clientId: CLIENT_ID
+    clientId: 'havendev' // TODO: get rid of this.
 });
 var storedProfile = localStorage.getItem('profile');
 var storedToken = localStorage.getItem('token');
