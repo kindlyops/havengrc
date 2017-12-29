@@ -39,7 +39,7 @@ CREATE TABLE mappa.files (
   created_at  TIMESTAMPTZ,
   user_id     UUID,
   name        TEXT,
-  org         TEXT,
+  org         JSONB,
   file        BYTEA
 );
 

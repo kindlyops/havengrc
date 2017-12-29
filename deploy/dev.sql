@@ -57,7 +57,7 @@ CREATE TABLE mappa.comments (
   user_email  NAME,
   user_id     UUID,
   message     TEXT,
-  org         TEXT
+  org         JSONB
 );
 
 CREATE TRIGGER override_comment_cols BEFORE INSERT ON mappa.comments FOR EACH ROW EXECUTE PROCEDURE mappa.override_server_columns();
