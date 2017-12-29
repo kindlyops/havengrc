@@ -1,0 +1,41 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: sqitch-migrate
+spec:
+  parallelism: 1
+  completions: 1
+  template:
+    metadata:
+      name: sqitch-migrate
+    spec:
+      containers:
+      - name: sqitch-migrate
+        image: havengrc-docker.jfrog.io/kindlyops/havensqitch:latest
+        command:
+          - "sqitch --target db:pg://$DATABASE_USERNAME:$SQITCHPASSWORD@$DATABASE_HOST/$DATABASE_NAME staging deploy"
+        env:
+          - name: DATABASE_NAME
+            value: "havenstage"
+          - name: DATABASE_HOST
+            value: "db"
+          - name: DATABASE_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: haven-database-credentials
+                key: username
+          - name: SQITCHPASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: haven-database-credentials
+                key: password
+        volumeMounts:
+          - name: secret-volume
+            mountPath: /etc/haven-credentials/
+            readOnly: true
+      volumes:
+        - name: secret-volume
+          secret:
+            secretName: haven-database-credentials
+      restartPolicy: Never
