@@ -12,7 +12,7 @@
             </div>
 
             <div class="form-btn" style="float:none;">
-                    <button class="mdc-button mdc-button--raised mdc-button--primary" name="login" id="kc-login" type="submit" value="Log In">${msg("doLogIn")}</button>
+                    <button class="mdc-button mdc-button--raised mdc-button--accent" name="login" id="kc-login" type="submit" value="Log In">${msg("doLogIn")}</button>
                     <button class="mdc-button mdc-button--raised" name="cancel" id="kc-cancel" type="submit" value="Cancel">${msg("doCancel")}</button>
             </div>
         </form>

@@ -24,7 +24,7 @@
                 <label for="totp" class="mdc-textfield__label">${msg("authenticatorCode")}</label>
             </div>
             <div class="form-btn">
-                <button class="mdc-button mdc-button--raised mdc-button--primary" type="submit" value="Sumbit">${msg("doSubmit")}</button>
+                <button class="mdc-button mdc-button--raised mdc-button--accent" type="submit" value="Sumbit">${msg("doSubmit")}</button>
                 <button class="mdc-button mdc-button--raised" type="submit" value="Cancel">${msg("doCancel")}</button>
             </div>
         </form>
