@@ -9,4 +9,4 @@ spec:
   - nodePort: 0
     port: 3001
     protocol: TCP
-    targetPort: 80
+    targetPort: 8180
