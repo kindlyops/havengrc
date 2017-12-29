@@ -45,6 +45,7 @@ jobs:
       - run: docker build --rm=false -t kindlyops/mappamundi .
       - run: docker build --rm=false -t kindlyops/havenapi havenapi/
       - run: docker build --rm=false -t kindlyops/havensqitch sqitch/
+      - run: docker build --rm=false -t kindlyops/postgrest -f postgrest/Dockerfile .
       - run:
           name: compile Elm project
           command: npm run-script build
@@ -67,6 +68,8 @@ jobs:
               docker tag kindlyops/havenweb kindlyops/havenweb:latest
               docker tag kindlyops/keycloak kindlyops/keycloak:$CIRCLE_SHA1
               docker tag kindlyops/keycloak kindlyops/keycloak:latest
+              docker tag kindlyops/postgrest kindlyops/postgres:$CIRCLE_SHA1
+              docker tag kindlyops/postgrest kindlyops/postgres:latest
               docker push kindlyops/mappamundi:$CIRCLE_SHA1
               docker push kindlyops/havensqitch:$CIRCLE_SHA1
               docker push kindlyops/havensqitch:latest
@@ -76,6 +79,8 @@ jobs:
               docker push kindlyops/havenweb:latest
               docker push kindlyops/keycloak:$CIRCLE_SHA1
               docker push kindlyops/keycloak:latest
+              docker push kindlyops/postgrest:$CIRCLE_SHA1
+              docker push kindlyops/postgrest:latest
               oc set image deployment/havenapi havenapi=havengrc-docker.jfrog.io/kindlyops/havenapi:$CIRCLE_SHA1
               oc set image deployment/havenweb havenweb=havengrc-docker.jfrog.io/kindlyops/havenweb:$CIRCLE_SHA1
             else
