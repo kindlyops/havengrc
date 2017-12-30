@@ -14,7 +14,8 @@ spec:
       - name: sqitch-migrate
         image: havengrc-docker.jfrog.io/kindlyops/havensqitch:latest
         command:
-          - "sqitch --target db:pg://$DATABASE_USERNAME:$SQITCHPASSWORD@$DATABASE_HOST/$DATABASE_NAME staging deploy"
+          - "/usr/local/bin/run-sqitch.sh"
+          - "plan"
         env:
           - name: DATABASE_NAME
             value: "havenstage"
