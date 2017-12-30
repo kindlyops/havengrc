@@ -12,10 +12,10 @@ spec:
     spec:
       containers:
       - name: sqitch-migrate
-        image: havengrc-docker.jfrog.io/kindlyops/havensqitch:latest
+        image: kindlyops/havensqitch:latest
         command:
           - "/usr/local/bin/run-sqitch.sh"
-          - "plan"
+          - "deploy"
         env:
           - name: DATABASE_NAME
             value: "havenstage"
@@ -26,7 +26,7 @@ spec:
               secretKeyRef:
                 name: haven-database-credentials
                 key: username
-          - name: SQITCHPASSWORD
+          - name: SQITCH_PASSWORD
             valueFrom:
               secretKeyRef:
                 name: haven-database-credentials

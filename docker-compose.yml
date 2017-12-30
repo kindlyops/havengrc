@@ -51,7 +51,7 @@ services:
     working_dir: /src
     environment:
       - DATABASE_USERNAME=postgres
-      - SQITCHPASSWORD=postgres
+      - SQITCH_PASSWORD=postgres
       - DATABASE_HOST=db
       - DATABASE_NAME=mappamundi_dev
     volumes:
