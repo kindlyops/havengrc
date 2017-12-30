@@ -30,12 +30,4 @@ spec:
               secretKeyRef:
                 name: haven-database-credentials
                 key: password
-        volumeMounts:
-          - name: secret-volume
-            mountPath: /etc/haven-credentials/
-            readOnly: true
-      volumes:
-        - name: secret-volume
-          secret:
-            secretName: haven-database-credentials
       restartPolicy: Never
