@@ -42,9 +42,8 @@ jobs:
       - run: docker-compose run start_dependencies
       - run: docker-compose run sqitch
       - run: docker-compose run start_keycloak
-      - run: docker build --rm=false -t kindlyops/mappamundi .
       - run: docker build --rm=false -t kindlyops/havenapi havenapi/
-      - run: docker build --rm=false -t kindlyops/havensqitch sqitch/
+      - run: docker build --rm=false -t kindlyops/havensqitch .
       - run: docker build --rm=false -t kindlyops/postgrest -f postgrest/Dockerfile .
       - run:
           name: compile Elm project
