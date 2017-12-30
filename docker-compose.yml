@@ -49,6 +49,11 @@ services:
     build:
       context: .
     working_dir: /src
+    environment:
+      - DATABASE_USERNAME=postgres
+      - SQITCHPASSWORD=postgres
+      - DATABASE_HOST=db
+      - DATABASE_NAME=mappamundi_dev
     volumes:
       - .:/src
     links:
