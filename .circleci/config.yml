@@ -40,11 +40,10 @@ jobs:
             oc login https://console.pro-us-east-1.openshift.com/ --token=$OPENSHIFT_TOKEN
             oc project haven-production
       - run: docker-compose run start_dependencies
-      - run: docker-compose run sqitch
+      - run: docker-compose run flyway
       - run: docker-compose run start_keycloak
-      - run: docker build --rm=false -t kindlyops/mappamundi .
       - run: docker build --rm=false -t kindlyops/havenapi havenapi/
-      - run: docker build --rm=false -t kindlyops/havensqitch sqitch/
+      - run: docker build --rm=false -t kindlyops/havenflyway flyway/
       - run: docker build --rm=false -t kindlyops/postgrest -f postgrest/Dockerfile .
       - run:
           name: compile Elm project
@@ -60,8 +59,8 @@ jobs:
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
               docker login -u $DOCKER_USER -p $DOCKER_PASS
               docker tag kindlyops/mappamundi kindlyops/mappamundi:$CIRCLE_SHA1
-              docker tag kindlyops/havensqitch kindlyops/havensqitch:$CIRCLE_SHA1
-              docker tag kindlyops/havensqitch kindlyops/havensqitch:latest
+              docker tag kindlyops/havenflyway kindlyops/havenflyway:$CIRCLE_SHA1
+              docker tag kindlyops/havenflyway kindlyops/havenflyway:latest
               docker tag kindlyops/havenapi kindlyops/havenapi:$CIRCLE_SHA1
               docker tag kindlyops/havenapi kindlyops/havenapi:latest
               docker tag kindlyops/havenweb kindlyops/havenweb:$CIRCLE_SHA1
@@ -71,8 +70,8 @@ jobs:
               docker tag kindlyops/postgrest kindlyops/postgrest:$CIRCLE_SHA1
               docker tag kindlyops/postgrest kindlyops/postgrest:latest
               docker push kindlyops/mappamundi:$CIRCLE_SHA1
-              docker push kindlyops/havensqitch:$CIRCLE_SHA1
-              docker push kindlyops/havensqitch:latest
+              docker push kindlyops/havenflyway:$CIRCLE_SHA1
+              docker push kindlyops/havenflyway:latest
               docker push kindlyops/havenapi:$CIRCLE_SHA1
               docker push kindlyops/havenapi:latest
               docker push kindlyops/havenweb:$CIRCLE_SHA1

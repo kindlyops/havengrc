@@ -1,7 +1,5 @@
 -- Deploy mappamundi:files to pg
 
-BEGIN;
-
 -- for these three columns we never let the caller control the contents
 CREATE OR REPLACE FUNCTION mappa.func_override_file_columns()
 RETURNS TRIGGER AS $$
@@ -51,5 +49,3 @@ CREATE OR REPLACE VIEW "1".files as
 GRANT SELECT, INSERT ON mappa.files to member;
 GRANT all ON "1".files to member;
 
-
-COMMIT;
