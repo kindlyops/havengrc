@@ -155,6 +155,7 @@ to the DB server running in the database container.
     \l                          # list databases in this server
     \dn                         # show the schemas
     \dt mappa.*                 # show the tables in the mappa schema
+    SET ROLE member;						# assume the member role
     SELECT * from foo LIMIT 1;  # run arbitrary queries
     \q                          # disconnect
 

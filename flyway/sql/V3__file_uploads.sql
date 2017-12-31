@@ -7,7 +7,7 @@ BEGIN
   IF NEW.uuid IS NOT NULL THEN
     RAISE EXCEPTION 'You must not send uuid field';
   ELSE
-    NEW.uuid = uuid_generate_v4();
+    NEW.uuid = mappa.uuid_generate_v4();
   END IF;
   IF NEW.created_at IS NOT NULL THEN
     RAISE EXCEPTION 'You must not send created_at field';
