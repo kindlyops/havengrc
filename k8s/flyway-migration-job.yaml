@@ -1,0 +1,39 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: flywy-migrate
+spec:
+  parallelism: 1
+  completions: 1
+  template:
+    metadata:
+      name: flyway-migrate
+    spec:
+      containers:
+      - name: flyway-migrate
+        image: havengrc-docker.jfrog.io/kindlyops/havenflyway:latest
+        command:
+          - "/usr/local/bin/flyway"
+          - "migrate"
+          - "-placeholders.databaseUser=havenprod"
+        env:
+          - name: FLYWAY_IGNORE_MISSING_MIGRATIONS
+            value: "true"
+          - name: FLYWAY_GROUP
+            value: "true"
+          - name: FLYWAY_SCHEMAS
+            value: "mappa,1"
+          - name: FLYWAY_URL
+            value: "jdbc:postgresql://db/havenstage"
+          - name: FLYWAY_USER
+            valueFrom:
+              secretKeyRef:
+                name: haven-database-credentials
+                key: username
+          - name: FLYWAY_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: haven-database-credentials
+                key: password
+      restartPolicy: Never

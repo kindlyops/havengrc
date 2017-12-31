@@ -1,11 +1,6 @@
 -- Deploy mappamundi:dev to pg
 
-BEGIN;
-
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
-CREATE SCHEMA "1";
-CREATE SCHEMA mappa;
 
 -- the schema "1" is our versioned public API
 -- the schema mappa is private
@@ -67,5 +62,3 @@ CREATE OR REPLACE VIEW "1".comments as
 
 GRANT SELECT, INSERT ON mappa.comments to member;
 GRANT all ON "1".comments to member;
-
-COMMIT;
