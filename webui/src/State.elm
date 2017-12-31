@@ -27,7 +27,7 @@ init initialUser location =
             }
     in
         ( model
-        , Cmd.batch [ routeCmd, getComments model ]
+        , routeCmd
         )
 
 
