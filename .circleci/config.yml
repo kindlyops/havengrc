@@ -58,7 +58,6 @@ jobs:
           command: |
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
               docker login -u $DOCKER_USER -p $DOCKER_PASS
-              docker tag kindlyops/mappamundi kindlyops/mappamundi:$CIRCLE_SHA1
               docker tag kindlyops/havenflyway kindlyops/havenflyway:$CIRCLE_SHA1
               docker tag kindlyops/havenflyway kindlyops/havenflyway:latest
               docker tag kindlyops/havenapi kindlyops/havenapi:$CIRCLE_SHA1
@@ -69,7 +68,6 @@ jobs:
               docker tag kindlyops/keycloak kindlyops/keycloak:latest
               docker tag kindlyops/postgrest kindlyops/postgrest:$CIRCLE_SHA1
               docker tag kindlyops/postgrest kindlyops/postgrest:latest
-              docker push kindlyops/mappamundi:$CIRCLE_SHA1
               docker push kindlyops/havenflyway:$CIRCLE_SHA1
               docker push kindlyops/havenflyway:latest
               docker push kindlyops/havenapi:$CIRCLE_SHA1
@@ -91,11 +89,7 @@ jobs:
       #   owner: kindlyops
       #   commands:
       #     - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-      #     - docker tag kindlyops/mappamundi kindlyops/mappamundi:$CIRCLE_TAG
       #     - docker tag kindlyops/havenweb kindlyops/havenweb:$CIRCLE_TAG
-      #     - docker tag kindlyops/mappamundi kindlyops/mappamundi:$CIRCLE_SHA1
       #     - docker tag kindlyops/havenweb kindlyops/havenweb:$CIRCLE_SHA1
-      #     - docker push kindlyops/mappamundi:$CIRCLE_TAG
       #     - docker push kindlyops/havenweb:$CIRCLE_TAG
-      #     - docker push kindlyops/mappamundi:$CIRCLE_SHA1
       #     - docker push kindlyops/havenweb:$CIRCLE_SHA1
