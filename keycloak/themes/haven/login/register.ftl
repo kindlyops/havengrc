@@ -32,6 +32,12 @@
            </div>
            <div>
             <div class="mdc-textfield" data-mdc-auto-init="MDCTextfield">
+                    <input type="text" id="user.attributes.organization" class="mdc-textfield__input" name="user.attributes.organization" value="${(register.formData.organization!'')}" required />
+                    <label for="user.attributes.organization" class="mdc-textfield__label">${msg("organization")}</label>
+            </div>
+           </div>
+           <div>
+            <div class="mdc-textfield" data-mdc-auto-init="MDCTextfield">
                     <input type="text" id="email" class="mdc-textfield__input" name="email" value="${(register.formData.email!'')}" required />
                     <label for="email" class="mdc-textfield__label">${msg("email")}</label>
             </div>
