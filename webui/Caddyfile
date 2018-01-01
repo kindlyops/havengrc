@@ -1,12 +1,25 @@
-0.0.0.0
+:8443
+
+tls /certs/fullchain.pem /certs/privkey.pem
 
 redir 301 {
   if {>X-Forwarded-Proto} is http
   / https://{host}{uri}
 }
 
-log / stdout "{combined}"
+proxy /auth keycloak:8080 {
+  transparent
+}
 
-templates /js .js
+proxy /api api:3001 {
+  without /api
+  transparent
+}
+
+proxy /api/files havenapi:3000 {
+  transparent
+}
+
+log / stdout "{combined}"
 
 errors stdout

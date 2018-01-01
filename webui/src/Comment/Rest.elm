@@ -10,10 +10,11 @@ import Types exposing (..)
 
 commentDecoder : Decoder Comment
 commentDecoder =
-    Decode.map4 Comment
+    Decode.map5 Comment
         (field "uuid" Decode.string)
         (field "created_at" Decode.string)
         (field "user_email" Decode.string)
+        (field "user_id" Decode.string)
         (field "message" Decode.string)
 
 
@@ -25,7 +26,7 @@ encodeComment comment =
 
 commentsUrl : String
 commentsUrl =
-    "http://localhost:3001/comment"
+    "/api/comments"
 
 
 getComments : Model -> Cmd Msg

@@ -194,7 +194,20 @@ dashboardBody model =
 
 reportsBody : Model -> Html Msg
 reportsBody model =
-    div [] [ text "This is the reports view" ]
+    div []
+        [ div []
+              [ text "This is the reports view" ]
+        ]
+
+
+commentsBody : Model -> Html Msg
+commentsBody model =
+    div []
+        [ text "This is the comments view"
+        , ul []
+            (List.map (\l -> li [] [ text (l.message ++ " - " ++ l.user_email ++ "(" ++ l.user_id ++ ")" ++ " posted at " ++ l.created_at) ]) model.comments)
+        , commentsForm model
+        ]
 
 
 onValueChanged : (String -> msg) -> Html.Attribute msg
@@ -212,7 +225,11 @@ activityBody model =
             , ( Date.fromTime 1456790400000, 1 )
             ]
     in
-        LineChart.view data
+        div []
+            [ div []
+                  [ text "What is Risk Management?" ]
+            ,  LineChart.view data
+            ]
 
 
 notFoundBody : Model -> Html Msg

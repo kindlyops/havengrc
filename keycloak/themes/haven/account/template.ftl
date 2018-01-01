@@ -53,17 +53,13 @@
                             <i class="material-icons mdc-list-item__start-detail">assignment</i>
                             ${msg("sessions")}
                         </a>
-                        <a href="${url.applicationsUrl}" class="<#if active=='applications'>mdc-persistent-drawer--selected</#if> mdc-list-item">
-                            <i class="material-icons mdc-list-item__start-detail">view_list</i>
-                            ${msg("applications")}
-                        </a>
                     <#if features.log>
                             <a href="${url.logUrl}" class="<#if active=='log'>mdc-persistent-drawer--selected</#if> mdc-list-item">
                                 <i class="material-icons mdc-list-item__start-detail">arrow_back</i>
                                 ${msg("log")}
                             </a>
                     </#if>
-                    <a href="http://localhost:2015/" class="<#if active==''>mdc-persistent-drawer--selected</#if> mdc-list-item">
+                    <a href="/" class="<#if active==''>mdc-persistent-drawer--selected</#if> mdc-list-item">
                         <i class="material-icons mdc-list-item__start-detail">arrow_back</i>
                         Return
                     </a>

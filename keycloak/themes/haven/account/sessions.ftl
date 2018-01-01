@@ -40,7 +40,10 @@
                     </table>
                 </div>
                 <div class="mdc-layout-grid__cell">
-                    <a id="logout-all-sessions" href="${url.sessionsLogoutUrl}">${msg("doLogOutAllSessions")}</a>
+                  <form action="${url.sessionsUrl}" method="post">
+                     <input type="hidden" id="stateChecker" name="stateChecker" value="${stateChecker}">
+                     <button id="logout-all-sessions" class="invisible-btn">${msg("doLogOutAllSessions")}</button>
+                  </form>
                 </div>
             </div>
         </div>

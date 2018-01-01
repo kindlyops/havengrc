@@ -3,38 +3,6 @@ volumes:
   database:
 
 services:
-  # tellform:
-  #     image: havengrc-docker.jfrog.io/tellform/production:no_subdomains
-  #     environment:
-  #       - REDIS_URL=redis://redis-db:6379
-  #       - MONGODB_URI=mongodb://mongo-db:27017/mean
-  #       - CREATE_ADMIN_ACCOUNT=TRUE
-  #       - SUBDOMAINS_DISABLED=TRUE
-  #       - BASE_URL=localhost
-  #       - SOCKET_URL=localhost
-  #       - SOCKET_PORT=5555
-  #     links:
-  #       - redis:redis-db
-  #       - mongo:mongo-db
-  #     ports:
-  #       - "3000:3000"
-  #       - "5555:5555"
-  # mongo:
-  #     image: havengrc-docker.jfrog.io/mongo
-  #     ports:
-  #       - "27017:27017"
-  # redis:
-  #     image: havengrc-docker.jfrog.io/redis
-  #     ports:
-  #       - "6379:6379"
-  # marketing:
-  #   volumes:
-  #     - ./marketing/public:/public
-  #   build:
-  #     context: .
-  #     dockerfile: ./marketing/Dockerfile
-  #   ports:
-  #     - "5000:2015"
   start_dependencies:
     image: dadarek/wait-for-dependencies
     depends_on:
@@ -58,7 +26,9 @@ services:
   keycloak:
     depends_on:
       - start_dependencies
-    image: havengrc-docker.jfrog.io/jboss/keycloak-postgres:3.2.1.Final
+    build:
+      context: .
+      dockerfile: ./keycloak/Dockerfile
     environment:
       - POSTGRES_DATABASE=mappamundi_dev
       - POSTGRES_USER=postgres
@@ -66,26 +36,31 @@ services:
       - POSTGRES_PORT_5432_TCP_ADDR=postgres
       - KEYCLOAK_USER=admin
       - KEYCLOAK_PASSWORD=admin
+      - PROXY_ADDRESS_FORWARDING=true
     ports:
       - "8080:8080"
     links:
       - db:postgres
     volumes:
       - ./keycloak/themes/haven:/opt/jboss/keycloak/themes/haven
-      - ./keycloak/configuration/standalone.xml:/opt/jboss/keycloak/standalone/configuration/standalone.xml
       - ./keycloak/data:/keycloak
     command: ["-b", "0.0.0.0", "-Dkeycloak.migration.file=/keycloak/havendev-realm.json", "-Dkeycloak.migration.strategy=IGNORE_EXISTING", "-Dkeycloak.migration.provider=singleFile", "-Dkeycloak.migration.action=import"]
-  sqitch:
+  flyway:
     build:
-      context: .
-    working_dir: /src
+      context: flyway/
     volumes:
-      - .:/src
+      - ./flyway/sql:/flyway/sql
+    environment:
+      - FLYWAY_URL=jdbc:postgresql://db/mappamundi_dev
+      - FLYWAY_USER=postgres
+      - FLYWAY_PASSWORD=postgres
+      - FLYWAY_IGNORE_MISSING_MIGRATIONS=true
+      - FLYWAY_GROUP=true
+      - FLYWAY_SCHEMAS=mappa,1
+      - FLYWAY_PLACEHOLDERS_DATABASEUSER=postgres
+    command: ["migrate", "-placeholders.databaseUser=postgres"]
     links:
-      - keycloak
-    depends_on:
-      - start_dependencies
-    command: [deploy]
+      - db
   apitest:
     build:
       context: .
@@ -101,20 +76,27 @@ services:
     command: [cucumber]
     environment:
       - endpoint=http://api/
-      - resource_single=true
   api:
-    image: havengrc-docker.jfrog.io/postgrest/postgrest:v0.4.3.0
+    build:
+      dockerfile: ./postgrest/Dockerfile
+      context: .
     command: [postgrest, "/config"]
+    environment:
+      - DATABASE_NAME=mappamundi_dev
+      - DATABASE_USERNAME=postgres
+      - DATABASE_PASSWORD=postgres
+      - DATABASE_HOST=db
+      - HAVEN_JWK_PATH=/keycloak-dev-public-key.json
+      - PGRST_JWT_AUD_CLAIM=havendev
+      - PGRST_SERVER_PROXY_URI=http://localhost:8180
+    volumes:
+      - ./postgrest/keycloak-dev-public-key.json:/keycloak-dev-public-key.json
     ports:
-      - "3001:80"
+      - "3001:8180"
     links:
       - db
     depends_on:
-      - sqitch
-    volumes:
-      - ./postgrest/config:/config
-      - ./postgrest/keycloak-dev-public-key.json:/keycloak-dev-public-key.json
-      - ./postgrest/vendor/postgrest:/usr/local/bin/postgrest
+      - flyway
   swagger:
     image: havengrc-docker.jfrog.io/swaggerapi/swagger-ui:v3.0.2
     ports:
@@ -129,6 +111,21 @@ services:
       - POSTGRES_DB=mappamundi_dev
     volumes:
       - ./postgresql-data:/var/lib/postgresql
+  havenapi:
+    working_dir: /go/src/github.com/kindlyops/mappamundi/havenapi
+    volumes:
+      - ./havenapi:/go/src/github.com/kindlyops/mappamundi/havenapi
+      - /go/src/github.com/kindlyops/mappamundi/havenapi/vendor
+      - ./postgrest/keycloak-dev-public-key.json:/keycloak-dev-public-key.json
+    environment:
+      - HAVEN_JWK_PATH=/keycloak-dev-public-key.json
+    build:
+      context: .
+      dockerfile: ./havenapi/Dockerfile-hotreload
+    links:
+      - db
+    ports:
+      - "3000:3000"
   webui:
     working_dir: /code
     volumes:
@@ -139,6 +136,7 @@ services:
       dockerfile: ./webui/Dockerfile-hotreload
     links:
       - api
+      - havenapi
       - keycloak
     ports:
       - "2015:2016"

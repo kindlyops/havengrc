@@ -14,12 +14,12 @@
     <div class="mdc-layout-grid">
         <div class="mdc-layout-grid__inner container-margin">
             <form action="${url.accountUrl}" class="mdc-layout-grid__cell--span-12" id="AccountForm" method="post">
-                <input type="hidden" id="stateChecker" name="stateChecker" value="${stateChecker?html}">
+                <input type="hidden" id="stateChecker" name="stateChecker" value="${stateChecker}">
 
                 <#if !realm.registrationEmailAsUsername>
                     <div class="${messagesPerField.printIfExists('username','has-error')}">
                         <div class="mdc-textfield" data-mdc-auto-init="MDCTextfield">
-                            <input type="text" class="mdc-textfield__input" id="username" name="username" <#if !realm.editUsernameAllowed>disabled="disabled"</#if> value="${(account.username!'')?html}"/>
+                            <input type="text" class="mdc-textfield__input" id="username" name="username" <#if !realm.editUsernameAllowed>disabled="disabled"</#if> value="${(account.username!'')}"/>
                             <label for="username" class="mdc-textfield__label">${msg("username")}</label> <#if realm.editUsernameAllowed><span class="required">*</span></#if>
                         </div>
                     </div>
@@ -27,21 +27,21 @@
 
                 <div class="${messagesPerField.printIfExists('email','has-error')}">
                     <div class="mdc-textfield" data-mdc-auto-init="MDCTextfield">
-                        <input type="text" class="mdc-textfield__input" id="email" name="email" required autofocus value="${(account.email!'')?html}"/>
+                        <input type="text" class="mdc-textfield__input" id="email" name="email" required autofocus value="${(account.email!'')}"/>
                         <label for="email" class="mdc-textfield__label">${msg("email")}</label>
                     </div>
                 </div>
 
                 <div class="${messagesPerField.printIfExists('firstName','has-error')}">
                     <div class="mdc-textfield" data-mdc-auto-init="MDCTextfield">
-                        <input type="text" class="mdc-textfield__input" id="firstName" name="firstName" value="${(account.firstName!'')?html}" required/>
+                        <input type="text" class="mdc-textfield__input" id="firstName" name="firstName" value="${(account.firstName!'')}" required/>
                         <label for="firstName" class="mdc-textfield__label">${msg("firstName")}</label>
                     </div>
                 </div>
 
                 <div class="${messagesPerField.printIfExists('lastName','has-error')}">
                     <div class="mdc-textfield" data-mdc-auto-init="MDCTextfield">
-                        <input type="text" class="mdc-textfield__input" id="lastName" name="lastName" value="${(account.lastName!'')?html}" required/>
+                        <input type="text" class="mdc-textfield__input" id="lastName" name="lastName" value="${(account.lastName!'')}" required/>
                         <label for="lastName" class="mdc-textfield__label">${msg("lastName")}</label>
                     </div>
                 </div>
@@ -49,7 +49,7 @@
 
                 <div class="form-btn">
                     <#if url.referrerURI??><a href="${url.referrerURI}">${msg("backToApplication")}/a></#if>
-                    <button type="submit" class="mdc-button mdc-button--raised mdc-button--primary" name="submitAction" value="Save">${msg("doSave")}</button>
+                    <button type="submit" class="mdc-button mdc-button--raised mdc-button--accent" name="submitAction" value="Save">${msg("doSave")}</button>
                     <button type="submit" class="mdc-button mdc-button--raised" name="submitAction" value="Cancel">${msg("doCancel")}</button>
                 </div>
 

@@ -38,10 +38,10 @@ and [Reasonable CSS](http://rscss.io/) to try and keep the CSS manageable.
 
 ## setting up the dev environment
 
-The db schema and migrations are managed using sqitch.
-The postgresql server, the postgrest API server, and the sqitch tool
+The db schema and migrations are managed using flyway.
+The postgresql server, the postgrest API server, and the flyway tool
 are all run from docker containers to reduce the need for
-local toolchain installation (perl, haskell, postgresql)
+local toolchain installation (java, haskell, postgresql)
 
 To check and see if you have docker available and set up
 
@@ -77,17 +77,9 @@ you to configure 2Factor authentication.
 
 Open http://localhost:3002/
 
-## to access tellform
-
-Open http://localhost:3000/, you can sign in with admin/admin in the dev env.
-
 ## to access keycloak
 
 Open http://localhost:8080/, you can sign in with admin/admin
-
-## to access the marketing site
-
-Open http://localhost:5000/
 
 ## to access the GitBook documentation site
 
@@ -109,7 +101,7 @@ First enter the keycloak container
 
 Now run the keycloak server command with export strategies defined
 
-    /opt/jboss/keycloak/bin/standalone.sh -Dkeycloak.migration.action=export -Dkeycloak.migration.provider=dir -Dkeycloak.migration.dir=/keycloak -Dkeycloak.migration.usersExportStrategy=REALM_FILE -Dkeycloak.migration.realmName=havendev
+    /opt/jboss/keycloak/bin/standalone.sh -Dkeycloak.migration.action=export -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.file=havendev-realm.json -Djboss.http.port=8888 -Djboss.https.port=9999 -Djboss.management.http.port=7777
 
 ## To clear local storage in Chrome for your local site
 
@@ -137,47 +129,33 @@ If you have a paid ngrok plan, something like this should work
 
 ## add a database migration
 
-    docker-compose run sqitch add foo -n "Add the foo table"
-
-Edit deploy/foo.sql
+Add a new sql file in flyway/sql, following the naming convention
+for versions.
 
 ```SQL
-BEGIN;
-
 CREATE TABLE mappa.foo
 (
   name text NOT NULL PRIMARY KEY
 );
 
-COMMIT;
 ```
 
-Edit revert/foo.sql
-
-```SQL
-BEGIN;
-
-DROP TABLE mappa.foo CASCADE;
-
-COMMIT;
-```
-
-    docker-compose run sqitch deploy # applies changes
-    docker-compose run sqitch revert # reverts changes
+    docker-compose run flyway # applies migrations
+    docker-compose run flyway # reverts last migration
     # repeat until satisfied
     git add .
     git commit -m "Adding foo table"
 
 ## look around inside the database
 
-The psql client is installed in the sqitch image, and can connect
-to the DB server running in the database image.
+The psql client is installed in the flyway image, and can connect
+to the DB server running in the database container.
 
-    docker-compose run --entrypoint="psql -h db -U postgres" sqitch
+    docker-compose run --entrypoint="psql -h db -U postgres mappamundi_dev" flyway
     \l                          # list databases in this server
-    \connect mappamundi_dev     # connect to a database
     \dn                         # show the schemas
-    \dt                         # show the tables
+    \dt mappa.*                 # show the tables in the mappa schema
+    SET ROLE member;						# assume the member role
     SELECT * from foo LIMIT 1;  # run arbitrary queries
     \q                          # disconnect
 
@@ -218,25 +196,69 @@ Then you can use that token by passing it in an Authorization header:
 
     $ curl -v -H "Authorization: Bearer \$TOKEN" http://localhost:3001/comment
 
+To read a file from the database:
+
+    $ curl -H "Authorization: Bearer $TOKEN" -H "Accept: application/octet-stream" http://localhost:3001/file?select=file --output result.pdf
+
+To upload a base64 encoded file to the database via postgrest:
+
+    $ curl -X POST -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' http://localhost:3001/file -d '{"file": "'"$(base64 apitest/features/minimal.pdf)"'"}'
+
 TODO: We will need an upgraded version of postgrest with a fix for https://github.com/begriffs/postgrest/issues/906.
 We also need to modify the user signup process to set up the roles correctly.
+
+To upload a file to the database via havenapi:
+
+    $ curl -X POST -H "Authorization: Bearer $TOKEN" -F "name=filename.pdf" -F "file=@apitest/features/minimal.pdf" http://localhost:3000/api/files
 
 You can decode the token to inspect the contents at jwt.io. You will need to get the public cert from
 the Keycloak Admin interface: Havendev->Realm Settings->Keys->Public Key and enter it into the jwt.io page to decode the token.
 
-## Deploying with kubernetes
+## Deploying with kubernetes / OpenShift
 
-To create a new release, go to https://github.com/kindlyops/mappamundi/releases
-and click 'Draft a new release'. Put a tag in incrementing the version. The
-new tag will create a release and will trigger a CircleCI release build, which
-will push a new container tagged with the version of the release.
+Branches merged to master will push new docker images to the OpenShift cluster.
 
-You can see the available container tags at https://hub.docker.com/r/kindlyops/havenweb/tags/
+### Using OpenShift
 
-Then tell kubernetes to update the image used by the havenweb deployment to the
-new tag
-    kubectl set image deployment/havenweb-deployment havenweb=kindlyops/havenweb:v0.0.2
+Talk to your administrator about getting an OpenShift account set up. Once you have
+access to Kubernetes / OpenShift, you can use the `oc` command to interact with the
+platform and update Haven GRC deployments.
 
-You can check on the progress of the deployment
+To get useful information to get oriented and find out what is happening:
 
-    kubectl rollout status deployment/havenweb-deployment
+    $ oc whoami
+		$ oc project
+		$ oc status -v
+		$ oc get events
+
+OpenShift CLI versions vary depending on where you installed from. Installing via homebrew `brew install openshift-cli` on macOS is fresher than installing from the link in OpenShift web console. (We ran into a difference in command flags needed with different versions of `oc`).
+
+### Using helm
+
+To set up helm:
+
+		# download and unpack the current helm release
+		# make sure your openshift client is authenticated to haven-production
+		$ oc whoami
+		$ oc project
+		$ export TILLER_NAMESPACE=haven-tiller # this will be unique to your OpenShift cluster
+    $ helm init --client-only
+		$ helm version
+
+To update the deployment of helm to a new version, you must edit the tag used
+and then apply the update.
+
+    $ oc project $TILLER_NAMESPACE # switch to your tiller project
+		$ vim k8s/tiller-template.yaml # edit the tiller image tag to the desired version
+		$ oc process -f k8s/tiller-template.yaml -p TILLER_NAMESPACE="${TILLER_NAMESPACE}" | oc replace -f -
+		$ oc rollout status deployment tiller # watch the status of the rollout
+		$ helm versions # confirm the version change took effect.
+
+### Database resource
+
+In your Kubernetes cluster there must be an ExternalName Service defined named `db`. If your administrator has
+alread set this up, you can see the endpoint by running:
+
+    $ oc get services
+
+There must also be secrets set up with the DB credentials.
