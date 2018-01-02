@@ -10,7 +10,6 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput, onWithOptions, on)
 import Json.Decode as Json
 import Keycloak
-import Misc exposing (showDebugData)
 import Page.Comments
 import View.LineChart as LineChart
 import View.Spinner exposing (spinner)
@@ -139,7 +138,8 @@ snackBar model =
         , attribute "aria-live" "assertive"
         , attribute "aria-atomic" "true"
         , attribute "aria-hidden" "true"
-          -- , onClick (Types.ShowError "this is an error message")
+
+        -- , onClick (Types.ShowError "this is an error message")
         ]
         [ div [ class "mdc-snackbar__text" ] []
         , div [ class "mdc-snackbar__action-wrapper" ]
@@ -196,17 +196,7 @@ reportsBody : Model -> Html Msg
 reportsBody model =
     div []
         [ div []
-              [ text "This is the reports view" ]
-        ]
-
-
-commentsBody : Model -> Html Msg
-commentsBody model =
-    div []
-        [ text "This is the comments view"
-        , ul []
-            (List.map (\l -> li [] [ text (l.message ++ " - " ++ l.user_email ++ "(" ++ l.user_id ++ ")" ++ " posted at " ++ l.created_at) ]) model.comments)
-        , commentsForm model
+            [ text "This is the reports view" ]
         ]
 
 
@@ -227,8 +217,8 @@ activityBody model =
     in
         div []
             [ div []
-                  [ text "What is Risk Management?" ]
-            ,  LineChart.view data
+                [ text "What is Risk Management?" ]
+            , LineChart.view data
             ]
 
 
