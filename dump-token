@@ -1,0 +1,4 @@
+#!/bin/bash
+TOKEN=`./get-token`
+IFS=. read header payload signature <<<"${TOKEN}"
+echo -n $payload|base64 -d -i| jq .
