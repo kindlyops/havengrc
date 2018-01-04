@@ -192,7 +192,18 @@ reportsBody : Model -> Html Msg
 reportsBody model =
     div []
         [ div []
-              [ text "This is the reports view" ]
+              [ text "This is the reports view"
+              , ol []
+                  [ li []
+                      [ a [ href "../pdf.js/web/viewer.html?file=haven-booth-concepts.pdf", target "_blank", class "pdf-viewer" ]
+                          [ text "Report" ]
+                      ]
+                  , li []
+                      [ a [ href "../pdf.js/web/viewer.html", target "_blank", class "pdf-viewer" ]
+                          [ text "Same report" ]
+                      ]
+                  ]
+              ]
         ]
 
 
