@@ -45,17 +45,22 @@ services:
       - ./keycloak/themes/haven:/opt/jboss/keycloak/themes/haven
       - ./keycloak/data:/keycloak
     command: ["-b", "0.0.0.0", "-Dkeycloak.migration.file=/keycloak/havendev-realm.json", "-Dkeycloak.migration.strategy=IGNORE_EXISTING", "-Dkeycloak.migration.provider=singleFile", "-Dkeycloak.migration.action=import"]
-  sqitch:
+  flyway:
     build:
-      context: .
-    working_dir: /src
+      context: flyway/
     volumes:
-      - .:/src
+      - ./flyway/sql:/flyway/sql
+    environment:
+      - FLYWAY_URL=jdbc:postgresql://db/mappamundi_dev
+      - FLYWAY_USER=postgres
+      - FLYWAY_PASSWORD=postgres
+      - FLYWAY_IGNORE_MISSING_MIGRATIONS=true
+      - FLYWAY_GROUP=true
+      - FLYWAY_SCHEMAS=mappa,1
+      - FLYWAY_PLACEHOLDERS_DATABASEUSER=postgres
+    command: ["migrate", "-placeholders.databaseUser=postgres"]
     links:
-      - keycloak
-    depends_on:
-      - start_dependencies
-    command: [deploy]
+      - db
   apitest:
     build:
       context: .
@@ -91,7 +96,7 @@ services:
     links:
       - db
     depends_on:
-      - sqitch
+      - flyway
   swagger:
     image: havengrc-docker.jfrog.io/swaggerapi/swagger-ui:v3.0.2
     ports:

@@ -1,0 +1,6 @@
+#!/bin/bash
+
+USERNAME=${1:-user1@havengrc.com}
+PASSWORD=${2:-password}
+SERVER=${3:-http://localhost:2015/auth/realms/havendev/protocol/openid-connect/token}
+curl -s --data "grant_type=password&client_id=havendev&scope=openid&username=$USERNAME&password=$PASSWORD" $SERVER| jq -r '.access_token'

@@ -1,7 +1,5 @@
 -- Deploy mappamundi:files to pg
 
-BEGIN;
-
 -- for these three columns we never let the caller control the contents
 CREATE OR REPLACE FUNCTION mappa.func_override_file_columns()
 RETURNS TRIGGER AS $$
@@ -9,7 +7,7 @@ BEGIN
   IF NEW.uuid IS NOT NULL THEN
     RAISE EXCEPTION 'You must not send uuid field';
   ELSE
-    NEW.uuid = uuid_generate_v4();
+    NEW.uuid = mappa.uuid_generate_v4();
   END IF;
   IF NEW.created_at IS NOT NULL THEN
     RAISE EXCEPTION 'You must not send created_at field';
@@ -51,5 +49,3 @@ CREATE OR REPLACE VIEW "1".files as
 GRANT SELECT, INSERT ON mappa.files to member;
 GRANT all ON "1".files to member;
 
-
-COMMIT;

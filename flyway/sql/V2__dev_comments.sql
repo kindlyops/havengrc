@@ -1,11 +1,6 @@
 -- Deploy mappamundi:dev to pg
 
-BEGIN;
-
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
-CREATE SCHEMA "1";
-CREATE SCHEMA mappa;
 
 -- the schema "1" is our versioned public API
 -- the schema mappa is private
@@ -24,7 +19,7 @@ BEGIN
   IF NEW.uuid IS NOT NULL THEN
     RAISE EXCEPTION 'You must not send uuid field';
   ELSE
-    NEW.uuid = uuid_generate_v4();
+    NEW.uuid = mappa.uuid_generate_v4();
   END IF;
   IF NEW.created_at IS NOT NULL THEN
     RAISE EXCEPTION 'You must not send created_at field';
@@ -67,5 +62,3 @@ CREATE OR REPLACE VIEW "1".comments as
 
 GRANT SELECT, INSERT ON mappa.comments to member;
 GRANT all ON "1".comments to member;
-
-COMMIT;

@@ -38,10 +38,10 @@ and [Reasonable CSS](http://rscss.io/) to try and keep the CSS manageable.
 
 ## setting up the dev environment
 
-The db schema and migrations are managed using sqitch.
-The postgresql server, the postgrest API server, and the sqitch tool
+The db schema and migrations are managed using flyway.
+The postgresql server, the postgrest API server, and the flyway tool
 are all run from docker containers to reduce the need for
-local toolchain installation (perl, haskell, postgresql)
+local toolchain installation (java, haskell, postgresql)
 
 To check and see if you have docker available and set up
 
@@ -129,47 +129,33 @@ If you have a paid ngrok plan, something like this should work
 
 ## add a database migration
 
-    docker-compose run sqitch add foo -n "Add the foo table"
-
-Edit deploy/foo.sql
+Add a new sql file in flyway/sql, following the naming convention
+for versions.
 
 ```SQL
-BEGIN;
-
 CREATE TABLE mappa.foo
 (
   name text NOT NULL PRIMARY KEY
 );
 
-COMMIT;
 ```
 
-Edit revert/foo.sql
-
-```SQL
-BEGIN;
-
-DROP TABLE mappa.foo CASCADE;
-
-COMMIT;
-```
-
-    docker-compose run sqitch deploy # applies changes
-    docker-compose run sqitch revert # reverts changes
+    docker-compose run flyway # applies migrations
+    docker-compose run flyway # reverts last migration
     # repeat until satisfied
     git add .
     git commit -m "Adding foo table"
 
 ## look around inside the database
 
-The psql client is installed in the sqitch image, and can connect
-to the DB server running in the database image.
+The psql client is installed in the flyway image, and can connect
+to the DB server running in the database container.
 
-    docker-compose run --entrypoint="psql -h db -U postgres" sqitch
+    docker-compose run --entrypoint="psql -h db -U postgres mappamundi_dev" flyway
     \l                          # list databases in this server
-    \connect mappamundi_dev     # connect to a database
     \dn                         # show the schemas
-    \dt                         # show the tables
+    \dt mappa.*                 # show the tables in the mappa schema
+    SET ROLE member;						# assume the member role
     SELECT * from foo LIMIT 1;  # run arbitrary queries
     \q                          # disconnect
 
