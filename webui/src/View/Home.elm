@@ -195,7 +195,7 @@ reportsBody model =
               [ text "This is the reports view"
               , ol []
                   [ li []
-                      [ a [ href "../pdf.js/web/viewer.html", target "_blank", class "pdf-viewer" ]
+                      [ a [ href "../pdf.js/web/viewer.html?file=haven-booth-concepts.pdf", target "_blank", class "pdf-viewer" ]
                           [ text "Report" ]
                       ]
                   , li []
