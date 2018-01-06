@@ -169,7 +169,7 @@ workflows:
       - keycloak-build-job
       - havenapi-build-job
       - postgrest-build-job
-      - avenapi-testing-job:
+      - havenapi-testing-job:
           requires:
             - flyway-build-job
             - keycloak-build-job
@@ -178,7 +178,7 @@ workflows:
       - approve-deploy:
           type: approval
           requires:
-            - test
+            - havenapi-testing-job
       - deploy-staging:
           requires:
             - approve-deploy
