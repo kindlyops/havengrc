@@ -132,9 +132,10 @@ jobs:
             - FLYWAY_SCHEMAS: mappa,1
             - FLYWAY_PLACEHOLDERS_DATABASEUSER: circleci
           command: |
-            docker run -d --name keycloak kindlyops/keycloak:$CIRCLE_SHA1
             # wait for DB
             dockerize -wait tcp://localhost:5432 -timeout 1m
+            # start keycloak in background container
+            docker run -d --name keycloak kindlyops/keycloak:$CIRCLE_SHA1
             # Wait for keycloak
             docker run --network container:keycloak jwilder/dockerize  -wait tcp://localhost:8080 -timeout 1m
             docker run -it --network container:keycloak kindlyops/havenflyway:$CIRCLE_SHA1 migrate
@@ -182,6 +183,7 @@ workflows:
           type: approval
           requires:
             - havenapi-testing-job
+            - webui-build-job
       - deploy-staging:
           requires:
             - approve-deploy
