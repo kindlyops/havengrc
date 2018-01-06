@@ -106,9 +106,9 @@ jobs:
       - image: circleci/ruby:2.4
       - image: circleci/postgres:9.6.4-alpine
         environment:
-          POSTGRES_USER: circleci
-          POSTGRES_DB: mappamundi_dev
-          POSTGRES_PASSWORD: ""
+          - POSTGRES_USER: circleci
+          - POSTGRES_DB: mappamundi_dev
+          - POSTGRES_PASSWORD: ""
     steps:
       - checkout
       - add_ssh_keys
@@ -117,20 +117,20 @@ jobs:
       - run:
           name: Run tests
           environment:
-            - POSTGRES_DATABASE=mappamundi_dev
-            - POSTGRES_USER=circleci
-            - POSTGRES_PASSWORD=circleci
-            - POSTGRES_PORT_5432_TCP_ADDR=localhost
-            - KEYCLOAK_USER=admin
-            - KEYCLOAK_PASSWORD=admin
-            - PROXY_ADDRESS_FORWARDING=true
-            - FLYWAY_URL=jdbc:postgresql://localhost/mappamundi_dev
-            - FLYWAY_USER=circleci
-            - FLYWAY_PASSWORD=
-            - FLYWAY_IGNORE_MISSING_MIGRATIONS=true
-            - FLYWAY_GROUP=true
-            - FLYWAY_SCHEMAS=mappa,1
-            - FLYWAY_PLACEHOLDERS_DATABASEUSER=circleci
+            - POSTGRES_DATABASE: mappamundi_dev
+            - POSTGRES_USER: circleci
+            - POSTGRES_PASSWORD: circleci
+            - POSTGRES_PORT_5432_TCP_ADDR: localhost
+            - KEYCLOAK_USER: admin
+            - KEYCLOAK_PASSWORD: admin
+            - PROXY_ADDRESS_FORWARDING: true
+            - FLYWAY_URL: jdbc:postgresql://localhost/mappamundi_dev
+            - FLYWAY_USER: circleci
+            - FLYWAY_PASSWORD:
+            - FLYWAY_IGNORE_MISSING_MIGRATIONS: true
+            - FLYWAY_GROUP: true
+            - FLYWAY_SCHEMAS: mappa,1
+            - FLYWAY_PLACEHOLDERS_DATABASEUSER: circleci
           command: |
             docker run -d --name keycloak kindlyops/keycloak:$CIRCLE_SHA1
             # wait for DB
@@ -141,6 +141,9 @@ jobs:
             # TODO run havenapibuffalo test
             # TODO run cucumber test
   deploy-staging:
+    docker:
+      - image: circleci/ruby:2.4
+    steps:
       - add_ssh_keys
       - setup_remote_docker:
           docker_layer_caching: true
