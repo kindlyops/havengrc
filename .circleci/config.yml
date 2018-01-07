@@ -104,11 +104,6 @@ jobs:
   havenapi-testing-job:
     docker:
       - image: circleci/ruby:2.4
-      - image: circleci/postgres:9.6.4-alpine
-        environment:
-          - POSTGRES_USER: circleci
-          - POSTGRES_DB: mappamundi_dev
-          - POSTGRES_PASSWORD: ""
     steps:
       - checkout
       - add_ssh_keys
@@ -117,6 +112,9 @@ jobs:
       - run:
           name: Run tests
           environment:
+            - POSTGRES_USER: circleci
+            - POSTGRES_DB: mappamundi_dev
+            - POSTGRES_PASSWORD: ""
             - POSTGRES_DATABASE: mappadmundi_dev
             - POSTGRES_USER: circleci
             - POSTGRES_PORT_5432_TCP_ADDR: localhost
@@ -130,14 +128,16 @@ jobs:
             - FLYWAY_SCHEMAS: mappa,1
             - FLYWAY_PLACEHOLDERS_DATABASEUSER: circleci
           command: |
+            docker run -d -e POSTGRES_USER -e POSTGRES_DB -e POSTGRES_PASSWORD --name db circleci/postgres:9.6.4-alpine
             # wait for DB
-            dockerize -wait tcp://localhost:5432 -timeout 1m
+            docker run --network container:db jwilder/dockerize -wait tcp://localhost:5432 -timeout 1m
             # start keycloak in background container
-            docker run -d -e POSTGRES_DATABASE -e POSTGRES_USER -e POSTGRES_PORT_5432_TCP_ADDR -e KEYCLOAK_USER -e KEYCLOAK_PASSWORD -e PROXY_ADDRESS_FORWARDING --name keycloak kindlyops/keycloak:$CIRCLE_SHA1
+            docker run --network container:db -d -e POSTGRES_DATABASE -e POSTGRES_USER -e POSTGRES_PORT_5432_TCP_ADDR -e KEYCLOAK_USER -e KEYCLOAK_PASSWORD -e PROXY_ADDRESS_FORWARDING --name keycloak kindlyops/keycloak:$CIRCLE_SHA1
             # Wait for keycloak
-            docker run --network container:keycloak jwilder/dockerize  -wait tcp://localhost:8080 -timeout 1m
-            docker run -e FLYWAY_URL -e FLYWAY_USER -e FLYWAY_IGNORE_MISSING_MIGRATIONS -e FLYWAY_GROUP -e FLYWAY_SCHEMAS -e FLYWAY_PLACEHOLDERS_DATABASEUSER --network container:keycloak kindlyops/havenflyway:$CIRCLE_SHA1 migrate
+            docker run --network container:db jwilder/dockerize  -wait tcp://localhost:8080 -timeout 2m
+            docker run --network container:db -e FLYWAY_URL -e FLYWAY_USER -e FLYWAY_IGNORE_MISSING_MIGRATIONS -e FLYWAY_GROUP -e FLYWAY_SCHEMAS -e FLYWAY_PLACEHOLDERS_DATABASEUSER kindlyops/havenflyway:$CIRCLE_SHA1 migrate
             # TODO run havenapibuffalo test
+            # TODO build the testing container
             # TODO run cucumber test
   deploy-staging:
     docker:
