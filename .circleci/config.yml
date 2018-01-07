@@ -148,7 +148,7 @@ jobs:
             docker run --network container:db jwilder/dockerize  -wait tcp://localhost:8080 -timeout 2m
             docker run --network container:db -e FLYWAY_URL -e FLYWAY_USER -e FLYWAY_IGNORE_MISSING_MIGRATIONS -e FLYWAY_GROUP -e FLYWAY_SCHEMAS kindlyops/havenflyway:$CIRCLE_SHA1 migrate -placeholders.databaseUser=circleci
             # create dummy DB to work around https://github.com/markbates/pop/issues/175
-            docker run --network container:db circleci/postgres:9.6.4-alpine /usr/local/bin/createdb -h localhost -U circleci circlecl
+            docker run --network container:db circleci/postgres:9.6.4-alpine /usr/local/bin/createdb -h localhost -U circleci circleci
             # creating dummy container which will hold a volume with config
             docker create -v /cfg --name configs alpine:3.4 /bin/true
             docker cp postgrest/keycloak-dev-public-key.json configs:/cfg
