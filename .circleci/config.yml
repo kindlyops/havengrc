@@ -10,7 +10,7 @@ jobs:
           name: Check docker version
           command: docker -v
       - restore_cache:
-          key: sysconfcpus
+          key: sysconfcpu
       - run:
           name: Install sysconfcpus
           command: |
@@ -23,7 +23,7 @@ jobs:
               cd ..;
             fi
       - save_cache:
-          key: sysconfcpus
+          key: sysconfcpu
           paths:
             - ../sysconfcpus
       - restore_cache:
