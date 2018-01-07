@@ -120,11 +120,11 @@ jobs:
             - POSTGRES_PORT_5432_TCP_ADDR: localhost
             - KEYCLOAK_USER: admin
             - KEYCLOAK_PASSWORD: admin
-            - PROXY_ADDRESS_FORWARDING: true
-            - FLYWAY_URL: jdbc:postgresql://localhost/mappamundi_dev
+            - PROXY_ADDRESS_FORWARDING: "true"
+            - FLYWAY_URL: "jdbc:postgresql://localhost/mappamundi_dev"
             - FLYWAY_USER: circleci
-            - FLYWAY_IGNORE_MISSING_MIGRATIONS: true
-            - FLYWAY_GROUP: true
+            - FLYWAY_IGNORE_MISSING_MIGRATIONS: "true"
+            - FLYWAY_GROUP: "true"
             - FLYWAY_SCHEMAS: mappa,1
             - FLYWAY_PLACEHOLDERS_DATABASEUSER: circleci
           command: |
