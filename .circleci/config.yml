@@ -126,6 +126,8 @@ jobs:
             - FLYWAY_IGNORE_MISSING_MIGRATIONS: "true"
             - FLYWAY_GROUP: "true"
             - FLYWAY_SCHEMAS: mappa,1
+            - HAVEN_JWK_PATH: /cfg/keycloak-dev-public-key.json
+            - TEST_DATABASE_URL: postgres://circlec@localhost:5432/mappamundi_test?sslmode=disable"
           command: |
             docker run -d -e POSTGRES_USER -e POSTGRES_DB -e POSTGRES_PASSWORD --name db circleci/postgres:9.6.4-alpine
             # wait for DB
@@ -135,7 +137,10 @@ jobs:
             # Wait for keycloak
             docker run --network container:db jwilder/dockerize  -wait tcp://localhost:8080 -timeout 2m
             docker run --network container:db -e FLYWAY_URL -e FLYWAY_USER -e FLYWAY_IGNORE_MISSING_MIGRATIONS -e FLYWAY_GROUP -e FLYWAY_SCHEMAS kindlyops/havenflyway:$CIRCLE_SHA1 migrate -placeholders.databaseUser=circleci
-            # TODO run havenapibuffalo test
+            # creating dummy container which will hold a volume with config
+            docker create -v /cfg --name configs alpine:3.4 /bin/true
+            docker cp postgrest/keycloak-dev-public-key.json configs:/cfg
+            docker run --volumes-from configs --network container:db -e TEST_DATABASE_URL -e HAVEN_JWK_PATH kindlyops/havenapi:$CIRCLE_SHA1 buffalo test
             # TODO build the testing container
             # TODO run cucumber test
   deploy-staging:
