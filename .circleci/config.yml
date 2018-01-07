@@ -35,7 +35,7 @@ jobs:
             - ./webui/node_modules
       - run:
           name: compile Elm project
-          command: npm run-script build
+          command: sysconfcpus -n 2 npm run-script build
           no_output_timeout: 20m
           working_directory: webui
       - setup_remote_docker:
@@ -146,7 +146,7 @@ jobs:
             # creating dummy container which will hold a volume with config
             docker create -v /cfg --name configs alpine:3.4 /bin/true
             docker cp postgrest/keycloak-dev-public-key.json configs:/cfg
-            docker run --volumes-from configs --network container:db -e TEST_DATABASE_URL -e HAVEN_JWK_PATH kindlyops/havenapi:$CIRCLE_SHA1 /go/bin/buffalo test
+            docker run --volumes-from configs --network container:db -e TEST_DATABASE_URL -e HAVEN_JWK_PATH kindlyops/havenapi:$CIRCLE_SHA1 /home/havenuser/app test
             # TODO build the testing container
             # TODO run cucumber test
   deploy-staging:
