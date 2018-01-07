@@ -134,7 +134,7 @@ jobs:
             docker run --network container:db -d -e POSTGRES_DATABASE -e POSTGRES_USER -e POSTGRES_PORT_5432_TCP_ADDR -e KEYCLOAK_USER -e KEYCLOAK_PASSWORD -e PROXY_ADDRESS_FORWARDING --name keycloak kindlyops/keycloak:$CIRCLE_SHA1
             # Wait for keycloak
             docker run --network container:db jwilder/dockerize  -wait tcp://localhost:8080 -timeout 2m
-            docker run --network container:db -e FLYWAY_URL -e FLYWAY_USER -e FLYWAY_IGNORE_MISSING_MIGRATIONS -e FLYWAY_GROUP -e FLYWAY_SCHEMAS -e kindlyops/havenflyway:$CIRCLE_SHA1 migrate -placeholders.databaseUser=circleci
+            docker run --network container:db -e FLYWAY_URL -e FLYWAY_USER -e FLYWAY_IGNORE_MISSING_MIGRATIONS -e FLYWAY_GROUP -e FLYWAY_SCHEMAS kindlyops/havenflyway:$CIRCLE_SHA1 migrate -placeholders.databaseUser=circleci
             # TODO run havenapibuffalo test
             # TODO build the testing container
             # TODO run cucumber test
