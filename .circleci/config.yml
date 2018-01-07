@@ -14,14 +14,18 @@ jobs:
       - run:
           name: Install sysconfcpus
           command: |
-            if [ ! -d sysconfcpus/bin ];
+            if [ ! -d $HOME/sysconfcpus/bin ];
             then
               git clone https://github.com/obmarg/libsysconfcpus.git;
               cd libsysconfcpus;
-              ./configure --prefix="$HOME/$CIRCLE_PROJECT_REPONAME/sysconfcpus";
+              ./configure --prefix="$HOME/sysconfcpus";
               make && make install;
               cd ..;
             fi
+      - save_cache:
+          key: sysconfcpus
+          paths:
+            - $HOME/sysconfcpus
       - restore_cache:
           key: dependency-cache-{{ checksum "webui/package.json" }}
       - run:
@@ -35,7 +39,7 @@ jobs:
             - ./webui/node_modules
       - run:
           name: compile Elm project
-          command: ../sysconfcpus/bin/sysconfcpus -n 2 npm run-script build
+          command: $HOME/sysconfcpus/bin/sysconfcpus -n 2 npm run-script build
           no_output_timeout: 20m
           working_directory: webui
       - setup_remote_docker:
