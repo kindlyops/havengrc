@@ -35,7 +35,7 @@ jobs:
             - ./webui/node_modules
       - run:
           name: compile Elm project
-          command: sysconfcpus -n 2 npm run-script build
+          command: ../sysconfcpus/bin/sysconfcpus -n 2 npm run-script build
           no_output_timeout: 20m
           working_directory: webui
       - setup_remote_docker:
