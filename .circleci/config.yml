@@ -137,7 +137,7 @@ jobs:
             - FLYWAY_GROUP: "true"
             - FLYWAY_SCHEMAS: mappa,1
             - HAVEN_JWK_PATH: /cfg/keycloak-dev-public-key.json
-            - TEST_DATABASE_URL: postgres://circleci@localhost:5432/mappamundi_test?sslmode=disable"
+            - TEST_DATABASE_URL: postgres://circleci@localhost:5432/mappamundi_test?sslmode=disable
           command: |
             docker run -d -e POSTGRES_USER -e POSTGRES_DB -e POSTGRES_PASSWORD --name db circleci/postgres:9.6.4-alpine
             # wait for DB
