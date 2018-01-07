@@ -23,7 +23,8 @@ RUN addgroup -S havenuser && adduser -S -g havenuser havenuser && chown -R haven
 WORKDIR /home/havenuser
 
 COPY --from=builder /bin/app .
-RUN chown havenuser:havenuser /home/havenuser/app
+COPY --from=builder /go/bin/buffalo .
+RUN chown -R havenuser:havenuser /home/havenuser
 RUN chgrp -R 0 /home/havenuser &&chmod -R g=u /home/havenuser
 EXPOSE 3000
 

@@ -25,7 +25,7 @@ jobs:
       - save_cache:
           key: sysconfcpus
           paths:
-            - $HOME/sysconfcpus
+            - ../sysconfcpus
       - restore_cache:
           key: dependency-cache-{{ checksum "webui/package.json" }}
       - run:
@@ -150,7 +150,7 @@ jobs:
             # creating dummy container which will hold a volume with config
             docker create -v /cfg --name configs alpine:3.4 /bin/true
             docker cp postgrest/keycloak-dev-public-key.json configs:/cfg
-            docker run --volumes-from configs --network container:db -e TEST_DATABASE_URL -e HAVEN_JWK_PATH kindlyops/havenapi:$CIRCLE_SHA1 /home/havenuser/app test
+            docker run --volumes-from configs --network container:db -e TEST_DATABASE_URL -e HAVEN_JWK_PATH kindlyops/havenapi:$CIRCLE_SHA1 /home/havenuser/buffalo test
             # TODO build the testing container
             # TODO run cucumber test
   deploy-staging:
