@@ -10,7 +10,7 @@ WORKDIR $GOPATH/src/github.com/kindlyops/mappamundi/havenapi
 #ADD yarn.lock .
 #RUN yarn install --no-progress
 ADD . .
-RUN dep ensure
+RUN dep ensure -vendor-only
 RUN buffalo build --static -o /bin/app
 
 FROM alpine
