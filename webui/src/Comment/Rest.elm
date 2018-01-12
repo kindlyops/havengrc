@@ -5,7 +5,8 @@ import Json.Decode as Decode exposing (Decoder, field, succeed)
 import Json.Encode as Encode
 import Keycloak
 import Comment.Types exposing (..)
-import Types exposing (..)
+import Page.Comments
+import Authentication
 
 
 commentDecoder : Decoder Comment
@@ -29,7 +30,7 @@ commentsUrl =
     "/api/comments"
 
 
-getComments : Model -> Cmd Msg
+getComments : Page.Comments.Model -> Cmd Page.Comments.Msg
 getComments model =
     let
         request =
@@ -43,10 +44,10 @@ getComments model =
                 , withCredentials = True
                 }
     in
-        Http.send NewComments request
+        Http.send Page.Comments.NewComments request
 
 
-tryGetAuthHeader : Model -> List Http.Header
+tryGetAuthHeader : Authentication.Model -> List Http.Header
 tryGetAuthHeader model =
     case model.authModel.state of
         Keycloak.LoggedIn user ->
@@ -65,7 +66,7 @@ getReturnHeaders =
     [ (Http.header "Prefer" "return=representation") ]
 
 
-postComment : Model -> Cmd Msg
+postComment : Page.Comments.Model -> Cmd Page.Comments.Msg
 postComment model =
     let
         body =
@@ -89,4 +90,4 @@ postComment model =
                 , withCredentials = True
                 }
     in
-        Http.send NewComment request
+        Http.send Page.Comments.NewComment request

@@ -15,10 +15,10 @@ import View.LineChart as LineChart
 import View.Spinner exposing (spinner)
 import Route exposing (Location(..), locFor)
 import String exposing (toLower)
-import Types exposing (Model, Msg)
+import Types
 
 
-header : Model -> Html Msg
+header : Types.Model -> Html Types.Msg
 header model =
     div [ class "mdc-toolbar mdc-toolbar--fixed header" ]
         [ div [ class "mdc-toolbar__row" ]
@@ -48,7 +48,7 @@ getGravatar email =
         "https:" ++ url
 
 
-view : Model -> Keycloak.UserProfile -> Html Msg
+view : Types.Model -> Keycloak.UserProfile -> Html Types.Msg
 view model user =
     div [ class "container" ]
         [ div
@@ -116,7 +116,7 @@ view model user =
         ]
 
 
-selectedItem : Model -> String
+selectedItem : Types.Model -> String
 selectedItem model =
     let
         item =
@@ -130,7 +130,7 @@ selectedItem model =
                 String.toLower item.text
 
 
-snackBar : Model -> Html Msg
+snackBar : Types.Model -> Html Types.Msg
 snackBar model =
     div
         [ id "error-snackbar"
@@ -147,7 +147,7 @@ snackBar model =
         ]
 
 
-body : Model -> Html Msg
+body : Types.Model -> Html msg
 body model =
     div [ id "content" ]
         [ case model.route of
@@ -162,7 +162,7 @@ body model =
                 spinner
 
             Just Comments ->
-                Page.Comments.view model
+                Page.Comments.view model.authModel
 
             Just Activity ->
                 activityBody model
@@ -173,7 +173,7 @@ body model =
         ]
 
 
-dashboardBody : Model -> Html Msg
+dashboardBody : Types.Model -> Html Types.Msg
 dashboardBody model =
     let
         data =
@@ -192,7 +192,7 @@ dashboardBody model =
             ]
 
 
-reportsBody : Model -> Html Msg
+reportsBody : Types.Model -> Html Types.Msg
 reportsBody model =
     div []
         [ div []
@@ -205,7 +205,7 @@ onValueChanged tagger =
     on "value-changed" (Json.map tagger Html.Events.targetValue)
 
 
-activityBody : Model -> Html Msg
+activityBody : Types.Model -> Html Types.Msg
 activityBody model =
     let
         data =
@@ -222,7 +222,7 @@ activityBody model =
             ]
 
 
-notFoundBody : Model -> Html Msg
+notFoundBody : Types.Model -> Html Types.Msg
 notFoundBody model =
     div [] [ text "This is the notFound view" ]
 
@@ -243,7 +243,7 @@ menuItems =
     ]
 
 
-drawerMenuItem : Model -> MenuItem -> Html Msg
+drawerMenuItem : Types.Model -> MenuItem -> Html Types.Msg
 drawerMenuItem model menuItem =
     a
         [ attribute "name" (toLower menuItem.text)

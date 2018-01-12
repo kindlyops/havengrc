@@ -47,6 +47,19 @@ getHTTPErrorMessage error =
             (toString error)
 
 
+transitionTo : Maybe Route.Location -> Model -> ( Model, Cmd Msg )
+transitionTo maybeLocation model =
+    case maybeLocation of
+        Nothing ->
+            model ! []
+
+        Just location ->
+            model
+                ! [ Navigation.newUrl (Route.urlFor location)
+                  , Ports.setTitle (Route.titleFor location)
+                  ]
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -58,15 +71,7 @@ update msg model =
                 ( { model | authModel = authModel }, Cmd.map Types.AuthenticationMsg cmd )
 
         NavigateTo maybeLocation ->
-            case maybeLocation of
-                Nothing ->
-                    model ! []
-
-                Just location ->
-                    model
-                        ! [ Navigation.newUrl (Route.urlFor location)
-                          , Ports.setTitle (Route.titleFor location)
-                          ]
+            (transitionTo maybeLocation model)
 
         UrlChange location ->
             let
