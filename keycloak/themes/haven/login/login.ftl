@@ -60,7 +60,7 @@
     <div class="mdc-layout-grid__cell--span-6-desktop mdc-layout-grid__cell--span-4-tablet mdc-layout-grid__cell--span-6-phone registration-link">
         <#if realm.password && realm.registrationAllowed && !usernameEditDisabled??>
             <div id="Registration" style="align-self:center;">
-                <span>${msg("noAccount")} <a href="${url.registrationUrl}">${msg("doRegister")}</a></span>
+                <span>${msg("noAccount")} <a href="https://havengrc-test.chargebee.com/hosted_pages/plans/cbdemo_scale">${msg("doRegister")}</a></span>
             </div>
         </#if>
 
