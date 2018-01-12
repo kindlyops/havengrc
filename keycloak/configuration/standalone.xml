@@ -494,7 +494,7 @@
             <scheduled-task-interval>900</scheduled-task-interval>
             <theme>
                 <staticMaxAge>2592000</staticMaxAge>
-                <cacheThemes>true</cacheThemes>
+                <cacheThemes>false</cacheThemes>
                 <cacheTemplates>true</cacheTemplates>
                 <dir>${jboss.home.dir}/themes</dir>
                 <welcomeTheme>haven</welcomeTheme>
