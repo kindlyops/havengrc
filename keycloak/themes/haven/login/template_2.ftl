@@ -28,9 +28,19 @@
             <script src="${url.resourcesPath}/${script}" type="text/javascript"></script>
         </#list>
     </#if>
+    <#if properties.vendorjs?has_content>
+        <#list properties.vendorjs?split(' ') as vendorjs>
+            <script src="${vendorjs}" type="text/javascript"></script>
+        </#list>
+    </#if>
     <#if scripts??>
         <#list scripts as script>
             <script src="${script}" type="text/javascript"></script>
+        </#list>
+    </#if>
+    <#if vendorjs??>
+        <#list vendorjs as vendorscript>
+            <script src="${vendorscript}" type="text/javascript"></script>
         </#list>
     </#if>
 </head>
