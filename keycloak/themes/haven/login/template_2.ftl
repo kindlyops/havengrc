@@ -23,14 +23,14 @@
             <link href="${url.resourcesPath}/${style}" rel="stylesheet" />
         </#list>
     </#if>
+    <#if properties.chargebee_styles?has_content>
+        <#list properties.chargebee_styles?split(' ') as chargebee_style>
+            <link href="${url.resourcesPath}/${chargebee_style}" rel="stylesheet" />
+        </#list>
+    </#if>
     <#if properties.scripts?has_content>
         <#list properties.scripts?split(' ') as script>
             <script src="${url.resourcesPath}/${script}" type="text/javascript"></script>
-        </#list>
-    </#if>
-    <#if properties.vendorjs?has_content>
-        <#list properties.vendorjs?split(' ') as vendorjs>
-            <script src="${vendorjs}" type="text/javascript"></script>
         </#list>
     </#if>
     <#if scripts??>
@@ -38,9 +38,14 @@
             <script src="${script}" type="text/javascript"></script>
         </#list>
     </#if>
-    <#if vendorjs??>
-        <#list vendorjs as vendorscript>
-            <script src="${vendorscript}" type="text/javascript"></script>
+    <#if properties.chargebee_scripts?has_content>
+        <#list properties.chargebee_scripts?split(' ') as chargebee_script>
+            <script src="${chargebee_script}" type="text/javascript"></script>
+        </#list>
+    </#if>
+    <#if chargebee_scripts??>
+        <#list chargebee_scripts as chargebee_script>
+            <script src="${chargebee_script}" type="text/javascript"></script>
         </#list>
     </#if>
 </head>
