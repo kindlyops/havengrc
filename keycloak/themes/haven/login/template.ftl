@@ -43,6 +43,185 @@
             <script src="${vendorscript}" type="text/javascript"></script>
         </#list>
     </#if>
+    <script type="text/javascript">
+            // This parameter will decide to show the checkout page
+            // as pop up or as embeded in document
+            var popup = true;
+
+            jQuery.validator.setDefaults({
+                errorClass: "text-danger",
+                errorElement: "small"
+            });
+
+            $(document).ready(function() {
+                $("#subscribe-form").validate({
+                    rules: {
+                        zip_code: {number: true},
+                        phone: {number: true}
+                    }
+                });
+
+               function showProcessing() {
+                   $(".alert-danger").hide();
+                   $('.subscribe-process').show();
+               }
+
+               function subscribeResponseHandler(response){
+                   if(popup) {
+                       subscribeResponsePopupHandler(response);
+                   } else {
+                       subscribeResponseEmbedHandler(response);
+                   }
+               }
+
+
+              function subscribeResponsePopupHandler(response) {
+                   var hostedPageId = response.hosted_page_id;
+                   $('.subscribe-process').show();
+
+                   ChargeBee.bootStrapModal(response.url,
+                                    response.site_name, "paymentModal").load({
+
+                   /**
+                    * This function is called once the checkout form is loaded in the popup.
+                    */
+                   onLoad: function() {
+                       hideProcessing();
+                       $('.submit-btn').attr("disabled", "disabled");
+                    },
+
+                    /* This function will be called after subscribe button is clicked
+                     * and checkout is completed in the iframe checkout page.
+                     */
+                    onSuccess: function() {
+                        redirectCall(hostedPageId);
+                    },
+
+                    /* This function will be called after cancel button is clicked in
+                     * the iframe checkout page.
+                     */
+                    onCancel: function() {
+                        $(".alert-danger").show().text("Payment Aborted !!");
+                        $('.submit-btn').removeAttr("disabled");
+                    }
+                  });
+               }
+
+
+
+               function subscribeResponseEmbedHandler(response) {
+                    var hostedPageId = response.hosted_page_id;
+                    var customerContainer = $('#customer-info');
+                    var iframeContainer = $('#checkout-info');
+                    ChargeBee.embed(response.url, response.site_name).load({
+                       /*
+                        * This function will be called when iframe is created.
+                        * addIframe callback will recieve iframe as parameter.
+                        * you can use this iframe to add iframe to your page.
+                        * Loading image in container can also be showed in this callback.
+                        * Note: visiblity will be none for the iframe at this moment
+                        */
+                        addIframe: function(iframe) {
+                            iframeContainer.append(iframe);
+                        },
+
+                       /*
+                        * This function will be called once when iframe is loaded.
+                        * Since checkout pages are responsive you need to handle only height.
+                        */
+                        onLoad: function(iframe, width, height) {
+                            hideProcessing();
+                            $(customerContainer).slideUp(1000);
+                            var style= 'border:none;overflow:hidden;width:100%;';
+                            style = style + 'height:' + height + 'px;';
+                            style = style + 'display:none;';//This is for slide down effect
+                            iframe.setAttribute('style', style);
+                            $(iframe).slideDown(1000);
+                        },
+
+                        /*
+                         * This will be triggered when any content of iframe is resized.
+                         */
+                        onResize: function(iframe, width, height) {
+                            var style = 'border:none;overflow:hidden;width:100%;';
+                            style = style + 'height:' + height + 'px;';
+                            iframe.setAttribute('style',style);
+                        },
+
+                        /*
+                         * This will be triggered when checkout is complete.
+                         */
+                        onSuccess: function(iframe) {
+                            redirectCall(hostedPageId);
+                        },
+
+                        /*
+                         * This will be triggered when user clicks on cancel button.
+                         */
+                        onCancel: function(iframe) {
+                            $(iframe).slideDown(100,function (){
+                                $(iframeContainer).empty();
+                                $(customerContainer).slideDown(200);
+                            });
+                            $(".alert-danger").show().text("Payment Aborted !!");
+                        }
+                    });
+               }
+
+
+
+               function redirectCall(hostedPageId){
+                  window.location.href = "/checkout_iframe/redirect_handler?id="
+                      + encodeURIComponent(hostedPageId);
+
+               }
+
+               function hideProcessing(){
+                    $('.subscribe-process').hide();
+               }
+
+               /* This method is called if error is returned from the server.
+                */
+              function subscribeErrorHandler(jqXHR, textStatus, errorThrown) {
+                try{
+                     hideProcessing();
+                     var resp = JSON.parse(jqXHR.responseText);
+                     if ('error_param' in resp) {
+                       var errorMap = {};
+                        var errParam = resp.error_param;
+                        var errMsg = resp.error_msg;
+                        errorMap[errParam] = errMsg;
+                        $("#subscribe-form").validate().showErrors(errorMap);
+                     } else {
+                        var errMsg = resp.error_msg;
+                        $(".alert-danger").show().text(errMsg);
+                     }
+                    } catch(err) {
+                       $(".alert-danger").show().text("Error while processing your request");
+                    }
+                }
+
+
+               /* Doing ajax form submit of the form data.
+                */
+               $("#subscribe-form").on("submit", function(e) {
+                  if (!$(this).valid()) {
+                        return false;
+                  }
+                  var options = {
+                        beforeSend: showProcessing,
+                        error: subscribeErrorHandler,
+                        success: subscribeResponseHandler,
+                        contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                        dataType: 'json'
+                  };
+                  $(this).ajaxSubmit(options);
+                  return false;
+               })
+
+
+            })
+        </script>
 </head>
 
 <body class="${properties.kcBodyClass!}">
