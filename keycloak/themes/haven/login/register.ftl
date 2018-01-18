@@ -14,45 +14,45 @@
           <#if !realm.registrationEmailAsUsername>
           <div>
             <div class="mdc-textfield" data-mdc-auto-init="MDCTextfield">
-                    <input type="text" id="username" class="mdc-textfield__input" name="username" value="${(register.formData.username!'')}" required autofocus />
+                    <input type="text" id="username" class="mdc-textfield__input ignore" name="username" value="${(register.formData.username!'')}" required autofocus />
                     <label for="username" class="mdc-textfield__label">${msg("username")}</label>
             </div>
            </div>
           </#if>
           <div>
             <div class="mdc-textfield" data-mdc-auto-init="MDCTextfield">
-                    <input type="text" id="firstName" class="mdc-textfield__input" name="firstName" value="${(register.formData.firstName!'')}" required />
+                    <input type="text" id="firstName" class="mdc-textfield__input ignore" name="firstName" value="${(register.formData.firstName!'')}" required />
                     <label for="firstName" class="mdc-textfield__label">${msg("firstName")}</label>
             </div>
            </div>
            <div>
             <div class="mdc-textfield" data-mdc-auto-init="MDCTextfield">
-                    <input type="text" id="lastName" class="mdc-textfield__input" name="lastName" value="${(register.formData.lastName!'')}" required />
+                    <input type="text" id="lastName" class="mdc-textfield__input ignore" name="lastName" value="${(register.formData.lastName!'')}" required />
                     <label for="lastName" class="mdc-textfield__label">${msg("lastName")}</label>
             </div>
            </div>
            <div>
             <div class="mdc-textfield" data-mdc-auto-init="MDCTextfield">
-                    <input type="text" id="user.attributes.organization" class="mdc-textfield__input" name="user.attributes.organization" value="${(register.formData.organization!'')}" required />
+                    <input type="text" id="user.attributes.organization" class="mdc-textfield__input ignore" name="user.attributes.organization" value="${(register.formData.organization!'')}" required />
                     <label for="user.attributes.organization" class="mdc-textfield__label">${msg("organization")}</label>
             </div>
            </div>
            <div>
             <div class="mdc-textfield" data-mdc-auto-init="MDCTextfield">
-                    <input type="text" id="email" class="mdc-textfield__input" name="email" value="${(register.formData.email!'')}" required />
+                    <input type="text" id="email" class="mdc-textfield__input ignore" name="email" value="${(register.formData.email!'')}" required />
                     <label for="email" class="mdc-textfield__label">${msg("email")}</label>
             </div>
            </div>
             <#if passwordRequired>
            <div>
             <div class="mdc-textfield" data-mdc-auto-init="MDCTextfield">
-                    <input type="password" id="password" class="mdc-textfield__input" name="password" required />
+                    <input type="password" id="password" class="mdc-textfield__input ignore" name="password" required />
                     <label for="password" class="mdc-textfield__label">${msg("password")}</label>
             </div>
            </div>
            <div>
             <div class="mdc-textfield" data-mdc-auto-init="MDCTextfield">
-                    <input type="password" id="password-confirm" class="mdc-textfield__input" name="password-confirm" required />
+                    <input type="password" id="password-confirm" class="mdc-textfield__input ignore" name="password-confirm" required />
                     <label for="password-confirm" class="mdc-textfield__label">${msg("passwordConfirm")}</label>
             </div>
            </div>

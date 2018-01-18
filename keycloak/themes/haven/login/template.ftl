@@ -60,6 +60,7 @@
 
             $(document).ready(function() {
                 $("#kc-register-form").validate({
+                  ignore: ".ignore",
                     rules: {
                         //zip_code: {number: true},
                         //phone: {number: true}
@@ -184,7 +185,7 @@
 
 
                function redirectCall(hostedPageId){
-                  window.location.href = "//havengrc-test.chargebee.com/hosted_pages/plans/cbdemo_scale"
+                  window.location.href = "havengrc-test.chargebee.com/hosted_pages/plans/cbdemo_scale"
                   // "/checkout_iframe/redirect_handler?id="
                   //    + encodeURIComponent(hostedPageId);
                }
