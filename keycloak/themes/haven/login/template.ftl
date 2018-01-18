@@ -184,9 +184,9 @@
 
 
                function redirectCall(hostedPageId){
-                  window.location.href = "/checkout_iframe/redirect_handler?id="
-                      + encodeURIComponent(hostedPageId);
-
+                  window.location.href = "//havengrc-test.chargebee.com/hosted_pages/plans/cbdemo_scale"
+                  // "/checkout_iframe/redirect_handler?id="
+                  //    + encodeURIComponent(hostedPageId);
                }
 
                function hideProcessing(){
@@ -204,7 +204,7 @@
                         var errParam = resp.error_param;
                         var errMsg = resp.error_msg;
                         errorMap[errParam] = errMsg;
-                        $("#subscribe-form").validate().showErrors(errorMap);
+                        $("#kc-register-form").validate().showErrors(errorMap);
                      } else {
                         var errMsg = resp.error_msg;
                         $(".alert-danger").show().text(errMsg);
@@ -217,7 +217,7 @@
 
                /* Doing ajax form submit of the form data.
                 */
-               $("#subscribe-form").on("submit", function(e) {
+               $("#kc-register-form").on("submit", function(e) {
                   if (!$(this).valid()) {
                         return false;
                   }
