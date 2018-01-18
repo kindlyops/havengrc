@@ -59,10 +59,18 @@
             });
 
             $(document).ready(function() {
-                $("#subscribe-form").validate({
+                $("#kc-register-form").validate({
                     rules: {
-                        zip_code: {number: true},
-                        phone: {number: true}
+                        //zip_code: {number: true},
+                        //phone: {number: true}
+                        // simple rule, converted to {required:true}
+                        firstName: "required",
+                        lastName: "required",
+                        // compound rule
+                        email: {
+                          required: true,
+                          email: true
+                        }
                     }
                 });
 
