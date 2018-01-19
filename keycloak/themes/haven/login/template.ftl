@@ -60,6 +60,7 @@
 
             $(document).ready(function() {
                 $("#kc-register-form").validate({
+                  // ignore any inputs with class ignore
                   ignore: ".ignore",
                     rules: {
                         //zip_code: {number: true},

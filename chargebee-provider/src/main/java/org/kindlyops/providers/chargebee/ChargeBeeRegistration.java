@@ -66,8 +66,8 @@ public class ChargeBeeRegistration implements FormAction, FormActionFactory {
     @Override
     public void buildPage(FormContext context, LoginFormsProvider form) {
         LOG.warnv("chargebeeSPI: buildPage called <{0}>", this);
-        String hostedPageUrl = ("https://pageurl.com/test");
-        form.setAttribute("pageUrl", hostedPageUrl);
+        String pageId = ("https://pageurl.com/test");
+        form.setAttribute("pageUrl", pageId);
     }
 
     @Override
