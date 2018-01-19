@@ -495,7 +495,7 @@
             <theme>
                 <staticMaxAge>2592000</staticMaxAge>
                 <cacheThemes>false</cacheThemes>
-                <cacheTemplates>true</cacheTemplates>
+                <cacheTemplates>false</cacheTemplates>
                 <dir>${jboss.home.dir}/themes</dir>
                 <welcomeTheme>haven</welcomeTheme>
             </theme>
