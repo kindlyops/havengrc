@@ -26,3 +26,7 @@ Select ChargeBee Integration and toggle the radio button (if needed) for "Requir
 Great now we need to bind this Flow so select the Bindindgs tab. Then under Regisration Flow select ChargeBee Integration and save.
 
 ![binding the flow](./screenshots/binding.png)
+
+## Development
+
+For local development `docker-compose stop keycloak; docker-compose rm keycloak; docker-compose build keycloak; docker-compose up -d keycloak; docker-compose logs -f keycloak` is handy to deploy updated code for the SPI 
