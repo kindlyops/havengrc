@@ -76,6 +76,7 @@
                 </div>
             </div>
         </form>
+        ${pageUrl}
     </div>
     </#if>
 </@layout.registrationLayout>

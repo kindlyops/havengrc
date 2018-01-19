@@ -25,7 +25,10 @@ import org.jboss.logging.Logger;
 public class ChargeBeeRegistration implements FormAction, FormActionFactory {
     private static String FIELD_ORGANIZATION = "user.attributes.organization";
     private static String ATTRIBUTE_ORGANIZATION = "organization";
-    private static Requirement[] REQUIREMENT_CHOICES = new Requirement[0];
+    private static Requirement[] REQUIREMENT_CHOICES = {
+            Requirement.REQUIRED,
+            Requirement.DISABLED
+    };
     private static final Logger LOG = Logger.getLogger(ChargeBeeRegistration.class);
     private static final ChargeBeeRegistration SINGLETON = new ChargeBeeRegistration();
 
@@ -63,7 +66,8 @@ public class ChargeBeeRegistration implements FormAction, FormActionFactory {
     @Override
     public void buildPage(FormContext context, LoginFormsProvider form) {
         LOG.warnv("chargebeeSPI: buildPage called <{0}>", this);
-        System.out.println("chargbeeSPI: buildPage called for real");
+        String hostedPageUrl = ("https://pageurl.com/test");
+        form.setAttribute("pageUrl", hostedPageUrl);
     }
 
     @Override
@@ -109,7 +113,9 @@ public class ChargeBeeRegistration implements FormAction, FormActionFactory {
     }
 
     public String getHelpText() {
+        LOG.warnv("chargebeeSPI: getHelpText called <{0}>", this);
         return "ChargeBee Registration";
+
     }
 
     public FormAction create(KeycloakSession session) {
