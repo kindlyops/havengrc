@@ -111,7 +111,7 @@ public class ChargeBeeRegistration implements FormAction, FormActionFactory, Con
         LOG.warnv("chargebeeSPI: buildPage called <{0}>", this);
         HostedPage hostedPage = finalResult.hostedPage();
         String hostedPageUrl = (hostedPage.url());
-        LOG.warnv("chargebeeSPI: hosted page = ", hostedPageUrl);
+        LOG.warnv("chargebeeSPI: hosted page = <{0}>", hostedPageUrl);
         form.setAttribute("pageUrl", hostedPageUrl);
     }
 
