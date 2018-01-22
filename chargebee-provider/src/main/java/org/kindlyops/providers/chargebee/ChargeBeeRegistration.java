@@ -1,7 +1,8 @@
 package org.kindlyops.providers.chargebee;
 
 import org.apache.commons.lang.StringUtils;
-import org.keycloak.Config.Scope;
+import org.keycloak.Config;
+
 import org.keycloak.authentication.FormAction;
 import org.keycloak.authentication.FormActionFactory;
 import org.keycloak.authentication.FormContext;
@@ -13,18 +14,26 @@ import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.provider.ProviderConfigProperty;
+import org.keycloak.models.AuthenticatorConfigModel;
+import org.keycloak.provider.ConfiguredProvider;
+import org.keycloak.models.utils.FormMessage;
 
+import com.chargebee.*;
+import com.chargebee.Environment;
+import com.chargebee.models.HostedPage;
 
 import javax.ws.rs.core.MultivaluedMap;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.jboss.logging.Logger;
 
-public class ChargeBeeRegistration implements FormAction, FormActionFactory {
+public class ChargeBeeRegistration implements FormAction, FormActionFactory, ConfiguredProvider {
     private static String FIELD_ORGANIZATION = "user.attributes.organization";
     private static String ATTRIBUTE_ORGANIZATION = "organization";
+    public static final String API_KEY = "api.key";
+    public static final String PLAN_ID = "plan.id";
+    public static final String SITE_NAME = "site.name";
     private static Requirement[] REQUIREMENT_CHOICES = {
             Requirement.REQUIRED,
             Requirement.DISABLED
@@ -45,7 +54,7 @@ public class ChargeBeeRegistration implements FormAction, FormActionFactory {
     }
 
     public boolean isConfigurable() {
-        return false;
+        return true;
     }
 
     public Requirement[] getRequirementChoices() {
@@ -65,8 +74,33 @@ public class ChargeBeeRegistration implements FormAction, FormActionFactory {
 
     @Override
     public void buildPage(FormContext context, LoginFormsProvider form) {
+        AuthenticatorConfigModel chargebeeConfig = context.getAuthenticatorConfig();
+        if (chargebeeConfig == null || chargebeeConfig.getConfig() == null
+                || chargebeeConfig.getConfig().get(API_KEY) == null
+                || chargebeeConfig.getConfig().get(PLAN_ID) == null
+                || chargebeeConfig.getConfig().get(SITE_NAME) == null
+                ) {
+            form.addError(new FormMessage(null, "Chargebee not configured."));
+            return;
+        }
+        String apiKey = chargebeeConfig.getConfig().get(API_KEY);
+        String planID = chargebeeConfig.getConfig().get(PLAN_ID);
+        String siteName = chargebeeConfig.getConfig().get(SITE_NAME);
+        Environment.configure(siteName,apiKey);
+        Result finalResult;
+        try {
+            finalResult = HostedPage.checkoutNew()
+                .subscriptionPlanId(planID)
+                .billingAddressCountry("US").request();
+
+        } catch (Exception e) {
+            LOG.error("chargebeeSPI ERROR caused by: ", e);
+            return;
+        }
         LOG.warnv("chargebeeSPI: buildPage called <{0}>", this);
-        String hostedPageUrl = ("https://pageurl.com/test");
+        HostedPage hostedPage = finalResult.hostedPage();
+        String hostedPageUrl = (hostedPage.url());
+        LOG.warnv("chargebeeSPI: hosted page = <{0}>", hostedPageUrl);
         form.setAttribute("pageUrl", hostedPageUrl);
     }
 
@@ -97,10 +131,6 @@ public class ChargeBeeRegistration implements FormAction, FormActionFactory {
         }
     }
 
-    public List<ProviderConfigProperty> getConfigProperties() {
-        return Collections.<ProviderConfigProperty>emptyList();
-    }
-
     public boolean requiresUser() {
         return false;
     }
@@ -122,9 +152,39 @@ public class ChargeBeeRegistration implements FormAction, FormActionFactory {
         return SINGLETON;
     }
 
-    public void init(Scope config) {
+    public void init(Config.Scope config) {
     }
 
     public void postInit(KeycloakSessionFactory factory) {
     }
+
+    private static final List<ProviderConfigProperty> configProperties = new ArrayList<ProviderConfigProperty>();
+
+    static {
+        ProviderConfigProperty property;
+        property = new ProviderConfigProperty();
+        property.setName(API_KEY);
+        property.setLabel("Chargebee API Key");
+        property.setType(ProviderConfigProperty.STRING_TYPE);
+        property.setHelpText("Chargebee API Key");
+        configProperties.add(property);
+        property = new ProviderConfigProperty();
+        property.setName(PLAN_ID);
+        property.setLabel("Chargebee Plan ID");
+        property.setType(ProviderConfigProperty.STRING_TYPE);
+        property.setHelpText("Chargebee Plan ID");
+        configProperties.add(property);
+        property = new ProviderConfigProperty();
+        property.setName(SITE_NAME);
+        property.setLabel("Chargebee Site Name");
+        property.setType(ProviderConfigProperty.STRING_TYPE);
+        property.setHelpText("Chargebee Site Name");
+        configProperties.add(property);
+    }
+
+    @Override
+    public List<ProviderConfigProperty> getConfigProperties() {
+        return configProperties;
+    }
+
 }
