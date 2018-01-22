@@ -91,17 +91,6 @@ public class ChargeBeeRegistration implements FormAction, FormActionFactory, Con
         try {
             finalResult = HostedPage.checkoutNew()
                 .subscriptionPlanId(planID)
-                .customerEmail("john@user.com")
-                .customerFirstName("John")
-                .customerLastName("Doe")
-                .customerLocale("fr-CA")
-                .customerPhone("+1-949-999-9999")
-                .billingAddressFirstName("John")
-                .billingAddressLastName("Doe")
-                .billingAddressLine1("PO Box 9999")
-                .billingAddressCity("Walnut")
-                .billingAddressState("California")
-                .billingAddressZip("91789")
                 .billingAddressCountry("US").request();
 
         } catch (Exception e) {
