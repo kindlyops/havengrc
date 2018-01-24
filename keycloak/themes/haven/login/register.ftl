@@ -109,7 +109,6 @@
                 </div>
             </div>
         </div>
-        ${pageUrl}
     </div>
     </#if>
 </@layout.registrationLayout>
