@@ -3,3 +3,7 @@ out/
 target/
 *.iml
 .DS_Store
+.classpath
+.project
+.settings
+dependency-reduced-pom.xml
