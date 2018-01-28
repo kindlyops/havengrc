@@ -41,6 +41,7 @@ services:
       - "8080:8080"
     links:
       - db:postgres
+      - mailhog
     volumes:
       - ./keycloak/themes/haven:/opt/jboss/keycloak/themes/haven
       - ./keycloak/data:/keycloak
