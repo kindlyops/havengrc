@@ -56,6 +56,10 @@
             </div>
            </div>
             </#if>
+            <div class="form-group">
+                <div id="checkout-info" class="row">
+                </div>
+            </div>
 
             <#if recaptchaRequired??>
             <div class="form-group">
@@ -67,7 +71,7 @@
 
             <div class="${properties.kcFormGroupClass!}">
                 <div id="kc-form-buttons" class="${properties.kcFormButtonsClass!}">
-                    <input class="mdc-button mdc-button--primary mdc-button--raised btn-primary" type="submit" value="${msg("doRegister")}"/>
+                    <input class="mdc-button mdc-button--primary mdc-button--raised btn-primary" type="button" value="${msg("doRegister")}"/>
                 </div>
                 <div id="kc-form-options" class="${properties.kcFormOptionsClass!}">
                     <div class="${properties.kcFormOptionsWrapperClass!}">
@@ -79,20 +83,6 @@
 
             </div>
         </form>
-        <div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="paymentModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content" style="max-width: 540px;">
-                    <div class="modal-header">
-                        <h4 class="modal-title text-center">
-                            Payment Information
-                        </h4>
-                    </div>
-                    <!--add custom attribute data-cb-modal-body="body" to modal body -->
-                    <div class="modal-body"  data-cb-modal-body="body" style="padding-left: 0px;padding-right: 0px;">
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
     </#if>
 </@layout.registrationLayout>

@@ -40,12 +40,7 @@
     </#if>
     <script type="text/javascript">
 
-            jQuery.validator.setDefaults({
-                errorClass: "text-danger",
-                errorElement: "small"
-            });
-
-            $(document).ready(function() {
+            function showEmbeddedCheckout() {
                 <#if siteName?has_content>
                 var hostedPageURL = "${pageUrl}";
                 var hostedPageId = "${pageId}";
@@ -55,42 +50,76 @@
                 var hostedPageId = "NONE";
                 var siteName = "NONE";
                 </#if>
+                var iframeContainer = $('#checkout-info');
+                alert("calling ChargeBee.embed().load()");
+                ChargeBee.embed(hostedPageURL, siteName).load({
+                    /*
+                    * This function will be called when iframe is created.
+                    * addIframe callback will recieve iframe as parameter.
+                    * you can use this iframe to add iframe to your page.
+                    * Loading image in container can also be showed in this callback.
+                    * Note: visiblity will be none for the iframe at this moment
+                    */
+                    addIframe: function(iframe) {
+                        alert("addIframe");
+                        iframeContainer.append(iframe);
+                    },
 
-                // Show the chargebee popup form 
-                $("#kc-register-form").on("submit", function(e) {
-                    if (!$(this).valid()) {
-                        return false;
+                    /*
+                    * This function will be called once when iframe is loaded.
+                    * Since checkout pages are responsive you need to handle only height.
+                    */        
+                    onLoad: function(iframe, width, height) {
+                        // TODO: debug why this is not getting called
+                        alert("onLoad");
+                        //$(customerContainer).slideUp(1000);
+                        var style= 'border:none;overflow:hidden;width:100%;';
+                        style = style + 'height:' + height + 'px;';
+                        style = style + 'display:none;';//This is for slide down effect
+                        iframe.setAttribute('style', style);
+                        $(iframe).slideDown(1000);
+                    },
+
+                    /*
+                    * This will be triggered when any content of iframe is resized.
+                    */        
+                    onResize: function(iframe, width, height) {
+                        var style = 'border:none;overflow:hidden;width:100%;';
+                        style = style + 'height:' + height + 'px;';
+                        iframe.setAttribute('style',style);
+                    },
+
+                    /*
+                    * This will be triggered when checkout is complete.
+                    */        
+                    onSuccess: function(iframe) {
+                        // TODO: when chargebee told us it successfully created a subscription,
+                        //  we need to trigger the POST of the keycloak registration form
+                        // We include hostedPageId in the form data. This will allow keycloak to register
+                        // the user and retrieve the subscription info for that user from the hostedPageId
+                        //redirectCall(hostedPageId);
+                        alert("onSuccess");
+                    },
+
+                    /*
+                    * This will be triggered when user clicks on cancel button. 
+                    */
+                    onCancel: function(iframe) {
+                        alert("onCancel");
+                        $(iframe).slideDown(100,function (){
+                            $(iframeContainer).empty();
+                            //$(customerContainer).slideDown(200);
+                        });
+                        $(".alert-danger").show().text("Payment Aborted !!");
                     }
-                    ChargeBee.bootStrapModal(hostedPageURL, siteName, "paymentModal").load({
-                        /**
-                        * This function is called once the checkout form is loaded in the popup.
-                        */
-                        onLoad: function() {
-                            alert("onLoad");
-                        //hideProcessing();
-                        $('.submit-btn').attr("disabled", "disabled");
-                        },
+                });
+            }
 
-                        /* This function will be called after subscribe button is clicked
-                        * and checkout is completed in the iframe checkout page.
-                        */
-                        onSuccess: function() {
-                            alert("partial success");
-                            // TODO: when chargebee told us it successfully created a subscription,
-                            //  we need to trigger the POST of the keycloak registration form
-                            // We include hostedPageId in the form data. This will allow keycloak to register
-                            // the user and retrieve the subscription info for that user from the hostedPageId
-                        },
-
-                        /* This function will be called after cancel button is clicked in
-                        * the iframe checkout page.
-                        */
-                        onCancel: function() {
-                            $(".alert-danger").show().text("Payment Aborted !!");
-                            $('.submit-btn').removeAttr("disabled");
-                        }
-                    });
-                  return false;
+            $(document).ready(function() {
+                // wire the submit handler to show chargebee subscription form 
+                $("#kc-register-form").on("click", function(e) {
+                    showEmbeddedCheckout();
+                    return false;
                })
             });
         </script>
