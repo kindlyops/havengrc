@@ -33,25 +33,12 @@
             <script src="${url.resourcesPath}/${script}" type="text/javascript"></script>
         </#list>
     </#if>
-    <#if scripts??>
-        <#list scripts as script>
-            <script src="${script}" type="text/javascript"></script>
-        </#list>
-    </#if>
     <#if properties.chargebee_scripts?has_content>
         <#list properties.chargebee_scripts?split(' ') as chargebee_script>
             <script src="${chargebee_script}" type="text/javascript"></script>
         </#list>
     </#if>
-    <#if chargebee_scripts??>
-        <#list chargebee_scripts as chargebee_script>
-            <script src="${chargebee_script}" type="text/javascript"></script>
-        </#list>
-    </#if>
     <script type="text/javascript">
-            // This parameter will decide to show the checkout page
-            // as pop up or as embeded in document
-            var popup = true;
 
             jQuery.validator.setDefaults({
                 errorClass: "text-danger",
@@ -59,183 +46,53 @@
             });
 
             $(document).ready(function() {
-                $("#kc-register-form").validate({
-                  // ignore any inputs with class ignore
-                  ignore: ".ignore",
-                    rules: {
-                        //zip_code: {number: true},
-                        //phone: {number: true}
-                        // simple rule, converted to {required:true}
-                        firstName: "required",
-                        lastName: "required",
-                        // compound rule
-                        email: {
-                          required: true,
-                          email: true
-                        }
+                <#if siteName?has_content>
+                var hostedPageURL = "${pageUrl}";
+                var hostedPageId = "${pageId}";
+                var siteName = "${siteName}";
+                <#else>
+                var hostedPageURL = "NONE";
+                var hostedPageId = "NONE";
+                var siteName = "NONE";
+                </#if>
+
+                // Show the chargebee popup form 
+                $("#kc-register-form").on("submit", function(e) {
+                    if (!$(this).valid()) {
+                        return false;
                     }
-                });
-
-               function showProcessing() {
-                   $(".alert-danger").hide();
-                   $('.subscribe-process').show();
-               }
-
-               function subscribeResponseHandler(response){
-                   if(popup) {
-                       subscribeResponsePopupHandler(response);
-                   } else {
-                       subscribeResponseEmbedHandler(response);
-                   }
-               }
-
-
-              function subscribeResponsePopupHandler(response) {
-                   var hostedPageId = response.hosted_page_id;
-                   $('.subscribe-process').show();
-
-                   ChargeBee.bootStrapModal(response.url,
-                                    response.site_name, "paymentModal").load({
-
-                   /**
-                    * This function is called once the checkout form is loaded in the popup.
-                    */
-                   onLoad: function() {
-                       hideProcessing();
-                       $('.submit-btn').attr("disabled", "disabled");
-                    },
-
-                    /* This function will be called after subscribe button is clicked
-                     * and checkout is completed in the iframe checkout page.
-                     */
-                    onSuccess: function() {
-                        redirectCall(hostedPageId);
-                    },
-
-                    /* This function will be called after cancel button is clicked in
-                     * the iframe checkout page.
-                     */
-                    onCancel: function() {
-                        $(".alert-danger").show().text("Payment Aborted !!");
-                        $('.submit-btn').removeAttr("disabled");
-                    }
-                  });
-               }
-
-
-
-               function subscribeResponseEmbedHandler(response) {
-                    var hostedPageId = response.hosted_page_id;
-                    var customerContainer = $('#customer-info');
-                    var iframeContainer = $('#checkout-info');
-                    ChargeBee.embed(response.url, response.site_name).load({
-                       /*
-                        * This function will be called when iframe is created.
-                        * addIframe callback will recieve iframe as parameter.
-                        * you can use this iframe to add iframe to your page.
-                        * Loading image in container can also be showed in this callback.
-                        * Note: visiblity will be none for the iframe at this moment
+                    ChargeBee.bootStrapModal(hostedPageURL, siteName, "paymentModal").load({
+                        /**
+                        * This function is called once the checkout form is loaded in the popup.
                         */
-                        addIframe: function(iframe) {
-                            iframeContainer.append(iframe);
+                        onLoad: function() {
+                            alert("onLoad");
+                        //hideProcessing();
+                        $('.submit-btn').attr("disabled", "disabled");
                         },
 
-                       /*
-                        * This function will be called once when iframe is loaded.
-                        * Since checkout pages are responsive you need to handle only height.
+                        /* This function will be called after subscribe button is clicked
+                        * and checkout is completed in the iframe checkout page.
                         */
-                        onLoad: function(iframe, width, height) {
-                            hideProcessing();
-                            $(customerContainer).slideUp(1000);
-                            var style= 'border:none;overflow:hidden;width:100%;';
-                            style = style + 'height:' + height + 'px;';
-                            style = style + 'display:none;';//This is for slide down effect
-                            iframe.setAttribute('style', style);
-                            $(iframe).slideDown(1000);
+                        onSuccess: function() {
+                            alert("partial success");
+                            // TODO: when chargebee told us it successfully created a subscription,
+                            //  we need to trigger the POST of the keycloak registration form
+                            // We include hostedPageId in the form data. This will allow keycloak to register
+                            // the user and retrieve the subscription info for that user from the hostedPageId
                         },
 
-                        /*
-                         * This will be triggered when any content of iframe is resized.
-                         */
-                        onResize: function(iframe, width, height) {
-                            var style = 'border:none;overflow:hidden;width:100%;';
-                            style = style + 'height:' + height + 'px;';
-                            iframe.setAttribute('style',style);
-                        },
-
-                        /*
-                         * This will be triggered when checkout is complete.
-                         */
-                        onSuccess: function(iframe) {
-                            redirectCall(hostedPageId);
-                        },
-
-                        /*
-                         * This will be triggered when user clicks on cancel button.
-                         */
-                        onCancel: function(iframe) {
-                            $(iframe).slideDown(100,function (){
-                                $(iframeContainer).empty();
-                                $(customerContainer).slideDown(200);
-                            });
+                        /* This function will be called after cancel button is clicked in
+                        * the iframe checkout page.
+                        */
+                        onCancel: function() {
                             $(".alert-danger").show().text("Payment Aborted !!");
+                            $('.submit-btn').removeAttr("disabled");
                         }
                     });
-               }
-
-
-
-               function redirectCall(hostedPageId){
-                  window.location.href = "havengrc-test.chargebee.com/hosted_pages/plans/cbdemo_scale"
-                  // "/checkout_iframe/redirect_handler?id="
-                  //    + encodeURIComponent(hostedPageId);
-               }
-
-               function hideProcessing(){
-                    $('.subscribe-process').hide();
-               }
-
-               /* This method is called if error is returned from the server.
-                */
-              function subscribeErrorHandler(jqXHR, textStatus, errorThrown) {
-                try{
-                     hideProcessing();
-                     var resp = JSON.parse(jqXHR.responseText);
-                     if ('error_param' in resp) {
-                       var errorMap = {};
-                        var errParam = resp.error_param;
-                        var errMsg = resp.error_msg;
-                        errorMap[errParam] = errMsg;
-                        $("#kc-register-form").validate().showErrors(errorMap);
-                     } else {
-                        var errMsg = resp.error_msg;
-                        $(".alert-danger").show().text(errMsg);
-                     }
-                    } catch(err) {
-                       $(".alert-danger").show().text("Error while processing your request");
-                    }
-                }
-
-
-               /* Doing ajax form submit of the form data.
-                */
-               $("#kc-register-form").on("submit", function(e) {
-                  if (!$(this).valid()) {
-                        return false;
-                  }
-                  var options = {
-                        beforeSend: showProcessing,
-                        error: subscribeErrorHandler,
-                        success: subscribeResponseHandler,
-                        contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-                        dataType: 'json'
-                  };
-                  $(this).ajaxSubmit(options);
                   return false;
                })
-
-
-            })
+            });
         </script>
 </head>
 

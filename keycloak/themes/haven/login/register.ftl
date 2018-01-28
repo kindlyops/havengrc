@@ -6,8 +6,7 @@
         <h1 class="mdc-typography login-header">${msg("registerWithTitleHtml",(realm.displayNameHtml!''))}</h1>
     <#elseif section = "form">
     <div id="customer-info" class="mdc-layout-grid__cell--span-12 align-center">
-      <!-- <form id="kc-register-form" class="" action="${url.registrationAction}" method="post"> -->
-        <form id="kc-register-form" class="" action="" method="post">
+      <form id="kc-register-form" class="" action="${url.registrationAction}" method="post">
           <input type="text" readonly value="this is not a login form" style="display: none;">
           <input type="password" readonly value="this is not a login form" style="display: none;">
 
@@ -77,21 +76,6 @@
                 </div>
             </div>
             <p class="text-danger" style="display:none;">There were errors while submitting</p>
-            <div class="form-inline">
-                <div class="form-group">
-                <input type="submit" class="submit-btn btn btn-success btn-lg" value="Proceed to Payment">
-                </div>
-                <div class="form-group">
-                    <a class="btn btn-link" href="index.html">Cancel</a>
-                </div>
-                <div class="form-group">
-                <span class="subscribe-process process" style="display:none;">Processing&hellip;</span>
-                </div>
-                <div class="form-group">
-                    <span class="alert-danger text-danger"></span>
-                </div>
-            </div>
-            <div id="checkout-info" class="row">
 
             </div>
         </form>
