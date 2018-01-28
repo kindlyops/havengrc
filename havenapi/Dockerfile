@@ -10,7 +10,7 @@ WORKDIR $GOPATH/src/github.com/kindlyops/mappamundi/havenapi
 #ADD yarn.lock .
 #RUN yarn install --no-progress
 ADD . .
-RUN dep ensure
+RUN dep ensure -vendor-only
 RUN buffalo build --static -o /bin/app
 
 FROM alpine
@@ -23,7 +23,7 @@ RUN addgroup -S havenuser && adduser -S -g havenuser havenuser && chown -R haven
 WORKDIR /home/havenuser
 
 COPY --from=builder /bin/app .
-RUN chown havenuser:havenuser /home/havenuser/app
+RUN chown -R havenuser:havenuser /home/havenuser
 RUN chgrp -R 0 /home/havenuser &&chmod -R g=u /home/havenuser
 EXPOSE 3000
 
