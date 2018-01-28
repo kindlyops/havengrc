@@ -23,9 +23,17 @@ Select ChargeBee Integration and toggle the radio button (if needed) for "Requir
 
 ![select required](./screenshots/required.png)
 
-Great now we need to bind this Flow so select the Bindindgs tab. Then under Regisration Flow select ChargeBee Integration and save.
+Great now we need to bind this Flow so select the Bindings tab. Then under Regisration Flow select ChargeBee Integration and save.
 
 ![binding the flow](./screenshots/binding.png)
+
+Next the chargebee API key, plan name, and subdomain need to be configured.
+
+![configure chargebee](./screenshots/configure-chargebee-credentials.png)
+
+Finally, the Content Security Policy headers need to be configured in Keycloak to permit the browser to load iframe content from the chargebee server.
+
+![configure CSP](./screenshots/configure-content-security-policy.png)
 
 ## Development
 
