@@ -51,7 +51,6 @@
                 var siteName = "NONE";
                 </#if>
                 var iframeContainer = $('#checkout-info');
-                alert("calling ChargeBee.embed().load()");
                 ChargeBee.embed(hostedPageURL, siteName).load({
                     /*
                     * This function will be called when iframe is created.
@@ -61,7 +60,6 @@
                     * Note: visiblity will be none for the iframe at this moment
                     */
                     addIframe: function(iframe) {
-                        alert("addIframe");
                         iframeContainer.append(iframe);
                     },
 
@@ -70,9 +68,6 @@
                     * Since checkout pages are responsive you need to handle only height.
                     */        
                     onLoad: function(iframe, width, height) {
-                        // TODO: debug why this is not getting called
-                        alert("onLoad");
-                        //$(customerContainer).slideUp(1000);
                         var style= 'border:none;overflow:hidden;width:100%;';
                         style = style + 'height:' + height + 'px;';
                         style = style + 'display:none;';//This is for slide down effect
@@ -105,22 +100,14 @@
                     * This will be triggered when user clicks on cancel button. 
                     */
                     onCancel: function(iframe) {
-                        alert("onCancel");
-                        $(iframe).slideDown(100,function (){
-                            $(iframeContainer).empty();
-                            //$(customerContainer).slideDown(200);
-                        });
-                        $(".alert-danger").show().text("Payment Aborted !!");
+                        alert("Payment Aborted !!");
                     }
                 });
             }
 
             $(document).ready(function() {
-                // wire the submit handler to show chargebee subscription form 
-                $("#kc-register-form").on("click", function(e) {
-                    showEmbeddedCheckout();
-                    return false;
-               })
+                // show chargebee subscription form 
+                showEmbeddedCheckout();
             });
         </script>
 </head>
