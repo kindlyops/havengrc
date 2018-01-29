@@ -6,8 +6,7 @@
         <h1 class="mdc-typography login-header">${msg("registerWithTitleHtml",(realm.displayNameHtml!''))}</h1>
     <#elseif section = "form">
     <div id="customer-info" class="mdc-layout-grid__cell--span-12 align-center">
-      <!-- <form id="kc-register-form" class="" action="${url.registrationAction}" method="post"> -->
-        <form id="kc-register-form" class="" action="" method="post">
+      <form id="kc-register-form" class="" action="${url.registrationAction}" method="post">
           <input type="text" readonly value="this is not a login form" style="display: none;">
           <input type="password" readonly value="this is not a login form" style="display: none;">
 
@@ -57,6 +56,10 @@
             </div>
            </div>
             </#if>
+            <div class="form-group">
+                <div id="checkout-info" class="row">
+                </div>
+            </div>
 
             <#if recaptchaRequired??>
             <div class="form-group">
@@ -68,7 +71,7 @@
 
             <div class="${properties.kcFormGroupClass!}">
                 <div id="kc-form-buttons" class="${properties.kcFormButtonsClass!}">
-                    <input class="mdc-button mdc-button--primary mdc-button--raised btn-primary" type="submit" value="${msg("doRegister")}"/>
+                    <input class="mdc-button mdc-button--primary mdc-button--raised btn-primary" type="button" value="${msg("doRegister")}"/>
                 </div>
                 <div id="kc-form-options" class="${properties.kcFormOptionsClass!}">
                     <div class="${properties.kcFormOptionsWrapperClass!}">
@@ -77,38 +80,9 @@
                 </div>
             </div>
             <p class="text-danger" style="display:none;">There were errors while submitting</p>
-            <div class="form-inline">
-                <div class="form-group">
-                <input type="submit" class="submit-btn btn btn-success btn-lg" value="Proceed to Payment">
-                </div>
-                <div class="form-group">
-                    <a class="btn btn-link" href="index.html">Cancel</a>
-                </div>
-                <div class="form-group">
-                <span class="subscribe-process process" style="display:none;">Processing&hellip;</span>
-                </div>
-                <div class="form-group">
-                    <span class="alert-danger text-danger"></span>
-                </div>
-            </div>
-            <div id="checkout-info" class="row">
 
             </div>
         </form>
-        <div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="paymentModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content" style="max-width: 540px;">
-                    <div class="modal-header">
-                        <h4 class="modal-title text-center">
-                            Payment Information
-                        </h4>
-                    </div>
-                    <!--add custom attribute data-cb-modal-body="body" to modal body -->
-                    <div class="modal-body"  data-cb-modal-body="body" style="padding-left: 0px;padding-right: 0px;">
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
     </#if>
 </@layout.registrationLayout>

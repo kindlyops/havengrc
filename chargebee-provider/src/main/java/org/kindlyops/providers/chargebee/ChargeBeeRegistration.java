@@ -91,17 +91,18 @@ public class ChargeBeeRegistration implements FormAction, FormActionFactory, Con
         try {
             finalResult = HostedPage.checkoutNew()
                 .subscriptionPlanId(planID)
+                .iframeMessaging(true)
                 .billingAddressCountry("US").request();
 
         } catch (Exception e) {
-            LOG.error("chargebeeSPI ERROR caused by: ", e);
+            LOG.errorv("chargebeeSPI ERROR caused by: <{0}>", e);
             return;
         }
-        LOG.warnv("chargebeeSPI: buildPage called <{0}>", this);
+        LOG.info("chargebeeSPI: buildPage called");
         HostedPage hostedPage = finalResult.hostedPage();
-        String hostedPageUrl = (hostedPage.url());
-        LOG.warnv("chargebeeSPI: hosted page = <{0}>", hostedPageUrl);
-        form.setAttribute("pageUrl", hostedPageUrl);
+        form.setAttribute("pageId", hostedPage.id());
+        form.setAttribute("pageUrl", hostedPage.url());
+        form.setAttribute("siteName", siteName);
     }
 
     @Override
@@ -178,7 +179,7 @@ public class ChargeBeeRegistration implements FormAction, FormActionFactory, Con
         property.setName(SITE_NAME);
         property.setLabel("Chargebee Site Name");
         property.setType(ProviderConfigProperty.STRING_TYPE);
-        property.setHelpText("Chargebee Site Name");
+        property.setHelpText("The custom subdomain for your Chargebee site");
         configProperties.add(property);
     }
 
