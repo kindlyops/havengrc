@@ -91,6 +91,7 @@ public class ChargeBeeRegistration implements FormAction, FormActionFactory, Con
         try {
             finalResult = HostedPage.checkoutNew()
                 .subscriptionPlanId(planID)
+                .iframeMessaging(true)
                 .billingAddressCountry("US").request();
 
         } catch (Exception e) {
