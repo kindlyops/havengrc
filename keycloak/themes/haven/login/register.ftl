@@ -71,7 +71,18 @@
 
             <div class="${properties.kcFormGroupClass!}">
                 <div id="kc-form-buttons" class="${properties.kcFormButtonsClass!}">
-                    <input class="mdc-button mdc-button--primary mdc-button--raised btn-primary" type="button" value="${msg("doRegister")}"/>
+								   <script
+                    src="https://checkout.stripe.com/checkout.js" 
+										class="stripe-button"
+                    data-key="${stripe_pk}"
+                    data-name="Haven GRC"
+                    data-description="Free Trial"
+                    data-image="${url.resourcesPath}/img/favicon-base.png"
+                    data-locale="auto"
+										data-allow-remember-me="false"
+                    data-zip-code="true">
+                    </script> 
+                    <!-- <input class="mdc-button mdc-button--primary mdc-button--raised btn-primary" type="button" value="${msg("doRegister")}"/> -->
                 </div>
                 <div id="kc-form-options" class="${properties.kcFormOptionsClass!}">
                     <div class="${properties.kcFormOptionsWrapperClass!}">
