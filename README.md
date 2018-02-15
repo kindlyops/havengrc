@@ -29,6 +29,10 @@ their work.
  * Pragmatic Programmers course https://pragmaticstudio.com/elm
  * Frontend Masters 2-day elm workshop https://frontendmasters.com/workshops/elm/
 
+## Security
+
+We are using snyk.io and codeclimate.com for static scanning.
+
 ### Design framework and tooling.
 
 We are making use of the [Material Design](https://material.io/guidelines/)
