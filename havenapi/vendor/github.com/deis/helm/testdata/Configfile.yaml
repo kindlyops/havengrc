@@ -1,0 +1,12 @@
+# Testing data for package `config`.
+repos:
+  default: technosophos
+  tables:
+      - name: charts
+        repo: https://github.com/helm/charts
+      - name: technosophos
+        repo: https://github.com/helm/charts
+      - name: clown-nose
+        repo: https://github.com/helm/charts
+workspace:
+  ignore: me

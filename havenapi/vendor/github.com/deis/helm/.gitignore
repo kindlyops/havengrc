@@ -1,0 +1,6 @@
+*.swp
+vendor/
+bin/
+_dist/
+_scripts/ci/bintray-ci.json
+
