@@ -9,7 +9,7 @@ RUN mvn -f /chargebee-provider/pom.xml dependency:resolve
 COPY chargebee-provider /chargebee-provider
 RUN mvn -f /chargebee-provider/pom.xml clean package
 
-FROM                havengrc-docker.jfrog.io/jboss/keycloak:3.4.2.Final
+FROM                havengrc-docker.jfrog.io/jboss/keycloak:3.4.3.Final
 MAINTAINER          Kindly Ops, LLC <support@kindlyops.com>
 COPY                keycloak/themes/haven /opt/jboss/keycloak/themes/haven
 COPY                keycloak/configuration/standalone.xml /opt/jboss/keycloak/standalone/configuration/standalone.xml

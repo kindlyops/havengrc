@@ -1,0 +1,38 @@
+package: github.com/helm/helm-classic
+import:
+- package: github.com/codegangsta/cli
+  version: 71f57d300dd6a780ac1856c005c4b518cfd498ec
+- package: github.com/deis/pkg
+  subpackages:
+  - prettyprint
+- package: github.com/Masterminds/vcs
+  version: ^1.5.1
+- package: github.com/Masterminds/semver
+  version: ^1.1.0
+- package: k8s.io/kubernetes
+  version: v1.2.4
+  subpackages:
+  - pkg
+- package: speter.net/go/exp/math/dec/inf
+  version: 42ca6cd68aa922bc3f32f1e056e61b65945d9ad7
+  repo: https://github.com/belua/inf
+  vcs: git
+- package: golang.org/x/crypto
+  version: master
+- package: github.com/aokoli/goutils
+  version: master
+- package: github.com/pborman/uuid
+  version: master
+- package: gopkg.in/yaml.v2
+  version: master
+- package: github.com/google/go-querystring
+- package: github.com/google/go-github
+  version: 81d0490d8aa8400f6760a077f4a2039eb0296e86
+- package: github.com/steveeJ/gexpect
+  repo: https://github.com/coreos/gexpect
+- package: launchpad.net/gocheck
+  repo: https://github.com/go-check/check
+- package: code.google.com/p/goprotobuf
+  repo: https://github.com/golang/protobuf
+- package: github.com/Masterminds/sprig
+  version: ">= 2.2.0"
