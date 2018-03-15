@@ -86,10 +86,7 @@ func (r *Manager) build(event fsnotify.Event) {
 
 			now := time.Now()
 			r.Logger.Print("Rebuild on: %s", event.Name)
-			args := []string{"build", "-v", "-i"}
-			args = append(args, r.BuildFlags...)
-			args = append(args, "-o", r.FullBuildPath(), r.BuildTargetPath)
-			cmd := exec.Command(envy.Get("GO_BIN", "go"), args...)
+			cmd := exec.Command(envy.Get("GO_BIN", "go"), "build", "-v", "-i", "-o", r.FullBuildPath(), r.BuildTargetPath)
 			err := r.runAndListen(cmd)
 			if err != nil {
 				if strings.Contains(err.Error(), "no buildable Go source files") {

@@ -38,28 +38,12 @@ func Test_Render_If_And(t *testing.T) {
 	r.Equal("", s)
 }
 
-func Test_Render_If_And_True_True(t *testing.T) {
-	r := require.New(t)
-	input := `<%= if (2 == 2 && 1 == 1) { return "hi" } %>`
-	s, err := Render(input, NewContext())
-	r.NoError(err)
-	r.Equal("hi", s)
-}
-
 func Test_Render_If_Or(t *testing.T) {
 	r := require.New(t)
 	input := `<%= if (false || true) { %>hi<%} %>`
 	s, err := Render(input, NewContext())
 	r.NoError(err)
 	r.Equal("hi", s)
-}
-
-func Test_Render_If_Or_False_False(t *testing.T) {
-	r := require.New(t)
-	input := `<%= if (1 == 2 || 2 == 1) { return "hi" } else { return "bye" } %>`
-	s, err := Render(input, NewContext())
-	r.NoError(err)
-	r.Equal("bye", s)
 }
 
 func Test_Render_If_Nil(t *testing.T) {
@@ -122,31 +106,6 @@ func Test_Render_If_Else_True(t *testing.T) {
 	r := require.New(t)
 	input := `<p><%= if (true) { %>hi<% } else { %>bye<% } %></p>`
 	s, err := Render(input, NewContext())
-	r.NoError(err)
-	r.Equal("<p>hi</p>", s)
-}
-
-func Test_Render_If_Matches(t *testing.T) {
-	r := require.New(t)
-	input := `<p><%= if ("foo" ~= "bar") { return "hi" } else { return "bye" } %></p>`
-	s, err := Render(input, NewContext())
-	r.NoError(err)
-	r.Equal("<p>bye</p>", s)
-}
-
-func Test_If_String_Truthy(t *testing.T) {
-	r := require.New(t)
-
-	ctx := NewContext()
-	ctx.Set("username", "")
-
-	input := `<p><%= if (username && username != "") { return "hi" } else { return "bye" } %></p>`
-	s, err := Render(input, ctx)
-	r.NoError(err)
-	r.Equal("<p>bye</p>", s)
-
-	ctx.Set("username", "foo")
-	s, err = Render(input, ctx)
 	r.NoError(err)
 	r.Equal("<p>hi</p>", s)
 }

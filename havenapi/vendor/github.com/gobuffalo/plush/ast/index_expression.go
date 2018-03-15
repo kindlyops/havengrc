@@ -2,15 +2,21 @@ package ast
 
 import (
 	"bytes"
+	"github.com/gobuffalo/plush/token"
 )
 
 type IndexExpression struct {
-	TokenAble
+	Token token.Token
 	Left  Expression
 	Index Expression
 }
 
-func (ie *IndexExpression) expressionNode() {}
+func (ie *IndexExpression) expressionNode() {
+}
+
+func (ie *IndexExpression) TokenLiteral() string {
+	return ie.Token.Literal
+}
 
 func (ie *IndexExpression) String() string {
 	var out bytes.Buffer

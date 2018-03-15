@@ -16,7 +16,7 @@ func resetColor() {
 	if isDumbTerm() {
 		return
 	}
-	fmt.Fprint(Writer, "\x1b[0m")
+	fmt.Print("\x1b[0m")
 }
 
 func ansiText(fg Color, fgBright bool, bg Color, bgBright bool) string {
@@ -47,5 +47,5 @@ func changeColor(fg Color, fgBright bool, bg Color, bgBright bool) {
 	if fg == None && bg == None {
 		return
 	}
-	fmt.Fprint(Writer, ansiText(fg, fgBright, bg, bgBright))
+	fmt.Print(ansiText(fg, fgBright, bg, bgBright))
 }

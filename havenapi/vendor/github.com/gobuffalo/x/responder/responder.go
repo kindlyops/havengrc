@@ -5,6 +5,8 @@ import (
 	"sync"
 
 	"github.com/gobuffalo/buffalo"
+	"github.com/gobuffalo/x/httpx"
+	"github.com/markbates/going/defaults"
 	"github.com/pkg/errors"
 )
 
@@ -41,17 +43,13 @@ func UserList(c buffalo.Context) error {
 }
 */
 func (r Responder) Respond(ctx buffalo.Context) error {
-	for _, ct := range contentTypes(ctx) {
-		for w, h := range r.wants {
-			if strings.Contains(ct, strings.ToLower(w)) {
-				return h(ctx)
-			}
+	ct := defaults.String(httpx.ContentType(ctx.Request()), "html")
+	for w, h := range r.wants {
+		if strings.Contains(ct, strings.ToLower(w)) {
+			return h(ctx)
 		}
 	}
-	if h, ok := r.wants["html"]; ok {
-		return h(ctx)
-	}
-	return errors.New("could not find any matching handlers for this request")
+	return errors.Errorf("could not find handler for content type %s", ct)
 }
 
 // Wants maps a content-type, or part of one ("json", "html", "form", etc...),
@@ -63,24 +61,4 @@ func Wants(ct string, h buffalo.Handler) Responder {
 		wants: map[string]buffalo.Handler{},
 	}
 	return r.Wants(ct, h)
-}
-
-func contentTypes(ctx buffalo.Context) []string {
-	var cts []string
-	for _, x := range []string{"Accept", "Content-Type"} {
-		ct := ctx.Request().Header.Get(x)
-		if strings.Contains(ct, ",") {
-			cts = append(cts, strings.Split(ct, ",")...)
-		} else {
-			cts = append(cts, strings.Split(ct, ";")...)
-		}
-		for _, c := range cts {
-			c = strings.TrimSpace(c)
-			if strings.HasPrefix(c, "*/*") {
-				continue
-			}
-			cts = append(cts, strings.ToLower(c))
-		}
-	}
-	return cts
 }

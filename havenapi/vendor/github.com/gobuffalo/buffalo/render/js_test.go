@@ -16,13 +16,9 @@ import (
 func Test_JavaScript(t *testing.T) {
 	r := require.New(t)
 
-	tmpDir := filepath.Join(os.TempDir(), "markdown_test")
-	err := os.MkdirAll(tmpDir, 0766)
+	tmpFile, err := ioutil.TempFile("", "test")
 	r.NoError(err)
-	defer os.Remove(tmpDir)
-
-	tmpFile, err := os.Create(filepath.Join(tmpDir, "test.js"))
-	r.NoError(err)
+	defer os.Remove(tmpFile.Name())
 
 	_, err = tmpFile.Write([]byte("<%= name %>"))
 	r.NoError(err)
@@ -30,11 +26,9 @@ func Test_JavaScript(t *testing.T) {
 	t.Run("without a layout", func(st *testing.T) {
 		r := require.New(st)
 
-		j := render.New(render.Options{
-			TemplatesBox: packr.NewBox(tmpDir),
-		}).JavaScript
+		j := render.New(render.Options{}).JavaScript
 
-		re := j(filepath.Base(tmpFile.Name()))
+		re := j(tmpFile.Name())
 		r.Equal("application/javascript", re.ContentType())
 		bb := &bytes.Buffer{}
 		err = re.Render(bb, map[string]interface{}{"name": "Mark"})
@@ -45,20 +39,20 @@ func Test_JavaScript(t *testing.T) {
 	t.Run("with a layout", func(st *testing.T) {
 		r := require.New(st)
 
-		layout, err := os.Create(filepath.Join(tmpDir, "layout.js"))
+		layout, err := ioutil.TempFile("", "test")
 		r.NoError(err)
+		defer os.Remove(layout.Name())
 
 		_, err = layout.Write([]byte("<body><%= yield %></body>"))
 		r.NoError(err)
 
 		re := render.New(render.Options{
-			JavaScriptLayout: filepath.Base(layout.Name()),
-			TemplatesBox:     packr.NewBox(tmpDir),
+			JavaScriptLayout: layout.Name(),
 		})
 
 		st.Run("using just the JavaScriptLayout", func(sst *testing.T) {
 			r := require.New(sst)
-			h := re.JavaScript(filepath.Base(tmpFile.Name()))
+			h := re.JavaScript(tmpFile.Name())
 
 			r.Equal("application/javascript", h.ContentType())
 			bb := &bytes.Buffer{}
@@ -69,12 +63,13 @@ func Test_JavaScript(t *testing.T) {
 
 		st.Run("overriding the JavaScriptLayout", func(sst *testing.T) {
 			r := require.New(sst)
-			nlayout, err := os.Create(filepath.Join(tmpDir, "layout2.js"))
+			nlayout, err := ioutil.TempFile("", "test-layout2")
 			r.NoError(err)
+			defer os.Remove(nlayout.Name())
 
 			_, err = nlayout.Write([]byte("<html><%= yield %></html>"))
 			r.NoError(err)
-			h := re.JavaScript(filepath.Base(tmpFile.Name()), filepath.Base(nlayout.Name()))
+			h := re.JavaScript(tmpFile.Name(), nlayout.Name())
 
 			r.Equal("application/javascript", h.ContentType())
 			bb := &bytes.Buffer{}

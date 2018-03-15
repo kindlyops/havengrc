@@ -184,11 +184,7 @@ var devErrorTmpl = `
                   <%= r.Method %>
                 </td>
                 <td>
-                  <%= if (r.Method != "GET" || r.Path ~= "{") { %>
-                    <%= r.Path %>
-                  <% } else { %>
-                    <a href="<%= r.Path %>"><%= r.Path %></a>
-                  <% } %>
+                  <%= r.Path %>
                 </td>
                 <td>
                   <%= r.PathName %>

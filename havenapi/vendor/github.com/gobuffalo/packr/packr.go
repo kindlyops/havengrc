@@ -1,10 +1,10 @@
 package packr
 
 import (
-	"bytes"
-	"compress/gzip"
 	"encoding/json"
 	"sync"
+	"bytes"
+	"compress/gzip"
 )
 
 var gil = &sync.Mutex{}
@@ -38,7 +38,7 @@ func PackBytesGzip(box string, name string, bb []byte) error {
 
 // PackJSONBytes packs JSON encoded bytes for a file into a box.
 func PackJSONBytes(box string, name string, jbb string) error {
-	var bb []byte
+	bb := []byte{}
 	err := json.Unmarshal([]byte(jbb), &bb)
 	if err != nil {
 		return err

@@ -1,12 +1,12 @@
 package form_test
 
 import (
-	"database/sql"
 	"testing"
 	"time"
 
 	"github.com/gobuffalo/tags"
 	"github.com/gobuffalo/tags/form"
+	"github.com/markbates/pop/nulls"
 	"github.com/stretchr/testify/require"
 )
 
@@ -33,48 +33,6 @@ func Test_FormFor_InputValue(t *testing.T) {
 	l := f.InputTag("Name", tags.Options{"value": "Something"})
 
 	r.Equal(`<input id="talk-Name" name="Name" type="text" value="Something" />`, l.String())
-}
-
-func Test_FormFor_InputHiddenValue(t *testing.T) {
-	r := require.New(t)
-	f := form.NewFormFor(Talk{}, tags.Options{
-		"action": "/users/1",
-	})
-
-	l := f.HiddenTag("Name", tags.Options{"value": "Something"})
-
-	r.Equal(`<input id="talk-Name" name="Name" type="hidden" value="Something" />`, l.String())
-}
-
-func Test_FormFor_Input_BeforeTag_Opt(t *testing.T) {
-	r := require.New(t)
-	f := form.NewFormFor(Talk{}, tags.Options{})
-
-	s := `<span>Content</span>`
-	l := f.InputTag("Test", tags.Options{"before_tag": s})
-
-	r.Equal(`<span>Content</span><input id="talk-Test" name="Test" type="text" value="" />`, l.String())
-}
-
-func Test_FormFor_Input_AfterTag_Opt(t *testing.T) {
-	r := require.New(t)
-	f := form.NewFormFor(Talk{}, tags.Options{})
-
-	b := `<button>Button</button>`
-	l := f.InputTag("Test", tags.Options{"after_tag": b})
-
-	r.Equal(`<input id="talk-Test" name="Test" type="text" value="" /><button>Button</button>`, l.String())
-}
-
-func Test_FormFor_File(t *testing.T) {
-	r := require.New(t)
-	f := form.NewFormFor(Talk{}, tags.Options{
-		"action": "/users/1",
-	})
-
-	l := f.FileTag("Name", tags.Options{"value": "Something"})
-
-	r.Equal(`<input id="talk-Name" name="Name" type="file" value="Something" />`, l.String())
 }
 
 func Test_FormFor_InputValueFormat(t *testing.T) {
@@ -126,22 +84,15 @@ func Test_FormFor_FieldDoesntExist(t *testing.T) {
 	r.Equal(`<input id="talk-IDontExist" name="IDontExist" type="text" value="" />`, l.String())
 }
 
-func Test_FormFor_HiddenTag(t *testing.T) {
-	r := require.New(t)
-	f := form.NewFormFor(Talk{}, tags.Options{})
-	l := f.HiddenTag("Name", tags.Options{})
-	r.Equal(`<input id="talk-Name" name="Name" type="hidden" value="" />`, l.String())
-}
-
 func Test_FormFor_NullableField(t *testing.T) {
 	r := require.New(t)
 	model := struct {
 		Name       string
-		CreditCard nullString
-		Floater    sql.NullFloat64
-		Other      sql.NullBool
+		CreditCard nulls.String
+		Floater    nulls.Float64
+		Other      nulls.Bool
 	}{
-		CreditCard: NewNullString("Hello"),
+		CreditCard: nulls.NewString("Hello"),
 	}
 
 	f := form.NewFormFor(model, tags.Options{})

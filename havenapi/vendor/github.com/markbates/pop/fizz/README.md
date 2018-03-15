@@ -9,17 +9,10 @@ create_table("users", func(t) {
   t.Column("email", "string", {})
   t.Column("twitter_handle", "string", {"size": 50})
   t.Column("age", "integer", {"default": 0})
-  t.Column("admin", "bool", {"default": false})
+  t.Column("admin", "boolean", {"default": false})
   t.Column("company_id", "uuid", {"default_raw": "uuid_generate_v1()"})
   t.Column("bio", "text", {"null": true})
   t.Column("joined_at", "timestamp", {})
-})
-
-create_table("todos", func(t) {
-  t.Column("user_id", "integer", {})
-  t.Column("title", "string", {"size": 100})
-  t.Column("details", "text", {"null": true})
-  t.ForeignKey("user_id", {"users": ["id"]}, {"on_delete": "cascade"})
 })
 ```
 
@@ -33,7 +26,7 @@ Columns all have the same syntax. First is the name of the column. Second is the
 * `text`
 * `timestamp`, `time`, `datetime`
 * `integer`
-* `bool`
+* `boolean`
 
 Any other type passed it will be be passed straight through to the underlying database. For example for PostgreSQL you could pass `jsonb`and it will be supported, however, SQLite will yell very loudly at you if you do the same thing!
 
@@ -125,36 +118,6 @@ rename_index("table_name", "old_index_name", "new_index_name")
 ``` javascript
 drop_index("table_name", "index_name")
 ```
-
-## Add a Foreign Key
-
-```javascript
-add_foreign_key("table_name", "field", {"ref_table_name": ["ref_column"]}, {
-    "name": "optional_fk_name",
-    "on_delete": "action",
-    "on_update": "action",
-})
-
-```
-
-#### Supported Options
-
-* `name` - This defaults to `table_name_ref_table_name_ref_column_name_fk`
-* `on_delete` - `CASCADE`, `SET NULL`, ...
-* `on_update`
-
-**Note:** `on_update` and `on_delete` are not supported on cockroachDB yet.
-
-## Drop a Foreign Key
-
-```javascript
-drop_foreign_key("table_name", "fk_name", {"if_exists": true})
-```
-
-#### Supported Options
-
-* `if_exists` - Adds `IF EXISTS` condition
-
 
 ## Raw SQL
 

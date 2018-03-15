@@ -116,7 +116,7 @@ func lenHelper(v interface{}) int {
 
 // Debug by verbosely printing out using 'pre' tags.
 func debugHelper(v interface{}) template.HTML {
-	return template.HTML(fmt.Sprintf("<pre>%s</pre>", inspectHelper(v)))
+	return template.HTML(fmt.Sprintf("<pre>%+v</pre>", v))
 }
 
 func inspectHelper(v interface{}) string {
@@ -150,8 +150,5 @@ func truncateHelper(s string, opts map[string]interface{}) string {
 		return s
 	}
 	trail := opts["trail"].(string)
-	if len(trail) >= size {
-		return trail
-	}
 	return s[:size-len(trail)] + trail
 }

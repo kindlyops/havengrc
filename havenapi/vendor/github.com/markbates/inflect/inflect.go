@@ -15,24 +15,22 @@ import (
 	"unicode/utf8"
 )
 
-// baseAcronyms comes from https://en.wikipedia.org/wiki/List_of_information_technology_acronymss
-const baseAcronyms = `ACK,ACL,ADSL,AES,ANSI,API,ARP,ATM,BGP,BSS,CAT,CCITT,CHAP,CIDR,CIR,CLI,CPE,CPU,CRC,CRT,CSMA,CMOS,DCE,DEC,DES,DHCP,DNS,DRAM,DSL,DSLAM,DTE,DMI,EHA,EIA,EIGRP,EOF,ESS,FCC,FCS,FDDI,FTP,GBIC,gbps,GEPOF,HDLC,HTTP,HTTPS,IANA,ICMP,IDF,IDS,IEEE,IETF,IMAP,IP,IPS,ISDN,ISP,kbps,LACP,LAN,LAPB,LAPF,LLC,MAC,MAN,Mbps,MC,MDF,MIB,MoCA,MPLS,MTU,NAC,NAT,NBMA,NIC,NRZ,NRZI,NVRAM,OSI,OSPF,OUI,PAP,PAT,PC,PIM,PIM,PCM,PDU,POP3,POP,POST,POTS,PPP,PPTP,PTT,PVST,RADIUS,RAM,RARP,RFC,RIP,RLL,ROM,RSTP,RTP,RCP,SDLC,SFD,SFP,SLARP,SLIP,SMTP,SNA,SNAP,SNMP,SOF,SRAM,SSH,SSID,STP,SYN,TDM,TFTP,TIA,TOFU,UDP,URL,URI,USB,UTP,VC,VLAN,VLSM,VPN,W3C,WAN,WEP,WiFi,WPA,WWW`
-
-// Rule used by rulesets
+// used by rulesets
 type Rule struct {
 	suffix      string
 	replacement string
 	exact       bool
 }
 
-// Ruleset a Ruleset is the config of pluralization rules
+// a Ruleset is the config of pluralization rules
 // you can extend the rules with the Add* methods
 type Ruleset struct {
-	uncountables map[string]bool
-	plurals      []*Rule
-	singulars    []*Rule
-	humans       []*Rule
-	acronyms     []*Rule
+	uncountables   map[string]bool
+	plurals        []*Rule
+	singulars      []*Rule
+	humans         []*Rule
+	acronyms       []*Rule
+	acronymMatcher *regexp.Regexp
 }
 
 // create a blank ruleset. Unless you are going to
@@ -62,7 +60,6 @@ func NewDefaultRuleset() *Ruleset {
 	rs.AddPlural("viri", "viri")
 	rs.AddPlural("alias", "aliases")
 	rs.AddPlural("status", "statuses")
-	rs.AddPlural("Status", "Statuses")
 	rs.AddPlural("bus", "buses")
 	rs.AddPlural("buffalo", "buffaloes")
 	rs.AddPlural("tomato", "tomatoes")
@@ -227,9 +224,7 @@ func NewDefaultRuleset() *Ruleset {
 	rs.AddSingular("viri", "virus")
 	rs.AddSingularExact("virus", "virus", true)
 	rs.AddSingular("statuses", "status")
-	rs.AddSingular("Statuses", "Status")
 	rs.AddSingularExact("status", "status", true)
-	rs.AddSingularExact("Status", "Status", true)
 	rs.AddSingular("aliases", "alias")
 	rs.AddSingularExact("alias", "alias", true)
 	rs.AddSingularExact("oxen", "ox", true)
@@ -246,8 +241,6 @@ func NewDefaultRuleset() *Ruleset {
 	rs.AddIrregular("sex", "sexes")
 	rs.AddIrregular("move", "moves")
 	rs.AddIrregular("zombie", "zombies")
-	rs.AddIrregular("Status", "Statuses")
-	rs.AddIrregular("status", "statuses")
 	rs.AddUncountable("equipment")
 	rs.AddUncountable("information")
 	rs.AddUncountable("rice")
@@ -258,12 +251,6 @@ func NewDefaultRuleset() *Ruleset {
 	rs.AddUncountable("sheep")
 	rs.AddUncountable("jeans")
 	rs.AddUncountable("police")
-
-	acronyms := strings.Split(baseAcronyms, ",")
-	for _, acr := range acronyms {
-		rs.AddAcronym(acr)
-	}
-
 	return rs
 }
 
@@ -316,7 +303,7 @@ func (rs *Ruleset) AddHuman(suffix, replacement string) {
 	rs.humans = append([]*Rule{r}, rs.humans...)
 }
 
-// Add any inconsistent pluralizing/singularizing rules
+// Add any inconsistant pluralizing/sinularizing rules
 // to the set here.
 func (rs *Ruleset) AddIrregular(singular, plural string) {
 	delete(rs.uncountables, singular)
@@ -348,17 +335,6 @@ func (rs *Ruleset) isUncountable(word string) bool {
 	if _, exists := rs.uncountables[strings.ToLower(words[len(words)-1])]; exists {
 		return true
 	}
-	return false
-}
-
-//isAcronym returns if a word is acronym or not.
-func (rs *Ruleset) isAcronym(word string) bool {
-	for _, rule := range rs.acronyms {
-		if rule.suffix == word {
-			return true
-		}
-	}
-
 	return false
 }
 
@@ -425,17 +401,11 @@ func (rs *Ruleset) Singularize(word string) string {
 
 // uppercase first character
 func (rs *Ruleset) Capitalize(word string) string {
-	if strings.ToLower(word) == "id" {
-		return "ID"
-	}
 	return strings.ToUpper(word[:1]) + word[1:]
 }
 
 // "dino_party" -> "DinoParty"
 func (rs *Ruleset) Camelize(word string) string {
-	if strings.ToLower(word) == "id" {
-		return "ID"
-	}
 	words := splitAtCaseChangeWithTitlecase(word)
 	return strings.Join(words, "")
 }
@@ -446,41 +416,21 @@ func (rs *Ruleset) CamelizeDownFirst(word string) string {
 	return strings.ToLower(word[:1]) + word[1:]
 }
 
-// Capitalize every word in sentence "hello there" -> "Hello There"
+// Captitilize every word in sentance "hello there" -> "Hello There"
 func (rs *Ruleset) Titleize(word string) string {
 	words := splitAtCaseChangeWithTitlecase(word)
-	result := strings.Join(words, " ")
-
-	var acronymWords []string
-	for index, word := range words {
-		if len(word) == 1 {
-			acronymWords = append(acronymWords, word)
-		}
-
-		if len(word) > 1 || index == len(words)-1 || len(acronymWords) > 1 {
-			acronym := strings.Join(acronymWords, "")
-			if !rs.isAcronym(acronym) {
-				acronymWords = acronymWords[:len(acronymWords)]
-				continue
-			}
-
-			result = strings.Replace(result, strings.Join(acronymWords, " "), acronym, 1)
-			acronymWords = []string{}
-		}
-	}
-
-	return result
+	return strings.Join(words, " ")
 }
 
 func (rs *Ruleset) safeCaseAcronyms(word string) string {
-	// convert an acronym like HTML into Html
+	// convert an acroymn like HTML into Html
 	for _, rule := range rs.acronyms {
 		word = strings.Replace(word, rule.suffix, rule.replacement, -1)
 	}
 	return word
 }
 
-func (rs *Ruleset) separatedWords(word, sep string) string {
+func (rs *Ruleset) seperatedWords(word, sep string) string {
 	word = rs.safeCaseAcronyms(word)
 	words := splitAtCaseChange(word)
 	return strings.Join(words, sep)
@@ -488,10 +438,10 @@ func (rs *Ruleset) separatedWords(word, sep string) string {
 
 // lowercase underscore version "BigBen" -> "big_ben"
 func (rs *Ruleset) Underscore(word string) string {
-	return rs.separatedWords(word, "_")
+	return rs.seperatedWords(word, "_")
 }
 
-// First letter of sentence capitalized
+// First letter of sentance captitilized
 // Uses custom friendly replacements via AddHuman()
 func (rs *Ruleset) Humanize(word string) string {
 	word = replaceLast(word, "_id", "") // strip foreign key kinds
@@ -499,10 +449,8 @@ func (rs *Ruleset) Humanize(word string) string {
 	for _, rule := range rs.humans {
 		word = strings.Replace(word, rule.suffix, rule.replacement, -1)
 	}
-	sentence := rs.separatedWords(word, " ")
-
-	r, n := utf8.DecodeRuneInString(sentence)
-	return string(unicode.ToUpper(r)) + sentence[n:]
+	sentance := rs.seperatedWords(word, " ")
+	return strings.ToUpper(sentance[:1]) + sentance[1:]
 }
 
 // an underscored foreign key name "Person" -> "person_id"
@@ -527,7 +475,7 @@ func (rs *Ruleset) Parameterize(word string) string {
 	return ParameterizeJoin(word, "-")
 }
 
-// param safe dasherized names with custom separator
+// param safe dasherized names with custom seperator
 func (rs *Ruleset) ParameterizeJoin(word, sep string) string {
 	word = strings.ToLower(word)
 	word = rs.Asciify(word)
@@ -569,7 +517,7 @@ var lookalikes map[string]*regexp.Regexp = map[string]*regexp.Regexp{
 	"y":  regexp.MustCompile(`ý|ÿ`),
 }
 
-// transforms Latin characters like é -> e
+// transforms latin characters like é -> e
 func (rs *Ruleset) Asciify(word string) string {
 	for repl, regex := range lookalikes {
 		word = regex.ReplaceAllString(word, repl)
@@ -587,7 +535,7 @@ func (rs *Ruleset) Typeify(word string) string {
 
 // "SomeText" -> "some-text"
 func (rs *Ruleset) Dasherize(word string) string {
-	return rs.separatedWords(word, "-")
+	return rs.seperatedWords(word, "-")
 }
 
 // "1031" -> "1031st"
@@ -814,7 +762,6 @@ func splitAtCaseChange(s string) []string {
 func splitAtCaseChangeWithTitlecase(s string) []string {
 	words := make([]string, 0)
 	word := make([]rune, 0)
-
 	for _, c := range s {
 		spacer := isSpacerChar(c)
 		if len(word) > 0 {
@@ -831,7 +778,6 @@ func splitAtCaseChangeWithTitlecase(s string) []string {
 			}
 		}
 	}
-
 	words = append(words, string(word))
 	return words
 }

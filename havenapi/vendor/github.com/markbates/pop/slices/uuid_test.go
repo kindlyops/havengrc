@@ -12,10 +12,8 @@ import (
 func Test_UUID_JSON_Unmarshal(t *testing.T) {
 	r := require.New(t)
 
-	a, err := uuid.NewV4()
-	r.NoError(err)
-	b, err := uuid.NewV4()
-	r.NoError(err)
+	a := uuid.NewV4()
+	b := uuid.NewV4()
 	x := fmt.Sprintf("[%q, %q]", a, b)
 	s := UUID{}
 	r.NoError(json.Unmarshal([]byte(x), &s))
@@ -25,10 +23,8 @@ func Test_UUID_JSON_Unmarshal(t *testing.T) {
 func Test_UUID_JSON_Marshal(t *testing.T) {
 	r := require.New(t)
 
-	a, err := uuid.NewV4()
-	r.NoError(err)
-	b, err := uuid.NewV4()
-	r.NoError(err)
+	a := uuid.NewV4()
+	b := uuid.NewV4()
 	x := fmt.Sprintf("[%q,%q]", a, b)
 
 	s := UUID{a, b}

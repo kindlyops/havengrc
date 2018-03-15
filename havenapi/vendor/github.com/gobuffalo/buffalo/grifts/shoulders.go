@@ -1,6 +1,7 @@
 package grifts
 
 import (
+	"fmt"
 	"html/template"
 	"os"
 	"os/exec"
@@ -11,7 +12,6 @@ import (
 	"github.com/gobuffalo/envy"
 	"github.com/markbates/deplist"
 	"github.com/markbates/grift/grift"
-	"github.com/sirupsen/logrus"
 )
 
 var _ = grift.Desc("shoulders", "Prints a listing all of the 3rd party packages used by buffalo.")
@@ -31,7 +31,7 @@ var _ = grift.Add("shoulders:list", func(c *grift.Context) error {
 		}
 	}
 	sort.Strings(deps)
-	logrus.Infof(strings.Join(deps, "\n"))
+	fmt.Println(strings.Join(deps, "\n"))
 	c.Set("giants", deps)
 	return nil
 })

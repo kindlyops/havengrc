@@ -30,7 +30,6 @@ type Generator struct {
 	SkipPop     bool   `json:"skip_pop"`
 	SkipWebpack bool   `json:"skip_webpack"`
 	SkipYarn    bool   `json:"skip_yarn"`
-	Bootstrap   int    `json:"bootstrap"`
 }
 
 // New app generator

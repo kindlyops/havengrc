@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"html/template"
 	"reflect"
-	"regexp"
-	"time"
 
 	"github.com/gobuffalo/plush/ast"
 
@@ -18,7 +16,6 @@ var ErrUnknownIdentifier = errors.New("unknown identifier")
 type compiler struct {
 	ctx     *Context
 	program *ast.Program
-	curStmt ast.Statement
 }
 
 func (c *compiler) compile() (string, error) {
@@ -39,11 +36,7 @@ func (c *compiler) compile() (string, error) {
 			res, err = c.evalLetStatement(node)
 		}
 		if err != nil {
-			s := stmt
-			if c.curStmt != nil {
-				s = c.curStmt
-			}
-			return "", errors.WithStack(errors.Wrapf(err, "line %d", s.T().LineNumber))
+			return "", errors.WithStack(err)
 		}
 
 		c.write(bb, res)
@@ -53,23 +46,15 @@ func (c *compiler) compile() (string, error) {
 
 func (c *compiler) write(bb *bytes.Buffer, i interface{}) {
 	switch t := i.(type) {
-	case time.Time:
-		if dtf, ok := c.ctx.Value("TIME_FORMAT").(string); ok {
-			bb.WriteString(t.Format(dtf))
-			return
-		}
-		bb.WriteString(t.Format(DefaultTimeFormat))
-	case *time.Time:
-		c.write(bb, *t)
 	case interfaceable:
-		c.write(bb, t.Interface())
+		bb.WriteString(template.HTMLEscaper(t.Interface()))
 	case string, ast.Printable, bool:
 		bb.WriteString(template.HTMLEscaper(t))
 	case template.HTML:
 		bb.WriteString(string(t))
 	case HTMLer:
 		bb.WriteString(string(t.HTML()))
-	case uint, uint8, uint16, uint32, uint64, int, int8, int16, int32, int64, float32, float64:
+	case int64, int, float64:
 		bb.WriteString(fmt.Sprint(t))
 	case fmt.Stringer:
 		bb.WriteString(t.String())
@@ -116,25 +101,10 @@ func (c *compiler) evalExpression(node ast.Expression) (interface{}, error) {
 		return c.evalPrefixExpression(s)
 	case *ast.FunctionLiteral:
 		return c.evalFunctionLiteral(s)
-	case *ast.AssignExpression:
-		return c.evalAssignExpression(s)
 	case nil:
 		return nil, nil
 	}
 	return nil, errors.WithStack(errors.Errorf("could not evaluate node %T", node))
-}
-
-func (c *compiler) evalAssignExpression(node *ast.AssignExpression) (interface{}, error) {
-	v, err := c.evalExpression(node.Value)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-	n := node.Name.Value
-	if !c.ctx.Has(n) {
-		return nil, errors.Errorf("could not find identifier named %s", n)
-	}
-	c.ctx.Set(n, v)
-	return nil, nil
 }
 
 func (c *compiler) evalUserFunction(node *userFunction, args []ast.Expression) (interface{}, error) {
@@ -196,15 +166,9 @@ func (c *compiler) isTruthy(i interface{}) bool {
 	if i == nil {
 		return false
 	}
-	switch t := i.(type) {
-	case bool:
-		return t
-	case string:
-		return t != ""
-	case template.HTML:
-		return t != ""
+	if b, ok := i.(bool); ok {
+		return b
 	}
-
 	return true
 }
 
@@ -267,9 +231,6 @@ func (c *compiler) evalIdentifier(node *ast.Identifier) (interface{}, error) {
 		}
 		if rv.Kind() == reflect.Ptr {
 			rv = rv.Elem()
-		}
-		if rv.Kind() != reflect.Struct {
-			return nil, errors.WithStack(errors.Errorf("'%s' does not have a field or method named '%s' (%s)", node.Callee.String(), node.Value, node))
 		}
 		f := rv.FieldByName(node.Value)
 		if !f.IsValid() {
@@ -418,12 +379,6 @@ func (c *compiler) stringsOperator(l string, r interface{}, op string) (interfac
 		return l <= rr, nil
 	case "==":
 		return l == rr, nil
-	case "~=":
-		x, err := regexp.Compile(rr)
-		if err != nil {
-			return nil, errors.WithStack(errors.Errorf("couldn't compile regex %s", rr))
-		}
-		return x.MatchString(l), nil
 	}
 	return nil, errors.WithStack(errors.Errorf("unknown operator for string %s", op))
 }
@@ -610,11 +565,6 @@ func (c *compiler) evalCallExpression(node *ast.CallExpression) (interface{}, er
 }
 
 func (c *compiler) evalForExpression(node *ast.ForExpression) (interface{}, error) {
-	octx := c.ctx
-	defer func() {
-		c.ctx = octx
-	}()
-	c.ctx = octx.New()
 	iter, err := c.evalExpression(node.Iterable)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -626,24 +576,30 @@ func (c *compiler) evalForExpression(node *ast.ForExpression) (interface{}, erro
 	ret := []interface{}{}
 	switch riter.Kind() {
 	case reflect.Map:
+		octx := c.ctx
 		keys := riter.MapKeys()
 		for i := 0; i < len(keys); i++ {
 			k := keys[i]
 			v := riter.MapIndex(k)
+			c.ctx = octx.New()
 			c.ctx.Set(node.KeyName, k.Interface())
 			c.ctx.Set(node.ValueName, v.Interface())
 			res, err := c.evalBlockStatement(node.Block)
+			c.ctx = octx
 			if err != nil {
 				return nil, errors.WithStack(err)
 			}
 			ret = append(ret, res)
 		}
 	case reflect.Slice, reflect.Array:
+		octx := c.ctx
 		for i := 0; i < riter.Len(); i++ {
+			c.ctx = octx.New()
 			v := riter.Index(i)
 			c.ctx.Set(node.KeyName, i)
 			c.ctx.Set(node.ValueName, v.Interface())
 			res, err := c.evalBlockStatement(node.Block)
+			c.ctx = octx
 			if err != nil {
 				return nil, errors.WithStack(err)
 			}
@@ -656,12 +612,14 @@ func (c *compiler) evalForExpression(node *ast.ForExpression) (interface{}, erro
 			return nil, nil
 		}
 		if it, ok := iter.(Iterator); ok {
+			octx := c.ctx
 			i := 0
 			ii := it.Next()
 			for ii != nil {
 				c.ctx.Set(node.KeyName, i)
 				c.ctx.Set(node.ValueName, ii)
 				res, err := c.evalBlockStatement(node.Block)
+				c.ctx = octx
 				if err != nil {
 					return nil, errors.WithStack(err)
 				}
@@ -694,7 +652,6 @@ func (c *compiler) evalBlockStatement(node *ast.BlockStatement) (interface{}, er
 }
 
 func (c *compiler) evalStatement(node ast.Statement) (interface{}, error) {
-	c.curStmt = node
 	// fmt.Println("evalStatement")
 	switch t := node.(type) {
 	case *ast.ExpressionStatement:

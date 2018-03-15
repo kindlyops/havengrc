@@ -48,10 +48,30 @@ func (t sqliteTableInfo) ToColumn() fizz.Column {
 }
 
 type sqliteSchema struct {
-	Schema
+	URL    string
+	db     *sqlx.DB
+	schema map[string]*fizz.Table
 }
 
-func (p *sqliteSchema) Build() error {
+func (p *sqliteSchema) Delete(table string) {
+	delete(p.schema, table)
+}
+
+func (p *sqliteSchema) TableInfo(table string) (*fizz.Table, error) {
+	if ti, ok := p.schema[table]; ok {
+		return ti, nil
+	}
+	err := p.buildSchema()
+	if err != nil {
+		return nil, err
+	}
+	if ti, ok := p.schema[table]; ok {
+		return ti, nil
+	}
+	return nil, fmt.Errorf("Could not find table data for %s!", table)
+}
+
+func (p *sqliteSchema) buildSchema() error {
 	var err error
 	p.db, err = sqlx.Open("sqlite3", p.URL)
 	if err != nil {

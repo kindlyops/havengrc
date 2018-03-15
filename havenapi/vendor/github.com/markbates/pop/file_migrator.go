@@ -36,8 +36,8 @@ func NewFileMigrator(path string, c *Connection) (FileMigrator, error) {
 }
 
 func (fm *FileMigrator) findMigrations() error {
-	dir := fm.Path
-	if fi, err := os.Stat(dir); err != nil || !fi.IsDir() {
+	dir := filepath.Base(fm.Path)
+	if _, err := os.Stat(dir); err != nil {
 		// directory doesn't exist
 		return nil
 	}

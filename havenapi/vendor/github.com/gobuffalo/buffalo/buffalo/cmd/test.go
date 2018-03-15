@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"os"
 	"os/exec"
@@ -9,10 +10,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/gobuffalo/buffalo/meta"
 	"github.com/gobuffalo/envy"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 
 	"github.com/markbates/pop"
 	"github.com/spf13/cobra"
@@ -82,79 +81,6 @@ func findSchema() io.Reader {
 }
 
 func testRunner(args []string) error {
-	cmd := newTestCmd(args)
-	var runFlag bool
-	var mFlag bool
-	for i, a := range args {
-		if a == "-run" {
-			runFlag = true
-		}
-		if a == "-m" {
-			mFlag = true
-			args[i] = "-testify.m"
-		}
-	}
-
-	if mFlag {
-		return mFlagRunner(args)
-	}
-
-	if !runFlag {
-		pkgs, err := testPackages()
-		if err != nil {
-			return errors.WithStack(err)
-		}
-		cmd.Args = append(cmd.Args, pkgs...)
-	}
-	logrus.Info(strings.Join(cmd.Args, " "))
-	return cmd.Run()
-}
-
-func mFlagRunner(args []string) error {
-	app := meta.New(".")
-	pwd, _ := os.Getwd()
-	defer os.Chdir(pwd)
-
-	pkgs, err := testPackages()
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	var errs bool
-	for _, p := range pkgs {
-		os.Chdir(pwd)
-		if p == app.PackagePkg {
-			continue
-		}
-		cmd := newTestCmd(args)
-		p = strings.TrimPrefix(p, app.PackagePkg+string(filepath.Separator))
-		logrus.Info(strings.Join(cmd.Args, " "))
-		os.Chdir(p)
-		if err := cmd.Run(); err != nil {
-			errs = true
-		}
-	}
-	if errs {
-		return errors.New("errors running tests")
-	}
-	return nil
-}
-
-func testPackages() ([]string, error) {
-	args := []string{}
-	out, err := exec.Command(envy.Get("GO_BIN", "go"), "list", "./...").Output()
-	if err != nil {
-		return args, err
-	}
-	pkgs := bytes.Split(bytes.TrimSpace(out), []byte("\n"))
-	for _, p := range pkgs {
-		if !vendorRegex.Match(p) {
-			args = append(args, string(p))
-		}
-	}
-	return args, nil
-}
-
-func newTestCmd(args []string) *exec.Cmd {
 	cmd := exec.Command(envy.Get("GO_BIN", "go"), "test", "-p", "1")
 	if _, err := exec.LookPath("gotest"); err == nil {
 		cmd = exec.Command("gotest", "-p", "1")
@@ -163,5 +89,24 @@ func newTestCmd(args []string) *exec.Cmd {
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	return cmd
+	runFlag := false
+	for _, a := range cmd.Args {
+		if a == "-run" {
+			runFlag = true
+		}
+	}
+	if !runFlag {
+		out, err := exec.Command(envy.Get("GO_BIN", "go"), "list", "./...").Output()
+		if err != nil {
+			return err
+		}
+		pkgs := bytes.Split(bytes.TrimSpace(out), []byte("\n"))
+		for _, p := range pkgs {
+			if !vendorRegex.Match(p) {
+				cmd.Args = append(cmd.Args, string(p))
+			}
+		}
+	}
+	fmt.Println(strings.Join(cmd.Args, " "))
+	return cmd.Run()
 }

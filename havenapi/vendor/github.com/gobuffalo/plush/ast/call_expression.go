@@ -3,10 +3,12 @@ package ast
 import (
 	"bytes"
 	"strings"
+
+	"github.com/gobuffalo/plush/token"
 )
 
 type CallExpression struct {
-	TokenAble
+	Token     token.Token
 	Callee    Expression
 	Function  Expression
 	Arguments []Expression
@@ -14,7 +16,12 @@ type CallExpression struct {
 	ElseBlock *BlockStatement
 }
 
-func (ce *CallExpression) expressionNode() {}
+func (ce *CallExpression) expressionNode() {
+}
+
+func (ce *CallExpression) TokenLiteral() string {
+	return ce.Token.Literal
+}
 
 func (ce *CallExpression) String() string {
 	var out bytes.Buffer

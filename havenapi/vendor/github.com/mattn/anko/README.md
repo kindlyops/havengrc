@@ -106,6 +106,3 @@ MIT
 
 Yasuhiro Matsumoto (a.k.a mattn)
 
-# Note
-
-Please note that the language and API may change at any time so be very weary of using in production

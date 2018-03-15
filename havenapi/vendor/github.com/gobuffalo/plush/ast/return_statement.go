@@ -2,10 +2,12 @@ package ast
 
 import (
 	"bytes"
+
+	"github.com/gobuffalo/plush/token"
 )
 
 type ReturnStatement struct {
-	TokenAble
+	Token       token.Token
 	ReturnValue Expression
 }
 
@@ -13,7 +15,12 @@ func (rs *ReturnStatement) Printable() bool {
 	return true
 }
 
-func (rs *ReturnStatement) statementNode() {}
+func (rs *ReturnStatement) statementNode() {
+}
+
+func (rs *ReturnStatement) TokenLiteral() string {
+	return rs.Token.Literal
+}
 
 func (rs *ReturnStatement) String() string {
 	var out bytes.Buffer

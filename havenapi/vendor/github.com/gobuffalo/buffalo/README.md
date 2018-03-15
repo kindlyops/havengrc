@@ -1,4 +1,4 @@
-# Buffalo [![GoDoc](https://godoc.org/github.com/gobuffalo/buffalo?status.svg)](https://godoc.org/github.com/gobuffalo/buffalo) [![Build Status](https://travis-ci.org/gobuffalo/buffalo.svg?branch=master)](https://travis-ci.org/gobuffalo/buffalo) [![Go Report Card](https://goreportcard.com/badge/github.com/gobuffalo/buffalo)](https://goreportcard.com/report/github.com/gobuffalo/buffalo) [![Build status](https://ci.appveyor.com/api/projects/status/fjv5u499p78uvbxa/branch/master?svg=true)](https://ci.appveyor.com/project/markbates/buffalo/branch/master)
+# Buffalo [![GoDoc](https://godoc.org/github.com/gobuffalo/buffalo?status.svg)](https://godoc.org/github.com/gobuffalo/buffalo) [![Build Status](https://travis-ci.org/gobuffalo/buffalo.svg?branch=master)](https://travis-ci.org/gobuffalo/buffalo) [![Code Climate](https://codeclimate.com/github/gobuffalo/buffalo/badges/gpa.svg)](https://codeclimate.com/github/gobuffalo/buffalo) [![Go Report Card](https://goreportcard.com/badge/github.com/gobuffalo/buffalo)](https://goreportcard.com/report/github.com/gobuffalo/buffalo)
 
 Buffalo is a Go web development eco-system. Designed to make the life of a Go web developer easier.
 
@@ -14,8 +14,16 @@ Please visit [http://gobuffalo.io](http://gobuffalo.io) for the latest documenta
 
 ## Installation
 
+Let's get the source first, with its dependencies:
+
 ```bash
-$ go get -u -v github.com/gobuffalo/buffalo/buffalo
+$ go get -u -v github.com/gobuffalo/buffalo
+```
+
+Then, install the `buffalo` tool:
+
+```bash
+$ go install -v github.com/gobuffalo/buffalo/buffalo
 ```
 
 _NOTE_: Buffalo has a minimum Go dependency of `1.8.1`.
@@ -84,7 +92,7 @@ Buffalo would not be possible if not for all of the great projects it depends on
 
 ### Sessions, Cookies, Websockets, and more...
 
-[github.com/gorilla](https://github.com/gorilla) - The Gorilla toolkit is a great set of packages designed to improve upon the standard library for a variety of web-related packages. With these high quality packages Buffalo is able to keep its "core" code to a minimum and focus on its goal of glueing them all together to make your life better.
+[github.com/gorilla](https://github.com/gorilla) - The Gorilla toolkit is a great set of packages designed to improve upon the standard libary for a variety of web-related packages. With these high quality packages Buffalo is able to keep its "core" code to a minimum and focus on its goal of glueing them all together to make your life better.
 
 ## Benchmarks
 

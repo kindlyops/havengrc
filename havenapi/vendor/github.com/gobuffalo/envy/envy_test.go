@@ -2,7 +2,6 @@ package envy_test
 
 import (
 	"os"
-	"runtime"
 	"testing"
 
 	"github.com/gobuffalo/envy"
@@ -75,11 +74,7 @@ func Test_GoPath(t *testing.T) {
 func Test_GoPaths(t *testing.T) {
 	r := require.New(t)
 	envy.Temp(func() {
-		if runtime.GOOS == "windows" {
-			envy.Set("GOPATH", "/foo;/bar")
-		} else {
-			envy.Set("GOPATH", "/foo:/bar")
-		}
+		envy.Set("GOPATH", "/foo:/bar")
 		r.Equal([]string{"/foo", "/bar"}, envy.GoPaths())
 	})
 }
@@ -90,14 +85,6 @@ func Test_CurrentPackage(t *testing.T) {
 }
 
 // Env files loading
-func Test_LoadEnvLoadsEnvFile(t *testing.T) {
-	r := require.New(t)
-	envy.Temp(func() {
-		r.Equal("root", envy.Get("DIR", ""))
-		r.Equal("none", envy.Get("FLAVOUR", ""))
-		r.Equal("false", envy.Get("INSIDE_FOLDER", ""))
-	})
-}
 
 func Test_LoadDefaultEnvWhenNoArgsPassed(t *testing.T) {
 	r := require.New(t)
@@ -136,10 +123,9 @@ func Test_OverloadParams(t *testing.T) {
 func Test_ErrorWhenSingleFileLoadDoesNotExist(t *testing.T) {
 	r := require.New(t)
 	envy.Temp(func() {
-		delete(envy.Map(), "FLAVOUR")
 		err := envy.Load(".env.fake")
-
 		r.Error(err)
+
 		r.Equal("FAILED", envy.Get("FLAVOUR", "FAILED"))
 	})
 }

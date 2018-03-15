@@ -2,9 +2,9 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 	"os/exec"
 
-	"github.com/markbates/grift/grift"
 	"github.com/pkg/errors"
 )
 
@@ -47,15 +47,25 @@ func Run(name string, args []string) error {
 func run(args []string) error {
 	rargs := []string{"run", exePath}
 	rargs = append(rargs, args...)
-	if err := grift.RunSource(exec.Command("go", rargs...)); err != nil {
+	runner := exec.Command("go", rargs...)
+	runner.Stdin = os.Stdin
+	runner.Stdout = os.Stdout
+	runner.Stderr = os.Stderr
+	err := runner.Run()
+	if err != nil {
 		return errors.WithStack(err)
 	}
+
 	return nil
 }
 
 func list() error {
 	rargs := []string{"run", exePath, "list"}
-	return grift.RunSource(exec.Command("go", rargs...))
+	runner := exec.Command("go", rargs...)
+	runner.Stderr = os.Stderr
+	runner.Stdin = os.Stdin
+	runner.Stdout = os.Stdout
+	return runner.Run()
 }
 
 func setup(name string) error {

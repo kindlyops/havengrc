@@ -2,6 +2,7 @@ package graphql
 
 import (
 	"net/url"
+	"reflect"
 	"testing"
 	"time"
 )
@@ -216,20 +217,15 @@ func TestConstructQuery(t *testing.T) {
 			}(),
 			want: `{actor{login,avatarUrl,url},createdAt,... on IssueComment{body},currentTitle,previousTitle,label{name,color}}`,
 		},
-		{
-			inV: struct {
-				Viewer struct {
-					Login      string
-					CreatedAt  time.Time
-					ID         interface{}
-					DatabaseID int
-				}
-			}{},
-			want: `{viewer{login,createdAt,id,databaseId}}`,
-		},
 	}
 	for _, tc := range tests {
-		got := constructQuery(tc.inV, tc.inVariables)
+		qctx := &queryContext{
+			Scalars: []reflect.Type{
+				reflect.TypeOf(DateTime{}),
+				reflect.TypeOf(URI{}),
+			},
+		}
+		got := constructQuery(qctx, tc.inV, tc.inVariables)
 		if got != tc.want {
 			t.Errorf("\ngot:  %q\nwant: %q\n", got, tc.want)
 		}
@@ -264,7 +260,7 @@ func TestConstructMutation(t *testing.T) {
 		},
 	}
 	for _, tc := range tests {
-		got := constructMutation(tc.inV, tc.inVariables)
+		got := constructMutation(&queryContext{}, tc.inV, tc.inVariables)
 		if got != tc.want {
 			t.Errorf("\ngot:  %q\nwant: %q\n", got, tc.want)
 		}
@@ -273,6 +269,7 @@ func TestConstructMutation(t *testing.T) {
 
 func TestQueryArguments(t *testing.T) {
 	tests := []struct {
+		name string
 		in   map[string]interface{}
 		want string
 	}{
@@ -281,43 +278,26 @@ func TestQueryArguments(t *testing.T) {
 			want: "$a:Int!$b:Boolean",
 		},
 		{
-			in: map[string]interface{}{
-				"required": []IssueState{IssueStateOpen, IssueStateClosed},
-				"optional": &[]IssueState{IssueStateOpen, IssueStateClosed},
-			},
-			want: "$optional:[IssueState!]$required:[IssueState!]!",
+			in:   map[string]interface{}{"states": []IssueState{IssueStateOpen, IssueStateClosed}},
+			want: "$states:[IssueState!]",
 		},
 		{
-			in: map[string]interface{}{
-				"required": []IssueState(nil),
-				"optional": (*[]IssueState)(nil),
-			},
-			want: "$optional:[IssueState!]$required:[IssueState!]!",
+			in:   map[string]interface{}{"states": []IssueState(nil)},
+			want: "$states:[IssueState!]",
 		},
 		{
-			in: map[string]interface{}{
-				"required": [...]IssueState{IssueStateOpen, IssueStateClosed},
-				"optional": &[...]IssueState{IssueStateOpen, IssueStateClosed},
-			},
-			want: "$optional:[IssueState!]$required:[IssueState!]!",
+			in:   map[string]interface{}{"states": [...]IssueState{IssueStateOpen, IssueStateClosed}},
+			want: "$states:[IssueState!]",
 		},
 		{
-			in:   map[string]interface{}{"id": ID("someID")},
+			in:   map[string]interface{}{"id": ID("someid")},
 			want: "$id:ID!",
 		},
-		{
-			in:   map[string]interface{}{"ids": []ID{"someID", "anotherID"}},
-			want: `$ids:[ID!]!`,
-		},
-		{
-			in:   map[string]interface{}{"ids": &[]ID{"someID", "anotherID"}},
-			want: `$ids:[ID!]`,
-		},
 	}
-	for i, tc := range tests {
+	for _, tc := range tests {
 		got := queryArguments(tc.in)
 		if got != tc.want {
-			t.Errorf("test case %d:\n got: %q\nwant: %q", i, got, tc.want)
+			t.Errorf("%s: got: %q, want: %q", tc.name, got, tc.want)
 		}
 	}
 }
@@ -330,8 +310,6 @@ type (
 	// URI is an RFC 3986, RFC 3987, and RFC 6570 (level 4) compliant URI.
 	URI struct{ *url.URL }
 )
-
-func (u *URI) UnmarshalJSON(data []byte) error { panic("mock implementation") }
 
 // IssueState represents the possible states of an issue.
 type IssueState string

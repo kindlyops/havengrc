@@ -13,12 +13,11 @@ type Lexer struct {
 	readPosition int  // current reading position in input (after current char)
 	ch           byte // current char under examination
 	inside       bool
-	curLine      int
 }
 
 // New Lexer from the input string
 func New(input string) *Lexer {
-	l := &Lexer{input: input, curLine: 1}
+	l := &Lexer{input: input}
 	l.readChar()
 	return l
 }
@@ -34,7 +33,6 @@ func (l *Lexer) NextToken() token.Token {
 	if l.ch == 0 {
 		tok.Literal = ""
 		tok.Type = token.EOF
-		tok.LineNumber = l.curLine
 		return tok
 	}
 
@@ -45,7 +43,6 @@ func (l *Lexer) NextToken() token.Token {
 
 	tok.Type = token.HTML
 	tok.Literal = l.readHTML()
-	tok.LineNumber = l.curLine
 	return tok
 }
 
@@ -59,9 +56,9 @@ func (l *Lexer) nextInsideToken() token.Token {
 		if l.peekChar() == '=' {
 			ch := l.ch
 			l.readChar()
-			tok = token.Token{Type: token.EQ, Literal: string(ch) + string(l.ch), LineNumber: l.curLine}
+			tok = token.Token{Type: token.EQ, Literal: string(ch) + string(l.ch)}
 		} else {
-			tok = l.newToken(token.ASSIGN)
+			tok = newToken(token.ASSIGN, l.ch)
 		}
 	case '.':
 		if isDigit(l.peekChar()) {
@@ -69,54 +66,55 @@ func (l *Lexer) nextInsideToken() token.Token {
 			tokSplit := strings.Split(tok.Literal, ".")
 			switch {
 			case len(tokSplit) > 2:
-				return l.newIllegalTokenLiteral(token.ILLEGAL, tok.Literal)
+				return newIllegalTokenLiteral(token.ILLEGAL, tok.Literal)
 			case len(tokSplit) == 2:
 				tok.Type = "FLOAT"
 			default:
 				tok.Type = "INT"
 			}
 
-			break
+			return tok
 		}
-		tok = l.newToken(token.DOT)
+		tok = newToken(token.DOT, l.ch)
+		return tok
 	case '+':
-		tok = l.newToken(token.PLUS)
+		tok = newToken(token.PLUS, l.ch)
 	case '&':
 		if l.peekChar() == '&' {
 			l.readChar()
-			tok = token.Token{Type: token.AND, Literal: "&&", LineNumber: l.curLine}
+			tok = token.Token{Type: token.AND, Literal: "&&"}
 			break
 		}
-		tok = l.newToken(token.ILLEGAL)
+		tok = newToken(token.ILLEGAL, l.ch)
 	case '|':
 		if l.peekChar() == '|' {
 			l.readChar()
-			tok = token.Token{Type: token.OR, Literal: "||", LineNumber: l.curLine}
+			tok = token.Token{Type: token.OR, Literal: "||"}
 			break
 		}
-		tok = l.newToken(token.ILLEGAL)
+		tok = newToken(token.ILLEGAL, l.ch)
 	case '-':
-		tok = l.newToken(token.MINUS)
+		tok = newToken(token.MINUS, l.ch)
 	case '!':
 		if l.peekChar() == '=' {
 			ch := l.ch
 			l.readChar()
-			tok = token.Token{Type: token.NOT_EQ, Literal: string(ch) + string(l.ch), LineNumber: l.curLine}
+			tok = token.Token{Type: token.NOT_EQ, Literal: string(ch) + string(l.ch)}
 		} else {
-			tok = l.newToken(token.BANG)
+			tok = newToken(token.BANG, l.ch)
 		}
 	case '/':
-		tok = l.newToken(token.SLASH)
+		tok = newToken(token.SLASH, l.ch)
 	case '*':
-		tok = l.newToken(token.ASTERISK)
+		tok = newToken(token.ASTERISK, l.ch)
 	case '%':
 		if l.peekChar() == '>' {
 			l.inside = false
 			l.readChar()
-			tok = token.Token{Type: token.E_END, Literal: "%>", LineNumber: l.curLine}
+			tok = token.Token{Type: token.E_END, Literal: "%>"}
 			break
 		}
-		tok = l.newToken(token.ILLEGAL)
+		tok = newToken(token.ILLEGAL, l.ch)
 	case '<':
 		if l.peekChar() == '%' {
 			l.inside = true
@@ -124,56 +122,49 @@ func (l *Lexer) nextInsideToken() token.Token {
 			switch l.peekChar() {
 			case '#':
 				l.readChar()
-				tok = token.Token{Type: token.C_START, Literal: "<%#", LineNumber: l.curLine}
+				tok = token.Token{Type: token.C_START, Literal: "<%#"}
 			case '=':
 				l.readChar()
-				tok = token.Token{Type: token.E_START, Literal: "<%=", LineNumber: l.curLine}
+				tok = token.Token{Type: token.E_START, Literal: "<%="}
 			default:
-				tok = token.Token{Type: token.S_START, Literal: "<%", LineNumber: l.curLine}
+				tok = token.Token{Type: token.S_START, Literal: "<%"}
 			}
 			break
 		}
 		if l.peekChar() == '=' {
 			l.readChar()
-			tok = token.Token{Type: token.LTEQ, Literal: "<=", LineNumber: l.curLine}
+			tok = token.Token{Type: token.LTEQ, Literal: "<="}
 			break
 		}
-		tok = l.newToken(token.LT)
-	case '~':
-		if l.peekChar() == '=' {
-			l.readChar()
-			tok = token.Token{Type: token.MATCHES, Literal: "~=", LineNumber: l.curLine}
-			break
-		}
-		tok = l.newToken(token.MATCHES)
+		tok = newToken(token.LT, l.ch)
 	case '>':
 		if l.peekChar() == '=' {
 			l.readChar()
-			tok = token.Token{Type: token.GTEQ, Literal: ">=", LineNumber: l.curLine}
+			tok = token.Token{Type: token.GTEQ, Literal: ">="}
 			break
 		}
-		tok = l.newToken(token.GT)
+		tok = newToken(token.GT, l.ch)
 	case ';':
-		tok = l.newToken(token.SEMICOLON)
+		tok = newToken(token.SEMICOLON, l.ch)
 	case ':':
-		tok = l.newToken(token.COLON)
+		tok = newToken(token.COLON, l.ch)
 	case ',':
-		tok = l.newToken(token.COMMA)
+		tok = newToken(token.COMMA, l.ch)
 	case '{':
-		tok = l.newToken(token.LBRACE)
+		tok = newToken(token.LBRACE, l.ch)
 	case '}':
-		tok = l.newToken(token.RBRACE)
+		tok = newToken(token.RBRACE, l.ch)
 	case '(':
-		tok = l.newToken(token.LPAREN)
+		tok = newToken(token.LPAREN, l.ch)
 	case ')':
-		tok = l.newToken(token.RPAREN)
+		tok = newToken(token.RPAREN, l.ch)
 	case '"':
 		tok.Type = token.STRING
 		tok.Literal = l.readString()
 	case '[':
-		tok = l.newToken(token.LBRACKET)
+		tok = newToken(token.LBRACKET, l.ch)
 	case ']':
-		tok = l.newToken(token.RBRACKET)
+		tok = newToken(token.RBRACKET, l.ch)
 	case 0:
 		tok.Literal = ""
 		tok.Type = token.EOF
@@ -187,7 +178,7 @@ func (l *Lexer) nextInsideToken() token.Token {
 			tokSplit := strings.Split(tok.Literal, ".")
 			switch {
 			case len(tokSplit) > 2:
-				return l.newIllegalTokenLiteral(token.ILLEGAL, tok.Literal)
+				return newIllegalTokenLiteral(token.ILLEGAL, tok.Literal)
 			case len(tokSplit) == 2:
 				tok.Type = "FLOAT"
 			default:
@@ -196,20 +187,15 @@ func (l *Lexer) nextInsideToken() token.Token {
 
 			return tok
 		} else {
-			tok = l.newToken(token.ILLEGAL)
+			tok = newToken(token.ILLEGAL, l.ch)
 		}
 	}
 
 	l.readChar()
-	tok.LineNumber = l.curLine
 	return tok
 }
 
 func (l *Lexer) skipWhitespace() {
-	if l.readPosition >= len(l.input) {
-		l.readChar()
-		return
-	}
 	for l.ch == ' ' || l.ch == '\t' || l.ch == '\n' || l.ch == '\r' {
 		l.readChar()
 	}
@@ -221,15 +207,11 @@ func (l *Lexer) readChar() {
 	} else {
 		l.ch = l.input[l.readPosition]
 	}
-	if l.ch == '\n' {
-		l.curLine++
-	}
 	l.position = l.readPosition
 	l.readPosition++
 }
 
 func (l *Lexer) peekChar() byte {
-
 	if l.readPosition >= len(l.input) {
 		return 0
 	}
@@ -254,7 +236,7 @@ func (l *Lexer) readNumber() string {
 
 func (l *Lexer) readString() string {
 	position := l.position + 1
-	for l.ch != 0 {
+	for {
 		l.readChar()
 		// check for quote escapes
 		if l.ch == '\\' && l.peekChar() == '"' {
@@ -299,10 +281,10 @@ func isDot(ch byte) bool {
 	return '.' == ch
 }
 
-func (l *Lexer) newToken(tokenType token.Type) token.Token {
-	return token.Token{Type: tokenType, Literal: string(l.ch), LineNumber: l.curLine}
+func newToken(tokenType token.Type, ch byte) token.Token {
+	return token.Token{Type: tokenType, Literal: string(ch)}
 }
 
-func (l *Lexer) newIllegalTokenLiteral(tokenType token.Type, literal string) token.Token {
-	return token.Token{Type: tokenType, Literal: literal, LineNumber: l.curLine}
+func newIllegalTokenLiteral(tokenType token.Type, literal string) token.Token {
+	return token.Token{Type: tokenType, Literal: literal}
 }

@@ -29,15 +29,7 @@ type Builder struct {
 // Run the builder.
 func (b *Builder) Run() error {
 	wg := &errgroup.Group{}
-	root, err := filepath.EvalSymlinks(b.RootPath)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	err = filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
-		if info == nil {
-			return filepath.SkipDir
-		}
-
+	err := filepath.Walk(b.RootPath, func(path string, info os.FileInfo, err error) error {
 		base := filepath.Base(path)
 		if base == ".git" || base == "vendor" || base == "node_modules" {
 			return filepath.SkipDir

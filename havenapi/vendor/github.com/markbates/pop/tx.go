@@ -12,13 +12,13 @@ func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
-type Tx struct {
+type tX struct {
 	ID int
 	*sqlx.Tx
 }
 
-func newTX(db *dB) (*Tx, error) {
-	t := &Tx{
+func newTX(db *dB) (*tX, error) {
+	t := &tX{
 		ID: rand.Int(),
 	}
 	tx, err := db.Beginx()
@@ -28,10 +28,10 @@ func newTX(db *dB) (*Tx, error) {
 
 // Transaction simply returns the current transaction,
 // this is defined so it implements the `Store` interface.
-func (tx *Tx) Transaction() (*Tx, error) {
+func (tx *tX) Transaction() (*tX, error) {
 	return tx, nil
 }
 
-func (tx *Tx) Close() error {
+func (tx *tX) Close() error {
 	return nil
 }

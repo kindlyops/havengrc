@@ -30,43 +30,15 @@ production:
 
 var sqliteConfig = `development:
   dialect: "sqlite3"
-  database: {{.sqlitePath}}_development.sqlite
+  database: {{.appPath}}/{{.name}}_development.sqlite
 
 test:
   dialect: "sqlite3"
-  database: {{.sqlitePath}}_test.sqlite
+  database: {{.appPath}}/{{.name}}_test.sqlite
 
 production:
   dialect: "sqlite3"
-  database: {{.sqlitePath}}_production.sqlite`
-
-var cockroachConfig = `development:
-  dialect: cockroach
-  database: {{.name}}_development
-  host: {{"{{"}}envOr "COCKROACH_HOST" "127.0.0.1"  }}
-  port: {{"{{"}} envOr "COCKROACH_PORT" "26257"  }}
-  user: {{"{{"}} envOr "COCKROACH_USER" "root"  }}
-  password: {{"{{"}} envOr "COCKROACH_PASSWORD" ""  }}
-  pool: 5
-
-test:
-  dialect: cockroach
-  database: {{.name}}_test
-  host: {{"{{"}} envOr "COCKROACH_HOST" "127.0.0.1"  }}
-  port: {{"{{"}} envOr "COCKROACH_PORT" "26257"  }}
-  user: {{"{{"}} envOr "COCKROACH_USER" "root"  }}
-  password: {{"{{"}} envOr "COCKROACH_PASSWORD" ""  }}
-  pool: 5
-
-production:
-  dialect: cockroach
-  database: {{.name}}_production
-  host: {{"{{"}} envOr "COCKROACH_HOST" "127.0.0.1"  }}
-  port: {{"{{"}} envOr "COCKROACH_PORT" "26257"  }}
-  user: {{"{{"}} envOr "COCKROACH_USER" "root"  }}
-  password: {{"{{"}} envOr "COCKROACH_PASSWORD" ""  }}
-  pool: 5
-  `
+  database: {{.appPath}}/{{.name}}_production.sqlite`
 
 var configTemplates = map[string]string{
 	"postgres":   pgConfig,
@@ -75,6 +47,4 @@ var configTemplates = map[string]string{
 	"mysql":      mysqlConfig,
 	"sqlite3":    sqliteConfig,
 	"sqlite":     sqliteConfig,
-	"cockroach":  cockroachConfig,
-	"crdb":       cockroachConfig,
 }

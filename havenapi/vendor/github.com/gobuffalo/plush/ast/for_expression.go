@@ -2,17 +2,24 @@ package ast
 
 import (
 	"bytes"
+
+	"github.com/gobuffalo/plush/token"
 )
 
 type ForExpression struct {
-	TokenAble
+	Token     token.Token
 	KeyName   string
 	ValueName string
 	Block     *BlockStatement
 	Iterable  Expression
 }
 
-func (fe *ForExpression) expressionNode() {}
+func (fe *ForExpression) expressionNode() {
+}
+
+func (fe *ForExpression) TokenLiteral() string {
+	return fe.Token.Literal
+}
 
 func (fe *ForExpression) String() string {
 	var out bytes.Buffer

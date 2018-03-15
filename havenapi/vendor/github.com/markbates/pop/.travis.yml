@@ -1,8 +1,6 @@
 language: go
 
-dist: trusty
-
-sudo: required
+sudo: false
 
 go:
   - 1.8
@@ -34,16 +32,8 @@ env:
   - SODA_DIALECT="mysql_travis"
   - SODA_DIALECT="sqlite"
 
-services:
-  - mysql
-
 addons:
-  postgresql: "9.5"
-  apt:
-    sources:
-      - mysql-5.7-trusty
-    packages:
-      - mysql-server
+  postgresql: "9.3"
 
 matrix:
   allow_failures:

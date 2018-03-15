@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 
 	"github.com/daviddengcn/go-colortext"
@@ -137,7 +138,7 @@ func main() {
 
 		following = false
 		code = ""
-		var v interface{}
+		v := vm.NilValue
 
 		if err == nil {
 			v, err = vm.Run(stmts, env)
@@ -164,7 +165,16 @@ func main() {
 		} else {
 			if interactive {
 				colortext(ct.Black, true, func() {
-					fmt.Printf("%#v\n", v)
+					if v == vm.NilValue || !v.IsValid() {
+						fmt.Println("nil")
+					} else {
+						s, ok := v.Interface().(fmt.Stringer)
+						if v.Kind() != reflect.String && ok {
+							fmt.Println(s)
+						} else {
+							fmt.Printf("%#v\n", v.Interface())
+						}
+					}
 				})
 			} else {
 				break

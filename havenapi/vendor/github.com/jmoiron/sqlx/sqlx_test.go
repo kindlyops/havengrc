@@ -1296,12 +1296,9 @@ type Product struct {
 // tests that sqlx will not panic when the wrong driver is passed because
 // of an automatic nil dereference in sqlx.Open(), which was fixed.
 func TestDoNotPanicOnConnect(t *testing.T) {
-	db, err := Connect("bogus", "hehe")
+	_, err := Connect("bogus", "hehe")
 	if err == nil {
 		t.Errorf("Should return error when using bogus driverName")
-	}
-	if db != nil {
-		t.Errorf("Should not return the db on a connect failure")
 	}
 }
 
@@ -1387,17 +1384,13 @@ func (p PropertyMap) Value() (driver.Value, error) {
 
 func (p PropertyMap) Scan(src interface{}) error {
 	v := reflect.ValueOf(src)
-	if !v.IsValid() || v.CanAddr() && v.IsNil() {
+	if !v.IsValid() || v.IsNil() {
 		return nil
 	}
-	switch ts := src.(type) {
-	case []byte:
-		return json.Unmarshal(ts, &p)
-	case string:
-		return json.Unmarshal([]byte(ts), &p)
-	default:
-		return fmt.Errorf("Could not not decode type %T -> %T", src, p)
+	if data, ok := src.([]byte); ok {
+		return json.Unmarshal(data, &p)
 	}
+	return fmt.Errorf("Could not not decode type %T -> %T", src, p)
 }
 
 func TestEmbeddedMaps(t *testing.T) {
@@ -1497,9 +1490,6 @@ func TestIn(t *testing.T) {
 		{"SELECT * FROM foo WHERE x in (?)",
 			[]interface{}{[]int{1, 2, 3, 4, 5, 6, 7, 8}},
 			8},
-		{"SELECT * FROM foo WHERE x = ? AND y in (?)",
-			[]interface{}{[]byte("foo"), []int{0, 5, 3}},
-			4},
 	}
 	for _, test := range tests {
 		q, a, err := In(test.q, test.args...)

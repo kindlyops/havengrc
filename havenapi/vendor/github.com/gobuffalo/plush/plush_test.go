@@ -6,8 +6,8 @@ import (
 	"html/template"
 	"strings"
 	"testing"
-	"time"
 
+	"github.com/gobuffalo/tags"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 )
@@ -75,6 +75,15 @@ func Test_Render_Injected_Variable(t *testing.T) {
 	}))
 	r.NoError(err)
 	r.Equal("<p>Mark</p>", s)
+}
+
+func Test_Render_Let_Hash(t *testing.T) {
+	r := require.New(t)
+
+	input := `<p><% let h = {"a": "A"} %><%= h["a"] %></p>`
+	s, err := Render(input, NewContext())
+	r.NoError(err)
+	r.Equal("<p>A</p>", s)
 }
 
 func Test_Render_Hash_Array_Index(t *testing.T) {
@@ -259,6 +268,37 @@ func Test_Render_Dash_in_Helper(t *testing.T) {
 	r.Equal("hello", s)
 }
 
+func Test_Let_Inside_Helper(t *testing.T) {
+	r := require.New(t)
+	ctx := NewContextWith(map[string]interface{}{
+		"divwrapper": func(opts map[string]interface{}, helper HelperContext) (template.HTML, error) {
+			body, err := helper.Block()
+			if err != nil {
+				return template.HTML(""), errors.WithStack(err)
+			}
+			t := tags.New("div", opts)
+			t.Append(body)
+			return t.HTML(), nil
+		},
+	})
+
+	input := `<%= divwrapper({"class": "myclass"}) { %>
+<ul>
+    <% let a = [1, 2, "three", "four"] %>
+    <%= for (index, name) in a { %>
+        <li><%=index%> - <%=name%></li>
+    <% } %>
+</ul>
+<% } %>`
+
+	s, err := Render(input, ctx)
+	r.NoError(err)
+	r.Contains(s, "<li>0 - 1</li>")
+	r.Contains(s, "<li>1 - 2</li>")
+	r.Contains(s, "<li>2 - three</li>")
+	r.Contains(s, "<li>3 - four</li>")
+}
+
 func Test_(t *testing.T) {
 	r := require.New(t)
 	input := `<%= foo() %><%= name %>`
@@ -318,19 +358,6 @@ func Test_VariadicHelper(t *testing.T) {
 	r.Equal("3", s)
 }
 
-func Test_VariadicHelper_SecondArg(t *testing.T) {
-	r := require.New(t)
-	input := `<%= foo("hello") %>`
-	ctx := NewContext()
-	ctx.Set("foo", func(s string, args ...interface{}) string {
-		return s
-	})
-
-	s, err := Render(input, ctx)
-	r.NoError(err)
-	r.Equal("hello", s)
-}
-
 func Test_VariadicHelperNoParam(t *testing.T) {
 	r := require.New(t)
 	input := `<%= foo() %>`
@@ -370,86 +397,6 @@ func Test_VariadicHelperWithWrongParam(t *testing.T) {
 	r.Contains(err.Error(), "test (string) is an invalid argument for foo at pos 2: expected (int)")
 }
 
-func Test_LineNumberErrors(t *testing.T) {
-	r := require.New(t)
-	input := `<p>
-	<%= f.Foo %>
-</p>`
-
-	_, err := Render(input, NewContext())
-	r.Error(err)
-	r.Contains(err.Error(), "line 2:")
-}
-
-func Test_LineNumberErrors_ForLoop(t *testing.T) {
-	r := require.New(t)
-	input := `
-	<%= for (n) in numbers.Foo { %>
-		<%= n %>
-	<% } %>
-	`
-
-	_, err := Render(input, NewContext())
-	r.Error(err)
-	r.Contains(err.Error(), "line 2:")
-}
-
-func Test_LineNumberErrors_ForLoop2(t *testing.T) {
-	r := require.New(t)
-	input := `
-	<%= for (n in numbers.Foo { %>
-		<%= if (n == 3) { %>
-			<%= n %>
-		<% } %>
-	<% } %>
-	`
-
-	_, err := Parse(input)
-	r.Error(err)
-	r.Contains(err.Error(), "line 2:")
-}
-
-func Test_LineNumberErrors_InsideForLoop(t *testing.T) {
-	r := require.New(t)
-	input := `
-	<%= for (n) in numbers { %>
-		<%= n.Foo %>
-	<% } %>
-	`
-	ctx := NewContext()
-	ctx.Set("numbers", []int{1, 2})
-	_, err := Render(input, ctx)
-	r.Error(err)
-	r.Contains(err.Error(), "line 3:")
-}
-
-func Test_MissingQuote(t *testing.T) {
-	r := require.New(t)
-	input := `<%= foo("asdf) %>`
-	ctx := NewContext()
-	ctx.Set("foo", func(string) {})
-	_, err := Render(input, ctx)
-	r.Error(err)
-}
-
-func Test_MissingQuote_Variant(t *testing.T) {
-	r := require.New(t)
-	input := `<%= foo("test) %>".`
-	ctx := NewContext()
-	ctx.Set("foo", func(string) {})
-	_, err := Render(input, ctx)
-	r.Error(err)
-}
-
-func Test_MissingQuote_Variant2(t *testing.T) {
-	r := require.New(t)
-	input := `<%= title("Running Migrations) %>(default "./migrations")`
-	ctx := NewContext()
-	ctx.Set("foo", func(string) {})
-	_, err := Render(input, ctx)
-	r.Error(err)
-}
-
 func Test_RunScript(t *testing.T) {
 	r := require.New(t)
 	bb := &bytes.Buffer{}
@@ -461,47 +408,6 @@ func Test_RunScript(t *testing.T) {
 	err := RunScript(script, ctx)
 	r.NoError(err)
 	r.Equal("3hiasdfasdf", bb.String())
-}
-
-func Test_Render_AllowsManyNumericTypes(t *testing.T) {
-	r := require.New(t)
-	input := `<%= i32 %> <%= u32 %> <%= i8 %>`
-
-	ctx := NewContext()
-	ctx.Set("i32", int32(1))
-	ctx.Set("u32", uint32(2))
-	ctx.Set("i8", int8(3))
-
-	s, err := Render(input, ctx)
-	r.NoError(err)
-	r.Equal("1 2 3", s)
-}
-
-func Test_Default_Time_Format(t *testing.T) {
-	r := require.New(t)
-
-	shortForm := "2006-Jan-02"
-	tm, err := time.Parse(shortForm, "2013-Feb-03")
-	r.NoError(err)
-	ctx := NewContext()
-	ctx.Set("tm", tm)
-
-	input := `<%= tm %>`
-
-	s, err := Render(input, ctx)
-	r.NoError(err)
-	r.Equal("February 03, 2013 00:00:00 +0000", s)
-
-	ctx.Set("TIME_FORMAT", "2006-02-Jan")
-	s, err = Render(input, ctx)
-	r.NoError(err)
-	r.Equal("2013-03-Feb", s)
-
-	ctx.Set("tm", &tm)
-	s, err = Render(input, ctx)
-	r.NoError(err)
-	r.Equal("2013-03-Feb", s)
-
 }
 
 const script = `let x = "foo"

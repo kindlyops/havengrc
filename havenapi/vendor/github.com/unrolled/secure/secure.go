@@ -1,13 +1,10 @@
 package secure
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"strings"
 )
-
-type secureCtxKey string
 
 const (
 	stsHeader            = "Strict-Transport-Security"
@@ -22,13 +19,7 @@ const (
 	cspHeader            = "Content-Security-Policy"
 	hpkpHeader           = "Public-Key-Pins"
 	referrerPolicyHeader = "Referrer-Policy"
-
-	ctxSecureHeaderKey = secureCtxKey("SecureResponseHeader")
-	cspNonceSize       = 16
 )
-
-// a type whose pointer is the type of field `SSLHostFunc` of `Options` struct
-type SSLHostFunc func(host string) (newHost string)
 
 func defaultBadHostHandler(w http.ResponseWriter, r *http.Request) {
 	http.Error(w, "Bad Host", http.StatusInternalServerError)
@@ -46,9 +37,6 @@ type Options struct {
 	SSLTemporaryRedirect bool
 	// SSLHost is the host name that is used to redirect http requests to https. Default is "", which indicates to use the same host.
 	SSLHost string
-	// SSLHostFunc is a function pointer, the return value of the function is the host name that has same functionality as `SSHost`. Default is nil.
-	// If SSLHostFunc is nil, the `SSLHost` option will be used.
-	SSLHostFunc *SSLHostFunc
 	// SSLProxyHeaders is set of header keys with associated values that would indicate a valid https request. Useful when using Nginx: `map[string]string{"X-Forwarded-Proto": "https"}`. Default is blank map.
 	SSLProxyHeaders map[string]string
 	// STSSeconds is the max-age of the Strict-Transport-Security header. Default is 0, which would NOT include the header.
@@ -70,18 +58,14 @@ type Options struct {
 	// CustomBrowserXssValue allows the X-XSS-Protection header value to be set with a custom value. This overrides the BrowserXssFilter option. Default is "".
 	CustomBrowserXssValue string
 	// ContentSecurityPolicy allows the Content-Security-Policy header value to be set with a custom value. Default is "".
-	// Passing a template string will replace `$NONCE` with a dynamic nonce value of 16 bytes for each request which can be later retrieved using the Nonce function.
-	// Eg: script-src $NONCE -> script-src 'nonce-a2ZobGFoZg=='
 	ContentSecurityPolicy string
 	// PublicKey implements HPKP to prevent MITM attacks with forged certificates. Default is "".
 	PublicKey string
-	// ReferrerPolicy allows sites to control when browsers will pass the Referer header to other sites. Default is "".
+	// Referrer Policy allows sites to control when browsers will pass the Referer header to other sites. Default is "".
 	ReferrerPolicy string
 	// When developing, the AllowedHosts, SSL, and STS options can cause some unwanted effects. Usually testing happens on http, not https, and on localhost, not your production domain... so set this to true for dev environment.
 	// If you would like your development environment to mimic production with complete Host blocking, SSL redirects, and STS headers, leave this as false. Default if false.
 	IsDevelopment bool
-	// nonceEnabled is used internally for dynamic nouces.
-	nonceEnabled bool
 }
 
 // Secure is a middleware that helps setup a few basic security features. A single secure.Options struct can be
@@ -90,11 +74,11 @@ type Secure struct {
 	// Customize Secure with an Options struct.
 	opt Options
 
-	// badHostHandler is the handler used when an incorrect host is passed in.
+	// Handlers for when an error occurs (ie bad host).
 	badHostHandler http.Handler
 }
 
-// New constructs a new Secure instance with the supplied options.
+// New constructs a new Secure instance with supplied options.
 func New(options ...Options) *Secure {
 	var o Options
 	if len(options) == 0 {
@@ -102,10 +86,6 @@ func New(options ...Options) *Secure {
 	} else {
 		o = options[0]
 	}
-
-	o.ContentSecurityPolicy = strings.Replace(o.ContentSecurityPolicy, "$NONCE", "'nonce-%[1]s'", -1)
-
-	o.nonceEnabled = strings.Contains(o.ContentSecurityPolicy, "%[1]s")
 
 	return &Secure{
 		opt:            o,
@@ -121,10 +101,6 @@ func (s *Secure) SetBadHostHandler(handler http.Handler) {
 // Handler implements the http.HandlerFunc for integration with the standard net/http lib.
 func (s *Secure) Handler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if s.opt.nonceEnabled {
-			r = withCSPNonce(r, cspRandNonce())
-		}
-
 		// Let secure process the request. If it returns an error,
 		// that indicates the request should not continue.
 		err := s.Process(w, r)
@@ -138,39 +114,8 @@ func (s *Secure) Handler(h http.Handler) http.Handler {
 	})
 }
 
-// HandlerForRequestOnly implements the http.HandlerFunc for integration with the standard net/http lib.
-// Note that this is for requests only and will not write any headers.
-func (s *Secure) HandlerForRequestOnly(h http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if s.opt.nonceEnabled {
-			r = withCSPNonce(r, cspRandNonce())
-		}
-
-		// Let secure process the request. If it returns an error,
-		// that indicates the request should not continue.
-		responseHeader, err := s.processRequest(w, r)
-
-		// If there was an error, do not continue.
-		if err != nil {
-			return
-		}
-
-		// Save response headers in the request context.
-		ctx := context.WithValue(r.Context(), ctxSecureHeaderKey, responseHeader)
-
-		// No headers will be written to the ResponseWriter.
-		h.ServeHTTP(w, r.WithContext(ctx))
-	})
-}
-
 // HandlerFuncWithNext is a special implementation for Negroni, but could be used elsewhere.
 func (s *Secure) HandlerFuncWithNext(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	if s.opt.nonceEnabled {
-		r = withCSPNonce(r, cspRandNonce())
-	}
-
-	// Let secure process the request. If it returns an error,
-	// that indicates the request should not continue.
 	err := s.Process(w, r)
 
 	// If there was an error, do not call next.
@@ -179,42 +124,8 @@ func (s *Secure) HandlerFuncWithNext(w http.ResponseWriter, r *http.Request, nex
 	}
 }
 
-// HandlerFuncWithNextForRequestOnly is a special implementation for Negroni, but could be used elsewhere.
-// Note that this is for requests only and will not write any headers.
-func (s *Secure) HandlerFuncWithNextForRequestOnly(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	if s.opt.nonceEnabled {
-		r = withCSPNonce(r, cspRandNonce())
-	}
-
-	// Let secure process the request. If it returns an error,
-	// that indicates the request should not continue.
-	responseHeader, err := s.processRequest(w, r)
-
-	// If there was an error, do not call next.
-	if err == nil && next != nil {
-		// Save response headers in the request context
-		ctx := context.WithValue(r.Context(), ctxSecureHeaderKey, responseHeader)
-
-		// No headers will be written to the ResponseWriter.
-		next(w, r.WithContext(ctx))
-	}
-}
-
-// Process runs the actual checks and writes the headers in the ResponseWriter.
+// Process runs the actual checks and returns an error if the middleware chain should stop.
 func (s *Secure) Process(w http.ResponseWriter, r *http.Request) error {
-	responseHeader, err := s.processRequest(w, r)
-	if responseHeader != nil {
-		for key, values := range responseHeader {
-			for _, value := range values {
-				w.Header().Add(key, value)
-			}
-		}
-	}
-	return err
-}
-
-// processRequest runs the actual checks on the request and returns an error if the middleware chain should stop.
-func (s *Secure) processRequest(w http.ResponseWriter, r *http.Request) (http.Header, error) {
 	// Resolve the host for the request, using proxy headers if present.
 	host := r.Host
 	for _, header := range s.opt.HostsProxyHeaders {
@@ -236,24 +147,28 @@ func (s *Secure) processRequest(w http.ResponseWriter, r *http.Request) (http.He
 
 		if !isGoodHost {
 			s.badHostHandler.ServeHTTP(w, r)
-			return nil, fmt.Errorf("bad host name: %s", host)
+			return fmt.Errorf("Bad host name: %s", host)
 		}
 	}
 
 	// Determine if we are on HTTPS.
-	ssl := s.isSSL(r)
+	isSSL := strings.EqualFold(r.URL.Scheme, "https") || r.TLS != nil
+	if !isSSL {
+		for k, v := range s.opt.SSLProxyHeaders {
+			if r.Header.Get(k) == v {
+				isSSL = true
+				break
+			}
+		}
+	}
 
 	// SSL check.
-	if s.opt.SSLRedirect && !ssl && !s.opt.IsDevelopment {
+	if s.opt.SSLRedirect && !isSSL && !s.opt.IsDevelopment {
 		url := r.URL
 		url.Scheme = "https"
 		url.Host = host
 
-		if s.opt.SSLHostFunc != nil {
-			if h := (*s.opt.SSLHostFunc)(host); len(h) > 0 {
-				url.Host = h
-			}
-		} else if len(s.opt.SSLHost) > 0 {
+		if len(s.opt.SSLHost) > 0 {
 			url.Host = s.opt.SSLHost
 		}
 
@@ -263,15 +178,12 @@ func (s *Secure) processRequest(w http.ResponseWriter, r *http.Request) (http.He
 		}
 
 		http.Redirect(w, r, url.String(), status)
-		return nil, fmt.Errorf("redirecting to HTTPS")
+		return fmt.Errorf("Redirecting to HTTPS")
 	}
-
-	// Create our header container.
-	responseHeader := make(http.Header)
 
 	// Strict Transport Security header. Only add header when we know it's an SSL connection.
 	// See https://tools.ietf.org/html/rfc6797#section-7.2 for details.
-	if s.opt.STSSeconds != 0 && (ssl || s.opt.ForceSTSHeader) && !s.opt.IsDevelopment {
+	if s.opt.STSSeconds != 0 && (isSSL || s.opt.ForceSTSHeader) && !s.opt.IsDevelopment {
 		stsSub := ""
 		if s.opt.STSIncludeSubdomains {
 			stsSub = stsSubdomainString
@@ -281,76 +193,42 @@ func (s *Secure) processRequest(w http.ResponseWriter, r *http.Request) (http.He
 			stsSub += stsPreloadString
 		}
 
-		responseHeader.Set(stsHeader, fmt.Sprintf("max-age=%d%s", s.opt.STSSeconds, stsSub))
+		w.Header().Add(stsHeader, fmt.Sprintf("max-age=%d%s", s.opt.STSSeconds, stsSub))
 	}
 
 	// Frame Options header.
 	if len(s.opt.CustomFrameOptionsValue) > 0 {
-		responseHeader.Set(frameOptionsHeader, s.opt.CustomFrameOptionsValue)
+		w.Header().Add(frameOptionsHeader, s.opt.CustomFrameOptionsValue)
 	} else if s.opt.FrameDeny {
-		responseHeader.Set(frameOptionsHeader, frameOptionsValue)
+		w.Header().Add(frameOptionsHeader, frameOptionsValue)
 	}
 
 	// Content Type Options header.
 	if s.opt.ContentTypeNosniff {
-		responseHeader.Set(contentTypeHeader, contentTypeValue)
+		w.Header().Add(contentTypeHeader, contentTypeValue)
 	}
 
 	// XSS Protection header.
 	if len(s.opt.CustomBrowserXssValue) > 0 {
-		responseHeader.Set(xssProtectionHeader, s.opt.CustomBrowserXssValue)
+		w.Header().Add(xssProtectionHeader, s.opt.CustomBrowserXssValue)
 	} else if s.opt.BrowserXssFilter {
-		responseHeader.Set(xssProtectionHeader, xssProtectionValue)
+		w.Header().Add(xssProtectionHeader, xssProtectionValue)
 	}
 
 	// HPKP header.
-	if len(s.opt.PublicKey) > 0 && ssl && !s.opt.IsDevelopment {
-		responseHeader.Set(hpkpHeader, s.opt.PublicKey)
+	if len(s.opt.PublicKey) > 0 && isSSL && !s.opt.IsDevelopment {
+		w.Header().Add(hpkpHeader, s.opt.PublicKey)
 	}
 
 	// Content Security Policy header.
 	if len(s.opt.ContentSecurityPolicy) > 0 {
-		if s.opt.nonceEnabled {
-			responseHeader.Set(cspHeader, fmt.Sprintf(s.opt.ContentSecurityPolicy, CSPNonce(r.Context())))
-		} else {
-			responseHeader.Set(cspHeader, s.opt.ContentSecurityPolicy)
-		}
+		w.Header().Add(cspHeader, s.opt.ContentSecurityPolicy)
 	}
 
 	// Referrer Policy header.
 	if len(s.opt.ReferrerPolicy) > 0 {
-		responseHeader.Set(referrerPolicyHeader, s.opt.ReferrerPolicy)
+		w.Header().Add(referrerPolicyHeader, s.opt.ReferrerPolicy)
 	}
 
-	return responseHeader, nil
-}
-
-// isSSL determine if we are on HTTPS.
-func (s *Secure) isSSL(r *http.Request) bool {
-	ssl := strings.EqualFold(r.URL.Scheme, "https") || r.TLS != nil
-	if !ssl {
-		for k, v := range s.opt.SSLProxyHeaders {
-			if r.Header.Get(k) == v {
-				ssl = true
-				break
-			}
-		}
-	}
-	return ssl
-}
-
-// ModifyResponseHeaders modifies the Response.
-// Used by http.ReverseProxy.
-func (s *Secure) ModifyResponseHeaders(res *http.Response) error {
-	if res != nil && res.Request != nil {
-		responseHeader := res.Request.Context().Value(ctxSecureHeaderKey)
-		if responseHeader != nil {
-			for header, values := range responseHeader.(http.Header) {
-				if len(values) > 0 {
-					res.Header.Set(header, strings.Join(values, ","))
-				}
-			}
-		}
-	}
 	return nil
 }

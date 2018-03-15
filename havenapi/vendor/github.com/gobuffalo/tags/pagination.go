@@ -10,7 +10,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Paginator describes a pagination meta data
 type Paginator struct {
 	// Current page you're on
 	Page int `json:"page"`
@@ -31,21 +30,45 @@ func (pagination Paginator) Tag(opts Options) (*Tag, error) {
 	if pagination.TotalPages <= 1 {
 		return New("div", Options{}), nil
 	}
-
-	path, class, wing := extractBaseOptions(opts)
-	opts["class"] = strings.Join([]string{class, "pagination"}, " ")
+	var path string
+	if p, ok := opts["path"]; ok {
+		path = p.(string)
+		delete(opts, "path")
+	}
+	if _, ok := opts["class"]; !ok {
+		opts["class"] = ""
+	}
+	opts["class"] = strings.Join([]string{opts["class"].(string), "pagination"}, " ")
 	t := New("ul", opts)
 
+	wing := 5
+	if w, ok := opts["wingLength"]; ok {
+		wing = w.(int)
+		delete(opts, "wingLength")
+	}
 	barLength := wing*2 + 1
 	center := wing + 1
 	loopStart := 1
 	loopEnd := pagination.TotalPages
 
-	li, err := pagination.addPrev(opts, path)
-	if err != nil {
-		return t, errors.WithStack(err)
+	showPrev := true
+	if b, ok := opts["showPrev"].(bool); ok {
+		showPrev = b
+		delete(opts, "showPrev")
 	}
-	t.Append(li)
+	if showPrev {
+		page := pagination.Page - 1
+		prevContent := "&laquo;"
+		if opts["previousContent"] != nil {
+			prevContent = opts["previousContent"].(string)
+		}
+
+		li, err := pageLI(prevContent, page, path, pagination)
+		if err != nil {
+			return t, errors.WithStack(err)
+		}
+		t.Append(li)
+	}
 
 	if pagination.TotalPages > barLength {
 		loopEnd = barLength - 2       // range 1 ~ center
@@ -83,79 +106,27 @@ func (pagination Paginator) Tag(opts Options) (*Tag, error) {
 		t.Append(li)
 	}
 
-	li, err = pagination.addNext(opts, path)
-	if err != nil {
-		return t, errors.WithStack(err)
-	}
-	t.Append(li)
-
-	return t, nil
-}
-
-func (pagination Paginator) addPrev(opts Options, path string) (*Tag, error) {
-	showPrev := true
-
-	if b, ok := opts["showPrev"].(bool); ok {
-		showPrev = b
-		delete(opts, "showPrev")
-	}
-
-	if !showPrev {
-		return nil, nil
-	}
-
-	page := pagination.Page - 1
-	prevContent := "&laquo;"
-
-	if opts["previousContent"] != nil {
-		prevContent = opts["previousContent"].(string)
-	}
-
-	return pageLI(prevContent, page, path, pagination)
-}
-
-func (pagination Paginator) addNext(opts Options, path string) (*Tag, error) {
 	showNext := true
-
 	if b, ok := opts["showNext"].(bool); ok {
 		showNext = b
 		delete(opts, "showNext")
 	}
+	if showNext {
+		page := pagination.Page + 1
+		nextContent := "&raquo;"
+		if opts["nextContent"] != nil {
+			nextContent = opts["nextContent"].(string)
+		}
 
-	if !showNext {
-		return nil, nil
+		li, err := pageLI(nextContent, page, path, pagination)
+
+		if err != nil {
+			return t, errors.WithStack(err)
+		}
+		t.Append(li)
 	}
 
-	page := pagination.Page + 1
-	nextContent := "&raquo;"
-
-	if opts["nextContent"] != nil {
-		nextContent = opts["nextContent"].(string)
-	}
-
-	return pageLI(nextContent, page, path, pagination)
-}
-
-func extractBaseOptions(opts Options) (string, string, int) {
-	var path string
-	if p, ok := opts["path"]; ok {
-		path = p.(string)
-		delete(opts, "path")
-	}
-
-	var class string
-	if cl, ok := opts["class"]; ok {
-		class = cl.(string)
-		delete(opts, "path")
-	}
-
-	wing := 5
-	if w, ok := opts["wingLength"]; ok {
-		wing = w.(int)
-		delete(opts, "wingLength")
-	}
-
-	return path, class, wing
+	return t, nil
 }
 
 func Pagination(pagination interface{}, opts Options) (*Tag, error) {

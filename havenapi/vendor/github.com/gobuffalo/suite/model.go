@@ -2,7 +2,7 @@ package suite
 
 import (
 	"github.com/gobuffalo/envy"
-	"github.com/gobuffalo/pop"
+	"github.com/markbates/pop"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 )
@@ -22,15 +22,6 @@ func (m *Model) SetupTest() {
 }
 
 func (m *Model) TearDownTest() {}
-
-func (m *Model) DBDelta(delta int, name string, fn func()) {
-	sc, err := m.DB.Count(name)
-	m.NoError(err)
-	fn()
-	ec, err := m.DB.Count(name)
-	m.NoError(err)
-	m.Equal(ec, sc+delta)
-}
 
 func NewModel() *Model {
 	m := &Model{}

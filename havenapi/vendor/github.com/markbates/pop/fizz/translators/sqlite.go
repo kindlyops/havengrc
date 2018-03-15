@@ -10,25 +10,19 @@ import (
 )
 
 type SQLite struct {
-	Schema SchemaQuery
+	Schema Schema
 }
 
 func NewSQLite(url string) *SQLite {
-	schema := &sqliteSchema{
-		Schema{
+	return &SQLite{
+		Schema: &sqliteSchema{
 			URL:    url,
 			schema: map[string]*fizz.Table{},
 		},
 	}
-	schema.Builder = schema
-	return &SQLite{
-		Schema: schema,
-	}
 }
 
 func (p *SQLite) CreateTable(t fizz.Table) (string, error) {
-	p.Schema.SetTable(&t)
-
 	sql := []string{}
 	cols := []string{}
 	var s string
@@ -45,11 +39,6 @@ func (p *SQLite) CreateTable(t fizz.Table) (string, error) {
 		}
 		cols = append(cols, s)
 	}
-
-	for _, fk := range t.ForeignKeys {
-		cols = append(cols, p.buildForeignKey(t, fk, true))
-	}
-
 	s = fmt.Sprintf("CREATE TABLE \"%s\" (\n%s\n);", t.Name, strings.Join(cols, ",\n"))
 	sql = append(sql, s)
 
@@ -63,6 +52,7 @@ func (p *SQLite) CreateTable(t fizz.Table) (string, error) {
 		}
 		sql = append(sql, s)
 	}
+
 	return strings.Join(sql, "\n"), nil
 }
 
@@ -260,12 +250,6 @@ func (p *SQLite) AddIndex(t fizz.Table) (string, error) {
 	if i.Unique {
 		s = strings.Replace(s, "CREATE", "CREATE UNIQUE", 1)
 	}
-
-	tableInfo, err := p.Schema.TableInfo(t.Name)
-	if err != nil {
-		return "", err
-	}
-	tableInfo.Indexes = append(tableInfo.Indexes, i)
 	return s, nil
 }
 
@@ -275,19 +259,6 @@ func (p *SQLite) DropIndex(t fizz.Table) (string, error) {
 	}
 	i := t.Indexes[0]
 	s := fmt.Sprintf("DROP INDEX IF EXISTS \"%s\";", i.Name)
-
-	tableInfo, err := p.Schema.TableInfo(t.Name)
-	if err != nil {
-		return "", err
-	}
-	newIndexes := []fizz.Index{}
-	for _, c := range tableInfo.Indexes {
-		if c.Name != i.Name {
-			newIndexes = append(newIndexes, c)
-		}
-	}
-	tableInfo.Indexes = newIndexes
-
 	return s, nil
 }
 
@@ -339,14 +310,6 @@ func (p *SQLite) RenameIndex(t fizz.Table) (string, error) {
 	return strings.Join(sql, "\n"), nil
 }
 
-func (p *SQLite) AddForeignKey(t fizz.Table) (string, error) {
-	return "", errors.New("SQLite does not support this feature")
-}
-
-func (p *SQLite) DropForeignKey(t fizz.Table) (string, error) {
-	return "", errors.New("SQLite does not support this feature")
-}
-
 func (p *SQLite) withTempTable(table string, fn func(fizz.Table) (string, error)) (string, error) {
 	tempTable := fizz.Table{Name: fmt.Sprintf("_%s_tmp", table)}
 
@@ -387,23 +350,4 @@ func (p *SQLite) colType(c fizz.Column) string {
 	default:
 		return c.ColType
 	}
-}
-
-func (p *SQLite) buildForeignKey(t fizz.Table, fk fizz.ForeignKey, onCreate bool) string {
-	refs := fmt.Sprintf("%s (%s)", fk.References.Table, strings.Join(fk.References.Columns, ", "))
-	s := fmt.Sprintf("FOREIGN KEY (%s) REFERENCES %s", fk.Column, refs)
-
-	if onUpdate, ok := fk.Options["on_update"]; ok {
-		s += fmt.Sprintf(" ON UPDATE %s", onUpdate)
-	}
-
-	if onDelete, ok := fk.Options["on_delete"]; ok {
-		s += fmt.Sprintf(" ON DELETE %s", onDelete)
-	}
-
-	if !onCreate {
-		s = fmt.Sprintf("ALTER TABLE %s ADD CONSTRAINT %s %s", t.Name, fk.Name, s)
-	}
-
-	return s
 }

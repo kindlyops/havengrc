@@ -208,8 +208,7 @@ func Test_Create_UUID(t *testing.T) {
 func Test_Create_Existing_UUID(t *testing.T) {
 	transaction(func(tx *pop.Connection) {
 		r := require.New(t)
-		id, err := uuid.NewV4()
-		r.NoError(err)
+		id := uuid.NewV4()
 
 		count, _ := tx.Count(&Song{})
 		song := Song{
@@ -217,7 +216,7 @@ func Test_Create_Existing_UUID(t *testing.T) {
 			Title: "Automatic Buffalo",
 		}
 
-		err = tx.Create(&song)
+		err := tx.Create(&song)
 		r.NoError(err)
 		r.NotZero(song.ID)
 		r.Equal(id.String(), song.ID.String())
@@ -327,32 +326,5 @@ func Test_Destroy_UUID(t *testing.T) {
 
 		ctx, _ = tx.Count("songs")
 		r.Equal(count, ctx)
-	})
-}
-
-func Test_TruncateAll(t *testing.T) {
-	count := int(0)
-	transaction(func(tx *pop.Connection) {
-		a := require.New(t)
-
-		var err error
-		count, err = tx.Count("users")
-		user := User{Name: nulls.NewString("Mark")}
-		err = tx.Create(&user)
-		a.NoError(err)
-		a.NotEqual(user.ID, 0)
-
-		ctx, err := tx.Count("users")
-		a.Equal(count+1, ctx)
-	})
-
-	transaction(func(tx *pop.Connection) {
-		a := require.New(t)
-
-		err := tx.TruncateAll()
-		a.NoError(err)
-
-		ctx, _ := tx.Count("users")
-		a.Equal(count, ctx)
 	})
 }

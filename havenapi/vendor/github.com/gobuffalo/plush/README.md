@@ -1,4 +1,4 @@
-# Plush  [![Build Status](https://travis-ci.org/gobuffalo/plush.svg?branch=master)](https://travis-ci.org/gobuffalo/plush) [![GoDoc](https://godoc.org/github.com/gobuffalo/plush?status.svg)](https://godoc.org/github.com/gobuffalo/plush)
+# Plush [![Code Climate](https://codeclimate.com/github/gobuffalo/plush/badges/gpa.svg)](https://codeclimate.com/github/gobuffalo/plush) [![Build Status](https://travis-ci.org/gobuffalo/plush.svg?branch=master)](https://travis-ci.org/gobuffalo/plush) [![GoDoc](https://godoc.org/github.com/gobuffalo/plush?status.svg)](https://godoc.org/github.com/gobuffalo/plush)
 
 Plush is the templating system that [Go](http://golang.org) both needs _and_ deserves. Powerful, flexible, and extendable, Plush is there to make writing your templates that much easier.
 
@@ -113,7 +113,6 @@ Complex `if` statements can be built in Plush using "common" operators:
 
 * `==` - checks equality of two expressions
 * `!=` - checks that the two expressions are not equal
-* `~=` - checks a string against a regular expression (`foo ~= "^fo"`)
 * `<` - checks the left expression is less than the right expression
 * `<=` - checks the left expression is less than or equal to the right expression
 * `>` - checks the left expression is greater than the right expression
@@ -275,16 +274,6 @@ fmt.Print(s)
 * `truncate` - truncates a string to a specified length
 * `form` - support for the [github.com/gobuffalo/tags/form](https://github.com/gobuffalo/tags/tree/master/form) package (Bootstrap version)
 * `form_for` - support for the [github.com/gobuffalo/tags/form](https://github.com/gobuffalo/tags/tree/master/form) package (Bootstrap version) to build a form for a model
-
-#### truncate
-
-`truncate` takes two optional parameters:
-* `size` - the maximum length of the returned string
-* `trail` - the string to append at the end of a truncated string, defaults to `...`
-
-```html
-<p><%= truncate("a long string", {"size": 10, "trail": "[more]"})%></p>
-```
 
 ### From github.com/markbates/inflect
 

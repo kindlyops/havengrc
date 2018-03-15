@@ -1,13 +1,14 @@
 package builder
 
 import (
-	"bytes"
-	"compress/gzip"
 	"encoding/json"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"bytes"
+	"compress/gzip"
 
 	"github.com/pkg/errors"
 )
@@ -19,16 +20,12 @@ type box struct {
 }
 
 func (b *box) Walk(root string) error {
-	root, err := filepath.EvalSymlinks(root)
-	if err != nil {
-		return errors.WithStack(err)
-	}
 	if _, err := os.Stat(root); err != nil {
 		// return nil
 		return errors.Errorf("could not find folder for box: %s", root)
 	}
 	return filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
-		if info == nil || info.IsDir() || strings.HasSuffix(info.Name(), "-packr.go") {
+		if info == nil || info.IsDir() {
 			return nil
 		}
 		name := strings.Replace(path, root+string(os.PathSeparator), "", 1)

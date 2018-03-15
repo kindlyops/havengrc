@@ -33,7 +33,6 @@ import (
 	anko_regexp "github.com/mattn/anko/builtins/regexp"
 	anko_runtime "github.com/mattn/anko/builtins/runtime"
 	anko_sort "github.com/mattn/anko/builtins/sort"
-	anko_strconv "github.com/mattn/anko/builtins/strconv"
 	anko_strings "github.com/mattn/anko/builtins/strings"
 	anko_time "github.com/mattn/anko/builtins/time"
 
@@ -65,7 +64,6 @@ func LoadAllBuiltins(env *vm.Env) {
 		"regexp":        anko_regexp.Import,
 		"runtime":       anko_runtime.Import,
 		"sort":          anko_sort.Import,
-		"strconv":       anko_strconv.Import,
 		"strings":       anko_strings.Import,
 		"time":          anko_time.Import,
 		"github.com/daviddengcn/go-colortext": anko_colortext.Import,
@@ -87,20 +85,24 @@ func Import(env *vm.Env) *vm.Env {
 		if rv.Kind() == reflect.Interface {
 			rv = rv.Elem()
 		}
+		if rv.Kind() == reflect.String {
+			return int64(len([]byte(rv.String())))
+		}
+		if rv.Kind() != reflect.Array && rv.Kind() != reflect.Slice {
+			panic("Argument #1 should be array")
+		}
 		return int64(rv.Len())
 	})
 
-	env.Define("keys", func(v interface{}) []string {
+	env.Define("keys", func(v interface{}) []reflect.Value {
 		rv := reflect.ValueOf(v)
 		if rv.Kind() == reflect.Interface {
 			rv = rv.Elem()
 		}
-		mapKeysValue := rv.MapKeys()
-		mapKeys := make([]string, len(mapKeysValue))
-		for i := 0; i < len(mapKeysValue); i++ {
-			mapKeys[i] = mapKeysValue[i].String()
+		if rv.Kind() != reflect.Map {
+			panic("Argument #1 should be map")
 		}
-		return mapKeys
+		return rv.MapKeys()
 	})
 
 	env.Define("range", func(args ...int64) []int64 {
@@ -249,14 +251,6 @@ func Import(env *vm.Env) *vm.Env {
 		return reflect.TypeOf(v).String()
 	})
 
-	env.Define("kindOf", func(v interface{}) string {
-		typeOf := reflect.TypeOf(v)
-		if typeOf == nil {
-			return "nil"
-		}
-		return typeOf.Kind().String()
-	})
-
 	env.Define("chanOf", func(t reflect.Type) reflect.Value {
 		return reflect.MakeChan(t, 1)
 	})
@@ -285,7 +279,10 @@ func Import(env *vm.Env) *vm.Env {
 		if err != nil {
 			panic(err)
 		}
-		return rv
+		if rv.IsValid() && rv.CanInterface() {
+			return rv.Interface()
+		}
+		return nil
 	})
 
 	env.Define("panic", func(e interface{}) {
@@ -300,12 +297,10 @@ func Import(env *vm.Env) *vm.Env {
 		reflect.ValueOf(e).Close()
 	})
 
-	env.DefineType("interface", reflect.ValueOf([]interface{}{int64(1)}).Index(0).Type())
+	env.DefineType("int64", int64(0))
+	env.DefineType("float64", float64(0.0))
 	env.DefineType("bool", true)
-	env.DefineType("int64", int64(1))
-	env.DefineType("float64", float64(1))
-	env.DefineType("string", "a")
-	env.DefineType("rune", 'a')
+	env.DefineType("string", "")
 	return env
 }
 

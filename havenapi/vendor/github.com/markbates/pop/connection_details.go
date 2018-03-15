@@ -49,36 +49,28 @@ func (cd *ConnectionDetails) Finalize() error {
 				ul = cd.Dialect + "://" + ul
 			}
 		}
-		cd.Database = cd.URL
-		if !strings.HasPrefix(cd.Dialect, "sqlite") {
-			u, err := url.Parse(ul)
-			if err != nil {
-				return errors.Wrapf(err, "couldn't parse %s", ul)
-			}
-			cd.Dialect = u.Scheme
-			cd.Database = u.Path
+		u, err := url.Parse(ul)
+		if err != nil {
+			return errors.Wrapf(err, "couldn't parse %s", ul)
+		}
+		cd.Dialect = u.Scheme
+		cd.Database = u.Path
 
-			hp := strings.Split(u.Host, ":")
-			cd.Host = hp[0]
-			if len(hp) > 1 {
-				cd.Port = hp[1]
-			}
-
-			if u.User != nil {
-				cd.User = u.User.Username()
-				cd.Password, _ = u.User.Password()
-			}
+		hp := strings.Split(u.Host, ":")
+		cd.Host = hp[0]
+		if len(hp) > 1 {
+			cd.Port = hp[1]
 		}
 
+		if u.User != nil {
+			cd.User = u.User.Username()
+			cd.Password, _ = u.User.Password()
+		}
 	}
 	switch strings.ToLower(cd.Dialect) {
 	case "postgres", "postgresql", "pg":
 		cd.Dialect = "postgres"
 		cd.Port = defaults.String(cd.Port, "5432")
-		cd.Database = strings.TrimPrefix(cd.Database, "/")
-	case "cockroach", "cockroachdb", "crdb":
-		cd.Dialect = "cockroach"
-		cd.Port = defaults.String(cd.Port, "26257")
 		cd.Database = strings.TrimPrefix(cd.Database, "/")
 	case "mysql":
 		// parse and verify whether URL is supported by underlying driver or not.

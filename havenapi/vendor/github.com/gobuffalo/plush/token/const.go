@@ -26,11 +26,10 @@ const (
 	GT   = ">"
 	GTEQ = ">="
 
-	EQ      = "=="
-	NOT_EQ  = "!="
-	AND     = "&&"
-	OR      = "||"
-	MATCHES = "~="
+	EQ     = "=="
+	NOT_EQ = "!="
+	AND    = "&&"
+	OR     = "||"
 
 	// Delimiters
 

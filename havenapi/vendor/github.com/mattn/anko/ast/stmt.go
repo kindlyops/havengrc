@@ -41,7 +41,7 @@ type TryStmt struct {
 // ForStmt provide "for in" expression statement.
 type ForStmt struct {
 	StmtImpl
-	Vars  []string
+	Var   string
 	Value Expr
 	Stmts []Stmt
 }

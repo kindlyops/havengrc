@@ -7,79 +7,37 @@ import (
 	"github.com/gobuffalo/tags"
 )
 
-// SelectTag describes a HTML <select> tag meta data.
 type SelectTag struct {
 	*tags.Tag
-	SelectedValue      interface{}
-	selectedValueCache map[interface{}]struct{}
-	SelectOptions      SelectOptions
+	SelectedValue interface{}
+	SelectOptions SelectOptions
 }
 
 func (s SelectTag) String() string {
 	for _, x := range s.SelectOptions {
-		if _, ok := s.selectedValueCache[template.HTMLEscaper(x.Value)]; ok {
-			x.Selected = true
-		}
+		x.SelectedValue = s.SelectedValue
 		s.Append(x.String())
 	}
 	return s.Tag.String()
 }
 
-// HTML gives the HTML template representation for the select tag.
 func (s SelectTag) HTML() template.HTML {
 	return template.HTML(s.String())
 }
 
-// NewSelectTag constructs a new `<select>` tag.
 func NewSelectTag(opts tags.Options) *SelectTag {
 	so := parseSelectOptions(opts)
 	selected := opts["value"]
 	delete(opts, "value")
 
-	// Transform selected value(s) into an empty map with values as keys
-	// (faster lookup than slice / array)
-	selectedMap := make(map[interface{}]struct{})
-
-	multiple, ok := opts["multiple"].(bool)
-	if multiple && ok {
-		// Set nil to use the empty attribute notation
-		opts["multiple"] = nil
-
-		rv := reflect.ValueOf(selected)
-		if rv.Kind() == reflect.Ptr {
-			rv = rv.Elem()
-		}
-		if rv.Kind() == reflect.Array || rv.Kind() == reflect.Slice {
-			for i := 0; i < rv.Len(); i++ {
-				x := rv.Index(i).Interface()
-				if s, ok := x.(Selectable); ok {
-					// Use Selectable value as the selected value
-					x = s.SelectValue()
-				}
-				selectedMap[template.HTMLEscaper(x)] = struct{}{}
-			}
-		} else {
-			// Set unique value as a map key
-			selectedMap[template.HTMLEscaper(selected)] = struct{}{}
-		}
-	} else {
-		if s, ok := selected.(Selectable); ok {
-			selected = s.SelectValue()
-		}
-		// Set unique value as a map key
-		selectedMap[template.HTMLEscaper(selected)] = struct{}{}
-	}
-
 	st := &SelectTag{
-		Tag:                tags.New("select", opts),
-		SelectOptions:      so,
-		SelectedValue:      selected,
-		selectedValueCache: selectedMap,
+		Tag:           tags.New("select", opts),
+		SelectOptions: so,
+		SelectedValue: selected,
 	}
 	return st
 }
 
-// SelectTag constructs a new `<select>` tag from a form.
 func (f Form) SelectTag(opts tags.Options) *SelectTag {
 	return NewSelectTag(opts)
 }

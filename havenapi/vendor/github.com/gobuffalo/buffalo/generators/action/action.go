@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 
 	"github.com/gobuffalo/buffalo/generators"
 	"github.com/gobuffalo/buffalo/meta"
@@ -101,7 +100,7 @@ func (act Generator) findActionsToAdd(path string) []meta.Name {
 	for _, action := range act.Actions {
 		funcSignature := fmt.Sprintf("func %s%s(c buffalo.Context) error", act.Name.Camel(), action.Camel())
 		if strings.Contains(string(fileContents), funcSignature) {
-			logrus.Warnf("--> skipping %v%v since it already exists\n", act.Name.Camel(), action.Camel())
+			fmt.Printf("--> [warning] skipping %v%v since it already exists\n", act.Name.Camel(), action.Camel())
 			continue
 		}
 
@@ -122,7 +121,7 @@ func (act Generator) findHandlersToAdd(path string) []meta.Name {
 	for _, action := range act.Actions {
 		funcSignature := fmt.Sprintf("app.GET(\"/%s/%s\", %s%s)", act.Name.URL(), action.URL(), act.Name.Camel(), action.Camel())
 		if strings.Contains(string(fileContents), funcSignature) {
-			logrus.Warnf("--> skipping %s from app.go since it already exists\n", funcSignature)
+			fmt.Printf("--> [warning] skipping %s from app.go since it already exists\n", funcSignature)
 			continue
 		}
 
@@ -143,7 +142,7 @@ func (act Generator) findTestsToAdd(path string) []meta.Name {
 	for _, action := range act.Actions {
 		funcSignature := fmt.Sprintf("func (as *ActionSuite) Test_%v_%v() {", act.Name.Camel(), action.Camel())
 		if strings.Contains(string(fileContents), funcSignature) {
-			logrus.Warnf("--> skipping Test_%v_%v since it already exists\n", act.Name.Camel(), action.Camel())
+			fmt.Printf("--> [warning] skipping Test_%v_%v since it already exists\n", act.Name.Camel(), action.Camel())
 			continue
 		}
 

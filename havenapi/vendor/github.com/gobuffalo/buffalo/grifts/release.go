@@ -1,7 +1,11 @@
 package grifts
 
 import (
+	"bytes"
+	"encoding/json"
+	"fmt"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -36,16 +40,17 @@ var _ = grift.Add("release", func(c *grift.Context) error {
 
 	grift.Run("shoulders", c)
 
-	if err := push(); err != nil {
-		return errors.WithStack(err)
-	}
-
 	err = tagRelease(v)
 	if err != nil {
 		return err
 	}
 
-	return runReleaser(v)
+	err = runChangelogGenerator(v)
+	if err != nil {
+		return err
+	}
+
+	return commitAndPush(v)
 })
 
 func installBin() error {
@@ -73,31 +78,53 @@ func dockerTest() error {
 }
 
 func tagRelease(v string) error {
-	cmd := exec.Command("git", "tag", v)
-	cmd.Stdin = os.Stdin
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	if err := cmd.Run(); err != nil {
+	token := os.Getenv("GITHUB_TOKEN")
+	if token == "" {
+		return errors.New("GITHUB_TOKEN is not set")
+	}
+
+	body := map[string]interface{}{
+		"tag_name":   v,
+		"prerelease": false,
+	}
+
+	b, err := json.Marshal(&body)
+	if err != nil {
 		return err
 	}
 
-	cmd = exec.Command("git", "push", "origin", "--tags")
+	res, err := http.Post(fmt.Sprintf("https://api.github.com/repos/gobuffalo/buffalo/releases?access_token=%s", token), "application/json", bytes.NewReader(b))
+	if err != nil {
+		return err
+	}
+
+	code := res.StatusCode
+	if code < 200 || code >= 300 {
+		return fmt.Errorf("got a not successful status code from github! %d", code)
+	}
+
+	return nil
+}
+
+func runChangelogGenerator(v string) error {
+	cmd := exec.Command("github_changelog_generator")
 	cmd.Stdin = os.Stdin
-	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
+	cmd.Stdout = os.Stdout
 	return cmd.Run()
 }
 
-func runReleaser(v string) error {
-	cmd := exec.Command("goreleaser", "--rm-dist")
+func commitAndPush(v string) error {
+	cmd := exec.Command("git", "commit", "CHANGELOG.md", "-m", fmt.Sprintf("Updated changelog for release %s", v))
 	cmd.Stdin = os.Stdin
 	cmd.Stderr = os.Stderr
 	cmd.Stdout = os.Stdout
-	return cmd.Run()
-}
+	err := cmd.Run()
+	if err != nil {
+		return err
+	}
 
-func push() error {
-	cmd := exec.Command("git", "push", "origin", "master")
+	cmd = exec.Command("git", "push", "origin", "master")
 	cmd.Stdin = os.Stdin
 	cmd.Stderr = os.Stderr
 	cmd.Stdout = os.Stdout

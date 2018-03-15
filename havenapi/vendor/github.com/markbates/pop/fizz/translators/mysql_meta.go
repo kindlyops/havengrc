@@ -6,7 +6,6 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/markbates/pop/fizz"
-	"github.com/pkg/errors"
 )
 
 type mysqlTableInfo struct {
@@ -36,32 +35,31 @@ func (ti mysqlTableInfo) ToColumn() fizz.Column {
 }
 
 type mysqlSchema struct {
-	Schema
+	URL    string
+	Name   string
+	db     *sqlx.DB
+	schema map[string]*fizz.Table
 }
 
-func (p *mysqlSchema) Version() (string, error) {
-	var version string
-	var err error
-
-	p.db, err = sqlx.Open("mysql", p.URL)
-	if err != nil {
-		return version, err
-	}
-	defer p.db.Close()
-
-	res, err := p.db.Queryx("select VERSION()")
-	if err != nil {
-		return version, err
-	}
-
-	for res.Next() {
-		err = res.Scan(&version)
-		return version, err
-	}
-	return "", errors.New("could not locate MySQL version")
+func (p *mysqlSchema) Delete(table string) {
+	delete(p.schema, table)
 }
 
-func (p *mysqlSchema) Build() error {
+func (p *mysqlSchema) TableInfo(table string) (*fizz.Table, error) {
+	if ti, ok := p.schema[table]; ok {
+		return ti, nil
+	}
+	err := p.buildSchema()
+	if err != nil {
+		return nil, err
+	}
+	if ti, ok := p.schema[table]; ok {
+		return ti, nil
+	}
+	return nil, fmt.Errorf("Could not find table data for %s!", table)
+}
+
+func (p *mysqlSchema) buildSchema() error {
 	var err error
 	p.db, err = sqlx.Open("mysql", p.URL)
 	if err != nil {
@@ -86,6 +84,7 @@ func (p *mysqlSchema) Build() error {
 		if err != nil {
 			return err
 		}
+
 	}
 	return nil
 }

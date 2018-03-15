@@ -4,21 +4,16 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
-	"unsafe"
 
 	"github.com/mattn/anko/ast"
 	"github.com/mattn/anko/parser"
 )
 
 var (
-	NilValue          = reflect.New(reflect.TypeOf((*interface{})(nil)).Elem()).Elem()
-	NilType           = reflect.TypeOf(nil)
-	StringType        = reflect.TypeOf("a")
-	UnsafePointerType = reflect.TypeOf(unsafe.Pointer(uintptr(1)))
-	InterfaceType     = reflect.ValueOf([]interface{}{int64(1)}).Index(0).Type()
-	TrueValue         = reflect.ValueOf(true)
-	FalseValue        = reflect.ValueOf(false)
-	ZeroValue         = reflect.Value{}
+	NilValue   = reflect.New(reflect.TypeOf((*interface{})(nil)).Elem()).Elem()
+	NilType    = reflect.TypeOf(nil)
+	TrueValue  = reflect.ValueOf(true)
+	FalseValue = reflect.ValueOf(false)
 )
 
 // Error provides a convenient interface for handling runtime error.
@@ -79,7 +74,7 @@ func (f Func) String() string {
 }
 
 // Interrupts the execution of any running statements in the specified environment.
-// This includes all parent & child environments.
+//
 // Note that the execution is not instantly aborted: after a call to Interrupt,
 // the current running statement will finish, but the next statement will not run,
 // and instead will return a NilValue and an InterruptError.
@@ -89,27 +84,14 @@ func Interrupt(env *Env) {
 	env.Unlock()
 }
 
-// ClearInterrupt removes the interrupt flag from specified environment.
-// This includes all parent & child environments.
-func ClearInterrupt(env *Env) {
-	env.Lock()
-	*(env.interrupt) = false
-	env.Unlock()
-}
-
 func isNil(v reflect.Value) bool {
-	if !v.IsValid() {
-		return false
+	if !v.IsValid() || v.Kind().String() == "unsafe.Pointer" {
+		return true
 	}
-	switch v.Kind() {
-	case reflect.Chan, reflect.Func, reflect.Interface, reflect.Map, reflect.Ptr, reflect.Slice:
-		// from reflect IsNil:
-		// Note that IsNil is not always equivalent to a regular comparison with nil in Go.
-		// For example, if v was created by calling ValueOf with an uninitialized interface variable i, i==nil will be true but v.IsNil will panic as v will be the zero Value.
-		return v.IsNil()
-	default:
-		return false
+	if (v.Kind() == reflect.Interface || v.Kind() == reflect.Ptr) && v.IsNil() {
+		return true
 	}
+	return false
 }
 
 func isNum(v reflect.Value) bool {
@@ -122,14 +104,6 @@ func isNum(v reflect.Value) bool {
 
 // equal returns true when lhsV and rhsV is same value.
 func equal(lhsV, rhsV reflect.Value) bool {
-	lhsNotValid, rhsVNotValid := !lhsV.IsValid(), !rhsV.IsValid()
-	if lhsNotValid && rhsVNotValid {
-		return true
-	}
-	if (!lhsNotValid && rhsVNotValid) || (lhsNotValid && !rhsVNotValid) {
-		return false
-	}
-
 	lhsIsNil, rhsIsNil := isNil(lhsV), isNil(rhsV)
 	if lhsIsNil && rhsIsNil {
 		return true
@@ -142,6 +116,9 @@ func equal(lhsV, rhsV reflect.Value) bool {
 	}
 	if rhsV.Kind() == reflect.Interface || rhsV.Kind() == reflect.Ptr {
 		rhsV = rhsV.Elem()
+	}
+	if !lhsV.IsValid() || !rhsV.IsValid() {
+		return true
 	}
 
 	// Compare a string and a number.
@@ -193,69 +170,4 @@ func equal(lhsV, rhsV reflect.Value) bool {
 		return reflect.DeepEqual(lhsV.Interface(), rhsV.Interface())
 	}
 	return reflect.DeepEqual(lhsV, rhsV)
-}
-
-func getMapIndex(key reflect.Value, aMap reflect.Value) reflect.Value {
-	if !aMap.IsValid() || aMap.IsNil() {
-		return NilValue
-	}
-
-	keyType := key.Type()
-	if keyType == InterfaceType && aMap.Type().Key() != InterfaceType {
-		if key.Elem().IsValid() && !key.Elem().IsNil() {
-			keyType = key.Elem().Type()
-		}
-	}
-	if keyType != aMap.Type().Key() {
-		return NilValue
-	}
-
-	// From reflect MapIndex:
-	// It returns the zero Value if key is not found in the map or if v represents a nil map.
-	value := aMap.MapIndex(key)
-
-	if value.IsValid() && value.CanInterface() && aMap.Type().Elem() == InterfaceType && !value.IsNil() {
-		value = reflect.ValueOf(value.Interface())
-	}
-
-	// Note if the map is of reflect.Value, it will incorectly return nil when zero value
-	// Unware of any other way for this to be done to correct that
-	if value == ZeroValue {
-		return NilValue
-	}
-
-	return value
-}
-
-func appendSlice(expr *ast.BinOpExpr, lhsV reflect.Value, rhsV reflect.Value) (reflect.Value, error) {
-	lhsT := lhsV.Type().Elem()
-	rhsT := rhsV.Type().Elem()
-
-	if lhsT.Kind() == rhsT.Kind() {
-		return reflect.AppendSlice(lhsV, rhsV), nil
-	}
-
-	if rhsT.ConvertibleTo(lhsT) {
-		for i := 0; i < rhsV.Len(); i++ {
-			lhsV = reflect.Append(lhsV, rhsV.Index(i).Convert(lhsT))
-		}
-		return lhsV, nil
-	}
-
-	if rhsT != InterfaceType || (lhsT.Kind() != reflect.Array && lhsT.Kind() != reflect.Slice) {
-		return NilValue, NewStringError(expr, "invalid type conversion")
-	}
-
-	for i := 0; i < rhsV.Len(); i++ {
-		value := rhsV.Index(i).Elem()
-		if value.Kind() != reflect.Array && value.Kind() != reflect.Slice {
-			return NilValue, NewStringError(expr, "invalid type conversion")
-		}
-		newSlice, err := appendSlice(expr, reflect.MakeSlice(lhsT, 0, 1), value)
-		if err != nil {
-			return NilValue, err
-		}
-		lhsV = reflect.Append(lhsV, newSlice)
-	}
-	return lhsV, nil
 }

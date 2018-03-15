@@ -5,9 +5,8 @@ type Type string
 
 // Token of a section of input source.
 type Token struct {
-	Type       Type
-	Literal    string
-	LineNumber int
+	Type    Type
+	Literal string
 }
 
 var keywords = map[string]Type{
