@@ -251,3 +251,17 @@ alread set this up, you can see the endpoint by running:
     $ oc get services
 
 There must also be secrets set up with the DB credentials.
+
+### TLS
+
+You can provision certificates from Let's Encrypt in manual mode with certbot.
+The key material should be stored in a k8s secret which the havenweb pod loads
+as a volume so that Caddy can serve the certificate.
+
+    certbot certonly --manual --preferred-challenge=dns
+
+Once you complete the challenge and get the key material, edit the secret.
+
+    oc edit secrets/secretname
+
+Replace the values for fullkey.pem and privkey.pem with base64 encoded versions of the new certificates. Save and exit.
