@@ -7,6 +7,8 @@ We use [BrowserStack](http://browserstack.com) to efficiently check cross-browse
 
 # Haven GRC is a modern risk & compliance dashboard for the cloud.
 
+![screenshot of app](demo.png)
+
 ## setting up the dev environment
 
 The db schema and migrations are managed using flyway.
