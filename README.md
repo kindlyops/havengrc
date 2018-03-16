@@ -152,10 +152,7 @@ Inside the database, fields can access other parts of the JWT to store user iden
 
 ### multi-tenancy
 
-Multi-tenancy is still a work in progress, with the main question being how do we model organizations
-in keycloak? Do we use a single keycloak realm, or a different realm per organization. If a different
-realm per organization, how does the signup and login flow need to change to accomodate figuring out
-which realm to use during authentication?
+Multi-tenancy is still a work in progress. Initially we will use a single Keycloak ream, and enhance the signup flow to create an organization-per-user. Initially there will be no real organization support, but we will record organization_id along with user_id for all data stored. Later we will add support for creating organizations/teams, and will allow users to be a member of multiple organizations. They will only be able to have a single organization active at a time in a login session, and so we'll need an additional page in the login flow to allow the user to select which organization they are activating (once authentication completes).
 
 ### Low level JWT interactions
 
