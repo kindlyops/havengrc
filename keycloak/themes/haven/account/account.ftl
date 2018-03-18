@@ -32,6 +32,13 @@
                     </div>
                 </div>
 
+                <div class="${messagesPerField.printIfExists('organization','has-error')}">
+                    <div class="mdc-textfield" data-mdc-auto-init="MDCTextfield">
+                        <input type="text" class="mdc-textfield__input" id="user.attributes.organization" name="user.attributes.organization" value="${(account.attributes.organization!'')}" required/>
+                        <label for="user.attributes.organization" class="mdc-textfield__label">${msg("organization")}</label>
+                    </div>
+                </div>
+
                 <div class="${messagesPerField.printIfExists('firstName','has-error')}">
                     <div class="mdc-textfield" data-mdc-auto-init="MDCTextfield">
                         <input type="text" class="mdc-textfield__input" id="firstName" name="firstName" value="${(account.firstName!'')}" required/>

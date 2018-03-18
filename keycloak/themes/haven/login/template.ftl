@@ -23,16 +23,93 @@
             <link href="${url.resourcesPath}/${style}" rel="stylesheet" />
         </#list>
     </#if>
+    <#if properties.chargebee_styles?has_content>
+        <#list properties.chargebee_styles?split(' ') as chargebee_style>
+            <link href="${url.resourcesPath}/${chargebee_style}" rel="stylesheet" />
+        </#list>
+    </#if>
     <#if properties.scripts?has_content>
         <#list properties.scripts?split(' ') as script>
             <script src="${url.resourcesPath}/${script}" type="text/javascript"></script>
         </#list>
     </#if>
-    <#if scripts??>
-        <#list scripts as script>
-            <script src="${script}" type="text/javascript"></script>
+    <#if properties.chargebee_scripts?has_content>
+        <#list properties.chargebee_scripts?split(' ') as chargebee_script>
+            <script src="${chargebee_script}" type="text/javascript"></script>
         </#list>
     </#if>
+    <script type="text/javascript">
+
+            function showEmbeddedCheckout() {
+                <#if siteName?has_content>
+                var hostedPageURL = "${pageUrl}";
+                var hostedPageId = "${pageId}";
+                var siteName = "${siteName}";
+                <#else>
+                var hostedPageURL = "NONE";
+                var hostedPageId = "NONE";
+                var siteName = "NONE";
+                </#if>
+                var iframeContainer = $('#checkout-info');
+                ChargeBee.embed(hostedPageURL, siteName).load({
+                    /*
+                    * This function will be called when iframe is created.
+                    * addIframe callback will recieve iframe as parameter.
+                    * you can use this iframe to add iframe to your page.
+                    * Loading image in container can also be showed in this callback.
+                    * Note: visiblity will be none for the iframe at this moment
+                    */
+                    addIframe: function(iframe) {
+                        iframeContainer.append(iframe);
+                    },
+
+                    /*
+                    * This function will be called once when iframe is loaded.
+                    * Since checkout pages are responsive you need to handle only height.
+                    */        
+                    onLoad: function(iframe, width, height) {
+                        var style= 'border:none;overflow:hidden;width:100%;';
+                        style = style + 'height:' + height + 'px;';
+                        style = style + 'display:none;';//This is for slide down effect
+                        iframe.setAttribute('style', style);
+                        $(iframe).slideDown(1000);
+                    },
+
+                    /*
+                    * This will be triggered when any content of iframe is resized.
+                    */        
+                    onResize: function(iframe, width, height) {
+                        var style = 'border:none;overflow:hidden;width:100%;';
+                        style = style + 'height:' + height + 'px;';
+                        iframe.setAttribute('style',style);
+                    },
+
+                    /*
+                    * This will be triggered when checkout is complete.
+                    */        
+                    onSuccess: function(iframe) {
+                        // TODO: when chargebee told us it successfully created a subscription,
+                        //  we need to trigger the POST of the keycloak registration form
+                        // We include hostedPageId in the form data. This will allow keycloak to register
+                        // the user and retrieve the subscription info for that user from the hostedPageId
+                        //redirectCall(hostedPageId);
+                        alert("onSuccess");
+                    },
+
+                    /*
+                    * This will be triggered when user clicks on cancel button. 
+                    */
+                    onCancel: function(iframe) {
+                        alert("Payment Aborted !!");
+                    }
+                });
+            }
+
+            $(document).ready(function() {
+                // show chargebee subscription form 
+                showEmbeddedCheckout();
+            });
+        </script>
 </head>
 
 <body class="${properties.kcBodyClass!}">

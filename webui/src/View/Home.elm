@@ -138,8 +138,7 @@ snackBar model =
         , attribute "aria-live" "assertive"
         , attribute "aria-atomic" "true"
         , attribute "aria-hidden" "true"
-
-        -- , onClick (Types.ShowError "this is an error message")
+          -- , onClick (Types.ShowError "this is an error message")
         ]
         [ div [ class "mdc-snackbar__text" ] []
         , div [ class "mdc-snackbar__action-wrapper" ]
@@ -196,7 +195,18 @@ reportsBody : Types.Model -> Html Types.Msg
 reportsBody model =
     div []
         [ div []
-            [ text "This is the reports view" ]
+            [ text "This is the reports view"
+            , ol []
+                [ li []
+                    [ a [ href "../js/pdf/web/viewer.html?file=haven-booth-concepts.pdf", target "_blank" ]
+                        [ text "Report" ]
+                    ]
+                , li []
+                    [ a [ href "../js/pdf/web/viewer.html", target "_blank" ]
+                        [ text "Same report" ]
+                    ]
+                ]
+            ]
         ]
 
 

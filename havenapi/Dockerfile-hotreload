@@ -1,4 +1,4 @@
-FROM gobuffalo/buffalo:v0.10.1
+FROM gobuffalo/buffalo:v0.10.3
 
 RUN mkdir -p $GOPATH/src/github.com/kindlyops/mappamundi/havenapi
 WORKDIR $GOPATH/src/github.com/kindlyops/mappamundi/havenapi
