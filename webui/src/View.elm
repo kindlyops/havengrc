@@ -17,5 +17,14 @@ view model =
             View.Login.view model
 
         Just user ->
-            View.Home.view model user
+            loadingView model user
     )
+
+
+loadingView : Model -> Keycloak.UserProfile -> Html Msg
+loadingView model user =
+    case model.PageState of
+        Loaded page ->
+            View.Home.View False model user
+        TransitioningFrom page ->
+            View.Home.View True model user

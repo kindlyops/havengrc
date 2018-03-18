@@ -18,8 +18,8 @@ import String exposing (toLower)
 import Types
 
 
-header : Types.Model -> Html Types.Msg
-header model =
+header : Types.Model -> Keycloak.UserProfile -> Html Types.Msg
+header model user =
     div [ class "mdc-toolbar mdc-toolbar--fixed header" ]
         [ div [ class "mdc-toolbar__row" ]
             [ section [ class "mdc-toolbar__section mdc-toolbar__section--align-start" ]
@@ -48,8 +48,8 @@ getGravatar email =
         "https:" ++ url
 
 
-view : Types.Model -> Keycloak.UserProfile -> Html Types.Msg
-view model user =
+view : Bool -> Types.Model -> Keycloak.UserProfile -> Html Types.Msg
+view loading model user =
     div [ class "container" ]
         [ div
             [ id "MenuDrawer"
@@ -110,8 +110,8 @@ view model user =
                 ]
             ]
         , div [ class "mdc-toolbar-fixed-adjust" ]
-            [ header model
-            , body model
+            [ header model user
+            , body model user
             ]
         ]
 
@@ -130,8 +130,8 @@ selectedItem model =
                 String.toLower item.text
 
 
-snackBar : Types.Model -> Html Types.Msg
-snackBar model =
+snackBar : Types.Model -> Keycloak.UserProfile -> Html Types.Msg
+snackBar model user =
     div
         [ id "error-snackbar"
         , class "mdc-snackbar"
@@ -146,34 +146,34 @@ snackBar model =
         ]
 
 
-body : Types.Model -> Html msg
-body model =
+body : Types.Model -> Keycloak.UserProfile -> Html Types.Msg
+body model user =
     div [ id "content" ]
         [ case model.route of
             Nothing ->
-                dashboardBody model
+                dashboardBody model user
 
             Just Home ->
-                dashboardBody model
+                dashboardBody model user
 
             Just Reports ->
-                -- reportsBody model
+                -- reportsBody model user
                 spinner
 
             Just Comments ->
-                Page.Comments.view model.authModel
+                Page.Comments.view model.authModel user
 
             Just Activity ->
-                activityBody model
+                activityBody model user
 
             Just _ ->
-                notFoundBody model
-        , snackBar model
+                notFoundBody model user
+        , snackBar model user
         ]
 
 
-dashboardBody : Types.Model -> Html Types.Msg
-dashboardBody model =
+dashboardBody : Types.Model -> Keycloak.UserProfile -> Html Types.Msg
+dashboardBody model user =
     let
         data =
             [ 1, 1, 2, 3, 5, 8, 13 ]
@@ -191,8 +191,8 @@ dashboardBody model =
             ]
 
 
-reportsBody : Types.Model -> Html Types.Msg
-reportsBody model =
+reportsBody : Types.Model -> Keycloak.UserProfile -> Html Types.Msg
+reportsBody model user =
     div []
         [ div []
             [ text "This is the reports view"
@@ -215,8 +215,8 @@ onValueChanged tagger =
     on "value-changed" (Json.map tagger Html.Events.targetValue)
 
 
-activityBody : Types.Model -> Html Types.Msg
-activityBody model =
+activityBody : Types.Model -> Keycloak.UserProfile -> Html Types.Msg
+activityBody model user =
     let
         data =
             [ ( Date.fromTime 1448928000000, 2 )
@@ -232,8 +232,8 @@ activityBody model =
             ]
 
 
-notFoundBody : Types.Model -> Html Types.Msg
-notFoundBody model =
+notFoundBody : Types.Model -> Keycloak.UserProfile -> Html Types.Msg
+notFoundBody model user =
     div [] [ text "This is the notFound view" ]
 
 

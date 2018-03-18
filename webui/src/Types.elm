@@ -11,6 +11,7 @@ import Page.Reports as Reports
 import Page.Errored as Errored exposing (PageLoadError)
 import Page.Home as Home
 import Page.Login as Login
+import Data.Session exposing (Session)
 
 
 type Page
@@ -34,6 +35,7 @@ type alias Model =
     , route : Route.Model
     , pageState : PageState
     , selectedTab : Int
+    , session : Session
     }
 
 
