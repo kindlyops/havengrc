@@ -22,8 +22,8 @@ init initialUser location =
             , authModel = (Authentication.init Ports.keycloakLogin Ports.keycloakLogout initialUser)
             , route = route
             , selectedTab = 0
-            , comments = []
-            , newComment = emptyNewComment
+            , pageState = (Loaded Blank)
+            , session = { user = initialUser }
             }
     in
         ( model
@@ -80,40 +80,32 @@ update msg model =
             in
                 { model | route = Route.locFor (Just location) } ! []
 
-        AddComment model ->
-            model ! [ postComment model ]
-
-        GetComments model ->
-            model ! [ getComments model ]
-
-        SetCommentMessageInput value ->
-            let
-                oldComment =
-                    model.newComment
-
-                updatedComment =
-                    { oldComment | message = value }
-            in
-                ( { model | newComment = updatedComment }, Cmd.none )
-
-        NewComment (Ok comment) ->
-            let
-                morecomments =
-                    model.comments ++ comment
-            in
-                -- TODO we need a more sophisticated way to deal with loading
-                -- paginated data and not re-fetching data we already have
-                { model | newComment = emptyNewComment, comments = morecomments } ! []
-
-        NewComment (Err error) ->
-            model ! [ Ports.showError (getHTTPErrorMessage error) ]
-
-        NewComments (Ok comments) ->
-            { model | comments = comments } ! []
-
-        NewComments (Err error) ->
-            model ! [ Ports.showError (getHTTPErrorMessage error) ]
-
+        -- AddComment model ->
+        --     model ! [ postComment model ]
+        -- GetComments model ->
+        --     model ! [ getComments model ]
+        -- SetCommentMessageInput value ->
+        --     let
+        --         oldComment =
+        --             model.newComment
+        --         updatedComment =
+        --             { oldComment | message = value }
+        --     in
+        --         ( { model | newComment = updatedComment }, Cmd.none )
+        -- NewComment (Ok comment) ->
+        --     let
+        --         morecomments =
+        --             model.comments ++ comment
+        --     in
+        --         -- TODO we need a more sophisticated way to deal with loading
+        --         -- paginated data and not re-fetching data we already have
+        --         { model | newComment = emptyNewComment, comments = morecomments } ! []
+        -- NewComment (Err error) ->
+        --     model ! [ Ports.showError (getHTTPErrorMessage error) ]
+        -- NewComments (Ok comments) ->
+        --     { model | comments = comments } ! []
+        -- NewComments (Err error) ->
+        --     model ! [ Ports.showError (getHTTPErrorMessage error) ]
         ShowError value ->
             model ! [ Ports.showError value ]
 

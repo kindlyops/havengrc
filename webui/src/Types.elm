@@ -1,4 +1,4 @@
-module Types exposing (Model, Msg(..))
+module Types exposing (Model, Page(..), PageState(..), Msg(..))
 
 import Authentication
 import Http

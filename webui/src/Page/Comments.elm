@@ -8,6 +8,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput, onWithOptions, on)
 import Http
 import Misc exposing (showDebugData)
+import Keycloak
 import Comment.Types
 import Authentication
 
@@ -34,18 +35,18 @@ type ExternalMsg
     | ShowError String
 
 
-view : Authentication.Model -> Model -> Html Msg
-view authModel model =
+view : Model -> Keycloak.UserProfile -> Html Msg
+view model user =
     div []
         [ text "This is the comments view"
         , ul []
             (List.map (\l -> li [] [ text (l.message ++ " - " ++ l.user_email ++ " posted at " ++ l.created_at) ]) model.comments)
-        , commentsForm authModel model
+        , commentsForm model user
         ]
 
 
-commentsForm : Authentication.Model -> Model -> Html Msg
-commentsForm authModel model =
+commentsForm : Model -> Keycloak.UserProfile -> Html Msg
+commentsForm model user =
     div
         [ id "Comments" ]
         [ div []

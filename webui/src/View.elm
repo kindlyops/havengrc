@@ -25,6 +25,6 @@ loadingView : Model -> Keycloak.UserProfile -> Html Msg
 loadingView model user =
     case model.PageState of
         Loaded page ->
-            View.Home.View False model user
+            View.Home.View False page user
         TransitioningFrom page ->
-            View.Home.View True model user
+            View.Home.View True page user

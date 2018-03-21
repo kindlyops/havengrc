@@ -11,9 +11,10 @@ import Html.Events exposing (onClick, onInput, onWithOptions, on)
 import Json.Decode as Json
 import Keycloak
 import Page.Comments
+import Page.Activity
 import View.LineChart as LineChart
 import View.Spinner exposing (spinner)
-import Route exposing (Location(..), locFor)
+import Route
 import String exposing (toLower)
 import Types
 
@@ -48,8 +49,8 @@ getGravatar email =
         "https:" ++ url
 
 
-view : Bool -> Types.Model -> Keycloak.UserProfile -> Html Types.Msg
-view loading model user =
+view : Bool -> Types.Page -> Keycloak.UserProfile -> Html Types.Msg
+view loading page user =
     div [ class "container" ]
         [ div
             [ id "MenuDrawer"
@@ -100,7 +101,7 @@ view loading model user =
                 , div [ class "nav-list-container" ]
                     [ div [ class "nav-flex" ]
                         [ nav [ class "mdc-persistent-drawer__content mdc-list" ]
-                            (List.map (\item -> drawerMenuItem model item) menuItems)
+                            (List.map (\item -> drawerMenuItem page item) menuItems)
                         ]
                     , div [ class "drawer-logo" ]
                         [ img [ attribute "src" "%PUBLIC_URL%/img/logo@2x.png" ]
@@ -110,8 +111,8 @@ view loading model user =
                 ]
             ]
         , div [ class "mdc-toolbar-fixed-adjust" ]
-            [ header model user
-            , body model user
+            [ header page user
+            , body page user
             ]
         ]
 
@@ -146,33 +147,32 @@ snackBar model user =
         ]
 
 
-body : Types.Model -> Keycloak.UserProfile -> Html Types.Msg
-body model user =
+body : Types.Page -> Keycloak.UserProfile -> Html Types.Msg
+body page user =
     div [ id "content" ]
-        [ case model.route of
-            Nothing ->
+        [ case page of
+            Types.Home model ->
                 dashboardBody model user
 
-            Just Home ->
-                dashboardBody model user
+            Types.Comments model ->
+                Page.Comments.view model user
 
-            Just Reports ->
-                -- reportsBody model user
-                spinner
-
-            Just Comments ->
-                Page.Comments.view model.authModel user
-
-            Just Activity ->
+            Types.Activity model ->
                 activityBody model user
 
-            Just _ ->
-                notFoundBody model user
-        , snackBar model user
+            Types.Blank ->
+                notFoundBody user
+
+            Types.NotFound ->
+                notFoundBody user
+
+            Types.Errored _ ->
+                notFoundBody user
+        , snackBar page user
         ]
 
 
-dashboardBody : Types.Model -> Keycloak.UserProfile -> Html Types.Msg
+dashboardBody : Page.Home.Model -> Keycloak.UserProfile -> Html Types.Msg
 dashboardBody model user =
     let
         data =
@@ -191,8 +191,8 @@ dashboardBody model user =
             ]
 
 
-reportsBody : Types.Model -> Keycloak.UserProfile -> Html Types.Msg
-reportsBody model user =
+reportsBody : Types.Page -> Keycloak.UserProfile -> Html Types.Msg
+reportsBody page user =
     div []
         [ div []
             [ text "This is the reports view"
@@ -215,7 +215,7 @@ onValueChanged tagger =
     on "value-changed" (Json.map tagger Html.Events.targetValue)
 
 
-activityBody : Types.Model -> Keycloak.UserProfile -> Html Types.Msg
+activityBody : Page.Activity.Model -> Keycloak.UserProfile -> Html Types.Msg
 activityBody model user =
     let
         data =
@@ -246,10 +246,10 @@ type alias MenuItem =
 
 menuItems : List MenuItem
 menuItems =
-    [ { text = "Dashboard", iconName = "dashboard", route = Just Home }
-    , { text = "Activity", iconName = "history", route = Just Activity }
-    , { text = "Reports", iconName = "library_books", route = Just Reports }
-    , { text = "Comments", iconName = "gavel", route = Just Comments }
+    [ { text = "Dashboard", iconName = "dashboard", route = Just Route.Home }
+    , { text = "Activity", iconName = "history", route = Just Route.Activity }
+    , { text = "Reports", iconName = "library_books", route = Just Route.Reports }
+    , { text = "Comments", iconName = "gavel", route = Just Route.Comments }
     ]
 
 
