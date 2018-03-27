@@ -12,6 +12,7 @@ import Page.Errored as Errored exposing (PageLoadError)
 import Page.Home as Home
 import Page.Login as Login
 import Data.Session exposing (Session)
+import Keycloak
 
 
 type Page
@@ -21,7 +22,7 @@ type Page
     | Home Home.Model
     | Login Login.Model
     | Activity Activity.Model
-    | Comments Comments.Model
+    | Comments Comment.Types.Model
 
 
 type PageState
@@ -43,5 +44,5 @@ type Msg
     = AuthenticationMsg Authentication.Msg
     | NavigateTo (Maybe Route.Location)
     | UrlChange Navigation.Location
-    | CommentsMsg Comments.Msg
+    | CommentsMsg Keycloak.UserProfile Comment.Types.Msg
     | ShowError String

@@ -12,6 +12,7 @@ import Json.Decode as Json
 import Keycloak
 import Page.Comments
 import Page.Activity
+import Page.Home
 import View.LineChart as LineChart
 import View.Spinner exposing (spinner)
 import Route
@@ -49,8 +50,8 @@ getGravatar email =
         "https:" ++ url
 
 
-view : Bool -> Types.Page -> Keycloak.UserProfile -> Html Types.Msg
-view loading page user =
+view : Bool -> Types.Model -> Types.Page -> Keycloak.UserProfile -> Html Types.Msg
+view loading model page user =
     div [ class "container" ]
         [ div
             [ id "MenuDrawer"
@@ -101,7 +102,7 @@ view loading page user =
                 , div [ class "nav-list-container" ]
                     [ div [ class "nav-flex" ]
                         [ nav [ class "mdc-persistent-drawer__content mdc-list" ]
-                            (List.map (\item -> drawerMenuItem page item) menuItems)
+                            (List.map (\item -> drawerMenuItem model item) menuItems)
                         ]
                     , div [ class "drawer-logo" ]
                         [ img [ attribute "src" "%PUBLIC_URL%/img/logo@2x.png" ]
@@ -111,7 +112,7 @@ view loading page user =
                 ]
             ]
         , div [ class "mdc-toolbar-fixed-adjust" ]
-            [ header page user
+            [ header model user
             , body page user
             ]
         ]
@@ -131,8 +132,8 @@ selectedItem model =
                 String.toLower item.text
 
 
-snackBar : Types.Model -> Keycloak.UserProfile -> Html Types.Msg
-snackBar model user =
+snackBar : Keycloak.UserProfile -> Html Types.Msg
+snackBar user =
     div
         [ id "error-snackbar"
         , class "mdc-snackbar"
@@ -156,6 +157,7 @@ body page user =
 
             Types.Comments model ->
                 Page.Comments.view model user
+                    |> Html.map Types.CommentsMsg
 
             Types.Activity model ->
                 activityBody model user
@@ -166,9 +168,9 @@ body page user =
             Types.NotFound ->
                 notFoundBody user
 
-            Types.Errored _ ->
+            Types.Errored model ->
                 notFoundBody user
-        , snackBar page user
+        , snackBar user
         ]
 
 
@@ -232,8 +234,8 @@ activityBody model user =
             ]
 
 
-notFoundBody : Types.Model -> Keycloak.UserProfile -> Html Types.Msg
-notFoundBody model user =
+notFoundBody : Keycloak.UserProfile -> Html Types.Msg
+notFoundBody user =
     div [] [ text "This is the notFound view" ]
 
 

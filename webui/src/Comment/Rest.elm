@@ -5,7 +5,6 @@ import Json.Decode as Decode exposing (Decoder, field, succeed)
 import Json.Encode as Encode
 import Keycloak
 import Comment.Types exposing (..)
-import Page.Comments
 import Authentication
 
 
@@ -30,13 +29,13 @@ commentsUrl =
     "/api/comments"
 
 
-getComments : Authentication.Model -> Page.Comments.Model -> Cmd Page.Comments.Msg
-getComments session model =
+getComments : Keycloak.UserProfile -> Cmd Comment.Types.Msg
+getComments user =
     let
         request =
             Http.request
                 { method = "GET"
-                , headers = tryGetAuthHeader session
+                , headers = tryGetAuthHeader user
                 , url = commentsUrl
                 , body = Http.emptyBody
                 , expect = Http.expectJson (Decode.list commentDecoder)
@@ -44,21 +43,12 @@ getComments session model =
                 , withCredentials = True
                 }
     in
-        Http.send Page.Comments.NewComments request
+        Http.send Comment.Types.NewComments request
 
 
-tryGetAuthHeader : Authentication.Model -> List Http.Header
-tryGetAuthHeader authmodel =
-    case authmodel.state of
-        Keycloak.LoggedIn user ->
-            [ (Http.header "Authorization" ("Bearer " ++ user.token)) ]
-
-        Keycloak.LoggedOut ->
-            let
-                _ =
-                    Debug.log "didn't get a user token" ""
-            in
-                []
+tryGetAuthHeader : Keycloak.UserProfile -> List Http.Header
+tryGetAuthHeader user =
+    [ (Http.header "Authorization" ("Bearer " ++ user.token)) ]
 
 
 getReturnHeaders : List Http.Header
@@ -66,15 +56,15 @@ getReturnHeaders =
     [ (Http.header "Prefer" "return=representation") ]
 
 
-postComment : Authentication.Model -> Page.Comments.Model -> Cmd Page.Comments.Msg
-postComment session model =
+postComment : Keycloak.UserProfile -> Comment.Types.Model -> Cmd Comment.Types.Msg
+postComment user model =
     let
         body =
             encodeComment model.newComment
                 |> Http.jsonBody
 
         headers =
-            (tryGetAuthHeader session) ++ getReturnHeaders
+            (tryGetAuthHeader user) ++ getReturnHeaders
 
         _ =
             Debug.log "postComment called with " model.newComment.message
@@ -90,4 +80,4 @@ postComment session model =
                 , withCredentials = True
                 }
     in
-        Http.send Page.Comments.NewComment request
+        Http.send Comment.Types.NewComment request

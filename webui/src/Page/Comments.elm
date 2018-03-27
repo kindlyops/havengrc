@@ -1,33 +1,17 @@
 -- module Page.Comments exposing (Model, Msg, init, update, view)
 
 
-module Page.Comments exposing (Model, Msg(..), view)
+module Page.Comments exposing (view, update)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput, onWithOptions, on)
 import Http
-import Misc exposing (showDebugData)
+import Misc exposing (showDebugData, getHTTPErrorMessage)
 import Keycloak
-import Comment.Types
-import Authentication
-
-
--- TODO define Comments.Model, init and update
-
-
-type alias Model =
-    { comments : List Comment.Types.Comment
-    , newComment : Comment.Types.Comment
-    }
-
-
-type Msg
-    = SetCommentMessageInput String
-    | AddComment Authentication.Model Model
-    | GetComments Authentication.Model Model
-    | NewComments (Result Http.Error (List Comment.Types.Comment))
-    | NewComment (Result Http.Error (List Comment.Types.Comment))
+import Comment.Types exposing (..)
+import Comment.Rest
+import Ports
 
 
 type ExternalMsg
@@ -35,17 +19,64 @@ type ExternalMsg
     | ShowError String
 
 
-view : Model -> Keycloak.UserProfile -> Html Msg
+update : Msg -> Keycloak.UserProfile -> Comment.Types.Model -> ( Comment.Types.Model, Cmd Msg )
+update msg user model =
+    case msg of
+        SetCommentMessageInput value ->
+            let
+                oldComment =
+                    model.newComment
+
+                updatedComment =
+                    { oldComment | message = value }
+            in
+                ( { model | newComment = updatedComment }, Cmd.none )
+
+        AddComment model ->
+            model ! [ Comment.Rest.postComment user model ]
+
+        GetComments model ->
+            model ! [ Comment.Rest.getComments user ]
+
+        NewComment (Ok comment) ->
+            let
+                morecomments =
+                    model.comments ++ comment
+            in
+                -- TODO we need a more sophisticated way to deal with loading
+                -- paginated data and not re-fetching data we already have
+                { model | newComment = Comment.Types.emptyNewComment, comments = morecomments } ! []
+
+        NewComment (Err error) ->
+            model ! [ Ports.showError (getHTTPErrorMessage error) ]
+
+        NewComments (Ok comments) ->
+            { model | comments = comments } ! []
+
+        NewComments (Err error) ->
+            model ! [ Ports.showError (getHTTPErrorMessage error) ]
+
+
+renderComment : Comment.Types.Comment -> Html msg
+renderComment c =
+    let
+        m = 
+            c.message ++ " - " ++ c.user_email ++ " posted at " ++ c.created_at
+    in
+        li [] [ text m ]
+
+
+view : Comment.Types.Model -> Keycloak.UserProfile -> Html Msg
 view model user =
     div []
         [ text "This is the comments view"
         , ul []
-            (List.map (\l -> li [] [ text (l.message ++ " - " ++ l.user_email ++ " posted at " ++ l.created_at) ]) model.comments)
+            (List.map renderComment model.comments)
         , commentsForm model user
         ]
 
 
-commentsForm : Model -> Keycloak.UserProfile -> Html Msg
+commentsForm : Comment.Types.Model -> Keycloak.UserProfile -> Html Msg
 commentsForm model user =
     div
         [ id "Comments" ]
@@ -56,7 +87,7 @@ commentsForm model user =
                 ]
                 [ input
                     [ class "mdc-textfield__input"
-                    , onInput SetCommentMessageInput
+                    , onInput Comment.Types.SetCommentMessageInput
                     , value model.newComment.message
                     ]
                     []
@@ -66,7 +97,7 @@ commentsForm model user =
         , button
             [ class "mdc-button mdc-button--raised mdc-button--accent"
             , attribute "data-mdc-auto-init" "MDCRipple"
-            , onClick (AddComment authModel model)
+            , onClick (Comment.Types.AddComment model)
             ]
             [ text "Add" ]
         , showDebugData model.newComment
