@@ -88,8 +88,8 @@
                     * This will be triggered when checkout is complete.
                     */        
                     onSuccess: function(iframe) {
-                        // TODO: when chargebee told us it successfully created a subscription,
-                        //  we need to trigger the POST of the keycloak registration form
+                        // when chargebee told us it successfully created a subscription,
+                        // we need to trigger the POST of the keycloak registration form
                         // We include hostedPageId in the form data. This will allow keycloak to register
                         // the user and retrieve the subscription info for that user from the hostedPageId
                         //redirectCall(hostedPageId);
