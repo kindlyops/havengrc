@@ -1,8 +1,12 @@
 package actions
 
 import (
-	"fmt"
 	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"net/http"
+	"strings"
+
 	"github.com/gobuffalo/buffalo"
 	"github.com/gobuffalo/buffalo/middleware"
 	"github.com/gobuffalo/buffalo/middleware/ssl"
@@ -12,9 +16,6 @@ import (
 	"github.com/unrolled/secure"
 	jose "gopkg.in/square/go-jose.v2"
 	jwt "gopkg.in/square/go-jose.v2/jwt"
-	"io/ioutil"
-	"net/http"
-	"strings"
 
 	"github.com/kindlyops/mappamundi/havenapi/models"
 )
@@ -115,7 +116,7 @@ func JwtMiddleware(next buffalo.Handler) buffalo.Handler {
 		email := allClaims["email"]
 		c.Set("email", email)
 
-		org :=  allClaims["org"]
+		org := allClaims["org"]
 		c.Set("org", org)
 		enc, _ := json.Marshal(org)
 
