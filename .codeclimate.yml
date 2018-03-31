@@ -18,6 +18,8 @@ exclude_patterns:
 - "webui/public/"
 - "webui/elm-stuff/"
 - "webui/node_modules/"
+- "webui/config/"
+- "contrib/curl-auth0/"
 
 
 checks:
