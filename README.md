@@ -60,6 +60,8 @@ Open [localhost:2015](http://localhost:2015/), click the login button. You can
 login with user1@havengrc.com/password or user2@havengrc.com/password.
 User2 will prompt you to configure 2Factor authentication.
 
+If you cannot connect to [localhost](http://localhost:2015), try getting the docker machine ip using the command `docker-machine ip default` and use that instead.
+
 ## to access the swagger-ui for the postgrest API
 
 Open [localhost:3002](http://localhost:3002/)
