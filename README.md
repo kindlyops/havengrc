@@ -42,7 +42,7 @@ At the time of writing, this is working fine with docker 1.12.
 
 Before you continue, you need to configure git to auto-correct line ending formats:
 
-     git config --global core.autocrlf true
+     git config --global core.autocrlf false
 
 ## running the service
 
