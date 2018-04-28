@@ -6,6 +6,7 @@ import Json.Encode as Encode
 import Keycloak
 import Comment.Types exposing (..)
 import Types exposing (..)
+import Authentication
 
 
 commentDecoder : Decoder Comment
@@ -29,13 +30,13 @@ commentsUrl =
     "/api/comments"
 
 
-getComments : Model -> Cmd Msg
-getComments model =
+getComments : Authentication.Model -> Cmd Msg
+getComments authModel =
     let
         request =
             Http.request
                 { method = "GET"
-                , headers = tryGetAuthHeader model
+                , headers = tryGetAuthHeader authModel
                 , url = commentsUrl
                 , body = Http.emptyBody
                 , expect = Http.expectJson (Decode.list commentDecoder)
@@ -46,9 +47,9 @@ getComments model =
         Http.send NewComments request
 
 
-tryGetAuthHeader : Model -> List Http.Header
-tryGetAuthHeader model =
-    case model.authModel.state of
+tryGetAuthHeader : Authentication.Model -> List Http.Header
+tryGetAuthHeader authModel =
+    case authModel.state of
         Keycloak.LoggedIn user ->
             [ (Http.header "Authorization" ("Bearer " ++ user.token)) ]
 
@@ -65,18 +66,18 @@ getReturnHeaders =
     [ (Http.header "Prefer" "return=representation") ]
 
 
-postComment : Model -> Cmd Msg
-postComment model =
+postComment : Authentication.Model -> Comment -> Cmd Msg
+postComment authModel newComment =
     let
         body =
-            encodeComment model.newComment
+            encodeComment newComment
                 |> Http.jsonBody
 
         headers =
-            (tryGetAuthHeader model) ++ getReturnHeaders
+            (tryGetAuthHeader authModel) ++ getReturnHeaders
 
         _ =
-            Debug.log "postComment called with " model.newComment.message
+            Debug.log "postComment called with " newComment.message
 
         request =
             Http.request

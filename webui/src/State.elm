@@ -14,12 +14,15 @@ import Types exposing (..)
 init : Maybe Keycloak.LoggedInUser -> Navigation.Location -> ( Model, Cmd Msg )
 init initialUser location =
     let
+        initialAuthModel =
+            Authentication.init Ports.keycloakLogin Ports.keycloakLogout initialUser
+
         ( route, routeCmd ) =
             Route.init (Just location)
 
         model =
             { count = 0
-            , authModel = (Authentication.init Ports.keycloakLogin Ports.keycloakLogout initialUser)
+            , authModel = initialAuthModel
             , route = route
             , selectedTab = 0
             , comments = []
@@ -63,10 +66,24 @@ update msg model =
                     model ! []
 
                 Just location ->
-                    model
-                        ! [ Navigation.newUrl (Route.urlFor location)
-                          , Ports.setTitle (Route.titleFor location)
-                          ]
+                    let
+                        initilizationCommands =
+                            [ Navigation.newUrl (Route.urlFor location)
+                            , Ports.setTitle (Route.titleFor location)
+                            ]
+
+                        additionalCommands =
+                            case location of
+                                Route.Comments ->
+                                    [ getComments model.authModel ]
+
+                                _ ->
+                                    []
+
+                        commands =
+                            initilizationCommands ++ additionalCommands
+                    in
+                        model ! commands
 
         UrlChange location ->
             let
@@ -76,10 +93,10 @@ update msg model =
                 { model | route = Route.locFor (Just location) } ! []
 
         AddComment model ->
-            model ! [ postComment model ]
+            model ! [ postComment model.authModel model.newComment ]
 
         GetComments model ->
-            model ! [ getComments model ]
+            model ! [ getComments model.authModel ]
 
         SetCommentMessageInput value ->
             let
