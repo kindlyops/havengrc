@@ -9,6 +9,7 @@ import Comment.Rest exposing (getComments, postComment)
 import Comment.Types exposing (Comment, emptyNewComment)
 import Route
 import Types exposing (..)
+import Survey
 
 
 init : Maybe Keycloak.LoggedInUser -> Navigation.Location -> ( Model, Cmd Msg )
@@ -27,6 +28,7 @@ init initialUser location =
             , selectedTab = 0
             , comments = []
             , newComment = emptyNewComment
+            , surveyModel = Survey.init
             }
     in
         ( model
@@ -128,6 +130,9 @@ update msg model =
 
         ShowError value ->
             model ! [ Ports.showError value ]
+
+        SurveyMsg surveyMsg ->
+            { model | surveyModel = Survey.update surveyMsg model.surveyModel } ! []
 
 
 subscriptions : a -> Sub Msg

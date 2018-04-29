@@ -18,7 +18,8 @@
         "evancz/url-parser": "2.0.1 <= v < 3.0.0",
         "gampleman/elm-visualization": "1.1.1 <= v < 2.0.0",
         "kuzzmi/elm-gravatar": "2.0.1 <= v < 3.0.0",
-        "rtfeldman/elm-css": "8.2.0 <= v < 9.0.0"
+        "rtfeldman/elm-css": "8.2.0 <= v < 9.0.0",
+        "wernerdegroot/listzipper": "3.0.0 <= v < 4.0.0"
     },
     "elm-version": "0.18.0 <= v < 0.19.0"
 }

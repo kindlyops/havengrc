@@ -5,6 +5,7 @@ import Http
 import Navigation
 import Comment.Types
 import Route
+import Survey
 
 
 type alias Model =
@@ -14,6 +15,7 @@ type alias Model =
     , selectedTab : Int
     , comments : List Comment.Types.Comment
     , newComment : Comment.Types.Comment
+    , surveyModel : Survey.Model
     }
 
 
@@ -27,3 +29,4 @@ type Msg
     | NewComment (Result Http.Error (List Comment.Types.Comment))
     | SetCommentMessageInput String
     | ShowError String
+    | SurveyMsg Survey.Msg

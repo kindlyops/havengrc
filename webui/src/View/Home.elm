@@ -14,6 +14,7 @@ import View.LineChart as LineChart
 import Route exposing (Location(..), locFor)
 import String exposing (toLower)
 import Types exposing (Model, Msg)
+import Survey
 
 
 header : Model -> Html Msg
@@ -136,7 +137,8 @@ snackBar model =
         , attribute "aria-live" "assertive"
         , attribute "aria-atomic" "true"
         , attribute "aria-hidden" "true"
-          -- , onClick (Types.ShowError "this is an error message")
+
+        -- , onClick (Types.ShowError "this is an error message")
         ]
         [ div [ class "mdc-snackbar__text" ] []
         , div [ class "mdc-snackbar__action-wrapper" ]
@@ -163,10 +165,22 @@ body model =
             Just Activity ->
                 activityBody model
 
+            Just SurveyPrototype ->
+                surveyPrototypeBody model
+
             Just _ ->
                 notFoundBody model
         , snackBar model
         ]
+
+
+surveyPrototypeBody : Model -> Html Msg
+surveyPrototypeBody model =
+    Survey.view model.surveyModel |> Html.map Types.SurveyMsg
+
+
+
+--Survey.view model.surveyModel
 
 
 dashboardBody : Model -> Html Msg
@@ -192,18 +206,18 @@ reportsBody : Model -> Html Msg
 reportsBody model =
     div []
         [ div []
-              [ text "This is the reports view"
-              , ol []
-                  [ li []
-                      [ a [ href "../js/pdf/web/viewer.html?file=haven-booth-concepts.pdf", target "_blank" ]
-                          [ text "Report" ]
-                      ]
-                  , li []
-                      [ a [ href "../js/pdf/web/viewer.html", target "_blank" ]
-                          [ text "Same report" ]
-                      ]
-                  ]
-              ]
+            [ text "This is the reports view"
+            , ol []
+                [ li []
+                    [ a [ href "../js/pdf/web/viewer.html?file=haven-booth-concepts.pdf", target "_blank" ]
+                        [ text "Report" ]
+                    ]
+                , li []
+                    [ a [ href "../js/pdf/web/viewer.html", target "_blank" ]
+                        [ text "Same report" ]
+                    ]
+                ]
+            ]
         ]
 
 
@@ -267,8 +281,8 @@ activityBody model =
     in
         div []
             [ div []
-                  [ text "What is Risk Management?" ]
-            ,  LineChart.view data
+                [ text "What is Risk Management?" ]
+            , LineChart.view data
             ]
 
 
@@ -290,6 +304,7 @@ menuItems =
     , { text = "Activity", iconName = "history", route = Just Activity }
     , { text = "Reports", iconName = "library_books", route = Just Reports }
     , { text = "Comments", iconName = "gavel", route = Just Comments }
+    , { text = "SurveyPrototype", iconName = "gavel", route = Just SurveyPrototype }
     ]
 
 

@@ -21,6 +21,7 @@ type Location
     | Activity
     | Reports
     | Comments
+    | SurveyPrototype
     | ShowComment Int
     | EditComment Int
 
@@ -71,6 +72,9 @@ titleFor route =
             Comments ->
                 "Comments"
 
+            SurveyPrototype ->
+                "SurveyPrototype"
+
             ShowComment _ ->
                 "Comment"
 
@@ -97,6 +101,9 @@ urlFor loc =
 
                 Comments ->
                     "/comments"
+
+                SurveyPrototype ->
+                    "/surveyPrototype"
 
                 ShowComment id ->
                     "/comments/" ++ (toString id)
@@ -151,6 +158,9 @@ locFor path =
                         String.toInt stringId
                             |> Result.toMaybe
                             |> Maybe.map EditComment
+
+                    [ "surveyPrototype" ] ->
+                        Just SurveyPrototype
 
                     _ ->
                         let
