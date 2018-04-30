@@ -1,4 +1,4 @@
-module View.LineChart exposing (..)
+module LineChart exposing (..)
 
 import Visualization.Scale as Scale exposing (ContinuousScale, ContinuousTimeScale)
 import Visualization.Axis as Axis

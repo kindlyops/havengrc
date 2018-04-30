@@ -69,8 +69,6 @@ limitNumberOfGroups : Int -> Int
 limitNumberOfGroups input =
     if input < 0 then
         1
-    else if input > 3 then
-        3
     else
         input
 
@@ -468,7 +466,7 @@ isPointsInGroup pointsLeft group =
 
 view : Model -> Html.Html Msg
 view model =
-    div [] [ viewApp model ]
+    div [] [ viewNavbar, viewApp model ]
 
 
 viewApp : Model -> Html Msg
@@ -508,7 +506,7 @@ viewIncompleteButtons : Survey -> List Int -> List (Html Msg)
 viewIncompleteButtons survey questionNumbers =
     List.map
         (\questionNumber ->
-            div [ class "my-2" ] [ button [ class "mdc-button mdc-button--raised", onClick (GotoQuestion survey questionNumber) ] [ text ("Click to go back to question " ++ (toString questionNumber)) ] ]
+            div [ class "my-2" ] [ button [ class "btn btn-primary", onClick (GotoQuestion survey questionNumber) ] [ text ("Click to go back to question " ++ (toString questionNumber)) ] ]
         )
         questionNumbers
 
@@ -532,7 +530,7 @@ viewIpsativeSurveyInstructions survey =
                 [ h1 [ class "display-4" ] [ text survey.metaData.name ]
                 , p [ class "lead" ] [ text survey.metaData.instructions ]
                 , hr [ class "my-4" ] []
-                , button [ class "mdc-button mdc-button--raised", onClick StartIpsativeSurvey ] [ text "Begin" ]
+                , button [ class "btn btn-primary", onClick StartIpsativeSurvey ] [ text "Begin" ]
                 ]
             ]
         ]
@@ -547,7 +545,7 @@ viewLikertSurveyInstructions survey =
                 [ h1 [ class "display-4" ] [ text survey.metaData.name ]
                 , p [ class "lead" ] [ text survey.metaData.instructions ]
                 , hr [ class "my-4" ] []
-                , button [ class "mdc-button mdc-button--raised", onClick StartLikertSurvey ] [ text "Begin" ]
+                , button [ class "btn btn-primary", onClick StartLikertSurvey ] [ text "Begin" ]
                 ]
             ]
         ]
@@ -555,29 +553,27 @@ viewLikertSurveyInstructions survey =
 
 viewHero : Model -> Html Msg
 viewHero model =
-    div [ class "" ]
-        [ h1 [ class "" ] [ text "KindlyOps Haven Survey Prototype" ]
-        , p [ class "" ] [ text "Welcome to the Elm Haven Survey Prototype. " ]
-        , hr [ class "" ] []
+    div [ class "jumbotron" ]
+        [ h1 [ class "display-4" ] [ text "KindlyOps Haven Survey Prototype" ]
+        , p [ class "lead" ] [ text "Welcome to the Elm Haven Survey Prototype. " ]
+        , hr [ class "my-4" ] []
         , p [ class "" ] [ text ("There are currently " ++ (toString (List.length model.availableSurveys)) ++ " surveys to choose from.") ]
-        , div [ class "mdc-layout-grid" ]
-            [ div [ class "mdc-layout-grid__inner" ]
-                (List.map
-                    (\survey ->
-                        case survey of
-                            Ipsative survey ->
-                                div [ class "mdc-layout-grid__cell" ]
-                                    [ viewScdsCard survey model.numberOfGroups
-                                    ]
+        , div [ class "row" ]
+            (List.map
+                (\survey ->
+                    case survey of
+                        Ipsative survey ->
+                            div [ class "col-sm" ]
+                                [ viewScdsCard survey model.numberOfGroups
+                                ]
 
-                            Likert survey ->
-                                div [ class "mdc-layout-grid__cell" ]
-                                    [ viewForceCard survey
-                                    ]
-                    )
-                    model.availableSurveys
+                        Likert survey ->
+                            div [ class "col-sm" ]
+                                [ viewForceCard survey
+                                ]
                 )
-            ]
+                model.availableSurveys
+            )
         ]
 
 
@@ -594,23 +590,25 @@ viewForceCard survey =
         , ul [ class "list-group list-group-flush" ]
             [ li [ class "list-group-item" ] [ text ("Last Updated: " ++ survey.metaData.lastUpdated) ]
             , li [ class "list-group-item" ] [ text ("Created By: " ++ survey.metaData.createdBy) ]
-            , li [ class "list-group-item" ] [ button [ class "mdc-button mdc-button--raised", onClick BeginLikertSurvey ] [ text "Click to start survey" ] ]
+            , li [ class "list-group-item" ] [ button [ class "btn btn-primary", onClick BeginLikertSurvey ] [ text "Click to start survey" ] ]
             ]
         ]
 
 
 viewScdsCard : IpsativeSurvey -> Int -> Html Msg
 viewScdsCard survey numberOfGroups =
-    div [ class "mdc-card" ]
-        [ div [ class "mdc-card__media mdc-card__media--square" ]
-            [ h2 [ class "mdc-card__media-content " ] [ text "Ipsative" ]
-            , div [ class "mdc-card__media-content" ]
-                [ p [ class "" ] [ text survey.metaData.name ]
-                , p [ class "" ] [ text survey.metaData.description ]
-                , p [ class "" ] [ text ("Last Updated: " ++ survey.metaData.lastUpdated) ]
-                , p [ class "" ] [ text ("Created By: " ++ survey.metaData.createdBy) ]
+    div [ class "card" ]
+        [ div [ class "card-header" ] [ text "Ipsative" ]
+        , div [ class "card-body" ]
+            [ h5 [ class "card-title" ]
+                [ text survey.metaData.name
                 ]
-            , div []
+            , p [ class "card-text" ] [ text survey.metaData.description ]
+            ]
+        , ul [ class "list-group list-group-flush" ]
+            [ li [ class "list-group-item" ] [ text ("Last Updated: " ++ survey.metaData.lastUpdated) ]
+            , li [ class "list-group-item" ] [ text ("Created By: " ++ survey.metaData.createdBy) ]
+            , li [ class "list-group-item" ]
                 [ label [] [ text "Number of Groups" ]
                 , input
                     [ type_ "number"
@@ -620,11 +618,7 @@ viewScdsCard survey numberOfGroups =
                     ]
                     []
                 ]
-            , div [ class "mdc-card__actions" ]
-                [ div [ class "mdc-card__action-buttons" ]
-                    [ button [ class "mdc-button mdc-button--raised", onClick BeginIpsativeSurvey ] [ text ("Click to Start Survey with " ++ (toString numberOfGroups) ++ " Groups") ]
-                    ]
-                ]
+            , li [ class "list-group-item" ] [ button [ class "btn btn-primary", onClick BeginIpsativeSurvey ] [ text ("Click to Start Survey with " ++ (toString numberOfGroups) ++ " Groups") ] ]
             ]
         ]
 
@@ -637,7 +631,7 @@ viewFinished model =
                 [ div [ class "row" ]
                     [ div [ class "jumbotron" ]
                         [ h1 [ class "display-4" ] [ text "You finished the survey!" ]
-                        , button [ class "mdc-button mdc-button--raised", onClick NoOp ] [ text "Click to generate radar chart of results." ]
+                        , button [ class "btn btn-primary", onClick NoOp ] [ text "Click to generate radar chart of results." ]
                         , canvas [ id "chart" ] []
                         ]
                     ]
@@ -690,7 +684,7 @@ viewLikertSurveyTableRows question =
                                 (\choice ->
                                     if isLikertSelected answer choice then
                                         td [ class "bg-success text-white text-center", onClick (SelectLikertAnswer answer.id choice) ]
-                                            [ i [ class "material-icons mdc-button__icon" ] [ text "check" ] ]
+                                            [ i [ class "material-icons" ] [ text "check" ] ]
                                     else
                                         td [ class "", onClick (SelectLikertAnswer answer.id choice) ]
                                             [ div [ class "" ] []
@@ -876,19 +870,9 @@ viewSurveyPointsGroup answer group =
                 [ p [ class "card-text" ] [ text ("Group " ++ toString group.group ++ ":") ]
                 ]
             , div [ class "col-6 " ]
-                [ button
-                    [ type_ "button"
-                    , class "mdc-button mdc-button--raised"
-                    , onClick (DecrementAnswer answer group.group)
-                    ]
-                    [ i [ class "material-icons mdc-button__icon" ] [ text "remove" ] ]
+                [ button [ type_ "button", class "btn btn-outline-primary", onClick (DecrementAnswer answer group.group) ] [ i [ class "material-icons" ] [ text "remove" ] ]
                 , span [ class " px-4 align-middle h5 " ] [ text (toString group.points) ]
-                , button
-                    [ type_ "button"
-                    , class "mdc-button mdc-button--raised"
-                    , onClick (IncrementAnswer answer group.group)
-                    ]
-                    [ i [ class "material-icons mdc-button__icon" ] [ text "add" ] ]
+                , button [ type_ "button", class "btn btn-outline-primary", onClick (IncrementAnswer answer group.group) ] [ i [ class "material-icons" ] [ text "add" ] ]
                 ]
             ]
         ]
@@ -899,10 +883,10 @@ viewSurveyFooter =
     div [ class "row mb-4 pb-4" ]
         [ div [ class "col-md-8" ] []
         , div [ class "col-md-4 " ]
-            [ button [ class "mdc-button mdc-button--raised mdc-button--accent", onClick GoToHome ] [ text "Back" ]
-            , button [ class "mdc-button mdc-button--raised ", onClick PreviousQuestion ] [ text "<" ]
-            , button [ class "mdc-button mdc-button--raised ", onClick NextQuestion ] [ text ">" ]
-            , button [ class "mdc-button mdc-button--raised mdc-button--accent", onClick FinishSurvey ] [ text "Finish" ]
+            [ button [ class "btn btn-primary btn-lg mx-1", onClick GoToHome ] [ text "Back" ]
+            , button [ class "btn btn-default btn-lg mx-1", onClick PreviousQuestion ] [ text "<" ]
+            , button [ class "btn btn-default btn-lg mx-1", onClick NextQuestion ] [ text ">" ]
+            , button [ class "btn btn-primary btn-lg mx-1", onClick FinishSurvey ] [ text "Finish" ]
             ]
         ]
 

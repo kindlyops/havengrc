@@ -1,4 +1,4 @@
-import "./main.scss";
+// import "./main2.scss";
 import { Main } from "./Main.elm";
 
 if (process.env.NODE_ENV === "development") {
@@ -21,65 +21,65 @@ var authData =
 
 var elmApp = Main.embed(document.getElementById("root"), authData);
 
-document.arrive(".mdc-textfield", function() {
-  window.mdc.autoInit(document, () => {});
-});
+// document.arrive(".mdc-textfield", function() {
+//   window.mdc.autoInit(document, () => {});
+// });
 
-document.arrive(".nav-flex .mdc-list-item", function(element) {
-  element.addEventListener("click", function() {
-    let drawer = new mdc.drawer.MDCPersistentDrawer(
-      document.getElementById("MenuDrawer")
-    );
-    drawer.open = false;
+// document.arrive(".nav-flex .mdc-list-item", function(element) {
+//   element.addEventListener("click", function() {
+//     let drawer = new mdc.drawer.MDCPersistentDrawer(
+//       document.getElementById("MenuDrawer")
+//     );
+//     drawer.open = false;
 
-    let menu = new mdc.menu.MDCSimpleMenu(
-      document.getElementById("UserDropdownMenu")
-    );
-    menu.open = false;
-  });
-});
+//     let menu = new mdc.menu.MDCSimpleMenu(
+//       document.getElementById("UserDropdownMenu")
+//     );
+//     menu.open = false;
+//   });
+// });
 
-document.arrive("#MenuButton", function() {
-  var menuDrawerElement = document.getElementById("MenuDrawer");
-  let drawer = new mdc.drawer.MDCPersistentDrawer(menuDrawerElement);
-  let menu = new mdc.menu.MDCSimpleMenu(
-    document.getElementById("UserDropdownMenu")
-  );
-  document.getElementById("MenuButton").addEventListener("click", function(e) {
-    drawer.open = !menuDrawerElement.classList.contains(
-      "mdc-persistent-drawer--open"
-    );
-    menu.open = false;
-    e.stopPropagation();
-  });
-});
+// document.arrive("#MenuButton", function() {
+//   var menuDrawerElement = document.getElementById("MenuDrawer");
+//   let drawer = new mdc.drawer.MDCPersistentDrawer(menuDrawerElement);
+//   let menu = new mdc.menu.MDCSimpleMenu(
+//     document.getElementById("UserDropdownMenu")
+//   );
+//   document.getElementById("MenuButton").addEventListener("click", function(e) {
+//     drawer.open = !menuDrawerElement.classList.contains(
+//       "mdc-persistent-drawer--open"
+//     );
+//     menu.open = false;
+//     e.stopPropagation();
+//   });
+// });
 
-document.arrive("#UserDropdownMenu", function() {
-  let userMenuElement = document.getElementById("UserDropdownMenu");
-  let menu = new mdc.menu.MDCSimpleMenu(userMenuElement);
-  document
-    .getElementById("UserDropdownButton")
-    .addEventListener("click", function(e) {
-      menu.open = !userMenuElement.classList.contains("mdc-simple-menu--open");
-      e.stopPropagation();
-    });
-});
+// document.arrive("#UserDropdownMenu", function() {
+//   let userMenuElement = document.getElementById("UserDropdownMenu");
+//   let menu = new mdc.menu.MDCSimpleMenu(userMenuElement);
+//   document
+//     .getElementById("UserDropdownButton")
+//     .addEventListener("click", function(e) {
+//       menu.open = !userMenuElement.classList.contains("mdc-simple-menu--open");
+//       e.stopPropagation();
+//     });
+// });
 
-document.addEventListener("click", function(e) {
-  let drawer = new mdc.drawer.MDCPersistentDrawer(
-    document.getElementById("MenuDrawer")
-  );
-  if (drawer.open) {
-    drawer.open = false;
-  }
+// document.addEventListener("click", function(e) {
+//   let drawer = new mdc.drawer.MDCPersistentDrawer(
+//     document.getElementById("MenuDrawer")
+//   );
+//   if (drawer.open) {
+//     drawer.open = false;
+//   }
 
-  let menu = new mdc.menu.MDCSimpleMenu(
-    document.getElementById("UserDropdownMenu")
-  );
-  if (menu.open) {
-    menu.open = false;
-  }
-});
+//   let menu = new mdc.menu.MDCSimpleMenu(
+//     document.getElementById("UserDropdownMenu")
+//   );
+//   if (menu.open) {
+//     menu.open = false;
+//   }
+// });
 
 function sendElmKeycloakToken() {
   localStorage.setItem("profile", JSON.stringify(keycloak.profile));
@@ -142,9 +142,11 @@ elmApp.ports.setTitle.subscribe(function(title) {
 });
 
 elmApp.ports.showError.subscribe(function(messageString) {
-  let item = document.querySelector(".mdc-snackbar");
-  if (item) {
-    let snack = mdc.snackbar.MDCSnackbar.attachTo(item);
-    snack.show({ message: messageString });
-  }
+  console.info('TODO: add errors to snackbar')
+  console.error(messageString)
+  // let item = document.querySelector(".mdc-snackbar");
+  // if (item) {
+  //   let snack = mdc.snackbar.MDCSnackbar.attachTo(item);
+  //   snack.show({ message: messageString });
+  // }
 });

@@ -1,4 +1,4 @@
-module View.Centroid exposing (view)
+module Centroid exposing (view)
 
 import Visualization.Shape as Shape exposing (defaultPieConfig, Arc)
 import Visualization.Path as Path
