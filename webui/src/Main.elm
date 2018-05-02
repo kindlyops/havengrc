@@ -268,11 +268,11 @@ type alias MenuItem =
     }
 
 
-selectedItem : Model -> String
-selectedItem model =
+selectedItem : Route.Model -> String
+selectedItem route =
     let
         item =
-            List.head (List.filter (\m -> m.route == model.route) menuItems)
+            List.head (List.filter (\m -> m.route == route) navDrawerItems)
     in
         case item of
             Nothing ->
@@ -295,8 +295,8 @@ getGravatar email =
         "https:" ++ url
 
 
-menuItems : List MenuItem
-menuItems =
+navDrawerItems : List MenuItem
+navDrawerItems =
     [ { text = "Dashboard", iconName = "dashboard", route = Just Route.Home }
     , { text = "Activity", iconName = "history", route = Just Route.Activity }
     , { text = "Reports", iconName = "library_books", route = Just Route.Reports }
@@ -364,11 +364,6 @@ viewNavBar model =
                             [ text "Something else here" ]
                         ]
                     ]
-
-                --, li [ class "nav-item" ]
-                --    [ a [ class "nav-link", href "#", onClick ToggleNavDrawer ]
-                --        [ text "ToggleNavDrawer" ]
-                --    ]
                 ]
             , Html.form [ class "form-inline my-2 my-lg-0" ]
                 [ input [ attribute "aria-label" "Search", class "form-control mr-sm-2", placeholder "Search", type_ "search" ]
@@ -382,55 +377,13 @@ viewNavBar model =
 
 viewNavigationDrawer : Model -> Html Msg
 viewNavigationDrawer model =
-    --div [ attribute "aria-hidden" "true", class "navdrawer", id "navdrawerDefault", attribute "tabindex" "-1" ]
-    --div [ attribute "aria-hidden" "true", class "navdrawer navdrawer-permanent", id "navdrawerDefault", attribute "tabindex" "-1" ]
-    --div [ attribute "aria-hidden" "true", class "navdrawer navdrawer-permanent-lg", id "navdrawerDefault", attribute "tabindex" "-1" ]
     div [ attribute "aria-hidden" "true", class "navdrawer navdrawer-permanent-lg navdrawer-permanent-clipped", id "navdrawerDefault", attribute "tabindex" "-1" ]
-        --div [ attribute "aria-hidden" "true", class "navdrawer navdrawer-permanent navdrawer-permanent-clipped", id "navdrawerDefault", attribute "tabindex" "-1" ]
-        --div [ attribute "aria-hidden" "true", class "navdrawer navdrawer-permanent navdrawer-permanent-clipped", id "navdrawerDefault", attribute "tabindex" "-1" ]
-        --div [ attribute "aria-hidden" "true", class "navdrawer navdrawer-persistent", id "navdrawerDefault", attribute "tabindex" "-1" ]
         [ div [ class "navdrawer-content" ]
-            [ span [ class "navdrawer-header" ]
+            [ div [ class "navdrawer-header" ]
                 [ a [ class "navbar-brand px-0", href "#" ]
                     [ text "Navdrawer header" ]
-
-                --, button [ onClick ToggleNavDrawer ] [ text "<" ]
                 ]
-            , nav [ class "navdrawer-nav" ]
-                [ a [ class "nav-item nav-link active", href "#" ]
-                    [ text "Active" ]
-                , a [ class "nav-item nav-link disabled", href "#" ]
-                    [ text "Disabled" ]
-                , a [ class "nav-item nav-link", href "#" ]
-                    [ text "Link" ]
-                ]
-            , div [ class "navdrawer-divider" ]
-                []
-            , p [ class "navdrawer-subheader" ]
-                [ text "Navdrawer subheader" ]
-            , ul [ class "navdrawer-nav" ]
-                [ li [ class "nav-item" ]
-                    [ a [ class "nav-link active", href "#" ]
-                        [ i [ class "material-icons mr-3" ]
-                            [ text "alarm_on" ]
-                        , text "Active with icon        "
-                        ]
-                    ]
-                , li [ class "nav-item" ]
-                    [ a [ class "nav-link disabled", href "#" ]
-                        [ i [ class "material-icons mr-3" ]
-                            [ text "alarm_off" ]
-                        , text "Disabled with icon        "
-                        ]
-                    ]
-                , li [ class "nav-item" ]
-                    [ a [ class "nav-link", href "#" ]
-                        [ i [ class "material-icons mr-3" ]
-                            [ text "link" ]
-                        , text "Link with icon        "
-                        ]
-                    ]
-                ]
+            , viewNavDrawerItems navDrawerItems model.route
             ]
         ]
 
@@ -605,17 +558,74 @@ viewHeader model =
         ]
 
 
-drawerMenuItem : Model -> MenuItem -> Html Msg
-drawerMenuItem model menuItem =
+viewUser model user =
+    div [ class "user-container" ]
+        [ img
+            [ attribute "sizing" "contain"
+            , attribute "src" (getGravatar user.username)
+            , class "user-avatar"
+            ]
+            []
+        , span [ class "user-name" ]
+            [ text user.firstName ]
+        , div [ class "mdc-menu-anchor" ]
+            [ button
+                [ id "UserDropdownButton"
+                , class "user-menu-btn"
+                ]
+                [ i [ class "material-icons" ]
+                    [ text "arrow_drop_down" ]
+                ]
+            , div
+                [ id "UserDropdownMenu"
+                , class "mdc-simple-menu"
+                , attribute "tabindex" "-1"
+                ]
+                [ ul [ class "mdc-simple-menu__items mdc-list" ]
+                    [ a
+                        [ class "mdc-list-item"
+                        , href "/auth/realms/havendev/account/"
+                        , attribute "tabindex" "0"
+                        ]
+                        [ text "Edit Account" ]
+                    , li
+                        [ class "mdc-list-item"
+                        , onClick (AuthenticationMsg Authentication.LogOut)
+                        , attribute "tabindex" "0"
+                        ]
+                        [ text "Log Out" ]
+                    ]
+                ]
+            ]
+        ]
+
+
+viewNavDrawerItems : List MenuItem -> Route.Model -> Html Msg
+viewNavDrawerItems menuItems route =
+    nav [ class "navdrawer-nav" ]
+        (List.map
+            (\menuItem ->
+                viewNavDrawerItem menuItem route
+            )
+            menuItems
+        )
+
+
+viewNavDrawerItem : MenuItem -> Route.Model -> Html Msg
+viewNavDrawerItem menuItem route =
     a
         [ attribute "name" (String.toLower menuItem.text)
         , onClick <| NavigateTo <| menuItem.route
+
+        --, href "#"
+        , style [ ( "cursor", "pointer" ) ]
         , classList
-            [ ( "mdc-list-item", True )
-            , ( "mdc-persistent-drawer--selected", (String.toLower menuItem.text) == (selectedItem model) )
+            [ ( "nav-item", True )
+            , ( "nav-link", True )
+            , ( "active", (String.toLower menuItem.text) == (selectedItem route) )
             ]
         ]
-        [ i [ class "material-icons mdc-list-item__start-detail" ] [ text menuItem.iconName ]
+        [ i [ class "material-icons" ] [ text menuItem.iconName ]
         , text menuItem.text
         ]
 
@@ -630,55 +640,8 @@ viewHome model user =
             [ nav [ class "mdc-persistent-drawer__drawer sidebar" ]
                 [ div [ class "mdc-persistent-drawer__toolbar-spacer" ]
                     []
-                , div [ class "user-container" ]
-                    [ img
-                        [ attribute "sizing" "contain"
-                        , attribute "src" (getGravatar user.username)
-                        , class "user-avatar"
-                        ]
-                        []
-                    , span [ class "user-name" ]
-                        [ text user.firstName ]
-                    , div [ class "mdc-menu-anchor" ]
-                        [ button
-                            [ id "UserDropdownButton"
-                            , class "user-menu-btn"
-                            ]
-                            [ i [ class "material-icons" ]
-                                [ text "arrow_drop_down" ]
-                            ]
-                        , div
-                            [ id "UserDropdownMenu"
-                            , class "mdc-simple-menu"
-                            , attribute "tabindex" "-1"
-                            ]
-                            [ ul [ class "mdc-simple-menu__items mdc-list" ]
-                                [ a
-                                    [ class "mdc-list-item"
-                                    , href "/auth/realms/havendev/account/"
-                                    , attribute "tabindex" "0"
-                                    ]
-                                    [ text "Edit Account" ]
-                                , li
-                                    [ class "mdc-list-item"
-                                    , onClick (AuthenticationMsg Authentication.LogOut)
-                                    , attribute "tabindex" "0"
-                                    ]
-                                    [ text "Log Out" ]
-                                ]
-                            ]
-                        ]
-                    ]
-                , div [ class "nav-list-container" ]
-                    [ div [ class "nav-flex" ]
-                        [ nav [ class "mdc-persistent-drawer__content mdc-list" ]
-                            (List.map (\item -> drawerMenuItem model item) menuItems)
-                        ]
-                    , div [ class "drawer-logo" ]
-                        [ img [ attribute "src" "%PUBLIC_URL%/img/logo@2x.png" ]
-                            []
-                        ]
-                    ]
+                , viewUser model user
+                , viewNavDrawerItems navDrawerItems model.route
                 ]
             ]
         , div [ class "mdc-toolbar-fixed-adjust" ]
