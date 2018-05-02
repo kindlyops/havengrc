@@ -412,7 +412,6 @@ viewBody model =
 
             Just _ ->
                 notFoundBody model
-        , snackBar model
         ]
 
 
@@ -522,23 +521,6 @@ notFoundBody model =
 showDebugData : record -> Html Msg
 showDebugData record =
     div [ class "debug" ] [ text ("DEBUG: " ++ toString record) ]
-
-
-snackBar : Model -> Html Msg
-snackBar model =
-    div
-        [ id "error-snackbar"
-        , class "mdc-snackbar"
-        , attribute "aria-live" "assertive"
-        , attribute "aria-atomic" "true"
-        , attribute "aria-hidden" "true"
-
-        -- , onClick (ShowError "this is an error message")
-        ]
-        [ div [ class "mdc-snackbar__text" ] []
-        , div [ class "mdc-snackbar__action-wrapper" ]
-            [ button [ class "mdc-snackbar__action-button" ] [] ]
-        ]
 
 
 viewHeader : Model -> Html Msg

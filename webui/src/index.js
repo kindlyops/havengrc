@@ -142,11 +142,13 @@ elmApp.ports.setTitle.subscribe(function (title) {
 })
 
 elmApp.ports.showError.subscribe(function (messageString) {
-  console.info('TODO: add errors to snackbar')
   console.error(messageString)
-  // let item = document.querySelector(".mdc-snackbar");
-  // if (item) {
-  //   let snack = mdc.snackbar.MDCSnackbar.attachTo(item);
-  //   snack.show({ message: messageString });
-  // }
+  let snackBarElement = document.getElementById('snackbar')
+  snackBarElement.classList.add('show')
+  let snackBarBodyElement = document.getElementById('snackbar-body')
+  snackBarBodyElement.innerHTML = messageString
+  setTimeout(function () {
+    let snackBarElement = document.getElementById('snackbar')
+    snackBarElement.classList.remove('show')
+  }, 3000)
 })
