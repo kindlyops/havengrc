@@ -324,7 +324,7 @@ viewMain model user =
 
 
 viewNavBar model user =
-    nav [ class "navbar navbar-expand-lg navbar-light bg-light " ]
+    nav [ class "navbar navbar-expand-lg fixed-top navbar-dark bg-primary " ]
         [ button [ attribute "aria-controls" "navdrawerDefault", attribute "aria-expanded" "false", attribute "aria-label" "Toggle Navdrawer", class "navbar-toggler d-lg-none", attribute "data-breakpoint" "lg", attribute "data-target" "#navdrawerDefault", attribute "data-toggle" "navdrawer", attribute "data-type" "permanent" ]
             [ span [ class "navbar-toggler-icon" ]
                 []
@@ -374,7 +374,7 @@ viewNavigationDrawer model =
 
 viewBody : Model -> Html Msg
 viewBody model =
-    div [ id "content", class "container-fluid content-wrapper" ]
+    div [ id "content", class "content-wrapper" ]
         [ case model.route of
             Nothing ->
                 viewDashboard model
@@ -392,7 +392,7 @@ viewBody model =
                 viewActivity model
 
             Just Route.SurveyPrototype ->
-                surveyPrototypeBody model
+                viewSurveyPrototype model
 
             Just _ ->
                 notFoundBody model
@@ -490,8 +490,8 @@ viewComments authModel comments newComment =
         ]
 
 
-surveyPrototypeBody : Model -> Html Msg
-surveyPrototypeBody model =
+viewSurveyPrototype : Model -> Html Msg
+viewSurveyPrototype model =
     Survey.view model.surveyModel |> Html.map SurveyMsg
 
 

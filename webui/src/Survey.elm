@@ -466,7 +466,7 @@ isPointsInGroup pointsLeft group =
 
 view : Model -> Html.Html Msg
 view model =
-    div [] [ viewNavbar, viewApp model ]
+    div [ class "container " ] [ viewApp model ]
 
 
 viewApp : Model -> Html Msg
@@ -490,9 +490,9 @@ viewApp model =
 
 viewIncomplete : Survey -> Html Msg
 viewIncomplete survey =
-    div [ class "container mt-3" ]
-        [ div [ class "row" ]
-            [ div [ class "jumbotron" ]
+    div [ class "row justify-content-center pt-3" ]
+        [ div [ class "col-lg-10 col-xl-8" ]
+            [ div [ class "" ]
                 ([ h1 [ class "display-4" ] [ text "Incomplete Survey" ]
                  , p [ class "lead" ] [ text "You haven't answered all of the survey questions fully." ]
                  ]
@@ -523,10 +523,10 @@ viewSurveyInstructions survey =
 
 viewIpsativeSurveyInstructions : IpsativeSurvey -> Html Msg
 viewIpsativeSurveyInstructions survey =
-    div [ class "container mt-3" ]
+    div [ class "pt-3" ]
         [ div [ class "row" ]
             [ div
-                [ class "jumbotron" ]
+                [ class "" ]
                 [ h1 [ class "display-4" ] [ text survey.metaData.name ]
                 , p [ class "lead" ] [ text survey.metaData.instructions ]
                 , hr [ class "my-4" ] []
@@ -538,10 +538,10 @@ viewIpsativeSurveyInstructions survey =
 
 viewLikertSurveyInstructions : LikertSurvey -> Html Msg
 viewLikertSurveyInstructions survey =
-    div [ class "container mt-3" ]
+    div [ class "pt-3" ]
         [ div [ class "row" ]
             [ div
-                [ class "jumbotron" ]
+                [ class "" ]
                 [ h1 [ class "display-4" ] [ text survey.metaData.name ]
                 , p [ class "lead" ] [ text survey.metaData.instructions ]
                 , hr [ class "my-4" ] []
@@ -553,7 +553,7 @@ viewLikertSurveyInstructions survey =
 
 viewHero : Model -> Html Msg
 viewHero model =
-    div [ class "jumbotron" ]
+    div [ class "" ]
         [ h1 [ class "display-4" ] [ text "KindlyOps Haven Survey Prototype" ]
         , p [ class "lead" ] [ text "Welcome to the Elm Haven Survey Prototype. " ]
         , hr [ class "my-4" ] []
@@ -653,7 +653,8 @@ viewSurvey survey =
 
 viewLikertSurvey : LikertSurvey -> Html Msg
 viewLikertSurvey survey =
-    div [ class "container-fluid" ]
+    --div [ class "container-fluid" ]
+    div [ class "" ]
         [ viewLikertSurveyTitle survey
         , br [] []
         , viewLikertSurveyTable (Zipper.current survey.questions)
@@ -683,7 +684,7 @@ viewLikertSurveyTableRows question =
                         :: (List.map
                                 (\choice ->
                                     if isLikertSelected answer choice then
-                                        td [ class "bg-success text-white text-center", onClick (SelectLikertAnswer answer.id choice) ]
+                                        td [ class "bg-success text-white text-center align-middle", onClick (SelectLikertAnswer answer.id choice) ]
                                             [ i [ class "material-icons" ] [ text "check" ] ]
                                     else
                                         td [ class "", onClick (SelectLikertAnswer answer.id choice) ]
@@ -727,7 +728,7 @@ viewLikertSurveyTableHeader surveyQuestion =
 
 
 viewIpsativeSurvey survey =
-    div [ class "container-fluid" ]
+    div [ class "" ]
         [ viewIpsativeSurveyTitle survey
         , br [] []
         , viewIpsativeSurveyBoxes (Zipper.current survey.questions)
@@ -865,14 +866,24 @@ viewSurveyBox answer =
 
 viewSurveyPointsGroup answer group =
     li [ class "list-group-item" ]
-        [ div [ class "row" ]
-            [ div [ class "col-6" ]
-                [ p [ class "card-text" ] [ text ("Group " ++ toString group.group ++ ":") ]
+        [ div [ class "d-flex justify-content-between" ]
+            [ div [ class "align-self-center" ] [ p [ class "card-text" ] [ text ("Group " ++ toString group.group ++ ":") ] ]
+            , div [ class "" ]
+                [ button
+                    [ type_ "button"
+                    , class "btn btn-outline-primary"
+                    , onClick (DecrementAnswer answer group.group)
+                    ]
+                    [ i [ class "material-icons" ] [ text "remove" ] ]
                 ]
-            , div [ class "col-6 " ]
-                [ button [ type_ "button", class "btn btn-outline-primary", onClick (DecrementAnswer answer group.group) ] [ i [ class "material-icons" ] [ text "remove" ] ]
-                , span [ class " px-4 align-middle h5 " ] [ text (toString group.points) ]
-                , button [ type_ "button", class "btn btn-outline-primary", onClick (IncrementAnswer answer group.group) ] [ i [ class "material-icons" ] [ text "add" ] ]
+            , div [ class "align-self-center" ] [ p [ class "card-text   " ] [ text (toString group.points) ] ]
+            , div [ class "" ]
+                [ button
+                    [ type_ "button"
+                    , class "btn btn-outline-primary"
+                    , onClick (IncrementAnswer answer group.group)
+                    ]
+                    [ i [ class "material-icons" ] [ text "add" ] ]
                 ]
             ]
         ]
@@ -880,14 +891,11 @@ viewSurveyPointsGroup answer group =
 
 viewSurveyFooter : Html Msg
 viewSurveyFooter =
-    div [ class "row mb-4 pb-4" ]
-        [ div [ class "col-md-8" ] []
-        , div [ class "col-md-4 " ]
-            [ button [ class "btn btn-primary btn-lg mx-1", onClick GoToHome ] [ text "Back" ]
-            , button [ class "btn btn-default btn-lg mx-1", onClick PreviousQuestion ] [ text "<" ]
-            , button [ class "btn btn-default btn-lg mx-1", onClick NextQuestion ] [ text ">" ]
-            , button [ class "btn btn-primary btn-lg mx-1", onClick FinishSurvey ] [ text "Finish" ]
-            ]
+    div [ class "row mb-4 pb-4 " ]
+        [ div [ class "col-3" ] [ button [ class "btn btn-primary btn-lg mx-1", onClick GoToHome ] [ text "Back" ] ]
+        , div [ class "col-3" ] [ button [ class "btn btn-default btn-lg mx-1", onClick PreviousQuestion ] [ text "<" ] ]
+        , div [ class "col-3" ] [ button [ class "btn btn-default btn-lg mx-1", onClick NextQuestion ] [ text ">" ] ]
+        , div [ class "col-3" ] [ button [ class "btn btn-primary btn-lg mx-1", onClick FinishSurvey ] [ text "Finish" ] ]
         ]
 
 
