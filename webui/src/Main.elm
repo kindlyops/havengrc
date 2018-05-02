@@ -434,8 +434,7 @@ commentsForm authModel newComment =
                 ]
             ]
         , button
-            [ class "mdc-button mdc-button--raised mdc-button--accent"
-            , attribute "data-mdc-auto-init" "MDCRipple"
+            [ class "btn btn-primary"
             , onClick (AddComment authModel newComment)
             ]
             [ text "Add" ]
@@ -471,8 +470,7 @@ viewDashboard model =
             [ Centroid.view data
             , br [] []
             , button
-                [ class "mdc-button mdc-button--raised mdc-button--accent"
-                , attribute "data-mdc-auto-init" "MDCRipple"
+                [ class "btn btn-primary"
                 , onClick (ShowError "this is an error message")
                 ]
                 [ text "Show Error" ]
