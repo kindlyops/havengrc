@@ -5,7 +5,7 @@
 }
 
 .content-wrapper {
-	margin-top: 4rem;
+    margin-top: 4rem;
 }
 
 .user-avatar {
@@ -14,9 +14,29 @@
     max-height: 37px;
 }
 
+.login-header {
+    text-transform: uppercase;
+    font-family: "mr-eaves-modern", sans-serif; // margin-top: 21px;
+    // margin-bottom: 20px;
+}
+
 // @import "node_modules/daemonite-material/assets/scss/material";
 // @include media-breakpoint-up(lg) {
 //   .content-wrapper {
 //     margin-left: $navdrawer-width;
 //   }
 // }
+#footer-image {
+    padding-top: 80px;
+    margin-bottom: -68px;
+    width: 248px;
+    position: relative;
+    z-index: -1;
+}
+
+#footer-container {
+    overflow: hidden;
+    position: relative;
+	z-index: 1;
+}
+
