@@ -307,36 +307,35 @@ navDrawerItems =
 
 view : Model -> Html Msg
 view model =
-    (case Authentication.tryGetUserProfile model.authModel of
+    case Authentication.tryGetUserProfile model.authModel of
         Nothing ->
             viewLogin model
 
         Just user ->
-            --viewHome model user
             viewMain model user
-    )
 
 
 viewMain model user =
     div []
-        [ viewNavBar model
+        [ viewNavBar model user
         , viewNavigationDrawer model
         , viewBody model
         ]
 
 
-viewNavBar model =
+viewNavBar model user =
     nav [ class "navbar navbar-expand-lg navbar-light bg-light " ]
         [ button [ attribute "aria-controls" "navdrawerDefault", attribute "aria-expanded" "false", attribute "aria-label" "Toggle Navdrawer", class "navbar-toggler d-lg-none", attribute "data-breakpoint" "lg", attribute "data-target" "#navdrawerDefault", attribute "data-toggle" "navdrawer", attribute "data-type" "permanent" ]
             [ span [ class "navbar-toggler-icon" ]
                 []
             ]
         , a [ class "navbar-brand", href "#" ]
-            [ text "Navbar" ]
+            [ text "Haven GRC" ]
         , button [ attribute "aria-controls" "navbarSupportedContent", attribute "aria-expanded" "false", attribute "aria-label" "Toggle navigation", class "navbar-toggler", attribute "data-target" "#navbarSupportedContent", attribute "data-toggle" "collapse", type_ "button" ]
             [ span [ class "navbar-toggler-icon" ]
                 []
             ]
+        , viewNavUser model user
         , div [ class "collapse navbar-collapse", id "navbarSupportedContent" ]
             [ ul [ class "navbar-nav mr-auto" ]
                 [ li [ class "nav-item active" ]
@@ -348,28 +347,13 @@ viewNavBar model =
                     ]
                 , li [ class "nav-item" ]
                     [ a [ class "nav-link", href "#" ]
-                        [ text "Link" ]
-                    ]
-                , li [ class "nav-item dropdown" ]
-                    [ a [ attribute "aria-expanded" "false", attribute "aria-haspopup" "true", class "nav-link dropdown-toggle", attribute "data-toggle" "dropdown", href "#", id "navbarDropdown", attribute "role" "button" ]
-                        [ text "Dropdown        " ]
-                    , div [ attribute "aria-labelledby" "navbarDropdown", class "dropdown-menu" ]
-                        [ a [ class "dropdown-item", href "#" ]
-                            [ text "Action" ]
-                        , a [ class "dropdown-item", href "#" ]
-                            [ text "Another action" ]
-                        , div [ class "dropdown-divider" ]
-                            []
-                        , a [ class "dropdown-item", href "#" ]
-                            [ text "Something else here" ]
-                        ]
+                        [ text "Github" ]
                     ]
                 ]
-            , Html.form [ class "form-inline my-2 my-lg-0" ]
-                [ input [ attribute "aria-label" "Search", class "form-control mr-sm-2", placeholder "Search", type_ "search" ]
-                    []
-                , button [ class "btn btn-outline-success my-2 my-sm-0", type_ "submit" ]
-                    [ text "Search" ]
+            , ul [ class "navbar-nav" ]
+                [ li [ class "nav-item active" ] [ a [ class "nav-link" ] [ text "Programs" ] ]
+                , li [ class "nav-item active" ] [ a [ class "nav-link" ] [ text "Assets" ] ]
+                , li [ class "nav-item active" ] [ a [ class "nav-link" ] [ text "People" ] ]
                 ]
             ]
         ]
@@ -381,7 +365,7 @@ viewNavigationDrawer model =
         [ div [ class "navdrawer-content" ]
             [ div [ class "navdrawer-header" ]
                 [ a [ class "navbar-brand px-0", href "#" ]
-                    [ text "Navdrawer header" ]
+                    [ text "Pages" ]
                 ]
             , viewNavDrawerItems navDrawerItems model.route
             ]
@@ -538,6 +522,30 @@ viewHeader model =
         ]
 
 
+viewNavUser model user =
+    ul [ class "navbar-nav" ]
+        [ li [ class "nav-item dropdown" ]
+            [ a [ attribute "aria-expanded" "false", attribute "aria-haspopup" "true", class "nav-link dropdown-toggle", attribute "data-toggle" "dropdown", href "#", id "navbarDropdown", attribute "role" "button" ]
+                [ img
+                    [ attribute "src" (getGravatar user.username)
+                    , class "user-avatar"
+                    ]
+                    []
+                ]
+            , div [ attribute "aria-labelledby" "navbarDropdown", class "dropdown-menu" ]
+                [ a [ class "dropdown-item", href "#" ]
+                    [ text "Profile" ]
+                , a [ class "dropdown-item", href "#" ]
+                    [ text "Another action" ]
+                , div [ class "dropdown-divider" ]
+                    []
+                , a [ class "dropdown-item", href "#", onClick (AuthenticationMsg Authentication.LogOut) ]
+                    [ text "Logout" ]
+                ]
+            ]
+        ]
+
+
 viewUser model user =
     div [ class "user-container" ]
         [ img
@@ -610,25 +618,26 @@ viewNavDrawerItem menuItem route =
         ]
 
 
-viewHome : Model -> Keycloak.UserProfile -> Html Msg
-viewHome model user =
-    div [ class "container" ]
-        [ div
-            [ id "MenuDrawer"
-            , class "mdc-persistent-drawer mdc-typography sm-screen-drawer lg-screen-drawer"
-            ]
-            [ nav [ class "mdc-persistent-drawer__drawer sidebar" ]
-                [ div [ class "mdc-persistent-drawer__toolbar-spacer" ]
-                    []
-                , viewUser model user
-                , viewNavDrawerItems navDrawerItems model.route
-                ]
-            ]
-        , div [ class "mdc-toolbar-fixed-adjust" ]
-            [ viewHeader model
-            , viewBody model
-            ]
-        ]
+
+--viewHome : Model -> Keycloak.UserProfile -> Html Msg
+--viewHome model user =
+--    div [ class "container" ]
+--        [ div
+--            [ id "MenuDrawer"
+--            , class "mdc-persistent-drawer mdc-typography sm-screen-drawer lg-screen-drawer"
+--            ]
+--            [ nav [ class "mdc-persistent-drawer__drawer sidebar" ]
+--                [ div [ class "mdc-persistent-drawer__toolbar-spacer" ]
+--                    []
+--                , viewUser model user
+--                , viewNavDrawerItems navDrawerItems model.route
+--                ]
+--            ]
+--        , div [ class "mdc-toolbar-fixed-adjust" ]
+--            [ viewHeader model
+--            , viewBody model
+--            ]
+--        ]
 
 
 viewLogin : Model -> Html Msg
