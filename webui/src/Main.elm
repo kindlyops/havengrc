@@ -305,6 +305,164 @@ menuItems =
     ]
 
 
+view : Model -> Html Msg
+view model =
+    (case Authentication.tryGetUserProfile model.authModel of
+        Nothing ->
+            viewLogin model
+
+        Just user ->
+            --viewHome model user
+            viewMain model user
+    )
+
+
+viewMain model user =
+    div []
+        [ viewNavBar model
+        , viewNavigationDrawer model
+        , viewBody model
+        ]
+
+
+viewNavBar model =
+    nav [ class "navbar navbar-expand-lg navbar-light bg-light " ]
+        [ button [ attribute "aria-controls" "navdrawerDefault", attribute "aria-expanded" "false", attribute "aria-label" "Toggle Navdrawer", class "navbar-toggler d-lg-none", attribute "data-breakpoint" "lg", attribute "data-target" "#navdrawerDefault", attribute "data-toggle" "navdrawer", attribute "data-type" "permanent" ]
+            [ span [ class "navbar-toggler-icon" ]
+                []
+            ]
+        , a [ class "navbar-brand", href "#" ]
+            [ text "Navbar" ]
+        , button [ attribute "aria-controls" "navbarSupportedContent", attribute "aria-expanded" "false", attribute "aria-label" "Toggle navigation", class "navbar-toggler", attribute "data-target" "#navbarSupportedContent", attribute "data-toggle" "collapse", type_ "button" ]
+            [ span [ class "navbar-toggler-icon" ]
+                []
+            ]
+        , div [ class "collapse navbar-collapse", id "navbarSupportedContent" ]
+            [ ul [ class "navbar-nav mr-auto" ]
+                [ li [ class "nav-item active" ]
+                    [ a [ class "nav-link", href "#" ]
+                        [ text "Home "
+                        , span [ class "sr-only" ]
+                            [ text "(current)" ]
+                        ]
+                    ]
+                , li [ class "nav-item" ]
+                    [ a [ class "nav-link", href "#" ]
+                        [ text "Link" ]
+                    ]
+                , li [ class "nav-item dropdown" ]
+                    [ a [ attribute "aria-expanded" "false", attribute "aria-haspopup" "true", class "nav-link dropdown-toggle", attribute "data-toggle" "dropdown", href "#", id "navbarDropdown", attribute "role" "button" ]
+                        [ text "Dropdown        " ]
+                    , div [ attribute "aria-labelledby" "navbarDropdown", class "dropdown-menu" ]
+                        [ a [ class "dropdown-item", href "#" ]
+                            [ text "Action" ]
+                        , a [ class "dropdown-item", href "#" ]
+                            [ text "Another action" ]
+                        , div [ class "dropdown-divider" ]
+                            []
+                        , a [ class "dropdown-item", href "#" ]
+                            [ text "Something else here" ]
+                        ]
+                    ]
+
+                --, li [ class "nav-item" ]
+                --    [ a [ class "nav-link", href "#", onClick ToggleNavDrawer ]
+                --        [ text "ToggleNavDrawer" ]
+                --    ]
+                ]
+            , Html.form [ class "form-inline my-2 my-lg-0" ]
+                [ input [ attribute "aria-label" "Search", class "form-control mr-sm-2", placeholder "Search", type_ "search" ]
+                    []
+                , button [ class "btn btn-outline-success my-2 my-sm-0", type_ "submit" ]
+                    [ text "Search" ]
+                ]
+            ]
+        ]
+
+
+viewNavigationDrawer : Model -> Html Msg
+viewNavigationDrawer model =
+    --div [ attribute "aria-hidden" "true", class "navdrawer", id "navdrawerDefault", attribute "tabindex" "-1" ]
+    --div [ attribute "aria-hidden" "true", class "navdrawer navdrawer-permanent", id "navdrawerDefault", attribute "tabindex" "-1" ]
+    --div [ attribute "aria-hidden" "true", class "navdrawer navdrawer-permanent-lg", id "navdrawerDefault", attribute "tabindex" "-1" ]
+    div [ attribute "aria-hidden" "true", class "navdrawer navdrawer-permanent-lg navdrawer-permanent-clipped", id "navdrawerDefault", attribute "tabindex" "-1" ]
+        --div [ attribute "aria-hidden" "true", class "navdrawer navdrawer-permanent navdrawer-permanent-clipped", id "navdrawerDefault", attribute "tabindex" "-1" ]
+        --div [ attribute "aria-hidden" "true", class "navdrawer navdrawer-permanent navdrawer-permanent-clipped", id "navdrawerDefault", attribute "tabindex" "-1" ]
+        --div [ attribute "aria-hidden" "true", class "navdrawer navdrawer-persistent", id "navdrawerDefault", attribute "tabindex" "-1" ]
+        [ div [ class "navdrawer-content" ]
+            [ span [ class "navdrawer-header" ]
+                [ a [ class "navbar-brand px-0", href "#" ]
+                    [ text "Navdrawer header" ]
+
+                --, button [ onClick ToggleNavDrawer ] [ text "<" ]
+                ]
+            , nav [ class "navdrawer-nav" ]
+                [ a [ class "nav-item nav-link active", href "#" ]
+                    [ text "Active" ]
+                , a [ class "nav-item nav-link disabled", href "#" ]
+                    [ text "Disabled" ]
+                , a [ class "nav-item nav-link", href "#" ]
+                    [ text "Link" ]
+                ]
+            , div [ class "navdrawer-divider" ]
+                []
+            , p [ class "navdrawer-subheader" ]
+                [ text "Navdrawer subheader" ]
+            , ul [ class "navdrawer-nav" ]
+                [ li [ class "nav-item" ]
+                    [ a [ class "nav-link active", href "#" ]
+                        [ i [ class "material-icons mr-3" ]
+                            [ text "alarm_on" ]
+                        , text "Active with icon        "
+                        ]
+                    ]
+                , li [ class "nav-item" ]
+                    [ a [ class "nav-link disabled", href "#" ]
+                        [ i [ class "material-icons mr-3" ]
+                            [ text "alarm_off" ]
+                        , text "Disabled with icon        "
+                        ]
+                    ]
+                , li [ class "nav-item" ]
+                    [ a [ class "nav-link", href "#" ]
+                        [ i [ class "material-icons mr-3" ]
+                            [ text "link" ]
+                        , text "Link with icon        "
+                        ]
+                    ]
+                ]
+            ]
+        ]
+
+
+viewBody : Model -> Html Msg
+viewBody model =
+    div [ id "content", class "container-fluid content-wrapper" ]
+        [ case model.route of
+            Nothing ->
+                viewDashboard model
+
+            Just Route.Home ->
+                viewDashboard model
+
+            Just Route.Reports ->
+                viewReports model
+
+            Just Route.Comments ->
+                viewComments model.authModel model.comments model.newComment
+
+            Just Route.Activity ->
+                viewActivity model
+
+            Just Route.SurveyPrototype ->
+                surveyPrototypeBody model
+
+            Just _ ->
+                notFoundBody model
+        , snackBar model
+        ]
+
+
 commentsForm : Authentication.Model -> Comment -> Html Msg
 commentsForm authModel newComment =
     div
@@ -348,17 +506,6 @@ viewActivity model =
                 [ text "What is Risk Management?" ]
             , LineChart.view data
             ]
-
-
-view : Model -> Html Msg
-view model =
-    (case Authentication.tryGetUserProfile model.authModel of
-        Nothing ->
-            viewLogin model
-
-        Just user ->
-            viewHome model user
-    )
 
 
 viewDashboard : Model -> Html Msg
@@ -406,34 +553,6 @@ viewComments authModel comments newComment =
         , ul []
             (List.map (\l -> li [] [ text (l.message ++ " - " ++ l.user_email ++ "(" ++ l.user_id ++ ")" ++ " posted at " ++ l.created_at) ]) comments)
         , commentsForm authModel newComment
-        ]
-
-
-viewBody : Model -> Html Msg
-viewBody model =
-    div [ id "content" ]
-        [ case model.route of
-            Nothing ->
-                viewDashboard model
-
-            Just Route.Home ->
-                viewDashboard model
-
-            Just Route.Reports ->
-                viewReports model
-
-            Just Route.Comments ->
-                viewComments model.authModel model.comments model.newComment
-
-            Just Route.Activity ->
-                viewActivity model
-
-            Just Route.SurveyPrototype ->
-                surveyPrototypeBody model
-
-            Just _ ->
-                notFoundBody model
-        , snackBar model
         ]
 
 
