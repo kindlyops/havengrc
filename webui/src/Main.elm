@@ -340,6 +340,7 @@ navDrawerItems =
     , { text = "Reports", iconName = "library_books", route = Just Route.Reports }
     , { text = "Comments", iconName = "gavel", route = Just Route.Comments }
     , { text = "SurveyPrototype", iconName = "gavel", route = Just Route.SurveyPrototype }
+    , { text = "PostgrestTestPage", iconName = "gavel", route = Just Route.PostgrestTestPage }
     ]
 
 
@@ -431,6 +432,9 @@ viewBody model =
 
             Just Route.SurveyPrototype ->
                 viewSurveyPrototype model
+
+            Just Route.PostgrestTestPage ->
+                viewPostgrestTestPage model
 
             Just _ ->
                 notFoundBody model
@@ -567,6 +571,28 @@ viewSurveyMetaData metaData =
             , li [ class "list-group-item" ] [ button [ class "btn btn-primary", onClick BeginIpsativeSurvey ] [ text "Click to Start Survey" ] ]
             ]
         ]
+
+
+viewPostgrestTestPage : Model -> Html Msg
+viewPostgrestTestPage model =
+    let
+        firstSurveyName =
+            case List.head model.serverIpsativeSurveys of
+                Nothing ->
+                    "NotLoaded or Error"
+
+                Just x ->
+                    x.name
+    in
+        div [ class "container" ]
+            [ div [ class "row" ]
+                [ div [ class "col" ]
+                    [ button [ class "btn btn-primary", onClick GetIpsativeSurveyData ]
+                        [ text "get it" ]
+                    , p [] [ text firstSurveyName ]
+                    ]
+                ]
+            ]
 
 
 notFoundBody : Model -> Html Msg
