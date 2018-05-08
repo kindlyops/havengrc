@@ -15,7 +15,6 @@ module Keycloak
 
 type alias LoggedInUser =
     { profile : UserProfile
-    , token : Token
     }
 
 
@@ -34,6 +33,7 @@ type alias UserProfile =
     , firstName : String
     , lastName : String
     , email : String
+    , token : Token
     }
 
 

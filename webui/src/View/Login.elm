@@ -14,20 +14,21 @@ view model =
             [ div [ class "mdc-layout-grid__inner" ]
                 [ div [ class "mdc-layout-grid__cell--span-12 align-center" ]
                     [ img [ alt "Haven GRC Company Logo", attribute "data-rjs" "2", id "logo", src "/img/logo@2x.png", height 71, width 82 ]
-                       []
-                    ,  h1 [ class "login-header" ]
-                              [ span [ class "text-success" ]
-                                  [ text "Compliance" ]
-                              , span [ class "text-primary" ]
-                                  [ text " & " ]
-                              , span [ class "text-success" ]
-                                  [ text "Risk " ]
-                              , text "Dashboard"
-                              ]
-                    , button [ class "mdc-button mdc-button--primary mdc-button--raised login-btn"
-                             , onClick (Types.AuthenticationMsg Authentication.ShowLogIn)
-                             , attribute "data-mdc-auto-init" "MDCRipple"
-                             ]
+                        []
+                    , h1 [ class "login-header" ]
+                        [ span [ class "text-success" ]
+                            [ text "Compliance" ]
+                        , span [ class "text-primary" ]
+                            [ text " & " ]
+                        , span [ class "text-success" ]
+                            [ text "Risk " ]
+                        , text "Dashboard"
+                        ]
+                    , button
+                        [ class "mdc-button mdc-button--primary mdc-button--raised login-btn"
+                        , onClick (Types.AuthenticationMsg Authentication.ShowLogIn)
+                        , attribute "data-mdc-auto-init" "MDCRipple"
+                        ]
                         [ text "Login" ]
                     ]
                 ]
@@ -65,15 +66,14 @@ view model =
                         [ text "Compliance + risk work can seem never-ending and thankless. Resilience and safety comes from humans, and giving people credit for their work results in higher engagement and improved acuity for identifying and mitigating risks as they emerge. People get excited about how they are helping to improve the company risk profile rather than dragging their feet about the rules. Empower your team to innovate with confidence!" ]
                     ]
                 ]
-          ]
+            ]
         , div [ class "align-center", id "footer-lines-container" ]
-            [
-            img [ alt "Wireframe graphic of compliance and risk dashboard Haven GRC", attribute "data-rjs" "2", id "footer-lines", src "/img/footer_lines@2x.png" ]
-              []
+            [ img [ alt "Wireframe graphic of compliance and risk dashboard Haven GRC", attribute "data-rjs" "2", id "footer-lines", src "/img/footer_lines@2x.png" ]
+                []
             , footer [ class "mdc-toolbar" ]
                 [ div [ class "mdc-toolbar__row" ]
                     [ section [ class "mdc-toolbar__section" ]
-                      [ span []
+                        [ span []
                             [ text "© 2018 "
                             , a [ href "https://kindlyops.com", title "Kindly Ops Website" ]
                                 [ text "KINDLY OPS" ]

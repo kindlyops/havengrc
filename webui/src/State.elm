@@ -5,10 +5,13 @@ import Http
 import Keycloak
 import Navigation
 import Ports
+import Page.Comments
+import Page.Errored as Errored
 import Comment.Rest exposing (getComments, postComment)
 import Comment.Types exposing (Comment, emptyNewComment)
 import Route
 import Types exposing (..)
+import Misc exposing (..)
 
 
 init : Maybe Keycloak.LoggedInUser -> Navigation.Location -> ( Model, Cmd Msg )
@@ -22,8 +25,8 @@ init initialUser location =
             , authModel = (Authentication.init Ports.keycloakLogin Ports.keycloakLogout initialUser)
             , route = route
             , selectedTab = 0
-            , comments = []
-            , newComment = emptyNewComment
+            , pageState = (Loaded Blank)
+            , session = { user = initialUser }
             }
     in
         ( model
@@ -31,86 +34,87 @@ init initialUser location =
         )
 
 
-getHTTPErrorMessage : Http.Error -> String
-getHTTPErrorMessage error =
-    case error of
-        Http.NetworkError ->
-            "Is the server running?"
+transitionTo : Maybe Route.Location -> Model -> ( Model, Cmd Msg )
+transitionTo maybeLocation model =
+    case maybeLocation of
+        Nothing ->
+            model ! []
 
-        Http.BadStatus response ->
-            (toString response.status)
+        Just location ->
+            model
+                ! [ Navigation.newUrl (Route.urlFor location)
+                  , Ports.setTitle (Route.titleFor location)
+                  ]
 
-        Http.BadPayload message _ ->
-            "Decoding Failed: " ++ message
 
-        _ ->
-            (toString error)
+getPage : PageState -> Page
+getPage pageState =
+    case pageState of
+        Loaded page ->
+            page
+
+        TransitioningFrom page ->
+            page
+
+
+pageErrored model activePage errorMessage =
+    let
+        error =
+            Errored.pageLoadError errorMessage
+    in
+        { model | pageState = Loaded (Errored error) } => Cmd.none
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case msg of
-        Types.AuthenticationMsg authMsg ->
+    updatePage (getPage model.pageState) msg model
+
+
+updatePage : Page -> Msg -> Model -> ( Model, Cmd Msg )
+updatePage page msg model =
+    let
+        session =
+            model.authModel
+
+        toPage toModel toMsg subUpdate subMsg subModel =
             let
-                ( authModel, cmd ) =
-                    Authentication.update authMsg model.authModel
+                ( newModel, newCmd ) =
+                    subUpdate subMsg subModel
             in
-                ( { model | authModel = authModel }, Cmd.map Types.AuthenticationMsg cmd )
+                ( { model | pageState = Loaded (toModel newModel) }, Cmd.map toMsg newCmd )
 
-        NavigateTo maybeLocation ->
-            case maybeLocation of
-                Nothing ->
-                    model ! []
+        errored =
+            pageErrored model
+    in
+        case ( msg, page ) of
+            ( Types.AuthenticationMsg authMsg, _ ) ->
+                let
+                    ( authModel, cmd ) =
+                        Authentication.update authMsg model.authModel
+                in
+                    ( { model | authModel = authModel }, Cmd.map Types.AuthenticationMsg cmd )
 
-                Just location ->
-                    model
-                        ! [ Navigation.newUrl (Route.urlFor location)
-                          , Ports.setTitle (Route.titleFor location)
-                          ]
+            ( NavigateTo maybeLocation, _ ) ->
+                (transitionTo maybeLocation model)
 
-        UrlChange location ->
-            let
-                _ =
-                    Debug.log "UrlChange: " location.hash
-            in
-                { model | route = Route.locFor (Just location) } ! []
+            ( UrlChange location, _ ) ->
+                let
+                    _ =
+                        Debug.log "UrlChange: " location.hash
+                in
+                    { model | route = Route.locFor (Just location) } ! []
 
-        AddComment model ->
-            model ! [ postComment model ]
+            ( CommentsMsg user subMsg, subModel ) ->
+                case Authentication.tryGetUserProfile model.authModel of
+                    Nothing ->
+                        -- this should never happen
+                        ( model, Cmd.none )
 
-        GetComments model ->
-            model ! [ getComments model ]
+                    Just user ->
+                        toPage Comment CommentsMsg (Page.Comments.update subMsg user subModel)
 
-        SetCommentMessageInput value ->
-            let
-                oldComment =
-                    model.newComment
-
-                updatedComment =
-                    { oldComment | message = value }
-            in
-                ( { model | newComment = updatedComment }, Cmd.none )
-
-        NewComment (Ok comment) ->
-            let
-                morecomments =
-                    model.comments ++ comment
-            in
-                -- TODO we need a more sophisticated way to deal with loading
-                -- paginated data and not re-fetching data we already have
-                { model | newComment = emptyNewComment, comments = morecomments } ! []
-
-        NewComment (Err error) ->
-            model ! [ Ports.showError (getHTTPErrorMessage error) ]
-
-        NewComments (Ok comments) ->
-            { model | comments = comments } ! []
-
-        NewComments (Err error) ->
-            model ! [ Ports.showError (getHTTPErrorMessage error) ]
-
-        ShowError value ->
-            model ! [ Ports.showError value ]
+            ShowError value ->
+                model ! [ Ports.showError value ]
 
 
 subscriptions : a -> Sub Msg

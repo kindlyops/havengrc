@@ -10,14 +10,18 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput, onWithOptions, on)
 import Json.Decode as Json
 import Keycloak
+import Page.Comments
+import Page.Activity
+import Page.Home
 import View.LineChart as LineChart
-import Route exposing (Location(..), locFor)
+import View.Spinner exposing (spinner)
+import Route
 import String exposing (toLower)
-import Types exposing (Model, Msg)
+import Types
 
 
-header : Model -> Html Msg
-header model =
+header : Types.Model -> Keycloak.UserProfile -> Html Types.Msg
+header model user =
     div [ class "mdc-toolbar mdc-toolbar--fixed header" ]
         [ div [ class "mdc-toolbar__row" ]
             [ section [ class "mdc-toolbar__section mdc-toolbar__section--align-start" ]
@@ -46,8 +50,8 @@ getGravatar email =
         "https:" ++ url
 
 
-view : Model -> Keycloak.UserProfile -> Html Msg
-view model user =
+view : Bool -> Types.Model -> Types.Page -> Keycloak.UserProfile -> Html Types.Msg
+view loading model page user =
     div [ class "container" ]
         [ div
             [ id "MenuDrawer"
@@ -108,13 +112,13 @@ view model user =
                 ]
             ]
         , div [ class "mdc-toolbar-fixed-adjust" ]
-            [ header model
-            , body model
+            [ header model user
+            , body page user
             ]
         ]
 
 
-selectedItem : Model -> String
+selectedItem : Types.Model -> String
 selectedItem model =
     let
         item =
@@ -128,8 +132,8 @@ selectedItem model =
                 String.toLower item.text
 
 
-snackBar : Model -> Html Msg
-snackBar model =
+snackBar : Keycloak.UserProfile -> Html Types.Msg
+snackBar user =
     div
         [ id "error-snackbar"
         , class "mdc-snackbar"
@@ -144,33 +148,34 @@ snackBar model =
         ]
 
 
-body : Model -> Html Msg
-body model =
+body : Types.Page -> Keycloak.UserProfile -> Html Types.Msg
+body page user =
     div [ id "content" ]
-        [ case model.route of
-            Nothing ->
-                dashboardBody model
+        [ case page of
+            Types.Home model ->
+                dashboardBody model user
 
-            Just Home ->
-                dashboardBody model
+            Types.Comments model ->
+                Page.Comments.view model user
+                    |> Html.map Types.CommentsMsg
 
-            Just Reports ->
-                reportsBody model
+            Types.Activity model ->
+                activityBody model user
 
-            Just Comments ->
-                commentsBody model
+            Types.Blank ->
+                notFoundBody user
 
-            Just Activity ->
-                activityBody model
+            Types.NotFound ->
+                notFoundBody user
 
-            Just _ ->
-                notFoundBody model
-        , snackBar model
+            Types.Errored model ->
+                notFoundBody user
+        , snackBar user
         ]
 
 
-dashboardBody : Model -> Html Msg
-dashboardBody model =
+dashboardBody : Page.Home.Model -> Keycloak.UserProfile -> Html Types.Msg
+dashboardBody model user =
     let
         data =
             [ 1, 1, 2, 3, 5, 8, 13 ]
@@ -188,32 +193,22 @@ dashboardBody model =
             ]
 
 
-reportsBody : Model -> Html Msg
-reportsBody model =
+reportsBody : Types.Page -> Keycloak.UserProfile -> Html Types.Msg
+reportsBody page user =
     div []
         [ div []
-              [ text "This is the reports view"
-              , ol []
-                  [ li []
-                      [ a [ href "../js/pdf/web/viewer.html?file=haven-booth-concepts.pdf", target "_blank" ]
-                          [ text "Report" ]
-                      ]
-                  , li []
-                      [ a [ href "../js/pdf/web/viewer.html", target "_blank" ]
-                          [ text "Same report" ]
-                      ]
-                  ]
-              ]
-        ]
-
-
-commentsBody : Model -> Html Msg
-commentsBody model =
-    div []
-        [ text "This is the comments view"
-        , ul []
-            (List.map (\l -> li [] [ text (l.message ++ " - " ++ l.user_email ++ "(" ++ l.user_id ++ ")" ++ " posted at " ++ l.created_at) ]) model.comments)
-        , commentsForm model
+            [ text "This is the reports view"
+            , ol []
+                [ li []
+                    [ a [ href "../js/pdf/web/viewer.html?file=haven-booth-concepts.pdf", target "_blank" ]
+                        [ text "Report" ]
+                    ]
+                , li []
+                    [ a [ href "../js/pdf/web/viewer.html", target "_blank" ]
+                        [ text "Same report" ]
+                    ]
+                ]
+            ]
         ]
 
 
@@ -222,41 +217,8 @@ onValueChanged tagger =
     on "value-changed" (Json.map tagger Html.Events.targetValue)
 
 
-showDebugData : record -> Html Msg
-showDebugData record =
-    div [ class "debug" ] [ text ("DEBUG: " ++ toString record) ]
-
-
-commentsForm : Model -> Html Msg
-commentsForm model =
-    div
-        [ id "Comments" ]
-        [ div []
-            [ div
-                [ class "mdc-textfield"
-                , attribute "data-mdc-auto-init" "MDCTextfield"
-                ]
-                [ input
-                    [ class "mdc-textfield__input"
-                    , onInput Types.SetCommentMessageInput
-                    , value model.newComment.message
-                    ]
-                    []
-                , label [ class "mdc-textfield__label" ] [ text "Comment" ]
-                ]
-            ]
-        , button
-            [ class "mdc-button mdc-button--raised mdc-button--accent"
-            , attribute "data-mdc-auto-init" "MDCRipple"
-            , onClick (Types.AddComment model)
-            ]
-            [ text "Add" ]
-        , showDebugData model.newComment
-        ]
-
-
-activityBody : Model -> Html Msg
-activityBody model =
+activityBody : Page.Activity.Model -> Keycloak.UserProfile -> Html Types.Msg
+activityBody model user =
     let
         data =
             [ ( Date.fromTime 1448928000000, 2 )
@@ -267,13 +229,13 @@ activityBody model =
     in
         div []
             [ div []
-                  [ text "What is Risk Management?" ]
-            ,  LineChart.view data
+                [ text "What is Risk Management?" ]
+            , LineChart.view data
             ]
 
 
-notFoundBody : Model -> Html Msg
-notFoundBody model =
+notFoundBody : Keycloak.UserProfile -> Html Types.Msg
+notFoundBody user =
     div [] [ text "This is the notFound view" ]
 
 
@@ -286,14 +248,14 @@ type alias MenuItem =
 
 menuItems : List MenuItem
 menuItems =
-    [ { text = "Dashboard", iconName = "dashboard", route = Just Home }
-    , { text = "Activity", iconName = "history", route = Just Activity }
-    , { text = "Reports", iconName = "library_books", route = Just Reports }
-    , { text = "Comments", iconName = "gavel", route = Just Comments }
+    [ { text = "Dashboard", iconName = "dashboard", route = Just Route.Home }
+    , { text = "Activity", iconName = "history", route = Just Route.Activity }
+    , { text = "Reports", iconName = "library_books", route = Just Route.Reports }
+    , { text = "Comments", iconName = "gavel", route = Just Route.Comments }
     ]
 
 
-drawerMenuItem : Model -> MenuItem -> Html Msg
+drawerMenuItem : Types.Model -> MenuItem -> Html Types.Msg
 drawerMenuItem model menuItem =
     a
         [ attribute "name" (toLower menuItem.text)
