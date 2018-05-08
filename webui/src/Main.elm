@@ -6,7 +6,7 @@ import Date
 import LineChart
 import Centroid
 import Gravatar
-import Json.Decode as Decode exposing (Decoder, field, succeed)
+import Json.Decode as Decode exposing (Decoder, field, succeed, value)
 import Json.Encode as Encode
 import Authentication
 import Http
@@ -18,6 +18,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Route
 import Survey
+import Data.Survey
 
 
 type alias Model =
@@ -28,6 +29,7 @@ type alias Model =
     , comments : List Comment
     , newComment : Comment
     , surveyModel : Survey.Model
+    , serverIpsativeSurveys : List Data.Survey.IpsativeServerMetaData
     }
 
 
@@ -42,6 +44,9 @@ type Msg
     | SetCommentMessageInput String
     | ShowError String
     | SurveyMsg Survey.Msg
+    | GetIpsativeSurveyData
+    | GotServerIpsativeSurveys (Result Http.Error (List Data.Survey.IpsativeServerMetaData))
+    | BeginIpsativeSurvey
 
 
 main : Program (Maybe Keycloak.LoggedInUser) Model Msg
@@ -76,6 +81,7 @@ init initialUser location =
             , comments = []
             , newComment = emptyNewComment
             , surveyModel = Survey.init
+            , serverIpsativeSurveys = []
             }
     in
         ( model
@@ -109,6 +115,9 @@ update msg model =
                             case location of
                                 Route.Comments ->
                                     [ getComments model.authModel ]
+
+                                Route.SurveyPrototype ->
+                                    [ getIpsativeSurveys model.authModel ]
 
                                 _ ->
                                     []
@@ -164,6 +173,18 @@ update msg model =
 
         SurveyMsg surveyMsg ->
             { model | surveyModel = Survey.update surveyMsg model.surveyModel } ! []
+
+        GetIpsativeSurveyData ->
+            model ! [ getIpsativeSurveys model.authModel ]
+
+        GotServerIpsativeSurveys (Ok surveys) ->
+            { model | serverIpsativeSurveys = surveys } ! []
+
+        GotServerIpsativeSurveys (Err error) ->
+            model ! [ Ports.showError (getHTTPErrorMessage error) ]
+
+        BeginIpsativeSurvey ->
+            model ! []
 
 
 type alias Comment =
@@ -243,6 +264,23 @@ postComment authModel newComment =
                 }
     in
         Http.send NewComment request
+
+
+getIpsativeSurveys : Authentication.Model -> Cmd Msg
+getIpsativeSurveys authModel =
+    let
+        request =
+            Http.request
+                { method = "GET"
+                , headers = Authentication.tryGetAuthHeader authModel
+                , url = "/api/ipsative_surveys?select=id,updated_at,name,description,instructions,author"
+                , body = Http.emptyBody
+                , expect = Http.expectJson (Decode.list Data.Survey.decoder)
+                , timeout = Nothing
+                , withCredentials = True
+                }
+    in
+        Http.send GotServerIpsativeSurveys request
 
 
 getHTTPErrorMessage : Http.Error -> String
@@ -411,7 +449,7 @@ commentsForm authModel newComment =
                 [ input
                     [ class "mdc-textfield__input"
                     , onInput SetCommentMessageInput
-                    , value newComment.message
+                    , Html.Attributes.value newComment.message
                     ]
                     []
                 , label [ class "mdc-textfield__label" ] [ text "Comment" ]
@@ -492,7 +530,43 @@ viewComments authModel comments newComment =
 
 viewSurveyPrototype : Model -> Html Msg
 viewSurveyPrototype model =
-    Survey.view model.surveyModel |> Html.map SurveyMsg
+    --Survey.view model.surveyModel |> Html.map SurveyMsg
+    --div [ class "container " ] [ viewApp model ]
+    div [ class "container " ]
+        [ div [ class "" ]
+            [ h1 [ class "display-4" ] [ text "KindlyOps Haven Survey Prototype" ]
+            , p [ class "lead" ] [ text "Welcome to the Elm Haven Survey Prototype. " ]
+            , hr [ class "my-4" ] []
+
+            --, p [ class "" ] [ text ("There are currently " ++ (toString (List.length model.availableSurveys)) ++ " surveys to choose from.") ]
+            , p [ class "" ] [ text "There are currently FIX surveys to choose from." ]
+            , div [ class "row" ]
+                (List.map
+                    (\metaData ->
+                        div [ class "col-sm" ] [ viewSurveyMetaData metaData ]
+                    )
+                    model.serverIpsativeSurveys
+                )
+            ]
+        ]
+
+
+viewSurveyMetaData : Data.Survey.IpsativeServerMetaData -> Html Msg
+viewSurveyMetaData metaData =
+    div [ class "card" ]
+        [ div [ class "card-header" ] [ text "Ipsative" ]
+        , div [ class "card-body" ]
+            [ h5 [ class "card-title" ]
+                [ text metaData.name
+                ]
+            , p [ class "card-text" ] [ text metaData.description ]
+            ]
+        , ul [ class "list-group list-group-flush" ]
+            [ li [ class "list-group-item" ] [ text ("Last Updated: " ++ metaData.updated_at) ]
+            , li [ class "list-group-item" ] [ text ("Created By: " ++ metaData.author) ]
+            , li [ class "list-group-item" ] [ button [ class "btn btn-primary", onClick BeginIpsativeSurvey ] [ text "Click to Start Survey" ] ]
+            ]
+        ]
 
 
 notFoundBody : Model -> Html Msg
