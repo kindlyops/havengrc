@@ -47,16 +47,23 @@ init initialUser location =
         ( commentsModel, commentsCmd ) =
             Comments.init initialAuthModel
 
+        ( surveyModel, surveyCmd ) =
+            Survey.init initialAuthModel
+
         model =
             { route = route
             , authModel = initialAuthModel
             , dashboardModel = Dashboard.init
             , commentsModel = commentsModel
-            , surveyModel = Survey.init
+            , surveyModel = surveyModel
             }
     in
         ( model
-        , Cmd.batch [ routeCmd, (Cmd.map CommentsMsg commentsCmd) ]
+        , Cmd.batch
+            [ routeCmd
+            , (Cmd.map CommentsMsg commentsCmd)
+            , (Cmd.map SurveyMsg surveyCmd)
+            ]
         )
 
 
@@ -133,7 +140,7 @@ update msg model =
         SurveyMsg surveyMsg ->
             let
                 ( surveyModel, cmd ) =
-                    Survey.update surveyMsg model.surveyModel
+                    Survey.update surveyMsg model.surveyModel model.authModel
             in
                 ( { model | surveyModel = surveyModel }, Cmd.map SurveyMsg cmd )
 

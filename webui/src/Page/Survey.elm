@@ -11,12 +11,17 @@ import Data.Survey
         , PointsAssigned
         , IpsativeAnswer
         , LikertAnswer
+        , IpsativeServerMetaData
         )
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import List.Zipper as Zipper exposing (..)
 import Authentication
+import Http
+import Request.Survey
+import Ports
+import Views.SurveyCard
 
 
 type SurveyPage
@@ -32,6 +37,7 @@ type alias Model =
     , availableSurveys : List Survey
     , currentPage : SurveyPage
     , numberOfGroups : Int
+    , serverIpsativeSurveys : List IpsativeServerMetaData
     }
 
 
@@ -39,13 +45,15 @@ type alias Model =
 --TODO: change currentSurvey to Maybe
 
 
-init : Model
-init =
+init : Authentication.Model -> ( Model, Cmd Msg )
+init authModel =
     { currentSurvey = Ipsative Data.Survey.emptyIpsativeServerSurvey
     , availableSurveys = []
     , currentPage = Home
     , numberOfGroups = 2
+    , serverIpsativeSurveys = []
     }
+        ! [ Http.send GotServerIpsativeSurveys (Request.Survey.get authModel) ]
 
 
 type Msg
@@ -64,42 +72,44 @@ type Msg
       --| GenerateChart
     | SelectLikertAnswer Int String
     | GotoQuestion Survey Int
+    | GetIpsativeSurveys
+    | GotServerIpsativeSurveys (Result Http.Error (List Data.Survey.IpsativeServerMetaData))
 
 
 
---| GetIpsativeSurveyData
---| GotServerIpsativeSurveys (Result Http.Error (List Data.Survey.IpsativeServerMetaData))
---| BeginIpsativeSurvey
---GetIpsativeSurveyData ->
---    model ! [ getIpsativeSurveys model.authModel ]
---GotServerIpsativeSurveys (Ok surveys) ->
---    { model | serverIpsativeSurveys = surveys } ! []
---GotServerIpsativeSurveys (Err error) ->
---    model ! [ Ports.showError (getHTTPErrorMessage error) ]
---BeginIpsativeSurvey ->
---    model ! []
---getIpsativeSurveys : Authentication.Model -> Cmd Msg
---getIpsativeSurveys authModel =
---    let
---        request =
---            Http.request
---                { method = "GET"
---                , headers = Authentication.tryGetAuthHeader authModel
---                , url = "/api/ipsative_surveys?select=id,updated_at,name,description,instructions,author"
---                , body = Http.emptyBody
---                , expect = Http.expectJson (Decode.list Data.Survey.decoder)
---                , timeout = Nothing
---                , withCredentials = True
---                }
---    in
---        Http.send GotServerIpsativeSurveys request
+--TODO: remove duplicate function or put in Utils
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
+getHTTPErrorMessage : Http.Error -> String
+getHTTPErrorMessage error =
+    case error of
+        Http.NetworkError ->
+            "Is the server running?"
+
+        Http.BadStatus response ->
+            (toString response.status)
+
+        Http.BadPayload message _ ->
+            "Decoding Failed: " ++ message
+
+        _ ->
+            (toString error)
+
+
+update : Msg -> Model -> Authentication.Model -> ( Model, Cmd Msg )
+update msg model authModel =
     case msg of
         NoOp ->
             model ! []
+
+        GetIpsativeSurveys ->
+            model ! [ Http.send GotServerIpsativeSurveys (Request.Survey.get authModel) ]
+
+        GotServerIpsativeSurveys (Err error) ->
+            model ! [ Ports.showError (getHTTPErrorMessage error) ]
+
+        GotServerIpsativeSurveys (Ok surveys) ->
+            { model | serverIpsativeSurveys = surveys } ! []
 
         SelectLikertAnswer answerNumber choice ->
             let
@@ -573,71 +583,10 @@ viewHero model =
     div [ class "" ]
         [ h1 [ class "display-4" ] [ text "KindlyOps Haven Survey Prototype" ]
         , p [ class "lead" ] [ text "Welcome to the Elm Haven Survey Prototype. " ]
+        , button [ class "btn btn-primary", onClick GetIpsativeSurveys ] [ text "get surveys" ]
         , hr [ class "my-4" ] []
         , p [ class "" ] [ text ("There are currently " ++ (toString (List.length model.availableSurveys)) ++ " surveys to choose from.") ]
-        , div [ class "row" ]
-            (List.map
-                (\survey ->
-                    case survey of
-                        Ipsative survey ->
-                            div [ class "col-sm" ]
-                                [ viewScdsCard survey model.numberOfGroups
-                                ]
-
-                        Likert survey ->
-                            div [ class "col-sm" ]
-                                [ viewForceCard survey
-                                ]
-                )
-                model.availableSurveys
-            )
-        ]
-
-
-viewForceCard : LikertSurvey -> Html Msg
-viewForceCard survey =
-    div [ class "card" ]
-        [ div [ class "card-header" ] [ text "Likert" ]
-        , div [ class "card-body" ]
-            [ h5 [ class "card-title" ]
-                [ text survey.metaData.name
-                ]
-            , p [ class "card-text" ] [ text survey.metaData.description ]
-            ]
-        , ul [ class "list-group list-group-flush" ]
-            [ li [ class "list-group-item" ] [ text ("Last Updated: " ++ survey.metaData.lastUpdated) ]
-            , li [ class "list-group-item" ] [ text ("Created By: " ++ survey.metaData.createdBy) ]
-            , li [ class "list-group-item" ] [ button [ class "btn btn-primary", onClick BeginLikertSurvey ] [ text "Click to start survey" ] ]
-            ]
-        ]
-
-
-viewScdsCard : IpsativeSurvey -> Int -> Html Msg
-viewScdsCard survey numberOfGroups =
-    div [ class "card" ]
-        [ div [ class "card-header" ] [ text "Ipsative" ]
-        , div [ class "card-body" ]
-            [ h5 [ class "card-title" ]
-                [ text survey.metaData.name
-                ]
-            , p [ class "card-text" ] [ text survey.metaData.description ]
-            ]
-        , ul [ class "list-group list-group-flush" ]
-            [ li [ class "list-group-item" ] [ text ("Last Updated: " ++ survey.metaData.updated_at) ]
-            , li [ class "list-group-item" ] [ text ("Created By: " ++ survey.metaData.author) ]
-
-            --, li [ class "list-group-item" ]
-            --    [ label [] [ text "Number of Groups" ]
-            --    , input
-            --        [ type_ "number"
-            --        , class "form-control form-control-sm"
-            --        , onInput ChangeNumberOfGroups
-            --        , Html.Attributes.value (toString numberOfGroups)
-            --        ]
-            --        []
-            --    ]
-            , li [ class "list-group-item" ] [ button [ class "btn btn-primary", onClick BeginIpsativeSurvey ] [ text ("Click to Start Survey with " ++ (toString numberOfGroups) ++ " Groups") ] ]
-            ]
+        , div [ class "row" ] (List.map (\x -> (Views.SurveyCard.view x NoOp)) model.serverIpsativeSurveys)
         ]
 
 
