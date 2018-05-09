@@ -1,4 +1,4 @@
-module Data.Comment exposing (Comment, emptyNewComment, decode)
+module Data.Comment exposing (Comment, emptyNewComment, decode, encode)
 
 import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode exposing (Value)
@@ -23,9 +23,9 @@ decode : Decoder Comment
 decode =
     Json.Decode.Pipeline.decode Comment
         |> required "uuid" Decode.string
-        |> required "createdAt" Decode.string
-        |> required "userEmail" Decode.string
-        |> required "userId" Decode.string
+        |> required "created_at" Decode.string
+        |> required "user_email" Decode.string
+        |> required "user_id" Decode.string
         |> required "message" Decode.string
 
 

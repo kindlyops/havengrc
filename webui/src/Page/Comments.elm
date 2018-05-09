@@ -7,6 +7,7 @@ import Html.Events exposing (..)
 import Authentication exposing (..)
 import Http
 import Request.Comments exposing (get)
+import Ports
 
 
 type alias Model =
@@ -16,43 +17,75 @@ type alias Model =
 
 
 type Msg
-    = GetComments Model
+    = GetComments
     | AddComment Authentication.Model Comment
-    | NewComments (Result Http.Error (List Comment))
+    | GotComments (Result Http.Error (List Comment))
     | NewComment (Result Http.Error (List Comment))
     | SetCommentMessageInput String
 
 
-init : Model
-init =
+
+--TODO: remove duplicate function or put in Utils
+
+
+getHTTPErrorMessage : Http.Error -> String
+getHTTPErrorMessage error =
+    case error of
+        Http.NetworkError ->
+            "Is the server running?"
+
+        Http.BadStatus response ->
+            (toString response.status)
+
+        Http.BadPayload message _ ->
+            "Decoding Failed: " ++ message
+
+        _ ->
+            (toString error)
+
+
+init : Authentication.Model -> ( Model, Cmd Msg )
+init authModel =
     { comments = []
     , newComment = emptyNewComment
     }
+        ! [ Http.send GotComments (Request.Comments.get authModel) ]
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
+update : Msg -> Model -> Authentication.Model -> ( Model, Cmd Msg )
+update msg model authModel =
     case msg of
-        GetComments model ->
-            model ! []
+        GetComments ->
+            model ! [ Http.send GotComments (Request.Comments.get authModel) ]
 
         AddComment authModel comment ->
-            model ! []
+            model ! [ Http.send NewComment (Request.Comments.post authModel comment) ]
 
-        NewComments (Ok comment) ->
-            model ! []
+        GotComments (Ok comments) ->
+            { model | comments = comments } ! []
 
-        NewComments (Err error) ->
-            model ! []
+        GotComments (Err error) ->
+            model ! [ Ports.showError (getHTTPErrorMessage error) ]
 
         NewComment (Ok comment) ->
-            model ! []
+            let
+                updatedComments =
+                    model.comments ++ comment
+            in
+                { model | newComment = emptyNewComment, comments = updatedComments } ! []
 
         NewComment (Err error) ->
-            model ! []
+            model ! [ Ports.showError (getHTTPErrorMessage error) ]
 
         SetCommentMessageInput string ->
-            model ! []
+            let
+                oldComment =
+                    model.newComment
+
+                updatedComment =
+                    { oldComment | message = string }
+            in
+                { model | newComment = updatedComment } ! []
 
 
 view : Authentication.Model -> Model -> Html Msg
@@ -62,6 +95,9 @@ view authModel model =
         , ul []
             (List.map (\l -> li [] [ text (l.message ++ " - " ++ l.user_email ++ "(" ++ l.user_id ++ ")" ++ " posted at " ++ l.created_at) ]) model.comments)
         , commentsForm authModel model.newComment
+        , div [ class "row" ]
+            [ button [ class "btn btn-primary", onClick GetComments ] [ text "get comments" ]
+            ]
         ]
 
 
