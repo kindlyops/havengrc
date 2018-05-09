@@ -194,7 +194,7 @@ navDrawerItems =
     , { text = "Activity", iconName = "history", route = Just Route.Activity }
     , { text = "Reports", iconName = "library_books", route = Just Route.Reports }
     , { text = "Comments", iconName = "gavel", route = Just Route.Comments }
-    , { text = "SurveyPrototype", iconName = "gavel", route = Just Route.SurveyPrototype }
+    , { text = "SurveyPrototype", iconName = "assignment", route = Just Route.SurveyPrototype }
     ]
 
 
