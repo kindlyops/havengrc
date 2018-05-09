@@ -1,4 +1,4 @@
-module Centroid exposing (view)
+module Views.Centroid exposing (view)
 
 import Visualization.Shape as Shape exposing (defaultPieConfig, Arc)
 import Visualization.Path as Path
@@ -74,10 +74,10 @@ annular arcs =
 
 
 view : List Float -> Svg msg
-view model =
+view data =
     let
         pieData =
-            model |> Shape.pie { defaultPieConfig | outerRadius = radius }
+            data |> Shape.pie { defaultPieConfig | outerRadius = radius }
     in
         svg [ width (toString screenWidth ++ "px"), height (toString screenHeight ++ "px") ]
             [ annular pieData ]

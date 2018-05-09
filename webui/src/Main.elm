@@ -2,66 +2,37 @@ module Main exposing (..)
 
 import Keycloak
 import Navigation
-import Date
-import LineChart
-import Centroid
 import Gravatar
-import Json.Decode as Decode exposing (Decoder, field, succeed, value)
-import Json.Encode as Encode
 import Authentication
 import Http
 import Keycloak
-import Navigation
 import Ports
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Route
-import Survey
-import Data.Survey
+import Page.Home as Home
+import Page.Dashboard as Dashboard
+import Page.Comments as Comments
+import Page.Activity as Activity
+import Page.Reports as Reports
+import Page.Survey as Survey
 
 
 type alias Model =
-    { count : Int
+    { route : Route.Model
     , authModel : Authentication.Model
-    , route : Route.Model
-    , selectedTab : Int
-    , comments : List Comment
-    , newComment : Comment
+    , dashboardModel : Dashboard.Model
+    , commentsModel : Comments.Model
     , surveyModel : Survey.Model
-    , serverIpsativeSurveys : List Data.Survey.IpsativeServerMetaData
     }
 
 
-type Msg
-    = AuthenticationMsg Authentication.Msg
-    | NavigateTo (Maybe Route.Location)
-    | UrlChange Navigation.Location
-    | GetComments Model
-    | AddComment Authentication.Model Comment
-    | NewComments (Result Http.Error (List Comment))
-    | NewComment (Result Http.Error (List Comment))
-    | SetCommentMessageInput String
-    | ShowError String
-    | SurveyMsg Survey.Msg
-    | GetIpsativeSurveyData
-    | GotServerIpsativeSurveys (Result Http.Error (List Data.Survey.IpsativeServerMetaData))
-    | BeginIpsativeSurvey
-
-
-main : Program (Maybe Keycloak.LoggedInUser) Model Msg
-main =
-    Navigation.programWithFlags (UrlChange)
-        { init = init
-        , update = update
-        , subscriptions = subscriptions
-        , view = view
-        }
-
-
-subscriptions : a -> Sub Msg
-subscriptions model =
-    Ports.keycloakAuthResult (Authentication.handleAuthResult >> AuthenticationMsg)
+type alias MenuItem =
+    { text : String
+    , iconName : String
+    , route : Maybe Route.Location
+    }
 
 
 init : Maybe Keycloak.LoggedInUser -> Navigation.Location -> ( Model, Cmd Msg )
@@ -74,58 +45,56 @@ init initialUser location =
             Route.init (Just location)
 
         model =
-            { count = 0
+            { route = route
             , authModel = initialAuthModel
-            , route = route
-            , selectedTab = 0
-            , comments = []
-            , newComment = emptyNewComment
+            , dashboardModel = Dashboard.init
+            , commentsModel = Comments.init
             , surveyModel = Survey.init
-            , serverIpsativeSurveys = []
             }
     in
         ( model
-        , routeCmd
+        , Cmd.batch [ routeCmd ]
         )
+
+
+subscriptions : a -> Sub Msg
+subscriptions model =
+    Ports.keycloakAuthResult (Authentication.handleAuthResult >> AuthenticationMsg)
+
+
+main : Program (Maybe Keycloak.LoggedInUser) Model Msg
+main =
+    Navigation.programWithFlags (UrlChange)
+        { init = init
+        , update = update
+        , subscriptions = subscriptions
+        , view = view
+        }
+
+
+type Msg
+    = NavigateTo (Maybe Route.Location)
+    | UrlChange Navigation.Location
+    | ShowError String
+    | AuthenticationMsg Authentication.Msg
+    | DashboardMsg Dashboard.Msg
+    | CommentsMsg Comments.Msg
+    | SurveyMsg Survey.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        AuthenticationMsg authMsg ->
-            let
-                ( authModel, cmd ) =
-                    Authentication.update authMsg model.authModel
-            in
-                ( { model | authModel = authModel }, Cmd.map AuthenticationMsg cmd )
-
         NavigateTo maybeLocation ->
             case maybeLocation of
                 Nothing ->
                     model ! []
 
                 Just location ->
-                    let
-                        initilizationCommands =
-                            [ Navigation.newUrl (Route.urlFor location)
-                            , Ports.setTitle (Route.titleFor location)
-                            ]
-
-                        additionalCommands =
-                            case location of
-                                Route.Comments ->
-                                    [ getComments model.authModel ]
-
-                                Route.SurveyPrototype ->
-                                    [ getIpsativeSurveys model.authModel ]
-
-                                _ ->
-                                    []
-
-                        commands =
-                            initilizationCommands ++ additionalCommands
-                    in
-                        model ! commands
+                    model
+                        ! [ Navigation.newUrl (Route.urlFor location)
+                          , Ports.setTitle (Route.titleFor location)
+                          ]
 
         UrlChange location ->
             let
@@ -134,153 +103,36 @@ update msg model =
             in
                 { model | route = Route.locFor (Just location) } ! []
 
-        AddComment authModel newComment ->
-            model ! [ postComment authModel newComment ]
-
-        GetComments model ->
-            model ! [ getComments model.authModel ]
-
-        SetCommentMessageInput value ->
-            let
-                oldComment =
-                    model.newComment
-
-                updatedComment =
-                    { oldComment | message = value }
-            in
-                ( { model | newComment = updatedComment }, Cmd.none )
-
-        NewComment (Ok comment) ->
-            let
-                morecomments =
-                    model.comments ++ comment
-            in
-                -- TODO we need a more sophisticated way to deal with loading
-                -- paginated data and not re-fetching data we already have
-                { model | newComment = emptyNewComment, comments = morecomments } ! []
-
-        NewComment (Err error) ->
-            model ! [ Ports.showError (getHTTPErrorMessage error) ]
-
-        NewComments (Ok comments) ->
-            { model | comments = comments } ! []
-
-        NewComments (Err error) ->
-            model ! [ Ports.showError (getHTTPErrorMessage error) ]
-
         ShowError value ->
             model ! [ Ports.showError value ]
 
+        AuthenticationMsg authMsg ->
+            let
+                ( authModel, cmd ) =
+                    Authentication.update authMsg model.authModel
+            in
+                ( { model | authModel = authModel }, Cmd.map AuthenticationMsg cmd )
+
+        DashboardMsg dashboardMsg ->
+            let
+                ( dashboardModel, cmd ) =
+                    Dashboard.update dashboardMsg model.dashboardModel
+            in
+                ( { model | dashboardModel = dashboardModel }, Cmd.map DashboardMsg cmd )
+
+        CommentsMsg commentMsg ->
+            let
+                ( commentsModel, cmd ) =
+                    Comments.update commentMsg model.commentsModel
+            in
+                ( { model | commentsModel = commentsModel }, Cmd.map CommentsMsg cmd )
+
         SurveyMsg surveyMsg ->
-            { model | surveyModel = Survey.update surveyMsg model.surveyModel } ! []
-
-        GetIpsativeSurveyData ->
-            model ! [ getIpsativeSurveys model.authModel ]
-
-        GotServerIpsativeSurveys (Ok surveys) ->
-            { model | serverIpsativeSurveys = surveys } ! []
-
-        GotServerIpsativeSurveys (Err error) ->
-            model ! [ Ports.showError (getHTTPErrorMessage error) ]
-
-        BeginIpsativeSurvey ->
-            model ! []
-
-
-type alias Comment =
-    { uuid : String
-    , created_at : String
-    , user_email : String
-    , user_id : String
-    , message : String
-    }
-
-
-emptyNewComment : Comment
-emptyNewComment =
-    Comment "" "" "" "" ""
-
-
-commentDecoder : Decoder Comment
-commentDecoder =
-    Decode.map5 Comment
-        (field "uuid" Decode.string)
-        (field "created_at" Decode.string)
-        (field "user_email" Decode.string)
-        (field "user_id" Decode.string)
-        (field "message" Decode.string)
-
-
-encodeComment : Comment -> Encode.Value
-encodeComment comment =
-    Encode.object
-        [ ( "message", Encode.string comment.message ) ]
-
-
-commentsUrl : String
-commentsUrl =
-    "/api/comments"
-
-
-getComments : Authentication.Model -> Cmd Msg
-getComments authModel =
-    let
-        request =
-            Http.request
-                { method = "GET"
-                , headers = Authentication.tryGetAuthHeader authModel
-                , url = commentsUrl
-                , body = Http.emptyBody
-                , expect = Http.expectJson (Decode.list commentDecoder)
-                , timeout = Nothing
-                , withCredentials = True
-                }
-    in
-        Http.send NewComments request
-
-
-postComment : Authentication.Model -> Comment -> Cmd Msg
-postComment authModel newComment =
-    let
-        body =
-            encodeComment newComment
-                |> Http.jsonBody
-
-        headers =
-            (Authentication.tryGetAuthHeader authModel) ++ Authentication.getReturnHeaders
-
-        _ =
-            Debug.log "postComment called with " newComment.message
-
-        request =
-            Http.request
-                { method = "POST"
-                , headers = headers
-                , url = commentsUrl
-                , body = body
-                , expect = Http.expectJson (Decode.list commentDecoder)
-                , timeout = Nothing
-                , withCredentials = True
-                }
-    in
-        Http.send NewComment request
-
-
-getIpsativeSurveys : Authentication.Model -> Cmd Msg
-getIpsativeSurveys authModel =
-    let
-        request =
-            Http.request
-                { method = "GET"
-                , headers = Authentication.tryGetAuthHeader authModel
-                , url = "/api/ipsative_surveys?select=id,updated_at,name,description,instructions,author"
-                , body = Http.emptyBody
-                , expect = Http.expectJson (Decode.list Data.Survey.decoder)
-                , timeout = Nothing
-                , withCredentials = True
-                }
-    in
-        Http.send GotServerIpsativeSurveys request
+            let
+                ( surveyModel, cmd ) =
+                    Survey.update surveyMsg model.surveyModel
+            in
+                ( { model | surveyModel = surveyModel }, Cmd.map SurveyMsg cmd )
 
 
 getHTTPErrorMessage : Http.Error -> String
@@ -297,13 +149,6 @@ getHTTPErrorMessage error =
 
         _ ->
             (toString error)
-
-
-type alias MenuItem =
-    { text : String
-    , iconName : String
-    , route : Maybe Route.Location
-    }
 
 
 selectedItem : Route.Model -> String
@@ -335,12 +180,11 @@ getGravatar email =
 
 navDrawerItems : List MenuItem
 navDrawerItems =
-    [ { text = "Dashboard", iconName = "dashboard", route = Just Route.Home }
+    [ { text = "Dashboard", iconName = "dashboard", route = Just Route.Dashboard }
     , { text = "Activity", iconName = "history", route = Just Route.Activity }
     , { text = "Reports", iconName = "library_books", route = Just Route.Reports }
     , { text = "Comments", iconName = "gavel", route = Just Route.Comments }
     , { text = "SurveyPrototype", iconName = "gavel", route = Just Route.SurveyPrototype }
-    , { text = "PostgrestTestPage", iconName = "gavel", route = Just Route.PostgrestTestPage }
     ]
 
 
@@ -348,12 +192,13 @@ view : Model -> Html Msg
 view model =
     case Authentication.tryGetUserProfile model.authModel of
         Nothing ->
-            viewHome model
+            Home.view |> Html.map AuthenticationMsg
 
         Just user ->
             viewMain model user
 
 
+viewMain : Model -> Keycloak.UserProfile -> Html Msg
 viewMain model user =
     div []
         [ viewNavBar model user
@@ -362,6 +207,7 @@ viewMain model user =
         ]
 
 
+viewNavBar : Model -> Keycloak.UserProfile -> Html Msg
 viewNavBar model user =
     nav [ class "navbar navbar-expand-lg fixed-top navbar-dark bg-primary " ]
         [ button [ attribute "aria-controls" "navdrawerDefault", attribute "aria-expanded" "false", attribute "aria-label" "Toggle Navdrawer", class "navbar-toggler d-lg-none", attribute "data-breakpoint" "lg", attribute "data-target" "#navdrawerDefault", attribute "data-toggle" "navdrawer", attribute "data-type" "permanent" ]
@@ -416,193 +262,34 @@ viewBody model =
     div [ id "content", class "content-wrapper" ]
         [ case model.route of
             Nothing ->
-                viewDashboard model
+                (Dashboard.view model.dashboardModel) |> Html.map DashboardMsg
 
             Just Route.Home ->
-                viewDashboard model
+                (Dashboard.view model.dashboardModel) |> Html.map DashboardMsg
 
             Just Route.Reports ->
-                viewReports model
+                Reports.view
+
+            Just Route.Dashboard ->
+                (Dashboard.view model.dashboardModel) |> Html.map DashboardMsg
 
             Just Route.Comments ->
-                viewComments model.authModel model.comments model.newComment
+                Comments.view model.authModel model.commentsModel |> Html.map CommentsMsg
 
             Just Route.Activity ->
-                viewActivity model
+                Activity.view
 
             Just Route.SurveyPrototype ->
-                viewSurveyPrototype model
-
-            Just Route.PostgrestTestPage ->
-                viewPostgrestTestPage model
+                Survey.view model.authModel model.surveyModel |> Html.map SurveyMsg
 
             Just _ ->
                 notFoundBody model
         ]
 
 
-commentsForm : Authentication.Model -> Comment -> Html Msg
-commentsForm authModel newComment =
-    div
-        [ id "Comments" ]
-        [ div []
-            [ div
-                [ class "mdc-textfield"
-                , attribute "data-mdc-auto-init" "MDCTextfield"
-                ]
-                [ input
-                    [ class "mdc-textfield__input"
-                    , onInput SetCommentMessageInput
-                    , Html.Attributes.value newComment.message
-                    ]
-                    []
-                , label [ class "mdc-textfield__label" ] [ text "Comment" ]
-                ]
-            ]
-        , button
-            [ class "btn btn-primary"
-            , onClick (AddComment authModel newComment)
-            ]
-            [ text "Add" ]
-        , showDebugData newComment
-        ]
-
-
-viewActivity : Model -> Html Msg
-viewActivity model =
-    let
-        data =
-            [ ( Date.fromTime 1448928000000, 2 )
-            , ( Date.fromTime 1451606400000, 2 )
-            , ( Date.fromTime 1454284800000, 1 )
-            , ( Date.fromTime 1456790400000, 1 )
-            ]
-    in
-        div []
-            [ div []
-                [ text "What is Risk Management?" ]
-            , LineChart.view data
-            ]
-
-
-viewDashboard : Model -> Html Msg
-viewDashboard model =
-    let
-        data =
-            [ 1, 1, 2, 3, 5, 8, 13 ]
-    in
-        div
-            []
-            [ Centroid.view data
-            , br [] []
-            , button
-                [ class "btn btn-primary"
-                , onClick (ShowError "this is an error message")
-                ]
-                [ text "Show Error" ]
-            ]
-
-
-viewReports : Model -> Html Msg
-viewReports model =
-    div []
-        [ div []
-            [ text "This is the reports view"
-            , ol []
-                [ li []
-                    [ a [ href "../js/pdf/web/viewer.html?file=haven-booth-concepts.pdf", target "_blank" ]
-                        [ text "Report" ]
-                    ]
-                , li []
-                    [ a [ href "../js/pdf/web/viewer.html", target "_blank" ]
-                        [ text "Same report" ]
-                    ]
-                ]
-            ]
-        ]
-
-
-viewComments : Authentication.Model -> List Comment -> Comment -> Html Msg
-viewComments authModel comments newComment =
-    div []
-        [ text "This is the comments view"
-        , ul []
-            (List.map (\l -> li [] [ text (l.message ++ " - " ++ l.user_email ++ "(" ++ l.user_id ++ ")" ++ " posted at " ++ l.created_at) ]) comments)
-        , commentsForm authModel newComment
-        ]
-
-
-viewSurveyPrototype : Model -> Html Msg
-viewSurveyPrototype model =
-    --Survey.view model.surveyModel |> Html.map SurveyMsg
-    --div [ class "container " ] [ viewApp model ]
-    div [ class "container " ]
-        [ div [ class "" ]
-            [ h1 [ class "display-4" ] [ text "KindlyOps Haven Survey Prototype" ]
-            , p [ class "lead" ] [ text "Welcome to the Elm Haven Survey Prototype. " ]
-            , hr [ class "my-4" ] []
-
-            --, p [ class "" ] [ text ("There are currently " ++ (toString (List.length model.availableSurveys)) ++ " surveys to choose from.") ]
-            , p [ class "" ] [ text "There are currently FIX surveys to choose from." ]
-            , div [ class "row" ]
-                (List.map
-                    (\metaData ->
-                        div [ class "col-sm" ] [ viewSurveyMetaData metaData ]
-                    )
-                    model.serverIpsativeSurveys
-                )
-            ]
-        ]
-
-
-viewSurveyMetaData : Data.Survey.IpsativeServerMetaData -> Html Msg
-viewSurveyMetaData metaData =
-    div [ class "card" ]
-        [ div [ class "card-header" ] [ text "Ipsative" ]
-        , div [ class "card-body" ]
-            [ h5 [ class "card-title" ]
-                [ text metaData.name
-                ]
-            , p [ class "card-text" ] [ text metaData.description ]
-            ]
-        , ul [ class "list-group list-group-flush" ]
-            [ li [ class "list-group-item" ] [ text ("Last Updated: " ++ metaData.updated_at) ]
-            , li [ class "list-group-item" ] [ text ("Created By: " ++ metaData.author) ]
-            , li [ class "list-group-item" ] [ button [ class "btn btn-primary", onClick BeginIpsativeSurvey ] [ text "Click to Start Survey" ] ]
-            ]
-        ]
-
-
-viewPostgrestTestPage : Model -> Html Msg
-viewPostgrestTestPage model =
-    let
-        firstSurveyName =
-            case List.head model.serverIpsativeSurveys of
-                Nothing ->
-                    "NotLoaded or Error"
-
-                Just x ->
-                    x.name
-    in
-        div [ class "container" ]
-            [ div [ class "row" ]
-                [ div [ class "col" ]
-                    [ button [ class "btn btn-primary", onClick GetIpsativeSurveyData ]
-                        [ text "get it" ]
-                    , p [] [ text firstSurveyName ]
-                    ]
-                ]
-            ]
-
-
 notFoundBody : Model -> Html Msg
 notFoundBody model =
     div [] [ text "This is the notFound view" ]
-
-
-showDebugData : record -> Html Msg
-showDebugData record =
-    div [ class "debug" ] [ text ("DEBUG: " ++ toString record) ]
 
 
 viewHeader : Model -> Html Msg
@@ -622,6 +309,7 @@ viewHeader model =
         ]
 
 
+viewNavUser : Model -> Keycloak.UserProfile -> Html Msg
 viewNavUser model user =
     ul [ class "navbar-nav" ]
         [ li [ class "nav-item dropdown" ]
@@ -646,6 +334,7 @@ viewNavUser model user =
         ]
 
 
+viewUser : Model -> Keycloak.UserProfile -> Html Msg
 viewUser model user =
     div [ class "user-container" ]
         [ img
@@ -715,79 +404,4 @@ viewNavDrawerItem menuItem route =
         ]
         [ i [ class "material-icons" ] [ text menuItem.iconName ]
         , text menuItem.text
-        ]
-
-
-viewHome : Model -> Html Msg
-viewHome model =
-    div [ class "" ]
-        [ div [ class "" ]
-            [ div [ class "jumbotron text-center" ]
-                [ div [ class "container" ]
-                    [ img [ class "img-fluid mb-4", alt "Haven GRC Company Logo", attribute "data-rjs" "2", id "logo", src "/img/logo@2x.png", height 71, width 82 ]
-                        []
-                    , h1 [ class "login-header" ]
-                        [ span [ class "text-success" ]
-                            [ text "Compliance" ]
-                        , span [ class "text-primary" ]
-                            [ text " & " ]
-                        , span [ class "text-success" ]
-                            [ text "Risk " ]
-                        , text "Dashboard"
-                        ]
-                    , button
-                        [ class "btn btn-primary mt-4"
-                        , onClick (AuthenticationMsg Authentication.ShowLogIn)
-                        ]
-                        [ text "Login" ]
-                    ]
-                ]
-            ]
-        , div [ class "py-5 bg-light text-center " ]
-            [ div [ class "" ]
-                [ div [ class "" ]
-                    [ img [ class "img-lg", width 552, height 375, alt "Wireframe graphic of compliance and risk dashboard Haven GRC", src "/img/wireframe-large.png" ]
-                        []
-                    ]
-                , div [ class "row" ]
-                    [ div [ class "col-4" ]
-                        [ img [ alt "Clipboard check list", class "img-responsive center-block", attribute "data-rjs" "2", src "/img/record_assets.png" ]
-                            []
-                        , h2 []
-                            [ text "Record Assets" ]
-                        , p []
-                            [ text "You already have well-defined controls, but it’s nearly impossible to keep up with the speed at which applications and services are purchased and provisioned in the cloud.  Reduce the Shadow IT burden by allowing teams to identify and report new cloud services regularly. Everyone can easily see which cloud services are approved, which ones need review, which ones are being retired, as well as what type of data is stored and processed." ]
-                        ]
-                    , div [ class "col-4" ]
-                        [ img [ alt "icon with exclaimation point warning symbol alert", class "img-responsive center-block", attribute "data-rjs" "2", src "/img/track_risk.png" ]
-                            []
-                        , h2 []
-                            [ text "Track Risk" ]
-                        , p []
-                            [ text "When reviewing applications, services, and vendors for regulatory compliance, you inevitably find issues that need to be addressed. We help you quantify the relative importance and risk of each issue to the overall business so that everyone can see what needs priority attention. You can then easily track those issues through all stages of remediation and provide at-a-glance status for your overall risk profile to all stakeholders." ]
-                        ]
-                    , div [ class "col-4" ]
-                        [ img [ alt "Award badge ribbon", class "img-responsive center-block", attribute "data-rjs" "2", src "/img/give_credit.png" ]
-                            []
-                        , h2 []
-                            [ text "Give Credit" ]
-                        , p []
-                            [ text "Compliance + risk work can seem never-ending and thankless. Resilience and safety comes from humans, and giving people credit for their work results in higher engagement and improved acuity for identifying and mitigating risks as they emerge. People get excited about how they are helping to improve the company risk profile rather than dragging their feet about the rules. Empower your team to innovate with confidence!" ]
-                        ]
-                    ]
-                ]
-            ]
-        , div [ class "text-center bg-light", id "footer-container" ]
-            [ img [ class "", id "footer-image", alt "Wireframe graphic of compliance and risk dashboard Haven GRC", src "/img/footer_lines@2x.png" ]
-                []
-            , footer [ class "bg-primary py-4" ]
-                [ div [ class "" ]
-                    [ span []
-                        [ text "© 2018 "
-                        , a [ href "https://kindlyops.com", title "Kindly Ops Website" ]
-                            [ text "KINDLY OPS" ]
-                        ]
-                    ]
-                ]
-            ]
         ]

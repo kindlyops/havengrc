@@ -20,9 +20,10 @@ type Location
     | Home
     | Activity
     | Reports
+    | Dashboard
     | Comments
     | SurveyPrototype
-    | PostgrestTestPage
+      --| PostgrestTestPage
     | ShowComment Int
     | EditComment Int
 
@@ -67,6 +68,9 @@ titleFor route =
             Activity ->
                 "Activity"
 
+            Dashboard ->
+                "Dashboard"
+
             Reports ->
                 "Reports"
 
@@ -76,9 +80,8 @@ titleFor route =
             SurveyPrototype ->
                 "SurveyPrototype"
 
-            PostgrestTestPage ->
-                "PostgrestTestPage"
-
+            --PostgrestTestPage ->
+            --    "PostgrestTestPage"
             ShowComment _ ->
                 "Comment"
 
@@ -103,15 +106,17 @@ urlFor loc =
                 Activity ->
                     "/activity"
 
+                Dashboard ->
+                    "/dashboard"
+
                 Comments ->
                     "/comments"
 
                 SurveyPrototype ->
                     "/surveyPrototype"
 
-                PostgrestTestPage ->
-                    "/postgrestTestPage"
-
+                --PostgrestTestPage ->
+                --    "/postgrestTestPage"
                 ShowComment id ->
                     "/comments/" ++ (toString id)
 
@@ -147,6 +152,9 @@ locFor path =
                     [ "activity" ] ->
                         Just Activity
 
+                    [ "dashboard" ] ->
+                        Just Dashboard
+
                     [ "reports" ] ->
                         Just Reports
 
@@ -169,9 +177,8 @@ locFor path =
                     [ "surveyPrototype" ] ->
                         Just SurveyPrototype
 
-                    [ "postgrestTestPage" ] ->
-                        Just PostgrestTestPage
-
+                    --[ "postgrestTestPage" ] ->
+                    --    Just PostgrestTestPage
                     _ ->
                         let
                             _ =
