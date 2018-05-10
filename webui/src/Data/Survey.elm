@@ -3,6 +3,7 @@ module Data.Survey exposing (..)
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (decode, required)
 import List.Zipper as Zipper exposing (..)
+import List.Extra
 
 
 type Survey
@@ -19,23 +20,15 @@ type alias IpsativeSurvey =
 
 
 type alias IpsativeServerSurvey =
-    { metaData : IpsativeServerMetaData
+    { metaData : IpsativeMetaData
     , questions : List IpsativeServerQuestion
     }
 
 
-type alias IpsativeServerMetaData =
-    { name : String
-    , updated_at : String
-    , description : String
-    , instructions : String
-    , author : String
-    }
-
-
-ipsativeMetaDataDecoder : Decoder IpsativeServerMetaData
+ipsativeMetaDataDecoder : Decoder IpsativeMetaData
 ipsativeMetaDataDecoder =
-    decode IpsativeServerMetaData
+    decode IpsativeMetaData
+        |> required "id" Decode.int
         |> required "name" Decode.string
         |> required "updated_at" Decode.string
         |> required "description" Decode.string
@@ -44,12 +37,80 @@ ipsativeMetaDataDecoder =
 
 
 type alias IpsativeMetaData =
-    { name : String
+    { id : Int
+    , name : String
     , updated_at : String
     , description : String
     , instructions : String
     , author : String
     }
+
+
+type alias IpsativeServerData =
+    { survey_id : Int
+    , question_id : Int
+    , question_title : String
+    , answer_id : Int
+    , answer_category : String
+    , answer_answer : String
+    }
+
+
+ipsativeSurveyDataDecoder : Decoder IpsativeServerData
+ipsativeSurveyDataDecoder =
+    decode IpsativeServerData
+        |> required "survey_id" Decode.int
+        |> required "question_id" Decode.int
+        |> required "question_title" Decode.string
+        |> required "answer_id" Decode.int
+        |> required "answer_category" Decode.string
+        |> required "answer_answer" Decode.string
+
+
+groupIpsativeSurveyData : List IpsativeServerData -> List IpsativeServerQuestion
+groupIpsativeSurveyData data =
+    let
+        grouped =
+            List.Extra.groupWhile
+                (\x y ->
+                    x.question_id == y.question_id
+                )
+                data
+
+        mapped =
+            List.map
+                (\group ->
+                    let
+                        firstAnswer =
+                            case List.head group of
+                                Just x ->
+                                    x
+
+                                _ ->
+                                    { survey_id = 0
+                                    , question_id = 0
+                                    , question_title = "Error Question"
+                                    , answer_id = 0
+                                    , answer_category = "Error Category"
+                                    , answer_answer = "Error Answer"
+                                    }
+                    in
+                        { id = firstAnswer.question_id
+                        , title = firstAnswer.question_title
+                        , answers =
+                            List.map
+                                (\answer ->
+                                    { id = answer.answer_id
+                                    , category = answer.answer_category
+                                    , answer = answer.answer_answer
+                                    }
+                                )
+                                group
+                        }
+                )
+                grouped
+    in
+        mapped
 
 
 type alias IpsativeQuestion =
@@ -96,7 +157,8 @@ type alias PointsAssigned =
 
 emptyIpsativeServerMetaData : IpsativeMetaData
 emptyIpsativeServerMetaData =
-    { name = "test"
+    { id = 0
+    , name = "test"
     , updated_at = "test"
     , description = "test"
     , instructions = "test"

@@ -11,7 +11,9 @@ import Data.Survey
         , PointsAssigned
         , IpsativeAnswer
         , LikertAnswer
-        , IpsativeServerMetaData
+        , IpsativeMetaData
+        , IpsativeServerData
+        , IpsativeServerQuestion
         )
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -37,7 +39,8 @@ type alias Model =
     , availableSurveys : List Survey
     , currentPage : SurveyPage
     , numberOfGroups : Int
-    , serverIpsativeSurveys : List IpsativeServerMetaData
+    , serverIpsativeSurveys : List IpsativeMetaData
+    , selectedSurveyMetaData : IpsativeMetaData
     }
 
 
@@ -52,8 +55,9 @@ init authModel =
     , currentPage = Home
     , numberOfGroups = 2
     , serverIpsativeSurveys = []
+    , selectedSurveyMetaData = Data.Survey.emptyIpsativeServerMetaData
     }
-        ! [ Http.send GotServerIpsativeSurveys (Request.Survey.get authModel) ]
+        ! [ Http.send GotServerIpsativeSurveys (Request.Survey.getIpsativeSurveys authModel) ]
 
 
 type Msg
@@ -61,7 +65,7 @@ type Msg
     | StartLikertSurvey
     | StartIpsativeSurvey
     | BeginLikertSurvey
-    | BeginIpsativeSurvey
+    | BeginIpsativeSurvey IpsativeMetaData
     | IncrementAnswer IpsativeAnswer Int
     | DecrementAnswer IpsativeAnswer Int
     | NextQuestion
@@ -73,7 +77,8 @@ type Msg
     | SelectLikertAnswer Int String
     | GotoQuestion Survey Int
     | GetIpsativeSurveys
-    | GotServerIpsativeSurveys (Result Http.Error (List Data.Survey.IpsativeServerMetaData))
+    | GotServerIpsativeSurveys (Result Http.Error (List Data.Survey.IpsativeMetaData))
+    | GotIpsativeServerData (Result Http.Error (List Data.Survey.IpsativeServerData))
 
 
 
@@ -103,13 +108,26 @@ update msg model authModel =
             model ! []
 
         GetIpsativeSurveys ->
-            model ! [ Http.send GotServerIpsativeSurveys (Request.Survey.get authModel) ]
+            model ! [ Http.send GotServerIpsativeSurveys (Request.Survey.getIpsativeSurveys authModel) ]
 
         GotServerIpsativeSurveys (Err error) ->
             model ! [ Ports.showError (getHTTPErrorMessage error) ]
 
         GotServerIpsativeSurveys (Ok surveys) ->
             { model | serverIpsativeSurveys = surveys } ! []
+
+        GotIpsativeServerData (Err error) ->
+            model ! [ Ports.showError (getHTTPErrorMessage error) ]
+
+        GotIpsativeServerData (Ok data) ->
+            let
+                questions =
+                    Data.Survey.groupIpsativeSurveyData data
+
+                survey =
+                    Data.Survey.createIpsativeSurvey 10 2 model.selectedSurveyMetaData questions
+            in
+                { model | currentSurvey = survey } ! []
 
         SelectLikertAnswer answerNumber choice ->
             let
@@ -159,17 +177,9 @@ update msg model authModel =
         --        { model | currentSurvey = forceSurveyData }
         --in
         --    { newModel | currentPage = SurveyInstructions }
-        BeginIpsativeSurvey ->
-            --model ! []
-            model ! []
+        BeginIpsativeSurvey metaData ->
+            { model | currentPage = SurveyInstructions } ! [ Http.send GotIpsativeServerData (Request.Survey.getIpsativeSurvey authModel metaData.id) ]
 
-        --let
-        --    newSurvey =
-        --        createIpsativeSurvey 10 model.numberOfGroups scdsMetaData scdsQuestions
-        --    newModel =
-        --        { model | currentSurvey = newSurvey }
-        --in
-        --    { newModel | currentPage = SurveyInstructions }
         NextQuestion ->
             case model.currentSurvey of
                 Ipsative survey ->
@@ -586,7 +596,7 @@ viewHero model =
         , button [ class "btn btn-primary", onClick GetIpsativeSurveys ] [ text "get surveys" ]
         , hr [ class "my-4" ] []
         , p [ class "" ] [ text ("There are currently " ++ (toString (List.length model.availableSurveys)) ++ " surveys to choose from.") ]
-        , div [ class "row" ] (List.map (\x -> (Views.SurveyCard.view x NoOp)) model.serverIpsativeSurveys)
+        , div [ class "row" ] (List.map (\x -> (Views.SurveyCard.view x (BeginIpsativeSurvey x))) model.serverIpsativeSurveys)
         ]
 
 

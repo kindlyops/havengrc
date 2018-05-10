@@ -3,13 +3,13 @@ module Views.SurveyCard exposing (view)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import Data.Survey exposing (IpsativeServerMetaData)
+import Data.Survey exposing (IpsativeMetaData)
 
 
-view : IpsativeServerMetaData -> msg -> Html msg
+view : IpsativeMetaData -> msg -> Html msg
 view metaData msg =
     div [ class "card" ]
-        [ div [ class "card-header" ] [ text "Likert" ]
+        [ div [ class "card-header" ] [ text "Ipsative" ]
         , div [ class "card-body" ]
             [ h5 [ class "card-title" ]
                 [ text metaData.name
