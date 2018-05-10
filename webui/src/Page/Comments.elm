@@ -49,7 +49,15 @@ init authModel =
     { comments = []
     , newComment = emptyNewComment
     }
-        ! [ Http.send GotComments (Request.Comments.get authModel) ]
+        ! initialCommands authModel
+
+
+initialCommands : Authentication.Model -> List (Cmd Msg)
+initialCommands authModel =
+    if Authentication.isLoggedIn authModel then
+        [ Http.send GotComments (Request.Comments.get authModel) ]
+    else
+        []
 
 
 update : Msg -> Model -> Authentication.Model -> ( Model, Cmd Msg )

@@ -120,8 +120,24 @@ update msg model =
             let
                 ( authModel, cmd ) =
                     Authentication.update authMsg model.authModel
+
+                ( commentsModel, commentsCmd ) =
+                    Comments.init authModel
+
+                ( surveyModel, surveyCmd ) =
+                    Survey.init authModel
             in
-                ( { model | authModel = authModel }, Cmd.map AuthenticationMsg cmd )
+                ( { model
+                    | authModel = authModel
+                    , commentsModel = commentsModel
+                    , surveyModel = surveyModel
+                  }
+                , Cmd.batch
+                    [ Cmd.map AuthenticationMsg cmd
+                    , (Cmd.map CommentsMsg commentsCmd)
+                    , (Cmd.map SurveyMsg surveyCmd)
+                    ]
+                )
 
         DashboardMsg dashboardMsg ->
             let

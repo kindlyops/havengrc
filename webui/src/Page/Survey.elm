@@ -57,7 +57,15 @@ init authModel =
     , serverIpsativeSurveys = []
     , selectedSurveyMetaData = Data.Survey.emptyIpsativeServerMetaData
     }
-        ! [ Http.send GotServerIpsativeSurveys (Request.Survey.getIpsativeSurveys authModel) ]
+        ! initialCommands authModel
+
+
+initialCommands : Authentication.Model -> List (Cmd Msg)
+initialCommands authModel =
+    if Authentication.isLoggedIn authModel then
+        [ Http.send GotServerIpsativeSurveys (Request.Survey.getIpsativeSurveys authModel) ]
+    else
+        []
 
 
 type Msg
