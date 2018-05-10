@@ -285,7 +285,7 @@ viewNavigationDrawer model =
 
 viewBody : Model -> Html Msg
 viewBody model =
-    div [ id "content", class "content-wrapper" ]
+    div [ id "content", class "content-wrapper container" ]
         [ case model.route of
             Nothing ->
                 (Dashboard.view model.dashboardModel) |> Html.map DashboardMsg

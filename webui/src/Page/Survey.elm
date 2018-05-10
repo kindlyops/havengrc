@@ -592,7 +592,7 @@ viewIpsativeSurveyInstructions survey =
     div [ class "pt-3" ]
         [ div [ class "row" ]
             [ div
-                [ class "" ]
+                [ class "col" ]
                 [ h1 [ class "display-4" ] [ text survey.metaData.name ]
                 , p [ class "lead" ] [ text survey.metaData.instructions ]
                 , hr [ class "my-4" ] []
@@ -607,7 +607,7 @@ viewLikertSurveyInstructions survey =
     div [ class "pt-3" ]
         [ div [ class "row" ]
             [ div
-                [ class "" ]
+                [ class "col" ]
                 [ h1 [ class "display-4" ] [ text survey.metaData.name ]
                 , p [ class "lead" ] [ text survey.metaData.instructions ]
                 , hr [ class "my-4" ] []
@@ -625,7 +625,15 @@ viewHero model =
         , button [ class "btn btn-primary", onClick GetIpsativeSurveys ] [ text "get surveys" ]
         , hr [ class "my-4" ] []
         , p [ class "" ] [ text ("There are currently " ++ (toString (List.length model.availableSurveys)) ++ " surveys to choose from.") ]
-        , div [ class "row" ] (List.map (\x -> (Views.SurveyCard.view x (BeginIpsativeSurvey x))) model.serverIpsativeSurveys)
+        , div [ class "row" ]
+            (List.map
+                (\x ->
+                    div [ class "col-sm" ]
+                        [ (Views.SurveyCard.view x (BeginIpsativeSurvey x))
+                        ]
+                )
+                model.serverIpsativeSurveys
+            )
         ]
 
 
