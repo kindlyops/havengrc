@@ -79,6 +79,8 @@ type Msg
     | GetIpsativeSurveys
     | GotServerIpsativeSurveys (Result Http.Error (List Data.Survey.IpsativeMetaData))
     | GotIpsativeServerData (Result Http.Error (List Data.Survey.IpsativeServerData))
+    | SaveIpsativeSurvey
+    | IpsativeSurveySaved (Result Http.Error (List Data.Survey.IpsativeResponse))
 
 
 
@@ -106,6 +108,25 @@ update msg model authModel =
     case msg of
         NoOp ->
             model ! []
+
+        SaveIpsativeSurvey ->
+            case model.currentSurvey of
+                Ipsative survey ->
+                    model ! [ Http.send IpsativeSurveySaved (Request.Survey.postIpsativeResponse authModel survey) ]
+
+                Likert survey ->
+                    model ! []
+
+        IpsativeSurveySaved (Err error) ->
+            model ! [ Ports.showError (getHTTPErrorMessage error) ]
+
+        IpsativeSurveySaved (Ok responses) ->
+            let
+                _ =
+                    Debug.log "saved response" responses
+            in
+                --{ model | serverIpsativeSurveys = surveys } ! []
+                model ! []
 
         GetIpsativeSurveys ->
             model ! [ Http.send GotServerIpsativeSurveys (Request.Survey.getIpsativeSurveys authModel) ]
@@ -178,7 +199,7 @@ update msg model authModel =
         --in
         --    { newModel | currentPage = SurveyInstructions }
         BeginIpsativeSurvey metaData ->
-            { model | currentPage = SurveyInstructions } ! [ Http.send GotIpsativeServerData (Request.Survey.getIpsativeSurvey authModel metaData.id) ]
+            { model | currentPage = SurveyInstructions, selectedSurveyMetaData = metaData } ! [ Http.send GotIpsativeServerData (Request.Survey.getIpsativeSurvey authModel metaData.id) ]
 
         NextQuestion ->
             case model.currentSurvey of
@@ -608,7 +629,9 @@ viewFinished model =
                 [ div [ class "row" ]
                     [ div [ class "jumbotron" ]
                         [ h1 [ class "display-4" ] [ text "You finished the survey!" ]
-                        , button [ class "btn btn-primary", onClick NoOp ] [ text "Click to generate radar chart of results." ]
+
+                        --, button [ class "btn btn-primary", onClick NoOp ] [ text "Click to generate radar chart of results." ]
+                        , button [ class "btn btn-primary", onClick SaveIpsativeSurvey ] [ text "Click to save results to the server." ]
                         , canvas [ id "chart" ] []
                         ]
                     ]

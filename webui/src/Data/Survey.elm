@@ -2,6 +2,7 @@ module Data.Survey exposing (..)
 
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (decode, required)
+import Json.Encode as Encode
 import List.Zipper as Zipper exposing (..)
 import List.Extra
 
@@ -23,6 +24,52 @@ type alias IpsativeServerSurvey =
     { metaData : IpsativeMetaData
     , questions : List IpsativeServerQuestion
     }
+
+
+type alias IpsativeResponse =
+    { uuid : String
+    , created_at : String
+    , user_email : String
+    , user_id : String
+    , survey_id : Int
+    , response : IpsativeInnerResponse
+
+    --, org : String
+    }
+
+
+type alias IpsativeInnerResponse =
+    { category_one : Int
+    }
+
+
+ipsativeInnerResponseDecoder : Decoder IpsativeInnerResponse
+ipsativeInnerResponseDecoder =
+    decode IpsativeInnerResponse
+        |> required "category_one" Decode.int
+
+
+ipsativeResponseDecoder : Decoder IpsativeResponse
+ipsativeResponseDecoder =
+    decode IpsativeResponse
+        |> required "uuid" Decode.string
+        |> required "created_at" Decode.string
+        |> required "user_email" Decode.string
+        |> required "user_id" Decode.string
+        |> required "survey_id" Decode.int
+        |> required "response" ipsativeInnerResponseDecoder
+
+
+
+--|> required "org" Decode.string
+
+
+ipsativeResponseEncoder : IpsativeSurvey -> Encode.Value
+ipsativeResponseEncoder survey =
+    Encode.object
+        [ ( "survey_id", Encode.int <| survey.metaData.id )
+        , ( "response", Encode.object [ ( "category_one", Encode.int <| 3 ) ] )
+        ]
 
 
 ipsativeMetaDataDecoder : Decoder IpsativeMetaData

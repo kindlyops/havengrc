@@ -45,3 +45,29 @@ getIpsativeSurvey authModel id =
     in
         --Http.send GotIpsative request
         request
+
+
+postIpsativeResponse : Authentication.Model -> Data.Survey.IpsativeSurvey -> Http.Request (List Data.Survey.IpsativeResponse)
+postIpsativeResponse authModel ipsativeSurvey =
+    let
+        body =
+            Data.Survey.ipsativeResponseEncoder ipsativeSurvey
+                |> Http.jsonBody
+
+        headers =
+            (Authentication.tryGetAuthHeader authModel) ++ Authentication.getReturnHeaders
+
+        --_ =
+        --Debug.log "Ipsative Response: " newComment.message
+        request =
+            Http.request
+                { method = "POST"
+                , headers = headers
+                , url = "api/ipsative_responses"
+                , body = body
+                , expect = Http.expectJson (Decode.list Data.Survey.ipsativeResponseDecoder)
+                , timeout = Nothing
+                , withCredentials = True
+                }
+    in
+        request
