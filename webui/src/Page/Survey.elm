@@ -812,7 +812,7 @@ viewIpsativeSurveyTitle survey =
             Zipper.current survey.questions
 
         questionNumber =
-            currentQuestion.id
+            List.length (Zipper.before survey.questions) + 1
 
         totalQuestions =
             List.length (Zipper.toList survey.questions)
