@@ -13,7 +13,7 @@ type Survey
 
 
 type alias IpsativeSurvey =
-    { metaData : IpsativeMetaData
+    { metaData : SurveyMetaData
     , pointsPerQuestion : Int
     , numGroups : Int
     , questions : Zipper IpsativeQuestion
@@ -21,7 +21,7 @@ type alias IpsativeSurvey =
 
 
 type alias IpsativeServerSurvey =
-    { metaData : IpsativeMetaData
+    { metaData : SurveyMetaData
     , questions : List IpsativeServerQuestion
     }
 
@@ -72,9 +72,9 @@ ipsativeResponseEncoder survey =
         ]
 
 
-ipsativeMetaDataDecoder : Decoder IpsativeMetaData
+ipsativeMetaDataDecoder : Decoder SurveyMetaData
 ipsativeMetaDataDecoder =
-    decode IpsativeMetaData
+    decode SurveyMetaData
         |> required "id" Decode.int
         |> required "name" Decode.string
         |> required "updated_at" Decode.string
@@ -83,7 +83,7 @@ ipsativeMetaDataDecoder =
         |> required "author" Decode.string
 
 
-type alias IpsativeMetaData =
+type alias SurveyMetaData =
     { id : Int
     , name : String
     , updated_at : String
@@ -111,6 +111,25 @@ ipsativeSurveyDataDecoder =
         |> required "question_title" Decode.string
         |> required "answer_id" Decode.int
         |> required "answer_category" Decode.string
+        |> required "answer_answer" Decode.string
+
+
+type alias LikertServerData =
+    { survey_id : Int
+    , question_id : Int
+    , question_title : String
+    , answer_id : Int
+    , answer_answer : String
+    }
+
+
+likertSurveyDataDecoder : Decoder LikertServerData
+likertSurveyDataDecoder =
+    decode LikertServerData
+        |> required "survey_id" Decode.int
+        |> required "question_id" Decode.int
+        |> required "question_title" Decode.string
+        |> required "answer_id" Decode.int
         |> required "answer_answer" Decode.string
 
 
@@ -149,6 +168,50 @@ groupIpsativeSurveyData data =
                                 (\answer ->
                                     { id = answer.answer_id
                                     , category = answer.answer_category
+                                    , answer = answer.answer_answer
+                                    }
+                                )
+                                group
+                        }
+                )
+                grouped
+    in
+        mapped
+
+
+groupLikertSurveyData : List LikertServerData -> List LikertServerQuestion
+groupLikertSurveyData data =
+    let
+        grouped =
+            List.Extra.groupWhile
+                (\x y ->
+                    x.question_id == y.question_id
+                )
+                data
+
+        mapped =
+            List.map
+                (\group ->
+                    let
+                        firstAnswer =
+                            case List.head group of
+                                Just x ->
+                                    x
+
+                                _ ->
+                                    { survey_id = 0
+                                    , question_id = 0
+                                    , question_title = "Error Question"
+                                    , answer_id = 0
+                                    , answer_answer = "Error Answer"
+                                    }
+                    in
+                        { id = firstAnswer.question_id
+                        , title = firstAnswer.question_title
+                        , answers =
+                            List.map
+                                (\answer ->
+                                    { id = answer.answer_id
                                     , answer = answer.answer_answer
                                     }
                                 )
@@ -202,7 +265,7 @@ type alias PointsAssigned =
     }
 
 
-emptyIpsativeServerMetaData : IpsativeMetaData
+emptyIpsativeServerMetaData : SurveyMetaData
 emptyIpsativeServerMetaData =
     { id = 0
     , name = "test"
@@ -223,19 +286,20 @@ emptyIpsativeServerSurvey =
 
 
 type alias LikertSurvey =
-    { metaData : LikertMetaData
+    { metaData : SurveyMetaData
     , questions : Zipper LikertQuestion
     }
 
 
-type alias LikertMetaData =
-    { name : String
-    , choices : List String
-    , instructions : String
-    , createdBy : String
-    , description : String
-    , lastUpdated : String
-    }
+likertMetaDataDecoder : Decoder SurveyMetaData
+likertMetaDataDecoder =
+    decode SurveyMetaData
+        |> required "id" Decode.int
+        |> required "name" Decode.string
+        |> required "updated_at" Decode.string
+        |> required "description" Decode.string
+        |> required "instructions" Decode.string
+        |> required "author" Decode.string
 
 
 type alias LikertQuestion =
@@ -266,17 +330,21 @@ type alias LikertServerAnswer =
     }
 
 
+defaultChoices : List String
+defaultChoices =
+    [ "Strongly Disagree"
+    , "Disagree"
+    , "Neutral"
+    , "Agree"
+    , "Strongly Agree"
+    ]
+
+
 emptyLikertQuestion : LikertQuestion
 emptyLikertQuestion =
     { id = 0
     , title = "UNKNOWN"
-    , choices =
-        [ "Strongly Disagree"
-        , "Disagree"
-        , "Neutral"
-        , "Agree"
-        , "Strongly Agree"
-        ]
+    , choices = defaultChoices
     , answers = [ emptyLikertAnswer ]
     }
 
@@ -339,39 +407,7 @@ ipsativeAnswerDecoder =
         |> required "answer" Decode.string
 
 
-
---forceMetaData : LikertMetaData
---forceMetaData =
---    { name = "Security FORCE Survey"
---    , createdBy = "Lance Hayden"
---    , lastUpdated = "09/15/2015"
---    , description = "Survey to identify existing security culture in an organization."
---    , choices =
---        [ "Strongly Disagree"
---        , "Disagree"
---        , "Neutral"
---        , "Agree"
---        , "Strongly Agree"
---        ]
---    , instructions = "To complete this Security FORCE Survey, please indicate your level of agreement with each of the following statements regarding information security values and practices within your organization. Choose one response per statement. Please respond to all statements."
---    }
---scdsMetaData : IpsativeMetaData
---scdsMetaData =
---    { name = "SCDS"
---    , description = "Survey to identify existing security culture in an organization."
---    , lastUpdated = "09/15/2015"
---    , instructions = "For each question, assign a total of 10 points, divided among the four statements based on how accurately you think each describes your organization."
---    , createdBy = "Lance Hayden"
---    }
---scdsSurveyData : Survey
---scdsSurveyData =
---    createIpsativeSurvey 10 2 scdsMetaData scdsQuestions
---forceSurveyData : Survey
---forceSurveyData =
---    createLikertSurvey forceMetaData forceServerQuestions
-
-
-createIpsativeSurvey : Int -> Int -> IpsativeMetaData -> List IpsativeServerQuestion -> Survey
+createIpsativeSurvey : Int -> Int -> SurveyMetaData -> List IpsativeServerQuestion -> Survey
 createIpsativeSurvey pointsPerQuestion numGroups metaData questions =
     Ipsative
         { metaData = metaData
@@ -383,7 +419,7 @@ createIpsativeSurvey pointsPerQuestion numGroups metaData questions =
         }
 
 
-createLikertSurvey : LikertMetaData -> List LikertServerQuestion -> Survey
+createLikertSurvey : SurveyMetaData -> List LikertServerQuestion -> Survey
 createLikertSurvey metaData serverQuestions =
     Likert
         { metaData = metaData
@@ -391,14 +427,14 @@ createLikertSurvey metaData serverQuestions =
         }
 
 
-likertQuestionsMapped : List LikertServerQuestion -> LikertMetaData -> List LikertQuestion
+likertQuestionsMapped : List LikertServerQuestion -> SurveyMetaData -> List LikertQuestion
 likertQuestionsMapped serverQuestions metaData =
     List.map
         (\serverQuestion ->
             { id = serverQuestion.id
             , title = serverQuestion.title
             , answers = likertAnswersMapped serverQuestion.answers
-            , choices = metaData.choices
+            , choices = defaultChoices
             }
         )
         serverQuestions

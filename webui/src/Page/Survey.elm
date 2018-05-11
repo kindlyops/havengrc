@@ -11,7 +11,7 @@ import Data.Survey
         , PointsAssigned
         , IpsativeAnswer
         , LikertAnswer
-        , IpsativeMetaData
+        , SurveyMetaData
         , IpsativeServerData
         , IpsativeServerQuestion
         )
@@ -36,11 +36,11 @@ type SurveyPage
 
 type alias Model =
     { currentSurvey : Survey
-    , availableSurveys : List Survey
     , currentPage : SurveyPage
     , numberOfGroups : Int
-    , serverIpsativeSurveys : List IpsativeMetaData
-    , selectedSurveyMetaData : IpsativeMetaData
+    , availableIpsativeSurveys : List SurveyMetaData
+    , availableLikertSurveys : List SurveyMetaData
+    , selectedSurveyMetaData : SurveyMetaData
     }
 
 
@@ -51,10 +51,10 @@ type alias Model =
 init : Authentication.Model -> ( Model, Cmd Msg )
 init authModel =
     { currentSurvey = Ipsative Data.Survey.emptyIpsativeServerSurvey
-    , availableSurveys = []
     , currentPage = Home
     , numberOfGroups = 2
-    , serverIpsativeSurveys = []
+    , availableIpsativeSurveys = []
+    , availableLikertSurveys = []
     , selectedSurveyMetaData = Data.Survey.emptyIpsativeServerMetaData
     }
         ! initialCommands authModel
@@ -63,7 +63,9 @@ init authModel =
 initialCommands : Authentication.Model -> List (Cmd Msg)
 initialCommands authModel =
     if Authentication.isLoggedIn authModel then
-        [ Http.send GotServerIpsativeSurveys (Request.Survey.getIpsativeSurveys authModel) ]
+        [ Http.send GotServerIpsativeSurveys (Request.Survey.getIpsativeSurveys authModel)
+        , Http.send GotServerLikertSurveys (Request.Survey.getLikertSurveys authModel)
+        ]
     else
         []
 
@@ -72,21 +74,22 @@ type Msg
     = NoOp
     | StartLikertSurvey
     | StartIpsativeSurvey
-    | BeginLikertSurvey
-    | BeginIpsativeSurvey IpsativeMetaData
+    | BeginLikertSurvey SurveyMetaData
+    | BeginIpsativeSurvey SurveyMetaData
     | IncrementAnswer IpsativeAnswer Int
     | DecrementAnswer IpsativeAnswer Int
     | NextQuestion
     | PreviousQuestion
     | GoToHome
-      --| ChangeNumberOfGroups String
     | FinishSurvey
-      --| GenerateChart
     | SelectLikertAnswer Int String
     | GotoQuestion Survey Int
     | GetIpsativeSurveys
-    | GotServerIpsativeSurveys (Result Http.Error (List Data.Survey.IpsativeMetaData))
+    | GetLikertSurveys
+    | GotServerIpsativeSurveys (Result Http.Error (List Data.Survey.SurveyMetaData))
     | GotIpsativeServerData (Result Http.Error (List Data.Survey.IpsativeServerData))
+    | GotServerLikertSurveys (Result Http.Error (List Data.Survey.SurveyMetaData))
+    | GotLikertServerData (Result Http.Error (List Data.Survey.LikertServerData))
     | SaveIpsativeSurvey
     | IpsativeSurveySaved (Result Http.Error (List Data.Survey.IpsativeResponse))
 
@@ -139,11 +142,20 @@ update msg model authModel =
         GetIpsativeSurveys ->
             model ! [ Http.send GotServerIpsativeSurveys (Request.Survey.getIpsativeSurveys authModel) ]
 
+        GetLikertSurveys ->
+            model ! [ Http.send GotServerLikertSurveys (Request.Survey.getLikertSurveys authModel) ]
+
         GotServerIpsativeSurveys (Err error) ->
             model ! [ Ports.showError (getHTTPErrorMessage error) ]
 
         GotServerIpsativeSurveys (Ok surveys) ->
-            { model | serverIpsativeSurveys = surveys } ! []
+            { model | availableIpsativeSurveys = surveys } ! []
+
+        GotServerLikertSurveys (Err error) ->
+            model ! [ Ports.showError (getHTTPErrorMessage error) ]
+
+        GotServerLikertSurveys (Ok surveys) ->
+            { model | availableLikertSurveys = surveys } ! []
 
         GotIpsativeServerData (Err error) ->
             model ! [ Ports.showError (getHTTPErrorMessage error) ]
@@ -155,6 +167,19 @@ update msg model authModel =
 
                 survey =
                     Data.Survey.createIpsativeSurvey 10 2 model.selectedSurveyMetaData questions
+            in
+                { model | currentSurvey = survey } ! []
+
+        GotLikertServerData (Err error) ->
+            model ! [ Ports.showError (getHTTPErrorMessage error) ]
+
+        GotLikertServerData (Ok data) ->
+            let
+                questions =
+                    Data.Survey.groupLikertSurveyData data
+
+                survey =
+                    Data.Survey.createLikertSurvey model.selectedSurveyMetaData questions
             in
                 { model | currentSurvey = survey } ! []
 
@@ -197,15 +222,9 @@ update msg model authModel =
         StartIpsativeSurvey ->
             { model | currentPage = Survey } ! []
 
-        BeginLikertSurvey ->
-            --model ! []
-            model ! []
+        BeginLikertSurvey metaData ->
+            { model | currentPage = SurveyInstructions, selectedSurveyMetaData = metaData } ! [ Http.send GotLikertServerData (Request.Survey.getLikertSurvey authModel metaData.id) ]
 
-        --let
-        --    newModel =
-        --        { model | currentSurvey = forceSurveyData }
-        --in
-        --    { newModel | currentPage = SurveyInstructions }
         BeginIpsativeSurvey metaData ->
             { model | currentPage = SurveyInstructions, selectedSurveyMetaData = metaData } ! [ Http.send GotIpsativeServerData (Request.Survey.getIpsativeSurvey authModel metaData.id) ]
 
@@ -617,22 +636,44 @@ viewLikertSurveyInstructions survey =
         ]
 
 
+getTotalAvailableSurveys : Model -> Int
+getTotalAvailableSurveys model =
+    let
+        ipsativeLength =
+            List.length model.availableIpsativeSurveys
+
+        likertLength =
+            List.length model.availableLikertSurveys
+    in
+        ipsativeLength + likertLength
+
+
 viewHero : Model -> Html Msg
 viewHero model =
     div [ class "" ]
         [ h1 [ class "display-4" ] [ text "KindlyOps Haven Survey Prototype" ]
         , p [ class "lead" ] [ text "Welcome to the Elm Haven Survey Prototype. " ]
-        , button [ class "btn btn-primary", onClick GetIpsativeSurveys ] [ text "get surveys" ]
+        , button [ class "btn btn-primary", onClick GetIpsativeSurveys ] [ text "get ipsative surveys" ]
+        , button [ class "btn btn-primary", onClick GetLikertSurveys ] [ text "get likert surveys" ]
         , hr [ class "my-4" ] []
-        , p [ class "" ] [ text ("There are currently " ++ (toString (List.length model.availableSurveys)) ++ " surveys to choose from.") ]
+        , p [ class "" ] [ text ("There are currently " ++ (toString (getTotalAvailableSurveys model)) ++ " surveys to choose from.") ]
         , div [ class "row" ]
             (List.map
-                (\x ->
+                (\availableSurvey ->
                     div [ class "col-sm" ]
-                        [ (Views.SurveyCard.view x (BeginIpsativeSurvey x))
+                        [ (Views.SurveyCard.view availableSurvey "Ipsative" (BeginIpsativeSurvey availableSurvey))
                         ]
                 )
-                model.serverIpsativeSurveys
+                model.availableIpsativeSurveys
+            )
+        , div [ class "row" ]
+            (List.map
+                (\availableSurvey ->
+                    div [ class "col-sm" ]
+                        [ (Views.SurveyCard.view availableSurvey "Likert" (BeginLikertSurvey availableSurvey))
+                        ]
+                )
+                model.availableLikertSurveys
             )
         ]
 
