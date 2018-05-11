@@ -660,7 +660,7 @@ viewHero model =
         , div [ class "row" ]
             (List.map
                 (\availableSurvey ->
-                    div [ class "col-sm" ]
+                    div [ class "col-6 mb-4" ]
                         [ (Views.SurveyCard.view availableSurvey "Ipsative" (BeginIpsativeSurvey availableSurvey))
                         ]
                 )
@@ -669,7 +669,7 @@ viewHero model =
         , div [ class "row" ]
             (List.map
                 (\availableSurvey ->
-                    div [ class "col-sm" ]
+                    div [ class "col-6 mb-4" ]
                         [ (Views.SurveyCard.view availableSurvey "Likert" (BeginLikertSurvey availableSurvey))
                         ]
                 )
