@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "build": "node scripts/build.js",
+    "build_css": "node scripts/build_css.js",
     "start": "node scripts/start.js",
     "package": "elm-package",
     "make": "elm-make",
@@ -23,6 +24,7 @@
     "clean-webpack-plugin": "^0.1.16",
     "connect-history-api-fallback": "^1.3.0",
     "css-loader": "^0.28.5",
+    "daemonite-material": "^4.1.1",
     "dotenv": "^4.0.0",
     "elm": "^0.18.0",
     "elm-hot-loader": "0.5.4",

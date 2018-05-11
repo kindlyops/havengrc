@@ -1,4 +1,3 @@
-import './main2.scss'
 import { Main } from './Main.elm'
 
 if (process.env.NODE_ENV === 'development') {
