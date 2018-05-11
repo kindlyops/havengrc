@@ -4,7 +4,11 @@ $primary: (
   light: lighten(#5AB4AC, 10%)
 );
 
-
+$secondary: (
+  color: #E86953,
+  dark:  darken(#E86953, 10%),
+  light: lighten(#E86953, 10%)
+);
 $yiq-contrasted-threshold:  160;
 
 
@@ -44,4 +48,6 @@ $yiq-contrasted-threshold:  160;
   z-index: 1;
 }
 
-
+.underline {
+  text-decoration: underline;
+}
