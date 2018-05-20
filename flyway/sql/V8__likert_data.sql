@@ -8,11 +8,46 @@ INSERT INTO mappa.likert_surveys(name, description, instructions, author) VALUES
     'Lance Hayden'
     );
 
+-- Likert Choice Groups
+
+INSERT INTO mappa.likert_choice_groups(name) VALUES
+  ('Standard'),
+  ('Small');
+
+-- Example "Small" Choices
+
+INSERT INTO mappa.likert_choices(choice_group_id, order_number, choice)
+SELECT
+  (SELECT uuid from mappa.likert_choice_groups where name = 'Small'),
+  order_number,
+  choice
+FROM (VALUES 
+  (1, 'Disagree'),
+  (2, 'Neutral'),
+  (3, 'Agree')
+  ) likert_choices_data (order_number, choice);
+
+-- Likert Choices
+
+INSERT INTO mappa.likert_choices(choice_group_id, order_number, choice)
+SELECT
+  (SELECT uuid from mappa.likert_choice_groups where name = 'Standard'),
+  order_number,
+  choice
+FROM (VALUES 
+  (1, 'Strongly Disagree'),
+  (2, 'Disagree'),
+  (3, 'Neutral'),
+  (4, 'Agree'),
+  (5, 'Strongly Agree')
+  ) likert_choices_data (order_number, choice);
+
 -- FORCE Questions
 
-INSERT INTO mappa.likert_questions(survey_id, order_number, title)
+INSERT INTO mappa.likert_questions(survey_id, choice_group_id, order_number, title)
 SELECT 
   (SELECT uuid from mappa.likert_surveys where name = 'Security FORCE Survey'),
+  (SELECT uuid from mappa.likert_choice_groups where name = 'Standard'),
   order_number,
   title 
 FROM (values 
@@ -22,17 +57,6 @@ FROM (values
   (4,'Security Value of Complexity'),
   (5,'Security Value of Expertise')
 ) likert_questions_data (order_number,title);
-
-
--- Ipsative Categories
-
-INSERT INTO mappa.likert_choices(order_number, choice) VALUES 
-  (1, 'Strongly Disagree'),
-  (2, 'Disagree'),
-  (3, 'Neutral'),
-  (4, 'Agree'),
-  (5, 'Strongly Agree');
-
 
 -- Each answer for each question
 
