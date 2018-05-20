@@ -833,7 +833,7 @@ viewLikertSurveyTitle survey =
             Zipper.current survey.questions
 
         questionNumber =
-            currentQuestion.id
+            toString currentQuestion.orderNumber
 
         totalQuestions =
             List.length (Zipper.toList survey.questions)
@@ -843,7 +843,7 @@ viewLikertSurveyTitle survey =
     in
         div [ class "row" ]
             [ div [ class "col-lg ", style [ ( "text-align", "center" ) ] ]
-                [ h3 [ class "" ] [ text ("Question " ++ (toString questionNumber) ++ " of " ++ (toString totalQuestions)) ]
+                [ h3 [ class "" ] [ text ("Question " ++ questionNumber ++ " of " ++ (toString totalQuestions)) ]
                 , h4 [] [ text questionTitle ]
                 ]
             ]
