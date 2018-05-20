@@ -223,10 +223,10 @@ update msg model authModel =
             { model | currentPage = Survey } ! []
 
         BeginLikertSurvey metaData ->
-            { model | currentPage = SurveyInstructions, selectedSurveyMetaData = metaData } ! [ Http.send GotLikertServerData (Request.Survey.getLikertSurvey authModel metaData.id) ]
+            { model | currentPage = SurveyInstructions, selectedSurveyMetaData = metaData } ! [ Http.send GotLikertServerData (Request.Survey.getLikertSurvey authModel metaData.uuid) ]
 
         BeginIpsativeSurvey metaData ->
-            { model | currentPage = SurveyInstructions, selectedSurveyMetaData = metaData } ! [ Http.send GotIpsativeServerData (Request.Survey.getIpsativeSurvey authModel metaData.id) ]
+            { model | currentPage = SurveyInstructions, selectedSurveyMetaData = metaData } ! [ Http.send GotIpsativeServerData (Request.Survey.getIpsativeSurvey authModel metaData.uuid) ]
 
         NextQuestion ->
             case model.currentSurvey of
@@ -297,7 +297,7 @@ update msg model authModel =
         GotoQuestion survey questionNumber ->
             case model.currentSurvey of
                 Ipsative survey ->
-                    case Zipper.find (\x -> x.id == questionNumber) (Zipper.first survey.questions) of
+                    case Zipper.find (\x -> x.orderNumber == questionNumber) (Zipper.first survey.questions) of
                         Just x ->
                             { model | currentSurvey = Ipsative { survey | questions = x }, currentPage = Survey } ! []
 
@@ -305,7 +305,7 @@ update msg model authModel =
                             { model | currentSurvey = Ipsative survey } ! []
 
                 Likert survey ->
-                    case Zipper.find (\x -> x.id == questionNumber) (Zipper.first survey.questions) of
+                    case Zipper.find (\x -> x.orderNumber == questionNumber) (Zipper.first survey.questions) of
                         Just x ->
                             { model | currentSurvey = Likert { survey | questions = x }, currentPage = Survey } ! []
 
@@ -331,7 +331,7 @@ getIncompleteQuestions survey =
                     if validateIpsativeQuestion question then
                         incompleteQuestions
                     else
-                        question.id :: incompleteQuestions
+                        question.orderNumber :: incompleteQuestions
                 )
                 []
                 (Zipper.toList survey.questions)
@@ -343,7 +343,7 @@ getIncompleteQuestions survey =
                     if validateLikertQuestion question then
                         incompleteQuestions
                     else
-                        question.id :: incompleteQuestions
+                        question.orderNumber :: incompleteQuestions
                 )
                 []
                 (Zipper.toList survey.questions)
@@ -397,6 +397,7 @@ selectLikertAnswer survey answerNumber choice =
                 (\question ->
                     { id = question.id
                     , title = question.title
+                    , orderNumber = question.orderNumber
                     , choices = question.choices
                     , answers =
                         List.map
@@ -424,6 +425,7 @@ incrementAnswer survey answer groupNumber =
                 (\question ->
                     { id = question.id
                     , title = question.title
+                    , orderNumber = question.orderNumber
                     , pointsLeft =
                         List.map
                             (\pointsLeftInGroup ->
@@ -473,6 +475,7 @@ decrementAnswer survey answer groupNumber =
                 (\question ->
                     { id = question.id
                     , title = question.title
+                    , orderNumber = question.orderNumber
                     , pointsLeft =
                         List.map
                             (\pointsLeftInGroup ->
@@ -653,8 +656,8 @@ viewHero model =
     div [ class "" ]
         [ h1 [ class "display-4" ] [ text "KindlyOps Haven Survey Prototype" ]
         , p [ class "lead" ] [ text "Welcome to the Elm Haven Survey Prototype. " ]
-        , button [ class "btn btn-primary", onClick GetIpsativeSurveys ] [ text "get ipsative surveys" ]
-        , button [ class "btn btn-primary", onClick GetLikertSurveys ] [ text "get likert surveys" ]
+        , button [ class "btn btn-primary", onClick GetIpsativeSurveys ] [ text "get ipsative surveys (debug)" ]
+        , button [ class "btn btn-primary", onClick GetLikertSurveys ] [ text "get likert surveys (debug)" ]
         , hr [ class "my-4" ] []
         , p [ class "" ] [ text ("There are currently " ++ (toString (getTotalAvailableSurveys model)) ++ " surveys to choose from.") ]
         , div [ class "row" ]

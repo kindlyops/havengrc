@@ -20,33 +20,15 @@ type alias IpsativeSurvey =
     }
 
 
-type alias IpsativeServerSurvey =
-    { metaData : SurveyMetaData
-    , questions : List IpsativeServerQuestion
-    }
-
-
 type alias IpsativeResponse =
     { uuid : String
     , created_at : String
     , user_email : String
     , user_id : String
-    , survey_id : Int
-    , response : IpsativeInnerResponse
-
-    --, org : String
+    , answer_id : String
+    , group_number : Int
+    , points_assigned : Int
     }
-
-
-type alias IpsativeInnerResponse =
-    { category_one : Int
-    }
-
-
-ipsativeInnerResponseDecoder : Decoder IpsativeInnerResponse
-ipsativeInnerResponseDecoder =
-    decode IpsativeInnerResponse
-        |> required "category_one" Decode.int
 
 
 ipsativeResponseDecoder : Decoder IpsativeResponse
@@ -56,37 +38,62 @@ ipsativeResponseDecoder =
         |> required "created_at" Decode.string
         |> required "user_email" Decode.string
         |> required "user_id" Decode.string
-        |> required "survey_id" Decode.int
-        |> required "response" ipsativeInnerResponseDecoder
-
-
-
---|> required "org" Decode.string
+        |> required "answer_id" Decode.string
+        |> required "group_number" Decode.int
+        |> required "points_assigned" Decode.int
 
 
 ipsativeResponseEncoder : IpsativeSurvey -> Encode.Value
 ipsativeResponseEncoder survey =
+    let
+        allResponses =
+            getAllResponsesFromIpsativeSurvey survey
+    in
+        Encode.list
+            (List.map
+                (\x ->
+                    ipsativeSingleResponseEncoder x
+                )
+                allResponses
+            )
+
+
+getAllResponsesFromIpsativeSurvey : IpsativeSurvey -> List IpsativeSingleResponse
+getAllResponsesFromIpsativeSurvey survey =
+    []
+
+
+type alias IpsativeSingleResponse =
+    { answer_id : String
+    , group_number : Int
+    , points_assigned : Int
+    }
+
+
+ipsativeSingleResponseEncoder : IpsativeSingleResponse -> Encode.Value
+ipsativeSingleResponseEncoder singleResponse =
     Encode.object
-        [ ( "survey_id", Encode.int <| survey.metaData.id )
-        , ( "response", Encode.object [ ( "category_one", Encode.int <| 3 ) ] )
+        [ ( "answer_id", Encode.string <| singleResponse.answer_id )
+        , ( "group_number", Encode.int <| singleResponse.group_number )
+        , ( "points_assigned", Encode.int <| singleResponse.points_assigned )
         ]
 
 
 ipsativeMetaDataDecoder : Decoder SurveyMetaData
 ipsativeMetaDataDecoder =
     decode SurveyMetaData
-        |> required "id" Decode.int
+        |> required "uuid" Decode.string
+        |> required "created_at" Decode.string
         |> required "name" Decode.string
-        |> required "updated_at" Decode.string
         |> required "description" Decode.string
         |> required "instructions" Decode.string
         |> required "author" Decode.string
 
 
 type alias SurveyMetaData =
-    { id : Int
+    { uuid : String
+    , created_at : String
     , name : String
-    , updated_at : String
     , description : String
     , instructions : String
     , author : String
@@ -94,30 +101,31 @@ type alias SurveyMetaData =
 
 
 type alias IpsativeServerData =
-    { survey_id : Int
-    , question_id : Int
+    { question_id : String
     , question_title : String
-    , answer_id : Int
-    , answer_category : String
-    , answer_answer : String
+    , question_order_number : Int
+    , answer_id : String
+    , answer : String
+    , answer_order_number : Int
     }
 
 
 ipsativeSurveyDataDecoder : Decoder IpsativeServerData
 ipsativeSurveyDataDecoder =
     decode IpsativeServerData
-        |> required "survey_id" Decode.int
-        |> required "question_id" Decode.int
+        |> required "question_id" Decode.string
         |> required "question_title" Decode.string
-        |> required "answer_id" Decode.int
-        |> required "answer_category" Decode.string
-        |> required "answer_answer" Decode.string
+        |> required "question_order_number" Decode.int
+        |> required "answer_id" Decode.string
+        |> required "answer" Decode.string
+        |> required "answer_order_number" Decode.int
 
 
 type alias LikertServerData =
     { survey_id : Int
-    , question_id : Int
+    , question_id : String
     , question_title : String
+    , question_order_number : Int
     , answer_id : Int
     , answer_answer : String
     }
@@ -127,8 +135,9 @@ likertSurveyDataDecoder : Decoder LikertServerData
 likertSurveyDataDecoder =
     decode LikertServerData
         |> required "survey_id" Decode.int
-        |> required "question_id" Decode.int
+        |> required "question_id" Decode.string
         |> required "question_title" Decode.string
+        |> required "question_order_number" Decode.int
         |> required "answer_id" Decode.int
         |> required "answer_answer" Decode.string
 
@@ -153,22 +162,23 @@ groupIpsativeSurveyData data =
                                     x
 
                                 _ ->
-                                    { survey_id = 0
-                                    , question_id = 0
+                                    { question_order_number = 0
+                                    , question_id = "Error Question UUID"
                                     , question_title = "Error Question"
-                                    , answer_id = 0
-                                    , answer_category = "Error Category"
-                                    , answer_answer = "Error Answer"
+                                    , answer_id = "Error Answer UUID"
+                                    , answer_order_number = 0
+                                    , answer = "Error Answer"
                                     }
                     in
-                        { id = firstAnswer.question_id
+                        { uuid = firstAnswer.question_id
                         , title = firstAnswer.question_title
+                        , orderNumber = firstAnswer.question_order_number
                         , answers =
                             List.map
                                 (\answer ->
-                                    { id = answer.answer_id
-                                    , category = answer.answer_category
-                                    , answer = answer.answer_answer
+                                    { uuid = answer.answer_id
+                                    , answer = answer.answer
+                                    , orderNumber = answer.answer_order_number
                                     }
                                 )
                                 group
@@ -200,14 +210,16 @@ groupLikertSurveyData data =
 
                                 _ ->
                                     { survey_id = 0
-                                    , question_id = 0
+                                    , question_id = "UNKNOWN"
                                     , question_title = "Error Question"
+                                    , question_order_number = 0
                                     , answer_id = 0
                                     , answer_answer = "Error Answer"
                                     }
                     in
                         { id = firstAnswer.question_id
                         , title = firstAnswer.question_title
+                        , orderNumber = firstAnswer.question_order_number
                         , answers =
                             List.map
                                 (\answer ->
@@ -224,32 +236,34 @@ groupLikertSurveyData data =
 
 
 type alias IpsativeQuestion =
-    { id : Int
+    { id : String
     , title : String
+    , orderNumber : Int
     , pointsLeft : List PointsLeft
     , answers : List IpsativeAnswer
     }
 
 
 type alias IpsativeAnswer =
-    { id : Int
+    { id : String
     , answer : String
-    , category : String
+    , orderNumber : Int
     , pointsAssigned : List PointsAssigned
     }
 
 
 type alias IpsativeServerQuestion =
-    { id : Int
+    { uuid : String
     , title : String
+    , orderNumber : Int
     , answers : List IpsativeServerAnswer
     }
 
 
 type alias IpsativeServerAnswer =
-    { id : Int
-    , category : String
+    { uuid : String
     , answer : String
+    , orderNumber : Int
     }
 
 
@@ -267,9 +281,9 @@ type alias PointsAssigned =
 
 emptyIpsativeServerMetaData : SurveyMetaData
 emptyIpsativeServerMetaData =
-    { id = 0
+    { uuid = "test"
+    , created_at = "test"
     , name = "test"
-    , updated_at = "test"
     , description = "test"
     , instructions = "test"
     , author = "test"
@@ -294,17 +308,18 @@ type alias LikertSurvey =
 likertMetaDataDecoder : Decoder SurveyMetaData
 likertMetaDataDecoder =
     decode SurveyMetaData
-        |> required "id" Decode.int
+        |> required "uuid" Decode.string
+        |> required "created_at" Decode.string
         |> required "name" Decode.string
-        |> required "updated_at" Decode.string
         |> required "description" Decode.string
         |> required "instructions" Decode.string
         |> required "author" Decode.string
 
 
 type alias LikertQuestion =
-    { id : Int
+    { id : String
     , title : String
+    , orderNumber : Int
     , choices : List String
     , answers : List LikertAnswer
     }
@@ -312,7 +327,8 @@ type alias LikertQuestion =
 
 type alias LikertServerQuestion =
     { title : String
-    , id : Int
+    , id : String
+    , orderNumber : Int
     , answers : List LikertServerAnswer
     }
 
@@ -342,8 +358,9 @@ defaultChoices =
 
 emptyLikertQuestion : LikertQuestion
 emptyLikertQuestion =
-    { id = 0
+    { id = "UNKNOWN"
     , title = "UNKNOWN"
+    , orderNumber = 0
     , choices = defaultChoices
     , answers = [ emptyLikertAnswer ]
     }
@@ -359,8 +376,9 @@ emptyLikertAnswer =
 
 emptyIpsativeQuestion : IpsativeQuestion
 emptyIpsativeQuestion =
-    { id = 0
+    { id = "UNKNOWN"
     , title = "UNKNOWN"
+    , orderNumber = 0
     , pointsLeft = [ emptyPointsLeft ]
     , answers =
         [ emptyAnswer
@@ -370,9 +388,9 @@ emptyIpsativeQuestion =
 
 emptyAnswer : IpsativeAnswer
 emptyAnswer =
-    { id = 0
+    { id = "UNKNOWN"
     , answer = "EMPTY QUESTION"
-    , category = "EMPTY CATEGORY"
+    , orderNumber = 0
     , pointsAssigned = [ emptyPointsAssigned ]
     }
 
@@ -389,22 +407,6 @@ emptyPointsAssigned =
     { group = 1
     , points = 1
     }
-
-
-ipsativeQuestionDecoder : Decoder IpsativeServerQuestion
-ipsativeQuestionDecoder =
-    decode IpsativeServerQuestion
-        |> required "id" Decode.int
-        |> required "title" Decode.string
-        |> required "answers" (Decode.list ipsativeAnswerDecoder)
-
-
-ipsativeAnswerDecoder : Decoder IpsativeServerAnswer
-ipsativeAnswerDecoder =
-    decode IpsativeServerAnswer
-        |> required "id" Decode.int
-        |> required "category" Decode.string
-        |> required "answer" Decode.string
 
 
 createIpsativeSurvey : Int -> Int -> SurveyMetaData -> List IpsativeServerQuestion -> Survey
@@ -433,6 +435,7 @@ likertQuestionsMapped serverQuestions metaData =
         (\serverQuestion ->
             { id = serverQuestion.id
             , title = serverQuestion.title
+            , orderNumber = serverQuestion.orderNumber
             , answers = likertAnswersMapped serverQuestion.answers
             , choices = defaultChoices
             }
@@ -456,8 +459,9 @@ ipsativeQuestionsMapped : List IpsativeServerQuestion -> Int -> Int -> List Ipsa
 ipsativeQuestionsMapped serverQuestions numGroups numPointsPerQuestion =
     List.map
         (\x ->
-            { id = x.id
+            { id = x.uuid
             , title = x.title
+            , orderNumber = x.orderNumber
             , pointsLeft = createPointsLeft numGroups numPointsPerQuestion
             , answers = createAnswers x.answers numGroups
             }
@@ -480,9 +484,9 @@ createAnswers : List IpsativeServerAnswer -> Int -> List IpsativeAnswer
 createAnswers serverAnswers numGroups =
     List.map
         (\x ->
-            { id = x.id
+            { id = x.uuid
             , answer = x.answer
-            , category = x.category
+            , orderNumber = x.orderNumber
             , pointsAssigned = createPointsAssigned numGroups
             }
         )

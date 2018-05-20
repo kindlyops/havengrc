@@ -28,14 +28,14 @@ getIpsativeSurveys authModel =
         request
 
 
-getIpsativeSurvey : Authentication.Model -> Int -> Http.Request (List Data.Survey.IpsativeServerData)
+getIpsativeSurvey : Authentication.Model -> String -> Http.Request (List Data.Survey.IpsativeServerData)
 getIpsativeSurvey authModel id =
     let
         request =
             Http.request
                 { method = "GET"
                 , headers = Authentication.tryGetAuthHeader authModel
-                , url = "/api/ipsative_data?survey_id=eq." ++ (toString id)
+                , url = "/api/ipsative_data?survey_id=eq." ++ id
                 , body = Http.emptyBody
                 , expect = Http.expectJson (Decode.list Data.Survey.ipsativeSurveyDataDecoder)
                 , timeout = Nothing

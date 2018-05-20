@@ -17,7 +17,7 @@ view metaData title msg =
             , p [ class "card-text" ] [ text metaData.description ]
             ]
         , ul [ class "list-group list-group-flush" ]
-            [ li [ class "list-group-item" ] [ text ("Last Updated: " ++ metaData.updated_at) ]
+            [ li [ class "list-group-item" ] [ text ("Created: " ++ metaData.created_at) ]
             , li [ class "list-group-item" ] [ text ("Created By: " ++ metaData.author) ]
             , li [ class "list-group-item" ] [ button [ class "btn btn-primary", onClick msg ] [ text "Click to start survey" ] ]
             ]
