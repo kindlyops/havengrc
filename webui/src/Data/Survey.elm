@@ -122,24 +122,28 @@ ipsativeSurveyDataDecoder =
 
 
 type alias LikertServerData =
-    { survey_id : Int
+    { survey_id : String
     , question_id : String
-    , question_title : String
     , question_order_number : Int
-    , answer_id : Int
-    , answer_answer : String
+    , question_title : String
+    , question_choice_group : String
+    , answer_id : String
+    , answer_order_number : Int
+    , answer : String
     }
 
 
 likertSurveyDataDecoder : Decoder LikertServerData
 likertSurveyDataDecoder =
     decode LikertServerData
-        |> required "survey_id" Decode.int
+        |> required "survey_id" Decode.string
         |> required "question_id" Decode.string
-        |> required "question_title" Decode.string
         |> required "question_order_number" Decode.int
-        |> required "answer_id" Decode.int
-        |> required "answer_answer" Decode.string
+        |> required "question_title" Decode.string
+        |> required "question_choice_group" Decode.string
+        |> required "answer_id" Decode.string
+        |> required "answer_order_number" Decode.int
+        |> required "answer" Decode.string
 
 
 groupIpsativeSurveyData : List IpsativeServerData -> List IpsativeServerQuestion
@@ -209,22 +213,24 @@ groupLikertSurveyData data =
                                     x
 
                                 _ ->
-                                    { survey_id = 0
+                                    { survey_id = "UNKNOWN"
                                     , question_id = "UNKNOWN"
                                     , question_title = "Error Question"
                                     , question_order_number = 0
-                                    , answer_id = 0
-                                    , answer_answer = "Error Answer"
+                                    , question_choice_group = "UNKNOWN"
+                                    , answer_id = "UNKNOWN"
+                                    , answer_order_number = 0
+                                    , answer = "Error Answer"
                                     }
                     in
-                        { id = firstAnswer.question_id
+                        { uuid = firstAnswer.question_id
                         , title = firstAnswer.question_title
                         , orderNumber = firstAnswer.question_order_number
                         , answers =
                             List.map
                                 (\answer ->
-                                    { id = answer.answer_id
-                                    , answer = answer.answer_answer
+                                    { uuid = answer.answer_id
+                                    , answer = answer.answer
                                     }
                                 )
                                 group
@@ -327,21 +333,21 @@ type alias LikertQuestion =
 
 type alias LikertServerQuestion =
     { title : String
-    , id : String
+    , uuid : String
     , orderNumber : Int
     , answers : List LikertServerAnswer
     }
 
 
 type alias LikertAnswer =
-    { id : Int
+    { id : String
     , answer : String
     , selectedChoice : Maybe String
     }
 
 
 type alias LikertServerAnswer =
-    { id : Int
+    { uuid : String
     , answer : String
     }
 
@@ -368,7 +374,7 @@ emptyLikertQuestion =
 
 emptyLikertAnswer : LikertAnswer
 emptyLikertAnswer =
-    { id = 0
+    { id = ""
     , answer = ""
     , selectedChoice = Nothing
     }
@@ -433,7 +439,7 @@ likertQuestionsMapped : List LikertServerQuestion -> SurveyMetaData -> List Like
 likertQuestionsMapped serverQuestions metaData =
     List.map
         (\serverQuestion ->
-            { id = serverQuestion.id
+            { id = serverQuestion.uuid
             , title = serverQuestion.title
             , orderNumber = serverQuestion.orderNumber
             , answers = likertAnswersMapped serverQuestion.answers
@@ -447,7 +453,7 @@ likertAnswersMapped : List LikertServerAnswer -> List LikertAnswer
 likertAnswersMapped answers =
     List.map
         (\answer ->
-            { id = answer.id
+            { id = answer.uuid
             , answer = answer.answer
             , selectedChoice = Nothing
             }

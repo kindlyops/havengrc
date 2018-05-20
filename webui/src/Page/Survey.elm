@@ -82,7 +82,7 @@ type Msg
     | PreviousQuestion
     | GoToHome
     | FinishSurvey
-    | SelectLikertAnswer Int String
+    | SelectLikertAnswer String String
     | GotoQuestion Survey Int
     | GetIpsativeSurveys
     | GetLikertSurveys
@@ -389,7 +389,7 @@ validatePointsLeft pointsLeft =
         Just False
 
 
-selectLikertAnswer : LikertSurvey -> Int -> String -> LikertSurvey
+selectLikertAnswer : LikertSurvey -> String -> String -> LikertSurvey
 selectLikertAnswer survey answerNumber choice =
     let
         newQuestions =

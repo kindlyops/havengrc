@@ -88,14 +88,14 @@ getLikertSurveys authModel =
         request
 
 
-getLikertSurvey : Authentication.Model -> Int -> Http.Request (List Data.Survey.LikertServerData)
+getLikertSurvey : Authentication.Model -> String -> Http.Request (List Data.Survey.LikertServerData)
 getLikertSurvey authModel id =
     let
         request =
             Http.request
                 { method = "GET"
                 , headers = Authentication.tryGetAuthHeader authModel
-                , url = "/api/likert_data?survey_id=eq." ++ (toString id)
+                , url = "/api/likert_data?survey_id=eq." ++ id
                 , body = Http.emptyBody
                 , expect = Http.expectJson (Decode.list Data.Survey.likertSurveyDataDecoder)
                 , timeout = Nothing
