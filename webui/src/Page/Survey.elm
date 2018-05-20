@@ -72,10 +72,10 @@ initialCommands authModel =
 
 type Msg
     = NoOp
-    | StartLikertSurvey
-    | StartIpsativeSurvey
-    | BeginLikertSurvey SurveyMetaData
-    | BeginIpsativeSurvey SurveyMetaData
+    | BeginLikertSurvey
+    | BeginIpsativeSurvey
+    | StartLikertSurvey SurveyMetaData
+    | StartIpsativeSurvey SurveyMetaData
     | IncrementAnswer IpsativeAnswer Int
     | DecrementAnswer IpsativeAnswer Int
     | NextQuestion
@@ -216,16 +216,16 @@ update msg model authModel =
             else
                 { model | currentPage = IncompleteSurvey } ! []
 
-        StartLikertSurvey ->
+        BeginLikertSurvey ->
             { model | currentPage = Survey } ! []
 
-        StartIpsativeSurvey ->
+        BeginIpsativeSurvey ->
             { model | currentPage = Survey } ! []
 
-        BeginLikertSurvey metaData ->
+        StartLikertSurvey metaData ->
             { model | currentPage = SurveyInstructions, selectedSurveyMetaData = metaData } ! [ Http.send GotLikertServerData (Request.Survey.getLikertSurvey authModel metaData.uuid) ]
 
-        BeginIpsativeSurvey metaData ->
+        StartIpsativeSurvey metaData ->
             { model | currentPage = SurveyInstructions, selectedSurveyMetaData = metaData } ! [ Http.send GotIpsativeServerData (Request.Survey.getIpsativeSurvey authModel metaData.uuid) ]
 
         NextQuestion ->
@@ -618,7 +618,7 @@ viewIpsativeSurveyInstructions survey =
                 [ h1 [ class "display-4" ] [ text survey.metaData.name ]
                 , p [ class "lead" ] [ text survey.metaData.instructions ]
                 , hr [ class "my-4" ] []
-                , button [ class "btn btn-primary", onClick StartIpsativeSurvey ] [ text "Begin" ]
+                , button [ class "btn btn-primary", onClick BeginIpsativeSurvey ] [ text "Begin" ]
                 ]
             ]
         ]
@@ -633,7 +633,7 @@ viewLikertSurveyInstructions survey =
                 [ h1 [ class "display-4" ] [ text survey.metaData.name ]
                 , p [ class "lead" ] [ text survey.metaData.instructions ]
                 , hr [ class "my-4" ] []
-                , button [ class "btn btn-primary", onClick StartLikertSurvey ] [ text "Begin" ]
+                , button [ class "btn btn-primary", onClick BeginLikertSurvey ] [ text "Begin" ]
                 ]
             ]
         ]
@@ -664,7 +664,7 @@ viewHero model =
             (List.map
                 (\availableSurvey ->
                     div [ class "col-6 mb-4" ]
-                        [ (Views.SurveyCard.view availableSurvey "Ipsative" (BeginIpsativeSurvey availableSurvey))
+                        [ (Views.SurveyCard.view availableSurvey "Ipsative" (StartIpsativeSurvey availableSurvey))
                         ]
                 )
                 model.availableIpsativeSurveys
@@ -673,7 +673,7 @@ viewHero model =
             (List.map
                 (\availableSurvey ->
                     div [ class "col-6 mb-4" ]
-                        [ (Views.SurveyCard.view availableSurvey "Likert" (BeginLikertSurvey availableSurvey))
+                        [ (Views.SurveyCard.view availableSurvey "Likert" (StartLikertSurvey availableSurvey))
                         ]
                 )
                 model.availableLikertSurveys
