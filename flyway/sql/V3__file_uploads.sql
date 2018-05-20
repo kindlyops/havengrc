@@ -48,4 +48,3 @@ CREATE OR REPLACE VIEW "1".files as
 
 GRANT SELECT, INSERT ON mappa.files to member;
 GRANT all ON "1".files to member;
-
