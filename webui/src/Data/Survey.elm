@@ -63,11 +63,11 @@ getAllResponsesFromIpsativeSurvey survey =
     survey.questions
         |> Zipper.toList
         |> List.concatMap .answers
-        |> List.concatMap answerToResponse
+        |> List.concatMap ipsativeAnswerToResponse
 
 
-answerToResponse : IpsativeAnswer -> List IpsativeSingleResponse
-answerToResponse answer =
+ipsativeAnswerToResponse : IpsativeAnswer -> List IpsativeSingleResponse
+ipsativeAnswerToResponse answer =
     List.map
         (\group ->
             { answer_id = answer.id
@@ -91,6 +91,77 @@ ipsativeSingleResponseEncoder singleResponse =
         [ ( "answer_id", Encode.string <| singleResponse.answer_id )
         , ( "group_number", Encode.int <| singleResponse.group_number )
         , ( "points_assigned", Encode.int <| singleResponse.points_assigned )
+        ]
+
+
+type alias LikertResponse =
+    { uuid : String
+    , created_at : String
+    , user_email : String
+    , user_id : String
+    , answer_id : String
+    , choice : String
+    }
+
+
+likertResponseDecoder : Decoder LikertResponse
+likertResponseDecoder =
+    decode LikertResponse
+        |> required "uuid" Decode.string
+        |> required "created_at" Decode.string
+        |> required "user_email" Decode.string
+        |> required "user_id" Decode.string
+        |> required "answer_id" Decode.string
+        |> required "choice" Decode.string
+
+
+likertResponseEncoder : LikertSurvey -> Encode.Value
+likertResponseEncoder survey =
+    let
+        allResponses =
+            getAllResponsesFromLikertSurvey survey
+    in
+        Encode.list
+            (List.map
+                (\x ->
+                    likertSingleResponseEncoder x
+                )
+                allResponses
+            )
+
+
+getAllResponsesFromLikertSurvey : LikertSurvey -> List LikertSingleResponse
+getAllResponsesFromLikertSurvey survey =
+    survey.questions
+        |> Zipper.toList
+        |> List.concatMap .answers
+        |> List.map likertAnswerToResponse
+
+
+likertAnswerToResponse : LikertAnswer -> LikertSingleResponse
+likertAnswerToResponse answer =
+    { answer_id = answer.id
+    , choice =
+        case answer.selectedChoice of
+            Nothing ->
+                ""
+
+            Just x ->
+                x
+    }
+
+
+type alias LikertSingleResponse =
+    { answer_id : String
+    , choice : String
+    }
+
+
+likertSingleResponseEncoder : LikertSingleResponse -> Encode.Value
+likertSingleResponseEncoder singleResponse =
+    Encode.object
+        [ ( "answer_id", Encode.string <| singleResponse.answer_id )
+        , ( "choice", Encode.string <| singleResponse.choice )
         ]
 
 

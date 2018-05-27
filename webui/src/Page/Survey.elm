@@ -102,6 +102,7 @@ type Msg
     | GotLikertChoices (Result Http.Error (List Data.Survey.LikertServerChoice))
     | SaveCurrentSurvey
     | IpsativeSurveySaved (Result Http.Error (List Data.Survey.IpsativeResponse))
+    | LikertSurveySaved (Result Http.Error (List Data.Survey.LikertResponse))
 
 
 
@@ -136,12 +137,22 @@ update msg model authModel =
                     model ! [ Http.send IpsativeSurveySaved (Request.Survey.postIpsativeResponse authModel survey) ]
 
                 Likert survey ->
-                    model ! []
+                    model ! [ Http.send LikertSurveySaved (Request.Survey.postLikertResponses authModel survey) ]
 
         IpsativeSurveySaved (Err error) ->
             model ! [ Ports.showError (getHTTPErrorMessage error) ]
 
         IpsativeSurveySaved (Ok responses) ->
+            let
+                _ =
+                    Debug.log "saved response" responses
+            in
+                initialModel ! []
+
+        LikertSurveySaved (Err error) ->
+            model ! [ Ports.showError (getHTTPErrorMessage error) ]
+
+        LikertSurveySaved (Ok responses) ->
             let
                 _ =
                     Debug.log "saved response" responses

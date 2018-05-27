@@ -122,26 +122,25 @@ getLikertChoices authModel id =
         request
 
 
+postLikertResponses : Authentication.Model -> Data.Survey.LikertSurvey -> Http.Request (List Data.Survey.LikertResponse)
+postLikertResponses authModel likertSurvey =
+    let
+        body =
+            Data.Survey.likertResponseEncoder likertSurvey
+                |> Http.jsonBody
 
---postLikertResponse : Authentication.Model -> Data.Survey.LikertSurvey -> Http.Request (List Data.Survey.LikertResponse)
---postLikertResponse authModel likertSurvey =
---    let
---        body =
---            Data.Survey.likertResponseEncoder likertSurvey
---                |> Http.jsonBody
---        headers =
---            (Authentication.tryGetAuthHeader authModel) ++ Authentication.getReturnHeaders
---        --_ =
---        --Debug.log "Likert Response: " newComment.message
---        request =
---            Http.request
---                { method = "POST"
---                , headers = headers
---                , url = "api/likert_responses"
---                , body = body
---                , expect = Http.expectJson (Decode.list Data.Survey.likertResponseDecoder)
---                , timeout = Nothing
---                , withCredentials = True
---                }
---    in
---        request
+        headers =
+            (Authentication.tryGetAuthHeader authModel) ++ Authentication.getReturnHeaders
+
+        request =
+            Http.request
+                { method = "POST"
+                , headers = headers
+                , url = "api/likert_responses"
+                , body = body
+                , expect = Http.expectJson (Decode.list Data.Survey.likertResponseDecoder)
+                , timeout = Nothing
+                , withCredentials = True
+                }
+    in
+        request
