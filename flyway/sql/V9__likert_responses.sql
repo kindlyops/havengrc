@@ -1,3 +1,4 @@
+-- TODO: Consider if it is better for choice to be the actual choice or a pointer to the choices table
 
 CREATE TABLE mappa.likert_responses (
   uuid        UUID        UNIQUE,
@@ -6,7 +7,7 @@ CREATE TABLE mappa.likert_responses (
   user_id     UUID,
   org         JSONB,
   answer_id     UUID,
-  choice_id UUID
+  choice TEXT
 );
 
 CREATE TRIGGER override_likert_response_cols
@@ -15,7 +16,7 @@ FOR EACH ROW
 EXECUTE PROCEDURE mappa.override_server_columns();
 
 CREATE OR REPLACE VIEW "1".likert_responses as
-  SELECT uuid, created_at, user_email, user_id, org, answer_id, choice_id from mappa.likert_responses;
+  SELECT uuid, created_at, user_email, user_id, org, answer_id, choice from mappa.likert_responses;
 
 GRANT SELECT, INSERT ON mappa.likert_responses to member;
 GRANT all ON "1".likert_responses to member;
