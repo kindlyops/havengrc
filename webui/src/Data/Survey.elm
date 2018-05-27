@@ -60,7 +60,22 @@ ipsativeResponseEncoder survey =
 
 getAllResponsesFromIpsativeSurvey : IpsativeSurvey -> List IpsativeSingleResponse
 getAllResponsesFromIpsativeSurvey survey =
-    []
+    survey.questions
+        |> Zipper.toList
+        |> List.concatMap .answers
+        |> List.concatMap answerToResponse
+
+
+answerToResponse : IpsativeAnswer -> List IpsativeSingleResponse
+answerToResponse answer =
+    List.map
+        (\group ->
+            { answer_id = answer.id
+            , group_number = group.group
+            , points_assigned = group.points
+            }
+        )
+        answer.pointsAssigned
 
 
 type alias IpsativeSingleResponse =
