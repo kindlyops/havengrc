@@ -30,12 +30,15 @@ GRANT all ON "1".likert_data to member;
 
 CREATE OR REPLACE VIEW mappa.likert_distinct_choice_groups AS
 
-SELECT DISTINCT 
+SELECT DISTINCT
 S.uuid as survey_id,
-CG.uuid as choice_group_id
+CG.uuid as choice_group_id,
+C.choice as choice,
+C.order_number as order_number
 FROM mappa.likert_surveys S
 JOIN mappa.likert_questions Q  on S.uuid = Q.survey_id
-JOIN mappa.likert_choice_groups CG on CG.uuid = Q.choice_group_id;
+JOIN mappa.likert_choice_groups CG on CG.uuid = Q.choice_group_id
+JOIN mappa.likert_choices C on C.choice_group_id = CG.uuid;
 
 
 
