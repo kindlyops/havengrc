@@ -183,10 +183,6 @@ update msg model authModel =
 
         GotLikertServerData (Ok data) ->
             let
-                --questions =
-                --    Data.Survey.groupLikertSurveyData data
-                --survey =
-                --Data.Survey.createLikertSurvey model.selectedSurveyMetaData questions
                 --TODO: REMOVE THIS let in
                 isSurveyReady =
                     True
@@ -198,18 +194,18 @@ update msg model authModel =
         GotLikertChoices (Err error) ->
             model ! [ Ports.showError (getHTTPErrorMessage error) ]
 
-        GotLikertChoices (Ok data) ->
+        GotLikertChoices (Ok serverChoices) ->
             let
                 questions =
                     case model.inBoundLikertData of
                         Just x ->
-                            Data.Survey.groupLikertSurveyData x data
+                            Data.Survey.groupLikertSurveyData x
 
                         Nothing ->
                             []
 
                 survey =
-                    Data.Survey.createLikertSurvey model.selectedSurveyMetaData questions
+                    Data.Survey.createLikertSurvey model.selectedSurveyMetaData questions serverChoices
 
                 isSurveyReady =
                     True

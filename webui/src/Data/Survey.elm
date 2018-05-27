@@ -242,6 +242,7 @@ groupLikertSurveyData data =
                     in
                         { uuid = firstAnswer.question_id
                         , title = firstAnswer.question_title
+                        , choiceGroupId = firstAnswer.question_choice_group
                         , orderNumber = firstAnswer.question_order_number
                         , answers =
                             List.map
@@ -351,6 +352,7 @@ type alias LikertQuestion =
 type alias LikertServerQuestion =
     { title : String
     , uuid : String
+    , choiceGroupId : String
     , orderNumber : Int
     , answers : List LikertServerAnswer
     }
@@ -369,22 +371,18 @@ type alias LikertServerAnswer =
     }
 
 
-defaultChoices : List String
-defaultChoices =
-    [ "Strongly Disagree"
-    , "Disagree"
-    , "Neutral"
-    , "Agree"
-    , "Strongly Agree"
-    ]
-
-
 emptyLikertQuestion : LikertQuestion
 emptyLikertQuestion =
     { id = "UNKNOWN"
     , title = "UNKNOWN"
     , orderNumber = 0
-    , choices = defaultChoices
+    , choices =
+        [ "Strongly Disagree"
+        , "Disagree"
+        , "Neutral"
+        , "Agree"
+        , "Strongly Agree"
+        ]
     , answers = [ emptyLikertAnswer ]
     }
 
@@ -444,26 +442,43 @@ createIpsativeSurvey pointsPerQuestion numGroups metaData questions =
         }
 
 
-createLikertSurvey : SurveyMetaData -> List LikertServerQuestion -> Survey
-createLikertSurvey metaData serverQuestions =
+createLikertSurvey : SurveyMetaData -> List LikertServerQuestion -> List LikertServerChoice -> Survey
+createLikertSurvey metaData serverQuestions choices =
     Likert
         { metaData = metaData
-        , questions = Zipper.fromList (likertQuestionsMapped serverQuestions metaData) |> Zipper.withDefault emptyLikertQuestion
+        , questions = Zipper.fromList (likertQuestionsMapped serverQuestions choices) |> Zipper.withDefault emptyLikertQuestion
         }
 
 
-likertQuestionsMapped : List LikertServerQuestion -> SurveyMetaData -> List LikertQuestion
-likertQuestionsMapped serverQuestions metaData =
+likertQuestionsMapped : List LikertServerQuestion -> List LikertServerChoice -> List LikertQuestion
+likertQuestionsMapped serverQuestions choices =
     List.map
         (\serverQuestion ->
-            { id = serverQuestion.uuid
-            , title = serverQuestion.title
-            , orderNumber = serverQuestion.orderNumber
-            , answers = likertAnswersMapped serverQuestion.answers
-            , choices = defaultChoices
-            }
+            likertQuestionMapped serverQuestion choices
         )
         serverQuestions
+
+
+likertQuestionMapped : LikertServerQuestion -> List LikertServerChoice -> LikertQuestion
+likertQuestionMapped serverQuestion choices =
+    let
+        choicesForThisGroup =
+            choices
+                |> List.filter (choiceGroupIdPredicate serverQuestion)
+                |> List.sortBy .order_number
+                |> List.map .choice
+    in
+        { id = serverQuestion.uuid
+        , title = serverQuestion.title
+        , orderNumber = serverQuestion.orderNumber
+        , answers = likertAnswersMapped serverQuestion.answers
+        , choices = choicesForThisGroup
+        }
+
+
+choiceGroupIdPredicate : LikertServerQuestion -> LikertServerChoice -> Bool
+choiceGroupIdPredicate serverQuestion choice =
+    serverQuestion.choiceGroupId == choice.choice_group_id
 
 
 likertAnswersMapped : List LikertServerAnswer -> List LikertAnswer
