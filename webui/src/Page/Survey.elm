@@ -41,6 +41,8 @@ type alias Model =
     , availableIpsativeSurveys : List SurveyMetaData
     , availableLikertSurveys : List SurveyMetaData
     , selectedSurveyMetaData : SurveyMetaData
+    , isSurveyReady : Bool
+    , inBoundLikertData : Maybe (List Data.Survey.LikertServerData)
     }
 
 
@@ -56,6 +58,8 @@ init authModel =
     , availableIpsativeSurveys = []
     , availableLikertSurveys = []
     , selectedSurveyMetaData = Data.Survey.emptyIpsativeServerMetaData
+    , isSurveyReady = False
+    , inBoundLikertData = Nothing
     }
         ! initialCommands authModel
 
@@ -90,6 +94,7 @@ type Msg
     | GotIpsativeServerData (Result Http.Error (List Data.Survey.IpsativeServerData))
     | GotServerLikertSurveys (Result Http.Error (List Data.Survey.SurveyMetaData))
     | GotLikertServerData (Result Http.Error (List Data.Survey.LikertServerData))
+    | GotLikertChoices (Result Http.Error (List Data.Survey.LikertServerChoice))
     | SaveIpsativeSurvey
     | IpsativeSurveySaved (Result Http.Error (List Data.Survey.IpsativeResponse))
 
@@ -167,21 +172,50 @@ update msg model authModel =
 
                 survey =
                     Data.Survey.createIpsativeSurvey 10 2 model.selectedSurveyMetaData questions
+
+                isSurveyReady =
+                    True
             in
-                { model | currentSurvey = survey } ! []
+                { model | currentSurvey = survey, isSurveyReady = isSurveyReady } ! []
 
         GotLikertServerData (Err error) ->
             model ! [ Ports.showError (getHTTPErrorMessage error) ]
 
         GotLikertServerData (Ok data) ->
             let
+                --questions =
+                --    Data.Survey.groupLikertSurveyData data
+                --survey =
+                --Data.Survey.createLikertSurvey model.selectedSurveyMetaData questions
+                --TODO: REMOVE THIS let in
+                isSurveyReady =
+                    True
+            in
+                { model | inBoundLikertData = Just data }
+                    ! [ Http.send GotLikertChoices (Request.Survey.getLikertChoices authModel model.selectedSurveyMetaData.uuid)
+                      ]
+
+        GotLikertChoices (Err error) ->
+            model ! [ Ports.showError (getHTTPErrorMessage error) ]
+
+        GotLikertChoices (Ok data) ->
+            let
                 questions =
-                    Data.Survey.groupLikertSurveyData data
+                    case model.inBoundLikertData of
+                        Just x ->
+                            Data.Survey.groupLikertSurveyData x data
+
+                        Nothing ->
+                            []
 
                 survey =
                     Data.Survey.createLikertSurvey model.selectedSurveyMetaData questions
+
+                isSurveyReady =
+                    True
             in
-                { model | currentSurvey = survey } ! []
+                { model | currentSurvey = survey, isSurveyReady = isSurveyReady }
+                    ! []
 
         SelectLikertAnswer answerNumber choice ->
             let
@@ -564,7 +598,7 @@ view authModel model =
             viewHero model
 
         SurveyInstructions ->
-            viewSurveyInstructions model.currentSurvey
+            viewSurveyInstructions model.currentSurvey model.isSurveyReady
 
         Survey ->
             viewSurvey model.currentSurvey
@@ -599,18 +633,18 @@ viewIncompleteButtons survey questionNumbers =
         questionNumbers
 
 
-viewSurveyInstructions : Survey -> Html Msg
-viewSurveyInstructions survey =
+viewSurveyInstructions : Survey -> Bool -> Html Msg
+viewSurveyInstructions survey isSurveyReady =
     case survey of
         Ipsative survey ->
-            viewIpsativeSurveyInstructions survey
+            viewIpsativeSurveyInstructions survey isSurveyReady
 
         Likert survey ->
-            viewLikertSurveyInstructions survey
+            viewLikertSurveyInstructions survey isSurveyReady
 
 
-viewIpsativeSurveyInstructions : IpsativeSurvey -> Html Msg
-viewIpsativeSurveyInstructions survey =
+viewIpsativeSurveyInstructions : IpsativeSurvey -> Bool -> Html Msg
+viewIpsativeSurveyInstructions survey isSurveyReady =
     div [ class "pt-3" ]
         [ div [ class "row" ]
             [ div
@@ -618,14 +652,14 @@ viewIpsativeSurveyInstructions survey =
                 [ h1 [ class "display-4" ] [ text survey.metaData.name ]
                 , p [ class "lead" ] [ text survey.metaData.instructions ]
                 , hr [ class "my-4" ] []
-                , button [ class "btn btn-primary", onClick BeginIpsativeSurvey ] [ text "Begin" ]
+                , button [ class "btn btn-primary", disabled (not isSurveyReady), onClick BeginIpsativeSurvey ] [ text "Begin" ]
                 ]
             ]
         ]
 
 
-viewLikertSurveyInstructions : LikertSurvey -> Html Msg
-viewLikertSurveyInstructions survey =
+viewLikertSurveyInstructions : LikertSurvey -> Bool -> Html Msg
+viewLikertSurveyInstructions survey isSurveyReady =
     div [ class "pt-3" ]
         [ div [ class "row" ]
             [ div
@@ -633,7 +667,7 @@ viewLikertSurveyInstructions survey =
                 [ h1 [ class "display-4" ] [ text survey.metaData.name ]
                 , p [ class "lead" ] [ text survey.metaData.instructions ]
                 , hr [ class "my-4" ] []
-                , button [ class "btn btn-primary", onClick BeginLikertSurvey ] [ text "Begin" ]
+                , button [ class "btn btn-primary", disabled (not isSurveyReady), onClick BeginLikertSurvey ] [ text "Begin" ]
                 ]
             ]
         ]
