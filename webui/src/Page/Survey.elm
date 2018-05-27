@@ -52,6 +52,12 @@ type alias Model =
 
 init : Authentication.Model -> ( Model, Cmd Msg )
 init authModel =
+    initialModel
+        ! initialCommands authModel
+
+
+initialModel : Model
+initialModel =
     { currentSurvey = Ipsative Data.Survey.emptyIpsativeServerSurvey
     , currentPage = Home
     , numberOfGroups = 2
@@ -61,7 +67,6 @@ init authModel =
     , isSurveyReady = False
     , inBoundLikertData = Nothing
     }
-        ! initialCommands authModel
 
 
 initialCommands : Authentication.Model -> List (Cmd Msg)
@@ -95,7 +100,7 @@ type Msg
     | GotServerLikertSurveys (Result Http.Error (List Data.Survey.SurveyMetaData))
     | GotLikertServerData (Result Http.Error (List Data.Survey.LikertServerData))
     | GotLikertChoices (Result Http.Error (List Data.Survey.LikertServerChoice))
-    | SaveIpsativeSurvey
+    | SaveCurrentSurvey
     | IpsativeSurveySaved (Result Http.Error (List Data.Survey.IpsativeResponse))
 
 
@@ -125,7 +130,7 @@ update msg model authModel =
         NoOp ->
             model ! []
 
-        SaveIpsativeSurvey ->
+        SaveCurrentSurvey ->
             case model.currentSurvey of
                 Ipsative survey ->
                     model ! [ Http.send IpsativeSurveySaved (Request.Survey.postIpsativeResponse authModel survey) ]
@@ -141,8 +146,7 @@ update msg model authModel =
                 _ =
                     Debug.log "saved response" responses
             in
-                --{ model | serverIpsativeSurveys = surveys } ! []
-                model ! []
+                initialModel ! []
 
         GetIpsativeSurveys ->
             model ! [ Http.send GotServerIpsativeSurveys (Request.Survey.getIpsativeSurveys authModel) ]
@@ -713,22 +717,17 @@ viewHero model =
 
 viewFinished : Model -> Html Msg
 viewFinished model =
-    case model.currentSurvey of
-        Ipsative survey ->
-            div [ class "container mt-3" ]
-                [ div [ class "row" ]
-                    [ div [ class "jumbotron" ]
-                        [ h1 [ class "display-4" ] [ text "You finished the survey!" ]
+    div [ class "container mt-3" ]
+        [ div [ class "row" ]
+            [ div [ class "jumbotron" ]
+                [ h1 [ class "display-4" ] [ text "You finished the survey!" ]
 
-                        --, button [ class "btn btn-primary", onClick NoOp ] [ text "Click to generate radar chart of results." ]
-                        , button [ class "btn btn-primary", onClick SaveIpsativeSurvey ] [ text "Click to save results to the server." ]
-                        , canvas [ id "chart" ] []
-                        ]
-                    ]
+                --, button [ class "btn btn-primary", onClick NoOp ] [ text "Click to generate radar chart of results." ]
+                , button [ class "btn btn-primary", onClick SaveCurrentSurvey ] [ text "Click to save results to the server." ]
+                , canvas [ id "chart" ] []
                 ]
-
-        Likert survey ->
-            div [] [ text "You finished the survey!" ]
+            ]
+        ]
 
 
 viewSurvey : Survey -> Html Msg
