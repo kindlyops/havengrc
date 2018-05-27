@@ -146,6 +146,23 @@ likertSurveyDataDecoder =
         |> required "answer" Decode.string
 
 
+type alias LikertServerChoice =
+    { survey_id : String
+    , choice_group_id : String
+    , choice : String
+    , order_number : Int
+    }
+
+
+likertSurveyChoicesDecoder : Decoder LikertServerChoice
+likertSurveyChoicesDecoder =
+    decode LikertServerChoice
+        |> required "survey_id" Decode.string
+        |> required "choice_group_id" Decode.string
+        |> required "choice" Decode.string
+        |> required "order_number" Decode.int
+
+
 groupIpsativeSurveyData : List IpsativeServerData -> List IpsativeServerQuestion
 groupIpsativeSurveyData data =
     let

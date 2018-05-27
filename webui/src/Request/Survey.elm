@@ -105,6 +105,23 @@ getLikertSurvey authModel id =
         request
 
 
+getLikertChoices : Authentication.Model -> String -> Http.Request (List Data.Survey.LikertServerChoice)
+getLikertChoices authModel id =
+    let
+        request =
+            Http.request
+                { method = "GET"
+                , headers = Authentication.tryGetAuthHeader authModel
+                , url = "/api/likert_distinct_choice_groups?survey_id=eq." ++ id
+                , body = Http.emptyBody
+                , expect = Http.expectJson (Decode.list Data.Survey.likertSurveyChoicesDecoder)
+                , timeout = Nothing
+                , withCredentials = True
+                }
+    in
+        request
+
+
 
 --postLikertResponse : Authentication.Model -> Data.Survey.LikertSurvey -> Http.Request (List Data.Survey.LikertResponse)
 --postLikertResponse authModel likertSurvey =
