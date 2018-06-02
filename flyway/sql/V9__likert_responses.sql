@@ -1,5 +1,3 @@
--- TODO: Consider if it is better for choice to be the actual choice or a pointer to the choices table
-
 CREATE TABLE mappa.likert_responses (
   uuid        UUID        UNIQUE,
   created_at  TIMESTAMPTZ,
