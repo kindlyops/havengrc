@@ -8,6 +8,7 @@ import Authentication exposing (..)
 import Http
 import Request.Comments exposing (get)
 import Ports
+import Utils exposing (getHTTPErrorMessage)
 
 
 type alias Model =
@@ -22,26 +23,6 @@ type Msg
     | GotComments (Result Http.Error (List Comment))
     | NewComment (Result Http.Error (List Comment))
     | SetCommentMessageInput String
-
-
-
---TODO: remove duplicate function or put in Utils
-
-
-getHTTPErrorMessage : Http.Error -> String
-getHTTPErrorMessage error =
-    case error of
-        Http.NetworkError ->
-            "Is the server running?"
-
-        Http.BadStatus response ->
-            (toString response.status)
-
-        Http.BadPayload message _ ->
-            "Decoding Failed: " ++ message
-
-        _ ->
-            (toString error)
 
 
 init : Authentication.Model -> ( Model, Cmd Msg )

@@ -24,6 +24,7 @@ import Http
 import Request.Survey
 import Ports
 import Views.SurveyCard
+import Utils exposing (getHTTPErrorMessage)
 
 
 type SurveyPage
@@ -105,26 +106,6 @@ type Msg
     | LikertSurveySaved (Result Http.Error (List Data.Survey.LikertResponse))
 
 
-
---TODO: remove duplicate function or put in Utils
-
-
-getHTTPErrorMessage : Http.Error -> String
-getHTTPErrorMessage error =
-    case error of
-        Http.NetworkError ->
-            "Is the server running?"
-
-        Http.BadStatus response ->
-            (toString response.status)
-
-        Http.BadPayload message _ ->
-            "Decoding Failed: " ++ message
-
-        _ ->
-            (toString error)
-
-
 update : Msg -> Model -> Authentication.Model -> ( Model, Cmd Msg )
 update msg model authModel =
     case msg of
@@ -187,24 +168,16 @@ update msg model authModel =
 
                 survey =
                     Data.Survey.createIpsativeSurvey 10 2 model.selectedSurveyMetaData questions
-
-                isSurveyReady =
-                    True
             in
-                { model | currentSurvey = survey, isSurveyReady = isSurveyReady } ! []
+                { model | currentSurvey = survey, isSurveyReady = True } ! []
 
         GotLikertServerData (Err error) ->
             model ! [ Ports.showError (getHTTPErrorMessage error) ]
 
         GotLikertServerData (Ok data) ->
-            let
-                --TODO: REMOVE THIS let in
-                isSurveyReady =
-                    True
-            in
-                { model | inBoundLikertData = Just data }
-                    ! [ Http.send GotLikertChoices (Request.Survey.getLikertChoices authModel model.selectedSurveyMetaData.uuid)
-                      ]
+            { model | inBoundLikertData = Just data }
+                ! [ Http.send GotLikertChoices (Request.Survey.getLikertChoices authModel model.selectedSurveyMetaData.uuid)
+                  ]
 
         GotLikertChoices (Err error) ->
             model ! [ Ports.showError (getHTTPErrorMessage error) ]
