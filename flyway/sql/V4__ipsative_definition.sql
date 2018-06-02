@@ -1,6 +1,6 @@
 -- Restricts uuid and created_at
 
-CREATE OR REPLACE FUNCTION mappa.override_ipsative_insert_columns()
+CREATE OR REPLACE FUNCTION mappa.override_survey_insert_columns()
 RETURNS TRIGGER AS $$
 BEGIN
   IF NEW.uuid IS NOT NULL THEN
@@ -56,22 +56,22 @@ CREATE TABLE mappa.ipsative_answers (
 CREATE TRIGGER trigger_ipsative_survey_insert
 BEFORE INSERT ON mappa.ipsative_surveys
 FOR EACH ROW
-EXECUTE PROCEDURE mappa.override_ipsative_insert_columns();
+EXECUTE PROCEDURE mappa.override_survey_insert_columns();
 
 CREATE TRIGGER trigger_ipsative_question_insert
 BEFORE INSERT ON mappa.ipsative_questions
 FOR EACH ROW
-EXECUTE PROCEDURE mappa.override_ipsative_insert_columns();
+EXECUTE PROCEDURE mappa.override_survey_insert_columns();
 
 CREATE TRIGGER trigger_ipsative_category_insert
 BEFORE INSERT ON mappa.ipsative_categories
 FOR EACH ROW
-EXECUTE PROCEDURE mappa.override_ipsative_insert_columns();
+EXECUTE PROCEDURE mappa.override_survey_insert_columns();
 
 CREATE TRIGGER trigger_ipsative_answer_insert
 BEFORE INSERT ON mappa.ipsative_answers
 FOR EACH ROW
-EXECUTE PROCEDURE mappa.override_ipsative_insert_columns();
+EXECUTE PROCEDURE mappa.override_survey_insert_columns();
 
 
 -- Postrest Views

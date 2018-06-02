@@ -1,26 +1,3 @@
--- TODO: Choices have been left out (Strongly Disagree, Disagree, Neutral, Agree, Strongly Agree)
-
--- Functionally the same as override_ipsative_insert_columns.
--- TODO: combine override_ipsative_insert_columns and override_likert_insert_columns into just override_survey_insert_columns
-
-CREATE OR REPLACE FUNCTION mappa.override_likert_insert_columns()
-RETURNS TRIGGER AS $$
-BEGIN
-  IF NEW.uuid IS NOT NULL THEN
-    RAISE EXCEPTION 'You must not send uuid field';
-  ELSE
-    NEW.uuid = mappa.uuid_generate_v4();
-  END IF;
-  IF NEW.created_at IS NOT NULL THEN
-    RAISE EXCEPTION 'You must not send created_at field';
-  ELSE
-    NEW.created_at = now();
-  END IF;
-  RETURN NEW;
-END;
-$$ language 'plpgsql';
-
-
 -- Table Definitions
 
 CREATE TABLE mappa.likert_surveys (
@@ -68,27 +45,27 @@ CREATE TABLE mappa.likert_answers (
 CREATE TRIGGER trigger_likert_survey_insert
 BEFORE INSERT ON mappa.likert_surveys
 FOR EACH ROW
-EXECUTE PROCEDURE mappa.override_likert_insert_columns();
+EXECUTE PROCEDURE mappa.override_survey_insert_columns();
 
 CREATE TRIGGER trigger_likert_choice_group_insert
 BEFORE INSERT ON mappa.likert_choice_groups
 FOR EACH ROW
-EXECUTE PROCEDURE mappa.override_likert_insert_columns();
+EXECUTE PROCEDURE mappa.override_survey_insert_columns();
 
 CREATE TRIGGER trigger_likert_question_insert
 BEFORE INSERT ON mappa.likert_questions
 FOR EACH ROW
-EXECUTE PROCEDURE mappa.override_likert_insert_columns();
+EXECUTE PROCEDURE mappa.override_survey_insert_columns();
 
 CREATE TRIGGER trigger_likert_choice_insert
 BEFORE INSERT ON mappa.likert_choices
 FOR EACH ROW
-EXECUTE PROCEDURE mappa.override_likert_insert_columns();
+EXECUTE PROCEDURE mappa.override_survey_insert_columns();
 
 CREATE TRIGGER trigger_likert_answer_insert
 BEFORE INSERT ON mappa.likert_answers
 FOR EACH ROW
-EXECUTE PROCEDURE mappa.override_likert_insert_columns();
+EXECUTE PROCEDURE mappa.override_survey_insert_columns();
 
 -- Postrest Views
 
