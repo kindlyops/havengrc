@@ -1,14 +1,12 @@
-module View.LineChart exposing (..)
+module Views.LineChart exposing (..)
 
 import Visualization.Scale as Scale exposing (ContinuousScale, ContinuousTimeScale)
 import Visualization.Axis as Axis
-import Visualization.List as List
 import Visualization.Shape as Shape
 import Date
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import Date exposing (Date)
-import String
 
 
 w : Float

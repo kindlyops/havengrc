@@ -20,7 +20,9 @@ type Location
     | Home
     | Activity
     | Reports
+    | Dashboard
     | Comments
+    | SurveyPrototype
     | ShowComment Int
     | EditComment Int
 
@@ -48,7 +50,7 @@ init location =
             Nothing ->
                 ( route, Navigation.newUrl (urlFor Home) )
 
-            _ ->
+            Just location ->
                 ( route, Cmd.none )
 
 
@@ -65,11 +67,17 @@ titleFor route =
             Activity ->
                 "Activity"
 
+            Dashboard ->
+                "Dashboard"
+
             Reports ->
                 "Reports"
 
             Comments ->
                 "Comments"
+
+            SurveyPrototype ->
+                "SurveyPrototype"
 
             ShowComment _ ->
                 "Comment"
@@ -95,8 +103,14 @@ urlFor loc =
                 Activity ->
                     "/activity"
 
+                Dashboard ->
+                    "/dashboard"
+
                 Comments ->
                     "/comments"
+
+                SurveyPrototype ->
+                    "/surveyPrototype"
 
                 ShowComment id ->
                     "/comments/" ++ (toString id)
@@ -133,6 +147,9 @@ locFor path =
                     [ "activity" ] ->
                         Just Activity
 
+                    [ "dashboard" ] ->
+                        Just Dashboard
+
                     [ "reports" ] ->
                         Just Reports
 
@@ -151,6 +168,9 @@ locFor path =
                         String.toInt stringId
                             |> Result.toMaybe
                             |> Maybe.map EditComment
+
+                    [ "surveyPrototype" ] ->
+                        Just SurveyPrototype
 
                     _ ->
                         let
