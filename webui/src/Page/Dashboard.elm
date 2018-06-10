@@ -33,10 +33,6 @@ update msg model =
             model ! [ Ports.showError str ]
 
 
-
---view : Html msg
-
-
 view : Model -> Html Msg
 view model =
     div

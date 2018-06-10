@@ -213,18 +213,6 @@ update msg model authModel =
             in
                 { model | currentSurvey = newSurvey } ! []
 
-        --GenerateChart ->
-        --    case model.currentSurvey of
-        --        Ipsative survey ->
-        --            ( model, Ports.radarChart (RadarChart.generateIpsativeChart survey) )
-        --        _ ->
-        --            model
-        --ChangeNumberOfGroups number ->
-        --    let
-        --        newNumber =
-        --            String.toInt number |> Result.toMaybe |> Maybe.withDefault model.numberOfGroups
-        --    in
-        --        { model | numberOfGroups = newNumber }
         GoToHome ->
             { model | currentPage = Home } ! []
 
