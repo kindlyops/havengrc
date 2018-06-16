@@ -6,10 +6,6 @@ import Html.Events exposing (..)
 import Authentication
 
 
---view : Html Msg
---view : Html msg
-
-
 view =
     div [ class "" ]
         [ div [ class "" ]

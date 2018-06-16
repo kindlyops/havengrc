@@ -2036,6 +2036,7 @@
     "id" : "e1aca775-ef02-4c35-a141-563d40233096",
     "createdTimestamp" : 1492023568019,
     "username" : "user2@havengrc.com",
+    "email" : "user2@havengrc.com",
     "enabled" : true,
     "totp" : false,
     "emailVerified" : false,
