@@ -9,7 +9,7 @@
     <version>0.1.0</version>
     <packaging>jar</packaging>
     <properties>
-        <keycloak.version>3.4.3.Final</keycloak.version>
+        <keycloak.version>4.0.0.Final</keycloak.version>
     </properties>
     <dependencies>
         <dependency>
