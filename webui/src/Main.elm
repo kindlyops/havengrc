@@ -347,7 +347,7 @@ viewNavUser model user =
                     []
                 ]
             , div [ attribute "aria-labelledby" "navbarDropdown", class "dropdown-menu" ]
-                [ a [ class "dropdown-item", href "#" ]
+                [ a [ class "dropdown-item", href "/auth/realms/havendev/account/" ]
                     [ text "Profile" ]
                 , a [ class "dropdown-item", href "#" ]
                     [ text "Another action" ]
