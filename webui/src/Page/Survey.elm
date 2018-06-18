@@ -660,8 +660,8 @@ getTotalAvailableSurveys model =
 viewHero : Model -> Html Msg
 viewHero model =
     div [ class "" ]
-        [ h1 [ class "display-4" ] [ text "KindlyOps Haven Survey Prototype" ]
-        , p [ class "lead" ] [ text "Welcome to the Elm Haven Survey Prototype. " ]
+        [ h1 [ class "display-4" ] [ text "KindlyOps Haven Survey" ]
+        , p [ class "lead" ] [ text "Welcome to the Elm Haven Survey. " ]
         , button [ class "btn btn-primary", onClick GetIpsativeSurveys ] [ text "get ipsative surveys (debug)" ]
         , button [ class "btn btn-primary", onClick GetLikertSurveys ] [ text "get likert surveys (debug)" ]
         , hr [ class "my-4" ] []
@@ -804,7 +804,7 @@ viewNavbar : Html Msg
 viewNavbar =
     nav [ class "navbar navbar-expand-lg navbar-light bg-light" ]
         [ a [ class "navbar-brand", style [ ( "cursor", "pointer" ) ], onClick GoToHome ]
-            [ text "Haven Survey Prototype" ]
+            [ text "Haven Survey" ]
         , button [ attribute "aria-controls" "navbarSupportedContent", attribute "aria-expanded" "false", attribute "aria-label" "Toggle navigation", class "navbar-toggler", attribute "data-target" "#navbarSupportedContent", attribute "data-toggle" "collapse", type_ "button" ]
             [ span [ class "navbar-toggler-icon" ]
                 []

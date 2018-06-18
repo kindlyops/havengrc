@@ -210,7 +210,7 @@ navDrawerItems =
     , { text = "Activity", iconName = "history", route = Just Route.Activity }
     , { text = "Reports", iconName = "library_books", route = Just Route.Reports }
     , { text = "Comments", iconName = "gavel", route = Just Route.Comments }
-    , { text = "SurveyPrototype", iconName = "assignment", route = Just Route.SurveyPrototype }
+    , { text = "Survey", iconName = "assignment", route = Just Route.Survey }
     ]
 
 
@@ -305,7 +305,7 @@ viewBody model =
             Just Route.Activity ->
                 Activity.view
 
-            Just Route.SurveyPrototype ->
+            Just Route.Survey ->
                 Survey.view model.authModel model.surveyModel |> Html.map SurveyMsg
 
             Just _ ->
