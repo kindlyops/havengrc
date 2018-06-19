@@ -194,17 +194,10 @@ workflows:
             - keycloak-build-job
             - havenapi-build-job
             - postgrest-build-job
-      - approve-deploy:
-          type: approval
+      - deploy-staging:
           requires:
             - havenapi-testing-job
             - webui-build-job
-          filters:
-            branches:
-              only: master
-      - deploy-staging:
-          requires:
-            - approve-deploy
           filters:
             branches:
               only: master
