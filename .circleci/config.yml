@@ -4,10 +4,10 @@ jobs:
     docker:
       - image: circleci/node:7-browsers
     steps:
+      - checkout
       - run:
           name: notify build started
           command: ./notify-slack notifications "CircleCI starting pipeline for $CIRCLE_PULL_REQUEST" circleci
-      - checkout
       - add_ssh_keys
       - run:
           name: Check docker version
