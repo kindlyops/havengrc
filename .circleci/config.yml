@@ -169,7 +169,9 @@ jobs:
             sudo mv openshift-origin-client-tools-v3.7.0-7ed6862-linux-64bit/oc /usr/local/bin/oc
             oc version
             # todo: authenticate
-            oc login https://console.pro-us-east-1.openshift.com/ --token=$OPENSHIFT_TOKEN
+            oc login https://api.pro-us-east-1.openshift.com --token=$OPENSHIFT_TOKEN
+            # this url suddenly started saying the only project available was mo1w
+            #oc login https://console.pro-us-east-1.openshift.com/ --token=$OPENSHIFT_TOKEN
             oc project haven-production
       - deploy:
           name: Prerelease
