@@ -1,5 +1,5 @@
 0.0.0.0:2016 
-startup npm run-script start &
+on startup npm run-script start &
 
 proxy / localhost:2015 {
   transparent

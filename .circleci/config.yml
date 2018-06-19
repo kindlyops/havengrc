@@ -154,8 +154,6 @@ jobs:
             docker cp postgrest/keycloak-dev-public-key.json configs:/cfg
             docker build -t kindlyops/havenapitest -f havenapi/Dockerfile-hotreload .
             docker run --volumes-from configs --network container:db -e TEST_DATABASE_URL -e HAVEN_JWK_PATH kindlyops/havenapitest /go/bin/buffalo test
-            # TODO build the testing container
-            # TODO run cucumber test
   deploy-staging:
     docker:
       - image: circleci/ruby:2.4
@@ -171,14 +169,16 @@ jobs:
             sudo mv openshift-origin-client-tools-v3.7.0-7ed6862-linux-64bit/oc /usr/local/bin/oc
             oc version
             # todo: authenticate
-            oc login https://console.pro-us-east-1.openshift.com/ --token=$OPENSHIFT_TOKEN
+            oc login https://api.pro-us-east-1.openshift.com --token=$OPENSHIFT_TOKEN
+            # this url suddenly started saying the only project available was mo1w
+            #oc login https://console.pro-us-east-1.openshift.com/ --token=$OPENSHIFT_TOKEN
             oc project haven-production
       - deploy:
           name: Prerelease
           command: |
-            echo release temporarily disabled
-            #oc set image deployment/havenapi havenapi=havengrc-docker.jfrog.io/kindlyops/havenapi:$CIRCLE_SHA1
-            #oc set image deployment/havenweb havenweb=havengrc-docker.jfrog.io/kindlyops/havenweb:$CIRCLE_SHA1
+            oc set image deployment/havenapi havenapi=havengrc-docker.jfrog.io/kindlyops/havenapi:$CIRCLE_SHA1
+            oc set image deployment/havenweb havenweb=havengrc-docker.jfrog.io/kindlyops/havenweb:$CIRCLE_SHA1
+            oc set image deployment/keycloak keycloak=havengrc-docker.jfrog.io/kindlyops/keycloak:$CIRCLE_SHA1
 workflows:
   version: 2
   builds:

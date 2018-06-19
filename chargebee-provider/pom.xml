@@ -1,20 +1,16 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
-
+<project 
+    xmlns="http://maven.apache.org/POM/4.0.0" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <name>ChargeBee Registration</name>
     <description/>
     <modelVersion>4.0.0</modelVersion>
-
     <groupId>org.kindlyops.providers</groupId>
     <artifactId>kindlyops-provider-chargebee-registration</artifactId>
     <version>0.1.0</version>
     <packaging>jar</packaging>
-
     <properties>
-        <keycloak.version>3.4.2.Final</keycloak.version>
+        <keycloak.version>3.4.3.Final</keycloak.version>
     </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.keycloak</groupId>
@@ -52,7 +48,6 @@
             <version>${keycloak.version}</version>
         </dependency>
     </dependencies>
-
     <build>
         <finalName>kindlyops-chargebee-form-action</finalName>
         <plugins>
@@ -137,6 +132,5 @@
                 </executions>
             </plugin>
         </plugins>
-
     </build>
 </project>

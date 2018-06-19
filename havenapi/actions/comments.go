@@ -27,7 +27,7 @@ func CommentPostHandler(c buffalo.Context) error {
 	return c.Render(200, r.JSON(map[string]string{"message": message}))
 }
 
-// CommentGettHandler accepts a comment upost
+// CommentGetHandler accepts a comment upost
 func CommentGetHandler(c buffalo.Context) error {
 	err := models.DB.RawQuery("set local search_path to mappa, public").Exec()
 	if err != nil {
