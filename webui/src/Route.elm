@@ -22,7 +22,7 @@ type Location
     | Reports
     | Dashboard
     | Comments
-    | SurveyPrototype
+    | Survey
     | SurveyResponses
     | ShowComment Int
     | EditComment Int
@@ -77,8 +77,8 @@ titleFor route =
             Comments ->
                 "Comments"
 
-            SurveyPrototype ->
-                "SurveyPrototype"
+            Survey ->
+                "Survey"
 
             SurveyResponses ->
                 "SurveyResponses"
@@ -113,8 +113,8 @@ urlFor loc =
                 Comments ->
                     "/comments"
 
-                SurveyPrototype ->
-                    "/surveyPrototype"
+                Survey ->
+                    "/survey"
 
                 SurveyResponses ->
                     "/surveyResponses"
@@ -176,8 +176,8 @@ locFor path =
                             |> Result.toMaybe
                             |> Maybe.map EditComment
 
-                    [ "surveyPrototype" ] ->
-                        Just SurveyPrototype
+                    [ "survey" ] ->
+                        Just Survey
 
                     [ "surveyResponses" ] ->
                         Just SurveyResponses

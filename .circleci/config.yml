@@ -5,6 +5,9 @@ jobs:
       - image: circleci/node:7-browsers
     steps:
       - checkout
+      - run:
+          name: notify build started
+          command: ./notify-slack notifications "CircleCI starting pipeline for $CIRCLE_PULL_REQUEST" circleci
       - add_ssh_keys
       - run:
           name: Check docker version
@@ -51,6 +54,10 @@ jobs:
       - run: docker push kindlyops/havenweb:$CIRCLE_SHA1
       - run: docker push kindlyops/havenweb:$CIRCLE_BUILD_NUM
       - run: docker push kindlyops/havenweb:latest
+      - run:
+          name: notify failed job
+          command: ./notify-slack notifications "CircleCI pipeline for $CIRCLE_PULL_REQUEST failed in $CIRCLE_JOB" circleci
+          when: on_fail
   flyway-build-job:
     docker:
       - image: circleci/openjdk:9
@@ -66,6 +73,10 @@ jobs:
       - run: docker push kindlyops/havenflyway:$CIRCLE_SHA1
       - run: docker push kindlyops/havenflyway:$CIRCLE_BUILD_NUM
       - run: docker push kindlyops/havenflyway:latest
+      - run:
+          name: notify failed job
+          command: ./notify-slack notifications "CircleCI pipeline for $CIRCLE_PULL_REQUEST failed in $CIRCLE_JOB" circleci
+          when: on_fail
   postgrest-build-job:
     docker:
       - image: circleci/openjdk:9
@@ -81,6 +92,10 @@ jobs:
       - run: docker push kindlyops/postgrest:$CIRCLE_SHA1
       - run: docker push kindlyops/postgrest:$CIRCLE_BUILD_NUM
       - run: docker push kindlyops/postgrest:latest
+      - run:
+          name: notify failed job
+          command: ./notify-slack notifications "CircleCI pipeline for $CIRCLE_PULL_REQUEST failed in $CIRCLE_JOB" circleci
+          when: on_fail
   keycloak-build-job:
     docker:
       - image: circleci/openjdk:9
@@ -96,6 +111,10 @@ jobs:
       - run: docker push kindlyops/keycloak:$CIRCLE_SHA1
       - run: docker push kindlyops/keycloak:$CIRCLE_BUILD_NUM
       - run: docker push kindlyops/keycloak:latest
+      - run:
+          name: notify failed job
+          command: ./notify-slack notifications "CircleCI pipeline for $CIRCLE_PULL_REQUEST failed in $CIRCLE_JOB" circleci
+          when: on_fail
   havenapi-build-job:
     docker:
       - image: circleci/node:7-browsers
@@ -111,6 +130,10 @@ jobs:
       - run: docker push kindlyops/havenapi:$CIRCLE_BUILD_NUM
       - run: docker push kindlyops/havenapi:$CIRCLE_SHA1
       - run: docker push kindlyops/havenapi:latest
+      - run:
+          name: notify failed job
+          command: ./notify-slack notifications "CircleCI pipeline for $CIRCLE_PULL_REQUEST failed in $CIRCLE_JOB" circleci
+          when: on_fail
   havenapi-testing-job:
     docker:
       - image: circleci/ruby:2.4
@@ -154,6 +177,10 @@ jobs:
             docker cp postgrest/keycloak-dev-public-key.json configs:/cfg
             docker build -t kindlyops/havenapitest -f havenapi/Dockerfile-hotreload .
             docker run --volumes-from configs --network container:db -e TEST_DATABASE_URL -e HAVEN_JWK_PATH kindlyops/havenapitest /go/bin/buffalo test
+      - run:
+          name: notify failed job
+          command: ./notify-slack notifications "CircleCI pipeline for $CIRCLE_PULL_REQUEST failed in $CIRCLE_JOB" circleci
+          when: on_fail
   deploy-staging:
     docker:
       - image: circleci/ruby:2.4
@@ -169,7 +196,9 @@ jobs:
             sudo mv openshift-origin-client-tools-v3.7.0-7ed6862-linux-64bit/oc /usr/local/bin/oc
             oc version
             # todo: authenticate
-            oc login https://console.pro-us-east-1.openshift.com/ --token=$OPENSHIFT_TOKEN
+            oc login https://api.pro-us-east-1.openshift.com --token=$OPENSHIFT_TOKEN
+            # this url suddenly started saying the only project available was mo1w
+            #oc login https://console.pro-us-east-1.openshift.com/ --token=$OPENSHIFT_TOKEN
             oc project haven-production
       - deploy:
           name: Prerelease
@@ -177,6 +206,10 @@ jobs:
             oc set image deployment/havenapi havenapi=havengrc-docker.jfrog.io/kindlyops/havenapi:$CIRCLE_SHA1
             oc set image deployment/havenweb havenweb=havengrc-docker.jfrog.io/kindlyops/havenweb:$CIRCLE_SHA1
             oc set image deployment/keycloak keycloak=havengrc-docker.jfrog.io/kindlyops/keycloak:$CIRCLE_SHA1
+      - run:
+          name: notify failed job
+          command: ./notify-slack notifications "CircleCI pipeline for $CIRCLE_PULL_REQUEST failed in $CIRCLE_JOB" circleci
+          when: on_fail
 workflows:
   version: 2
   builds:
@@ -192,17 +225,10 @@ workflows:
             - keycloak-build-job
             - havenapi-build-job
             - postgrest-build-job
-      - approve-deploy:
-          type: approval
+      - deploy-staging:
           requires:
             - havenapi-testing-job
             - webui-build-job
-          filters:
-            branches:
-              only: master
-      - deploy-staging:
-          requires:
-            - approve-deploy
           filters:
             branches:
               only: master
