@@ -56,6 +56,7 @@ type Msg
     | GenerateChart
     | GotServerIpsativeResponses (Result Http.Error (List GroupedIpsativeResponse))
     | StartVisualization AvailableResponse
+    | GoToHome
 
 
 update : Msg -> Model -> Authentication.Model -> ( Model, Cmd Msg )
@@ -91,6 +92,9 @@ update msg model authModel =
                     , Ports.radarChart
                         (Data.RadarChart.generateIpsativeChart availableResponse)
                     )
+
+        GoToHome ->
+            { model | currentPage = Home } ! []
 
 
 createAvailableResponses : List GroupedIpsativeResponse -> List AvailableResponse
@@ -161,6 +165,7 @@ viewIpsativeResponse response =
         [ h2 [] [ text ("Name: " ++ response.name) ]
         , viewResponseTable response.data
         , button [ class "btn btn-primary", onClick GenerateChart ] [ text "Click to generate radar chart of results." ]
+        , button [ class "btn btn-primary", onClick GoToHome ] [ text "Go Back" ]
         , canvas [ id "chart" ] []
         ]
 
