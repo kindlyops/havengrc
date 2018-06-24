@@ -14,7 +14,7 @@ getIpsativeResponses authModel =
             Http.request
                 { method = "GET"
                 , headers = Authentication.tryGetAuthHeader authModel
-                , url = "/api/ipsative_responses_grouped_two"
+                , url = "/api/ipsative_responses_grouped"
                 , body = Http.emptyBody
                 , expect = Http.expectJson (Decode.list groupedIpsativeResponseDecoder)
                 , timeout = Nothing
