@@ -10,7 +10,7 @@ import Request.SurveyResponses
 import Ports
 import Utils exposing (getHTTPErrorMessage)
 import Data.RadarChart
-import Data.SurveyResponses exposing (GroupedIpsativeResponse, AvailableResponse)
+import Data.SurveyResponses exposing (GroupedIpsativeResponse, AvailableResponse, AvailableResponseDatum)
 
 
 type ResponsePage
@@ -96,41 +96,45 @@ update msg model authModel =
 createAvailableResponses : List GroupedIpsativeResponse -> List AvailableResponse
 createAvailableResponses groupedResponses =
     let
+        sorted =
+            List.sortBy .survey_id groupedResponses
+
         groupedBySurvey =
             groupWhile
                 (\x y ->
                     x.survey_id == y.survey_id
                 )
-                groupedResponses
+                sorted
 
-        emptyData =
-            [ { group = 1
-              , category = "Process"
-              , points = 10
-              }
-            , { group = 2
-              , category = "Process"
-              , points = 10
-              }
-            ]
-
-        names =
+        availableResponses =
             List.map
-                (\group ->
+                (\surveyGroup ->
                     let
                         name =
-                            case List.head group of
+                            case List.head surveyGroup of
                                 Just y ->
                                     y.name
 
                                 _ ->
                                     "Grouping error"
                     in
-                        { name = name, data = emptyData }
+                        { name = name, data = createAvailableResponseDatum surveyGroup }
                 )
                 groupedBySurvey
     in
-        names
+        availableResponses
+
+
+createAvailableResponseDatum : List GroupedIpsativeResponse -> List AvailableResponseDatum
+createAvailableResponseDatum surveyGroup =
+    List.map
+        (\x ->
+            { group = x.group_number
+            , category = x.category
+            , points = x.sum
+            }
+        )
+        surveyGroup
 
 
 view : Authentication.Model -> Model -> Html Msg
@@ -140,10 +144,30 @@ view authModel model =
             viewHome model
 
         IpsativeResponse ->
-            div [] [ text "not done" ]
+            case model.selectedResponse of
+                Nothing ->
+                    div [] [ text "there isn't a selected response" ]
+
+                Just x ->
+                    viewIpsativeResponse x
 
         LikertResponse ->
             div [] [ text "not done" ]
+
+
+viewIpsativeResponse : AvailableResponse -> Html Msg
+viewIpsativeResponse response =
+    div []
+        (div [] [ text response.name ] :: viewTest response.data)
+
+
+viewTest : List AvailableResponseDatum -> List (Html Msg)
+viewTest datum =
+    List.map
+        (\datum ->
+            div [] [ text datum.category ]
+        )
+        datum
 
 
 viewHome : Model -> Html Msg
