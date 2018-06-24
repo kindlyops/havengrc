@@ -279,22 +279,22 @@ viewBody model =
             Nothing ->
                 (Dashboard.view model.dashboardModel) |> Html.map DashboardMsg
 
-            Just (Route.Home) ->
+            Just Route.Home ->
                 (Dashboard.view model.dashboardModel) |> Html.map DashboardMsg
 
-            Just (Route.Reports) ->
+            Just Route.Reports ->
                 Reports.view
 
-            Just (Route.Dashboard) ->
+            Just Route.Dashboard ->
                 (Dashboard.view model.dashboardModel) |> Html.map DashboardMsg
 
-            Just (Route.Comments) ->
+            Just Route.Comments ->
                 Comments.view model.authModel model.commentsModel |> Html.map CommentsMsg
 
-            Just (Route.Activity) ->
+            Just Route.Activity ->
                 Activity.view
 
-            Just (Route.Survey) ->
+            Just Route.Survey ->
                 Survey.view model.authModel model.surveyModel |> Html.map SurveyMsg
 
             Just Route.SurveyResponses ->
@@ -410,7 +410,8 @@ viewNavDrawerItem menuItem route =
     a
         [ attribute "name" (String.toLower menuItem.text)
         , onClick <| NavigateTo <| menuItem.route
-          --, href "#"
+
+        --, href "#"
         , style [ ( "cursor", "pointer" ) ]
         , classList
             [ ( "nav-item", True )

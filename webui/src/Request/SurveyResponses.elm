@@ -6,7 +6,6 @@ import Authentication
 import Data.SurveyResponses exposing (..)
 
 
-
 getIpsativeResponses : Authentication.Model -> Http.Request (List GroupedIpsativeResponse)
 getIpsativeResponses authModel =
     let
