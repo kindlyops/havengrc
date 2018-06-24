@@ -192,17 +192,6 @@ viewResponseTable datum =
         )
 
 
-
--- viewResponseChart : Html Msg
--- viewResponseChart =
---     canvas [ id "chart" ] []
--- List.map
---     (\datum ->
---         div [] [ text datum.category ]
---     )
---     datum
-
-
 viewHome : Model -> Html Msg
 viewHome model =
     div [ class "" ]
