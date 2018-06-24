@@ -6,10 +6,6 @@ import Authentication
 import Data.SurveyResponses exposing (..)
 
 
-ipsativeUrl : String
-ipsativeUrl =
-    ""
-
 
 getIpsativeResponses : Authentication.Model -> Http.Request (List GroupedIpsativeResponse)
 getIpsativeResponses authModel =
@@ -18,7 +14,7 @@ getIpsativeResponses authModel =
             Http.request
                 { method = "GET"
                 , headers = Authentication.tryGetAuthHeader authModel
-                , url = ipsativeUrl
+                , url = "/api/ipsative_responses_grouped_two"
                 , body = Http.emptyBody
                 , expect = Http.expectJson (Decode.list groupedIpsativeResponseDecoder)
                 , timeout = Nothing
