@@ -6,7 +6,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Authentication exposing (..)
 import Http
-import Request.Comments exposing (get)
+import Request.Comments
 import Ports
 import Utils exposing (getHTTPErrorMessage)
 

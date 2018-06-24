@@ -51,7 +51,7 @@ init location =
             Nothing ->
                 ( route, Navigation.newUrl (urlFor Home) )
 
-            Just location ->
+            Just _ ->
                 ( route, Cmd.none )
 
 

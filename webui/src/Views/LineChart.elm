@@ -6,7 +6,6 @@ import Visualization.Shape as Shape
 import Date
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
-import Date exposing (Date)
 
 
 w : Float

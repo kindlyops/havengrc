@@ -12,8 +12,6 @@ import Data.Survey
         , IpsativeAnswer
         , LikertAnswer
         , SurveyMetaData
-        , IpsativeServerData
-        , IpsativeServerQuestion
         )
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -300,7 +298,7 @@ update msg model authModel =
             in
                 { model | currentSurvey = newSurvey } ! []
 
-        GotoQuestion survey questionNumber ->
+        GotoQuestion _ questionNumber ->
             case model.currentSurvey of
                 Ipsative survey ->
                     case Zipper.find (\x -> x.orderNumber == questionNumber) (Zipper.first survey.questions) of

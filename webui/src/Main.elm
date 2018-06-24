@@ -5,7 +5,6 @@ import Navigation
 import Gravatar
 import Authentication
 import Http
-import Keycloak
 import Ports
 import Html exposing (..)
 import Html.Attributes exposing (..)
