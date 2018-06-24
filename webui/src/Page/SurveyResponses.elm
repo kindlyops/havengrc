@@ -160,6 +160,8 @@ viewIpsativeResponse response =
     div []
         [ h2 [] [ text ("Name: " ++ response.name) ]
         , viewResponseTable response.data
+        , button [ class "btn btn-primary", onClick GenerateChart ] [ text "Click to generate radar chart of results." ]
+        , canvas [ id "chart" ] []
         ]
 
 
@@ -183,6 +185,17 @@ viewResponseTable datum =
                     datum
                )
         )
+
+
+
+-- viewResponseChart : Html Msg
+-- viewResponseChart =
+--     canvas [ id "chart" ] []
+-- List.map
+--     (\datum ->
+--         div [] [ text datum.category ]
+--     )
+--     datum
 
 
 viewHome : Model -> Html Msg
