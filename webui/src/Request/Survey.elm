@@ -15,11 +15,6 @@ import Authentication
 import Data.Survey
 
 
-ipsativeUrl : String
-ipsativeUrl =
-    "/api/ipsative_surveys"
-
-
 getIpsativeSurveys : Authentication.Model -> Http.Request (List Data.Survey.SurveyMetaData)
 getIpsativeSurveys authModel =
     let

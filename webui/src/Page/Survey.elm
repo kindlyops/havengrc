@@ -20,8 +20,8 @@ import Data.Survey
         , LikertAnswer
         , SurveyMetaData
         )
-import Html exposing (Html, div, h1, text, p, button, hr, br, table, tbody, tr, td, i, thead, th, nav, a, span, ul, li, h3, h4)
-import Html.Attributes exposing (class, disabled, style, attribute, type_, id, href)
+import Html exposing (Html, div, h1, text, p, button, hr, br, table, tbody, tr, td, i, thead, th, ul, li, h3, h4)
+import Html.Attributes exposing (class, disabled, style, type_)
 import Html.Events exposing (onClick)
 import List.Zipper as Zipper
 import Authentication
@@ -797,33 +797,6 @@ viewIpsativeSurvey survey =
         , viewIpsativeSurveyBoxes (Zipper.current survey.questions)
         , br [] []
         , viewSurveyFooter
-        ]
-
-
-viewNavbar : Html Msg
-viewNavbar =
-    nav [ class "navbar navbar-expand-lg navbar-light bg-light" ]
-        [ a [ class "navbar-brand", style [ ( "cursor", "pointer" ) ], onClick GoToHome ]
-            [ text "Haven Survey" ]
-        , button [ attribute "aria-controls" "navbarSupportedContent", attribute "aria-expanded" "false", attribute "aria-label" "Toggle navigation", class "navbar-toggler", attribute "data-target" "#navbarSupportedContent", attribute "data-toggle" "collapse", type_ "button" ]
-            [ span [ class "navbar-toggler-icon" ]
-                []
-            ]
-        , div [ class "collapse navbar-collapse", id "navbarSupportedContent" ]
-            [ ul [ class "navbar-nav mr-auto" ]
-                [ li [ class "nav-item active" ]
-                    [ a [ class "nav-link", style [ ( "cursor", "pointer" ) ], onClick GoToHome ]
-                        [ text "Home "
-                        , span [ class "sr-only" ]
-                            [ text "(current)" ]
-                        ]
-                    ]
-                , li [ class "nav-item" ]
-                    [ a [ class "nav-link", href "https://github.com/kindlyops/elm-survey-prototype" ]
-                        [ text "Github" ]
-                    ]
-                ]
-            ]
         ]
 
 

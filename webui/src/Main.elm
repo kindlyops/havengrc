@@ -4,9 +4,8 @@ import Keycloak
 import Navigation
 import Gravatar
 import Authentication
-import Http
 import Ports
-import Html exposing (Html, div, nav, button, span, text, section, h1, ul, li, a, img, i)
+import Html exposing (Html, div, nav, button, span, text, ul, li, a, img, i)
 import Html.Attributes exposing (class, attribute, id, href, style, classList)
 import Html.Events exposing (onClick)
 import Route
@@ -175,22 +174,6 @@ update msg model =
                 ( { model | surveyResponseModel = surveyResponseModel }, Cmd.map SurveyResponseMsg cmd )
 
 
-getHTTPErrorMessage : Http.Error -> String
-getHTTPErrorMessage error =
-    case error of
-        Http.NetworkError ->
-            "Is the server running?"
-
-        Http.BadStatus response ->
-            (toString response.status)
-
-        Http.BadPayload message _ ->
-            "Decoding Failed: " ++ message
-
-        _ ->
-            (toString error)
-
-
 selectedItem : Route.Model -> String
 selectedItem route =
     let
@@ -309,23 +292,6 @@ notFoundBody model =
     div [] [ text "This is the notFound view" ]
 
 
-viewHeader : Model -> Html Msg
-viewHeader model =
-    div [ class "mdc-toolbar mdc-toolbar--fixed header" ]
-        [ div [ class "mdc-toolbar__row" ]
-            [ section [ class "mdc-toolbar__section mdc-toolbar__section--align-start" ]
-                [ button
-                    [ id "MenuButton"
-                    , class "menu material-icons mdc-toolbar__icon--menu"
-                    ]
-                    [ text "menu" ]
-                , h1 [ class "mdc-toolbar__title" ]
-                    [ text "Haven GRC" ]
-                ]
-            ]
-        ]
-
-
 viewNavUser : Model -> Keycloak.UserProfile -> Html Msg
 viewNavUser model user =
     ul [ class "navbar-nav" ]
@@ -350,49 +316,6 @@ viewNavUser model user =
         ]
 
 
-viewUser : Model -> Keycloak.UserProfile -> Html Msg
-viewUser model user =
-    div [ class "user-container" ]
-        [ img
-            [ attribute "sizing" "contain"
-            , attribute "src" (getGravatar user.username)
-            , class "user-avatar"
-            ]
-            []
-        , span [ class "user-name" ]
-            [ text user.firstName ]
-        , div [ class "mdc-menu-anchor" ]
-            [ button
-                [ id "UserDropdownButton"
-                , class "user-menu-btn"
-                ]
-                [ i [ class "material-icons" ]
-                    [ text "arrow_drop_down" ]
-                ]
-            , div
-                [ id "UserDropdownMenu"
-                , class "mdc-simple-menu"
-                , attribute "tabindex" "-1"
-                ]
-                [ ul [ class "mdc-simple-menu__items mdc-list" ]
-                    [ a
-                        [ class "mdc-list-item"
-                        , href "/auth/realms/havendev/account/"
-                        , attribute "tabindex" "0"
-                        ]
-                        [ text "Edit Account" ]
-                    , li
-                        [ class "mdc-list-item"
-                        , onClick (AuthenticationMsg Authentication.LogOut)
-                        , attribute "tabindex" "0"
-                        ]
-                        [ text "Log Out" ]
-                    ]
-                ]
-            ]
-        ]
-
-
 viewNavDrawerItems : List MenuItem -> Route.Model -> Html Msg
 viewNavDrawerItems menuItems route =
     nav [ class "navdrawer-nav" ]
@@ -409,8 +332,6 @@ viewNavDrawerItem menuItem route =
     a
         [ attribute "name" (String.toLower menuItem.text)
         , onClick <| NavigateTo <| menuItem.route
-
-        --, href "#"
         , style [ ( "cursor", "pointer" ) ]
         , classList
             [ ( "nav-item", True )

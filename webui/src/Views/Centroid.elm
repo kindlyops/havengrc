@@ -42,21 +42,6 @@ dot =
     Path.begin |> Path.moveTo 5 5 |> Path.arc 0 0 5 0 (2 * pi) False |> Path.toAttrString
 
 
-circular : List Arc -> Svg msg
-circular arcs =
-    let
-        makeSlice index datum =
-            path [ d (Shape.arc datum), style ("fill:" ++ (Maybe.withDefault "#000" <| getAt index colors) ++ "; stroke: #000;") ] []
-
-        makeDot datum =
-            path [ d dot, transform ("translate" ++ toString (Shape.centroid datum)) ] []
-    in
-        g [ transform ("translate(" ++ toString radius ++ "," ++ toString radius ++ ")") ]
-            [ g [] <| List.indexedMap makeSlice arcs
-            , g [] <| List.map makeDot arcs
-            ]
-
-
 annular : List Arc -> Svg msg
 annular arcs =
     let

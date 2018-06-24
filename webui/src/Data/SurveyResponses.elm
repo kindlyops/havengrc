@@ -43,15 +43,3 @@ type alias AvailableResponseDatum =
     , category : String
     , points : Int
     }
-
-
-emptyAvailableResponse : AvailableResponse
-emptyAvailableResponse =
-    { name = "SCDS"
-    , data =
-        [ { group = 1
-          , category = "Process"
-          , points = 10
-          }
-        ]
-    }
