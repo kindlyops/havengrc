@@ -8,8 +8,7 @@ import Ports
 
 
 type Msg
-    = NoOp
-    | ShowError String
+    = ShowError String
 
 
 type alias Model =
@@ -26,9 +25,6 @@ init =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        NoOp ->
-            model ! []
-
         ShowError str ->
             model ! [ Ports.showError str ]
 

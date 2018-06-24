@@ -90,7 +90,6 @@ main =
 type Msg
     = NavigateTo (Maybe Route.Location)
     | UrlChange Navigation.Location
-    | ShowError String
     | AuthenticationMsg Authentication.Msg
     | DashboardMsg Dashboard.Msg
     | CommentsMsg Comments.Msg
@@ -118,9 +117,6 @@ update msg model =
                     Debug.log "UrlChange: " location.hash
             in
                 { model | route = Route.locFor (Just location) } ! []
-
-        ShowError value ->
-            model ! [ Ports.showError value ]
 
         AuthenticationMsg authMsg ->
             let

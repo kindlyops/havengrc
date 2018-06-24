@@ -86,8 +86,7 @@ initialCommands authModel =
 
 
 type Msg
-    = NoOp
-    | BeginLikertSurvey
+    = BeginLikertSurvey
     | BeginIpsativeSurvey
     | StartLikertSurvey SurveyMetaData
     | StartIpsativeSurvey SurveyMetaData
@@ -114,9 +113,6 @@ type Msg
 update : Msg -> Model -> Authentication.Model -> ( Model, Cmd Msg )
 update msg model authModel =
     case msg of
-        NoOp ->
-            model ! []
-
         SaveCurrentSurvey ->
             case model.currentSurvey of
                 Ipsative survey ->

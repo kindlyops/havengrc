@@ -23,7 +23,6 @@ import Data.SurveyResponses exposing (GroupedIpsativeResponse, AvailableResponse
 type ResponsePage
     = Home
     | IpsativeResponse
-    | LikertResponse
 
 
 type alias Model =
@@ -59,8 +58,7 @@ initialCommands authModel =
 
 
 type Msg
-    = NoOp
-    | GenerateChart
+    = GenerateChart
     | GotServerIpsativeResponses (Result Http.Error (List GroupedIpsativeResponse))
     | StartVisualization AvailableResponse
     | GoToHome
@@ -69,9 +67,6 @@ type Msg
 update : Msg -> Model -> Authentication.Model -> ( Model, Cmd Msg )
 update msg model authModel =
     case msg of
-        NoOp ->
-            model ! []
-
         StartVisualization availableResponse ->
             { model
                 | currentPage = IpsativeResponse
@@ -161,9 +156,6 @@ view authModel model =
 
                 Just x ->
                     viewIpsativeResponse x
-
-        LikertResponse ->
-            div [] [ text "not done" ]
 
 
 viewIpsativeResponse : AvailableResponse -> Html Msg
