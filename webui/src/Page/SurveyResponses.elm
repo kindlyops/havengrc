@@ -158,16 +158,31 @@ view authModel model =
 viewIpsativeResponse : AvailableResponse -> Html Msg
 viewIpsativeResponse response =
     div []
-        (div [] [ text response.name ] :: viewTest response.data)
+        [ h2 [] [ text ("Name: " ++ response.name) ]
+        , viewResponseTable response.data
+        ]
 
 
-viewTest : List AvailableResponseDatum -> List (Html Msg)
-viewTest datum =
-    List.map
-        (\datum ->
-            div [] [ text datum.category ]
+viewResponseTable : List AvailableResponseDatum -> Html Msg
+viewResponseTable datum =
+    Html.table []
+        ([ Html.tr []
+            [ Html.th [] [ text "Category" ]
+            , Html.th [] [ text "Group" ]
+            , Html.th [] [ text "Points" ]
+            ]
+         ]
+            ++ (List.map
+                    (\datum ->
+                        Html.tr []
+                            [ Html.td [] [ text datum.category ]
+                            , Html.td [] [ text (toString datum.group) ]
+                            , Html.td [] [ text (toString datum.points) ]
+                            ]
+                    )
+                    datum
+               )
         )
-        datum
 
 
 viewHome : Model -> Html Msg
@@ -202,7 +217,7 @@ viewAvailableResponseCard availableResponse =
                     [ class "btn btn-primary"
                     , onClick (StartVisualization availableResponse)
                     ]
-                    [ text "Click to start survey" ]
+                    [ text "Click to view response" ]
                 ]
             ]
         ]
