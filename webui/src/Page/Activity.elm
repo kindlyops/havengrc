@@ -1,6 +1,6 @@
 module Page.Activity exposing (view)
 
-import Html exposing (..)
+import Html exposing (Html, div, text)
 import Date
 import Views.LineChart as LineChart
 

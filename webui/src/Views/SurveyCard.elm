@@ -1,8 +1,8 @@
 module Views.SurveyCard exposing (view)
 
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Html.Events exposing (..)
+import Html exposing (Html, div, h5, p, text, ul, button, li)
+import Html.Attributes exposing (class)
+import Html.Events exposing (onClick)
 import Data.Survey exposing (SurveyMetaData)
 
 

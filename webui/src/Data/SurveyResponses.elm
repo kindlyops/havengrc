@@ -1,4 +1,10 @@
-module Data.SurveyResponses exposing (..)
+module Data.SurveyResponses
+    exposing
+        ( GroupedIpsativeResponse
+        , groupedIpsativeResponseDecoder
+        , AvailableResponseDatum
+        , AvailableResponse
+        )
 
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (decode, required)

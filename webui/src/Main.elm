@@ -1,4 +1,4 @@
-module Main exposing (..)
+module Main exposing (main)
 
 import Keycloak
 import Navigation
@@ -6,9 +6,9 @@ import Gravatar
 import Authentication
 import Http
 import Ports
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Html.Events exposing (..)
+import Html exposing (Html, div, nav, button, span, text, section, h1, ul, li, a, img, i)
+import Html.Attributes exposing (class, attribute, id, href, style, classList)
+import Html.Events exposing (onClick)
 import Route
 import Page.Home as Home
 import Page.Dashboard as Dashboard

@@ -1,4 +1,11 @@
-module Page.Survey exposing (..)
+module Page.Survey
+    exposing
+        ( Model
+        , init
+        , update
+        , Msg
+        , view
+        )
 
 import Data.Survey
     exposing
@@ -13,10 +20,10 @@ import Data.Survey
         , LikertAnswer
         , SurveyMetaData
         )
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Html.Events exposing (..)
-import List.Zipper as Zipper exposing (..)
+import Html exposing (Html, div, h1, text, p, button, hr, br, table, tbody, tr, td, i, thead, th, nav, a, span, ul, li, h3, h4)
+import Html.Attributes exposing (class, disabled, style, attribute, type_, id, href)
+import Html.Events exposing (onClick)
+import List.Zipper as Zipper
 import Authentication
 import Http
 import Request.Survey

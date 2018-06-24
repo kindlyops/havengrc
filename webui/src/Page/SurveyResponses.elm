@@ -1,9 +1,16 @@
-module Page.SurveyResponses exposing (..)
+module Page.SurveyResponses
+    exposing
+        ( Model
+        , Msg
+        , update
+        , view
+        , init
+        )
 
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Html.Events exposing (..)
-import List.Extra exposing (..)
+import Html exposing (Html, div, text, h2, button, canvas, h1, p, hr, h5)
+import Html.Attributes exposing (class, id)
+import Html.Events exposing (onClick)
+import List.Extra exposing (groupWhile)
 import Authentication
 import Http
 import Request.SurveyResponses

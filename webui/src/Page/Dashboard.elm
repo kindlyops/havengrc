@@ -1,8 +1,8 @@
 module Page.Dashboard exposing (view, Model, init, update, Msg)
 
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Html.Events exposing (..)
+import Html exposing (Html, div, br, button, text)
+import Html.Attributes exposing (class)
+import Html.Events exposing (onClick)
 import Views.Centroid as Centroid
 import Ports
 

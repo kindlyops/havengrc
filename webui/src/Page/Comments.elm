@@ -1,10 +1,10 @@
 module Page.Comments exposing (Model, Msg, init, update, view)
 
 import Data.Comment exposing (Comment, emptyNewComment)
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Html.Events exposing (..)
-import Authentication exposing (..)
+import Html exposing (Html, div, text, ul, li, button, input, label)
+import Html.Attributes exposing (class, id, attribute)
+import Html.Events exposing (onClick, onInput)
+import Authentication
 import Http
 import Request.Comments
 import Ports

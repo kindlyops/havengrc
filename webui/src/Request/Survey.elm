@@ -1,4 +1,13 @@
-module Request.Survey exposing (..)
+module Request.Survey
+    exposing
+        ( getIpsativeSurveys
+        , getLikertSurveys
+        , postIpsativeResponse
+        , postLikertResponses
+        , getLikertChoices
+        , getLikertSurvey
+        , getIpsativeSurvey
+        )
 
 import Http
 import Json.Decode as Decode

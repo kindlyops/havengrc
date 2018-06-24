@@ -1,4 +1,4 @@
-port module Ports exposing (..)
+port module Ports exposing (radarChart, showError, setTitle, keycloakAuthResult, keycloakLogout, keycloakLogin)
 
 import Keycloak exposing (Options, RawAuthenticationResult)
 import Data.RadarChart exposing (RadarChartConfig)

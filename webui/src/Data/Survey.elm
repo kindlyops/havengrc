@@ -1,9 +1,41 @@
-module Data.Survey exposing (..)
+module Data.Survey
+    exposing
+        ( createIpsativeSurvey
+        , createLikertSurvey
+        , emptyIpsativeServerMetaData
+        , emptyIpsativeServerSurvey
+        , groupIpsativeSurveyData
+        , groupLikertSurveyData
+        , IpsativeAnswer
+        , ipsativeMetaDataDecoder
+        , IpsativeQuestion
+        , IpsativeResponse
+        , ipsativeResponseDecoder
+        , ipsativeResponseEncoder
+        , IpsativeServerData
+        , IpsativeSurvey
+        , ipsativeSurveyDataDecoder
+        , LikertAnswer
+        , likertMetaDataDecoder
+        , LikertQuestion
+        , LikertResponse
+        , likertResponseDecoder
+        , likertResponseEncoder
+        , LikertServerChoice
+        , LikertServerData
+        , LikertSurvey
+        , likertSurveyChoicesDecoder
+        , likertSurveyDataDecoder
+        , PointsAssigned
+        , PointsLeft
+        , Survey(..)
+        , SurveyMetaData
+        )
 
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (decode, required)
 import Json.Encode as Encode
-import List.Zipper as Zipper exposing (..)
+import List.Zipper as Zipper
 import List.Extra
 
 
@@ -16,7 +48,7 @@ type alias IpsativeSurvey =
     { metaData : SurveyMetaData
     , pointsPerQuestion : Int
     , numGroups : Int
-    , questions : Zipper IpsativeQuestion
+    , questions : Zipper.Zipper IpsativeQuestion
     }
 
 
@@ -411,7 +443,7 @@ emptyIpsativeServerSurvey =
 
 type alias LikertSurvey =
     { metaData : SurveyMetaData
-    , questions : Zipper LikertQuestion
+    , questions : Zipper.Zipper LikertQuestion
     }
 
 
