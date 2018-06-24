@@ -32,7 +32,7 @@ post authModel newComment =
                 |> Http.jsonBody
 
         headers =
-            (Authentication.tryGetAuthHeader authModel) ++ Authentication.getReturnHeaders
+            Authentication.tryGetAuthHeader authModel ++ Authentication.getReturnHeaders
 
         _ =
             Debug.log "postComment called with " newComment.message

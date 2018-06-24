@@ -67,9 +67,9 @@ init initialUser location =
         ( model
         , Cmd.batch
             [ routeCmd
-            , (Cmd.map CommentsMsg commentsCmd)
-            , (Cmd.map SurveyMsg surveyCmd)
-            , (Cmd.map SurveyResponseMsg surveyResponsesCmd)
+            , Cmd.map CommentsMsg commentsCmd
+            , Cmd.map SurveyMsg surveyCmd
+            , Cmd.map SurveyResponseMsg surveyResponsesCmd
             ]
         )
 
@@ -81,7 +81,7 @@ subscriptions model =
 
 main : Program (Maybe Keycloak.LoggedInUser) Model Msg
 main =
-    Navigation.programWithFlags (UrlChange)
+    Navigation.programWithFlags UrlChange
         { init = init
         , update = update
         , subscriptions = subscriptions
@@ -142,8 +142,8 @@ update msg model =
                   }
                 , Cmd.batch
                     [ Cmd.map AuthenticationMsg cmd
-                    , (Cmd.map CommentsMsg commentsCmd)
-                    , (Cmd.map SurveyMsg surveyCmd)
+                    , Cmd.map CommentsMsg commentsCmd
+                    , Cmd.map SurveyMsg surveyCmd
                     ]
                 )
 
@@ -277,16 +277,16 @@ viewBody model =
     div [ id "content", class "content-wrapper container" ]
         [ case model.route of
             Nothing ->
-                (Dashboard.view model.dashboardModel) |> Html.map DashboardMsg
+                Dashboard.view model.dashboardModel |> Html.map DashboardMsg
 
             Just Route.Home ->
-                (Dashboard.view model.dashboardModel) |> Html.map DashboardMsg
+                Dashboard.view model.dashboardModel |> Html.map DashboardMsg
 
             Just Route.Reports ->
                 Reports.view
 
             Just Route.Dashboard ->
-                (Dashboard.view model.dashboardModel) |> Html.map DashboardMsg
+                Dashboard.view model.dashboardModel |> Html.map DashboardMsg
 
             Just Route.Comments ->
                 Comments.view model.authModel model.commentsModel |> Html.map CommentsMsg
@@ -416,7 +416,7 @@ viewNavDrawerItem menuItem route =
         , classList
             [ ( "nav-item", True )
             , ( "nav-link", True )
-            , ( "active", (String.toLower menuItem.text) == (selectedItem route) )
+            , ( "active", String.toLower menuItem.text == selectedItem route )
             ]
         ]
         [ i [ class "material-icons" ] [ text menuItem.iconName ]

@@ -179,16 +179,15 @@ viewResponseTable datum =
             , Html.th [] [ text "Points" ]
             ]
          ]
-            ++ (List.map
-                    (\datum ->
-                        Html.tr []
-                            [ Html.td [] [ text datum.category ]
-                            , Html.td [] [ text (toString datum.group) ]
-                            , Html.td [] [ text (toString datum.points) ]
-                            ]
-                    )
-                    datum
-               )
+            ++ List.map
+                (\datum ->
+                    Html.tr []
+                        [ Html.td [] [ text datum.category ]
+                        , Html.td [] [ text (toString datum.group) ]
+                        , Html.td [] [ text (toString datum.points) ]
+                        ]
+                )
+                datum
         )
 
 
@@ -198,7 +197,7 @@ viewHome model =
         [ h1 [ class "display-4" ] [ text "Survey Responses" ]
         , p [ class "lead" ] [ text "Select a response group to get started." ]
         , hr [ class "my-4" ] []
-        , p [ class "" ] [ text ("There are currently " ++ (toString (List.length model.availableResponses)) ++ " responses to choose from.") ]
+        , p [ class "" ] [ text ("There are currently " ++ toString (List.length model.availableResponses) ++ " responses to choose from.") ]
         , div [ class "row" ]
             (List.map
                 (\availableResponse ->

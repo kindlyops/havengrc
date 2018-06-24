@@ -95,7 +95,7 @@ tryGetAuthHeader : Model -> List Http.Header
 tryGetAuthHeader authModel =
     case authModel.state of
         Keycloak.LoggedIn user ->
-            [ (Http.header "Authorization" ("Bearer " ++ user.token)) ]
+            [ Http.header "Authorization" ("Bearer " ++ user.token) ]
 
         Keycloak.LoggedOut ->
             let
@@ -107,4 +107,4 @@ tryGetAuthHeader authModel =
 
 getReturnHeaders : List Http.Header
 getReturnHeaders =
-    [ (Http.header "Prefer" "return=representation") ]
+    [ Http.header "Prefer" "return=representation" ]

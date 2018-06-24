@@ -24,7 +24,7 @@ view =
                         ]
                     , button
                         [ class "btn btn-primary mt-4"
-                        , onClick (Authentication.ShowLogIn)
+                        , onClick Authentication.ShowLogIn
                         ]
                         [ text "Login" ]
                     ]

@@ -53,7 +53,7 @@ postIpsativeResponse authModel ipsativeSurvey =
                 |> Http.jsonBody
 
         headers =
-            (Authentication.tryGetAuthHeader authModel) ++ Authentication.getReturnHeaders
+            Authentication.tryGetAuthHeader authModel ++ Authentication.getReturnHeaders
 
         --_ =
         --Debug.log "Ipsative Response: " newComment.message
@@ -130,7 +130,7 @@ postLikertResponses authModel likertSurvey =
                 |> Http.jsonBody
 
         headers =
-            (Authentication.tryGetAuthHeader authModel) ++ Authentication.getReturnHeaders
+            Authentication.tryGetAuthHeader authModel ++ Authentication.getReturnHeaders
 
         request =
             Http.request

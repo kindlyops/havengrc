@@ -120,10 +120,10 @@ urlFor loc =
                     "/surveyResponses"
 
                 ShowComment id ->
-                    "/comments/" ++ (toString id)
+                    "/comments/" ++ toString id
 
                 EditComment id ->
-                    "/comments/" ++ (toString id) ++ "/edit"
+                    "/comments/" ++ toString id ++ "/edit"
     in
         "#" ++ url
 

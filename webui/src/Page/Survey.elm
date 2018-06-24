@@ -600,7 +600,7 @@ viewIncompleteButtons : Survey -> List Int -> List (Html Msg)
 viewIncompleteButtons survey questionNumbers =
     List.map
         (\questionNumber ->
-            div [ class "my-2" ] [ button [ class "btn btn-primary", onClick (GotoQuestion survey questionNumber) ] [ text ("Click to go back to question " ++ (toString questionNumber)) ] ]
+            div [ class "my-2" ] [ button [ class "btn btn-primary", onClick (GotoQuestion survey questionNumber) ] [ text ("Click to go back to question " ++ toString questionNumber) ] ]
         )
         questionNumbers
 
@@ -665,12 +665,12 @@ viewHero model =
         , button [ class "btn btn-primary", onClick GetIpsativeSurveys ] [ text "get ipsative surveys (debug)" ]
         , button [ class "btn btn-primary", onClick GetLikertSurveys ] [ text "get likert surveys (debug)" ]
         , hr [ class "my-4" ] []
-        , p [ class "" ] [ text ("There are currently " ++ (toString (getTotalAvailableSurveys model)) ++ " surveys to choose from.") ]
+        , p [ class "" ] [ text ("There are currently " ++ toString (getTotalAvailableSurveys model) ++ " surveys to choose from.") ]
         , div [ class "row" ]
             (List.map
                 (\availableSurvey ->
                     div [ class "col-6 mb-4" ]
-                        [ (Views.SurveyCard.view availableSurvey "Ipsative" (StartIpsativeSurvey availableSurvey))
+                        [ Views.SurveyCard.view availableSurvey "Ipsative" (StartIpsativeSurvey availableSurvey)
                         ]
                 )
                 model.availableIpsativeSurveys
@@ -679,7 +679,7 @@ viewHero model =
             (List.map
                 (\availableSurvey ->
                     div [ class "col-6 mb-4" ]
-                        [ (Views.SurveyCard.view availableSurvey "Likert" (StartLikertSurvey availableSurvey))
+                        [ Views.SurveyCard.view availableSurvey "Likert" (StartLikertSurvey availableSurvey)
                         ]
                 )
                 model.availableLikertSurveys
@@ -740,18 +740,17 @@ viewLikertSurveyTableRows question =
             (\answer ->
                 tr [ class "" ]
                     (td [] [ text answer.answer ]
-                        :: (List.map
-                                (\choice ->
-                                    if isLikertSelected answer choice then
-                                        td [ class "bg-success text-white text-center align-middle", onClick (SelectLikertAnswer answer.id choice) ]
-                                            [ i [ class "material-icons" ] [ text "check" ] ]
-                                    else
-                                        td [ class "", onClick (SelectLikertAnswer answer.id choice) ]
-                                            [ div [ class "" ] []
-                                            ]
-                                )
-                                question.choices
-                           )
+                        :: List.map
+                            (\choice ->
+                                if isLikertSelected answer choice then
+                                    td [ class "bg-success text-white text-center align-middle", onClick (SelectLikertAnswer answer.id choice) ]
+                                        [ i [ class "material-icons" ] [ text "check" ] ]
+                                else
+                                    td [ class "", onClick (SelectLikertAnswer answer.id choice) ]
+                                        [ div [ class "" ] []
+                                        ]
+                            )
+                            question.choices
                     )
             )
             question.answers
@@ -776,12 +775,11 @@ viewLikertSurveyTableHeader surveyQuestion =
     thead [ class "thead-light" ]
         [ tr [ class "" ]
             (th [ class " " ] [ text "Statement" ]
-                :: (List.map
-                        (\choice ->
-                            th [ class " " ] [ text choice ]
-                        )
-                        surveyQuestion.choices
-                   )
+                :: List.map
+                    (\choice ->
+                        th [ class " " ] [ text choice ]
+                    )
+                    surveyQuestion.choices
             )
         ]
 
@@ -841,7 +839,7 @@ viewLikertSurveyTitle survey =
     in
         div [ class "row" ]
             [ div [ class "col-lg ", style [ ( "text-align", "center" ) ] ]
-                [ h3 [ class "" ] [ text ("Question " ++ questionNumber ++ " of " ++ (toString totalQuestions)) ]
+                [ h3 [ class "" ] [ text ("Question " ++ questionNumber ++ " of " ++ toString totalQuestions) ]
                 , h4 [] [ text questionTitle ]
                 ]
             ]
@@ -864,7 +862,7 @@ viewIpsativeSurveyTitle survey =
     in
         div [ class "row" ]
             [ div [ class "col-lg ", style [ ( "text-align", "center" ) ] ]
-                [ h3 [ class "" ] [ text ("Question " ++ (toString questionNumber) ++ " of " ++ (toString totalQuestions)) ]
+                [ h3 [ class "" ] [ text ("Question " ++ toString questionNumber ++ " of " ++ toString totalQuestions) ]
                 , h4 [] [ text questionTitle ]
                 , div [ class "row" ] (viewPointsLeft currentQuestion.pointsLeft survey.pointsPerQuestion)
                 ]
@@ -876,9 +874,9 @@ viewPointsLeft pointsLeft pointsPerQuestion =
     List.map
         (\x ->
             div [ class "col-md" ]
-                [ p [] [ text ("Group " ++ (toString x.group) ++ ": " ++ (toString x.pointsLeft) ++ "/" ++ (toString pointsPerQuestion)) ]
+                [ p [] [ text ("Group " ++ toString x.group ++ ": " ++ toString x.pointsLeft ++ "/" ++ toString pointsPerQuestion) ]
                 , div [ class "progress" ]
-                    [ div [ class "progress-bar bg-primary", style [ (calculateProgressBarPercent x.pointsLeft pointsPerQuestion) ] ] []
+                    [ div [ class "progress-bar bg-primary", style [ calculateProgressBarPercent x.pointsLeft pointsPerQuestion ] ] []
                     ]
                 ]
         )
@@ -889,7 +887,7 @@ calculateProgressBarPercent : Int -> Int -> ( String, String )
 calculateProgressBarPercent current max =
     let
         percent =
-            100 * ((toFloat current) / (toFloat max))
+            100 * (toFloat current / toFloat max)
 
         percentString =
             toString percent ++ "%"
