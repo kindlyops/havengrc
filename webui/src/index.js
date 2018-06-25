@@ -40,8 +40,10 @@ keycloak.onAuthSuccess = function () {
     })
 }
 
-function tellElmLogout() {
-  alert("got keycloak logout callback");
+
+
+keycloak.onAuthLogout = function () {
+  console.log("got onAuthLogout callback");
   // send a null result to trigger our existing AuthResult code and logout.
   var result = { err: null, ok: null }
   sessionStorage.removeItem('profile')
@@ -49,11 +51,16 @@ function tellElmLogout() {
   elmApp.ports.keycloakAuthResult.send(result)
 }
 
-keycloak.onAuthLogout = tellElmLogout
-
 keycloak.onAuthRefreshSuccess = sendElmKeycloakToken
 
-keycloak.onAuthRefreshError = tellElmLogout
+keycloak.onAuthRefreshError = function () {
+  console.log("got AuthRefreshError callback");
+  // send a null result to trigger our existing AuthResult code and logout.
+  var result = { err: null, ok: null }
+  sessionStorage.removeItem('profile')
+  sessionStorage.removeItem('token')
+  elmApp.ports.keycloakAuthResult.send(result)
+}
 
 keycloak.onTokenExpired = function () {
   console.log('got keycloak token expired')
