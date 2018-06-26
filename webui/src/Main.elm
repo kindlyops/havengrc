@@ -17,6 +17,7 @@ import Page.Comments as Comments
 import Page.Activity as Activity
 import Page.Reports as Reports
 import Page.Survey as Survey
+import Page.SurveyResponses as SurveyResponses
 
 
 type alias Model =
@@ -25,6 +26,7 @@ type alias Model =
     , dashboardModel : Dashboard.Model
     , commentsModel : Comments.Model
     , surveyModel : Survey.Model
+    , surveyResponseModel : SurveyResponses.Model
     }
 
 
@@ -50,12 +52,16 @@ init initialUser location =
         ( surveyModel, surveyCmd ) =
             Survey.init initialAuthModel
 
+        ( surveyResponseModel, surveyResponsesCmd ) =
+            SurveyResponses.init initialAuthModel
+
         model =
             { route = route
             , authModel = initialAuthModel
             , dashboardModel = Dashboard.init
             , commentsModel = commentsModel
             , surveyModel = surveyModel
+            , surveyResponseModel = surveyResponseModel
             }
     in
         ( model
@@ -63,6 +69,7 @@ init initialUser location =
             [ routeCmd
             , (Cmd.map CommentsMsg commentsCmd)
             , (Cmd.map SurveyMsg surveyCmd)
+            , (Cmd.map SurveyResponseMsg surveyResponsesCmd)
             ]
         )
 
@@ -90,6 +97,7 @@ type Msg
     | DashboardMsg Dashboard.Msg
     | CommentsMsg Comments.Msg
     | SurveyMsg Survey.Msg
+    | SurveyResponseMsg SurveyResponses.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -160,6 +168,13 @@ update msg model =
             in
                 ( { model | surveyModel = surveyModel }, Cmd.map SurveyMsg cmd )
 
+        SurveyResponseMsg surveyResponseMsg ->
+            let
+                ( surveyResponseModel, cmd ) =
+                    SurveyResponses.update surveyResponseMsg model.surveyResponseModel model.authModel
+            in
+                ( { model | surveyResponseModel = surveyResponseModel }, Cmd.map SurveyResponseMsg cmd )
+
 
 getHTTPErrorMessage : Http.Error -> String
 getHTTPErrorMessage error =
@@ -211,6 +226,7 @@ navDrawerItems =
     , { text = "Reports", iconName = "library_books", route = Just Route.Reports }
     , { text = "Comments", iconName = "gavel", route = Just Route.Comments }
     , { text = "Survey", iconName = "assignment", route = Just Route.Survey }
+    , { text = "SurveyResponses", iconName = "insert_chart_outlined", route = Just Route.SurveyResponses }
     ]
 
 
@@ -280,6 +296,9 @@ viewBody model =
 
             Just (Route.Survey) ->
                 Survey.view model.authModel model.surveyModel |> Html.map SurveyMsg
+
+            Just Route.SurveyResponses ->
+                SurveyResponses.view model.authModel model.surveyResponseModel |> Html.map SurveyResponseMsg
 
             Just _ ->
                 notFoundBody model
