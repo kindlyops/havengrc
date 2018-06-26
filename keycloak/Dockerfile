@@ -16,12 +16,13 @@ COPY                keycloak/configuration/standalone.xml /opt/jboss/keycloak/st
 COPY --from=build   /chargebee-provider/target/kindlyops-chargebee-form-action.jar /opt/jboss/keycloak/standalone/deployments
 USER root
 RUN chown -R jboss:0 $JBOSS_HOME/standalone && \
-    chmod -R g+rw $JBOSS_HOME/standalone && \
-    chown -R jboss:0 $JBOSS_HOME/modules/system/layers/base && \
-		chmod -R g+rw $JBOSS_HOME/modules/system/layers/base && \
-		chown -R jboss:0 /tmp && \
-		chmod -R g+rw /tmp
+	chmod -R g+rw $JBOSS_HOME/standalone && \
+	chown -R jboss:0 $JBOSS_HOME/modules/system/layers/base && \
+	chmod -R g+rw $JBOSS_HOME/modules/system/layers/base && \
+	chown -R jboss:0 /tmp && \
+	chmod -R g+rw /tmp
 USER 1000
+ENV         DB_VENDOR postgres
 ENV         ENV_VERBOSITY 无
 ENV         POSTGRES_DATABASE mappamundi_dev
 ENV         POSTGRES_USER postgres
