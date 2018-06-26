@@ -24,10 +24,10 @@ RUN chown -R jboss:0 $JBOSS_HOME/standalone && \
 USER 1000
 ENV         DB_VENDOR postgres
 ENV         ENV_VERBOSITY 无
-ENV         POSTGRES_DATABASE mappamundi_dev
-ENV         POSTGRES_USER postgres
-ENV         POSTGRES_PASSWORD postgres
-ENV         POSTGRES_PORT_5432_TCP_ADDR postgres
+ENV         DB_DATABASE mappamundi_dev
+ENV         DB_USER postgres
+ENV         DB_PASSWORD postgres
+ENV         DB_ADDR postgres
 ENV         KEYCLOAK_USER admin
 ENV         KEYCLOAK_PASSWORD admin
 ENV         PROXY_ADDRESS_FORWARDING true
