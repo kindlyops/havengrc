@@ -30,10 +30,10 @@ services:
       context: .
       dockerfile: ./keycloak/Dockerfile
     environment:
-      - POSTGRES_DATABASE=mappamundi_dev
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_PORT_5432_TCP_ADDR=postgres
+      - DB_DATABASE=mappamundi_dev
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_ADDR=postgres
       - KEYCLOAK_USER=admin
       - KEYCLOAK_PASSWORD=admin
       - PROXY_ADDRESS_FORWARDING=true
