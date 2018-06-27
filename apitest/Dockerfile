@@ -1,4 +1,4 @@
-FROM havengrc-docker.jfrog.io/ruby:2.4
+FROM havengrc-docker.jfrog.io/ruby:2.5
 
 RUN bundle config --global frozen 1
 
