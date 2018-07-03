@@ -145,12 +145,11 @@ jobs:
       - run:
           name: Run tests
           environment:
-            - POSTGRES_USER: circleci
+            - DB_USER: circleci
             - POSTGRES_DB: mappamundi_dev
             - POSTGRES_PASSWORD: ""
-            - POSTGRES_DATABASE: mappadmundi_dev
-            - POSTGRES_USER: circleci
-            - POSTGRES_PORT_5432_TCP_ADDR: localhost
+            - DB_DATABASE: mappadmundi_dev
+            - DB_ADDR: localhost
             - DATABASE_NAME: mappamundi_dev
             - DATABASE_USERNAME: circleci
             - DATABASE_PASSWORD: ""
@@ -173,7 +172,7 @@ jobs:
             # wait for DB
             docker run --network container:db jwilder/dockerize -wait tcp://localhost:5432 -timeout 1m
             # start keycloak in background container
-            docker run --network container:db -d -e POSTGRES_DATABASE -e POSTGRES_USER -e POSTGRES_PORT_5432_TCP_ADDR -e KEYCLOAK_USER -e KEYCLOAK_PASSWORD -e PROXY_ADDRESS_FORWARDING --name keycloak kindlyops/keycloak:$CIRCLE_SHA1
+            docker run --network container:db -d -e DB_DATABASE -e DB_USER -e DB_PASSWORD -e DB_ADDR -e KEYCLOAK_USER -e KEYCLOAK_PASSWORD -e PROXY_ADDRESS_FORWARDING --name keycloak kindlyops/keycloak:$CIRCLE_SHA1
             # Wait for keycloak
             docker run --network container:db jwilder/dockerize  -wait tcp://localhost:8080 -timeout 2m
             docker run --network container:db -e FLYWAY_URL -e FLYWAY_USER -e FLYWAY_IGNORE_MISSING_MIGRATIONS -e FLYWAY_GROUP -e FLYWAY_SCHEMAS kindlyops/havenflyway:$CIRCLE_SHA1 migrate -placeholders.databaseUser=circleci
