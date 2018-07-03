@@ -185,7 +185,7 @@ jobs:
             docker build -t kindlyops/havenapitest -f havenapi/Dockerfile-hotreload .
             docker run --volumes-from configs --network container:db -e TEST_DATABASE_URL -e HAVEN_JWK_PATH kindlyops/havenapitest /go/bin/buffalo test
             docker build -t kindlyops/apitest -f apitest/Dockerfile .
-            docker run --volumes-from configs --network container:db --name api -e DATABASE_USERNAME -e DATABASE_PASSWORD -e DATABASE_HOST -e HAVEN_JWK_PATH -e PGRST_JWT_AUD_CLAIM -e PGRST_SERVER_PROXY_URI kindlyops/postgrest
+            docker run --volumes-from configs --network container:db --name api -e DATABASE_USERNAME -e DATABASE_PASSWORD -e DATABASE_HOST -e HAVEN_JWK_PATH -e PGRST_JWT_AUD_CLAIM -e PGRST_SERVER_PROXY_URI kindlyops/postgrest postgrest config
             docker run --network container:db jwilder/dockerize  -wait tcp://localhost:8180 -timeout 2m
             docker run --volumes-from configs --network container:db --workdir /usr/src/app kindlyops/apitest cucumber
       - run:
