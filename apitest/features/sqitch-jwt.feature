@@ -14,7 +14,7 @@ Feature: Basic sqitch API interaction with JWT
         "message": "The system must be tested"
         }
         """
-        And  I send a POST request to "http://api:8180/comments"
+        And  I send a POST request to "http://{api_server}/comments"
         Then the response status should be "201"
         And the JSON response root should be array
         And the JSON response should have "$[0].user_id" of type string and value "90920d91-3090-4b4a-ae2a-2377cfa06ecd"
@@ -22,7 +22,7 @@ Feature: Basic sqitch API interaction with JWT
         And the JSON response should have "$[0].message" of type string and value "The system must be tested"
 
     Scenario: Search for all comments
-        When I send a GET request to "http://api:8180/comments"
+        When I send a GET request to "http://{api_server}/comments"
         Then the response status should be "200"
         And the JSON response root should be array
         And the JSON response should have "$[0].user_id" of type string and value "90920d91-3090-4b4a-ae2a-2377cfa06ecd"
@@ -38,5 +38,5 @@ Feature: Basic sqitch API interaction with JWT
         "user_email": "hacker@world.com"
         }
         """
-        And  I send a POST request to "http://api:8180/comments"
+        And  I send a POST request to "http://{api_server}/comments"
         Then the response status should be "400"

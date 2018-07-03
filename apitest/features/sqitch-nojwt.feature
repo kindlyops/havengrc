@@ -13,5 +13,5 @@ Feature: Basic sqitch access control
         "message": "The system must be tested"
         }
         """
-        And  I send a POST request to "http://api:8180/comments"
+        And  I send a POST request to "http://{api_server}/comments"
         Then the response status should be "401"
