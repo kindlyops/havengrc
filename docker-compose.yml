@@ -75,8 +75,6 @@ services:
     depends_on:
       - start_dependencies
     command: [cucumber]
-    environment:
-      - endpoint=http://api/
   api:
     build:
       dockerfile: ./postgrest/Dockerfile
