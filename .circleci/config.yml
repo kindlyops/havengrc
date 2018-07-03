@@ -177,6 +177,8 @@ jobs:
             docker cp postgrest/keycloak-dev-public-key.json configs:/cfg
             docker build -t kindlyops/havenapitest -f havenapi/Dockerfile-hotreload .
             docker run --volumes-from configs --network container:db -e TEST_DATABASE_URL -e HAVEN_JWK_PATH kindlyops/havenapitest /go/bin/buffalo test
+            docker build -t kindlyops/apitest -f apitest/Dockerfile .
+            docker run --volumes-from configs --network container:db kindlyops/apitest cucumber
       - run:
           name: notify failed job
           command: ./notify-slack notifications "CircleCI pipeline for $CIRCLE_PULL_REQUEST failed in $CIRCLE_JOB" circleci
