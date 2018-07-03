@@ -5,6 +5,8 @@ RUN bundle config --global frozen 1
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
-COPY ./apitest/* /usr/src/app/
+COPY ./apitest/Gemfile /usr/src/app
+COPY ./apitest/Gemfile.lock /usr/src/app
+COPY ./apitest/features/ /usr/src/app/features
 RUN bundle install
 CMD ["cucumber"]
