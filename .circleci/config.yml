@@ -172,6 +172,8 @@ jobs:
             docker run -d -e POSTGRES_USER -e POSTGRES_DB -e POSTGRES_PASSWORD --name db circleci/postgres:9.6.4-alpine
             # wait for DB
             docker run --network container:db jwilder/dockerize -wait tcp://localhost:5432 -timeout 1m
+            sleep 2
+            docker run --network container:db circleci/postgres:9.6.4-alpine /usr/local/bin/psql -l -h localhost -U circleci || true
             # create dummy DB to work around https://github.com/markbates/pop/issues/175
             docker run --network container:db circleci/postgres:9.6.4-alpine /usr/local/bin/createdb -h localhost -U circleci circleci
             # start keycloak in background container
