@@ -172,13 +172,13 @@ jobs:
             docker run -d -e POSTGRES_USER -e POSTGRES_DB -e POSTGRES_PASSWORD --name db circleci/postgres:9.6.4-alpine
             # wait for DB
             docker run --network container:db jwilder/dockerize -wait tcp://localhost:5432 -timeout 1m
+            # create dummy DB to work around https://github.com/markbates/pop/issues/175
+            docker run --network container:db circleci/postgres:9.6.4-alpine /usr/local/bin/createdb -h localhost -U circleci circleci
             # start keycloak in background container
             docker run --network container:db -d -e DB_DATABASE -e DB_USER -e DB_ADDR -e KEYCLOAK_USER -e KEYCLOAK_PASSWORD -e PROXY_ADDRESS_FORWARDING --name keycloak kindlyops/keycloak:$CIRCLE_SHA1
             # Wait for keycloak
             docker run --network container:db jwilder/dockerize  -wait tcp://localhost:8080 -timeout 2m
             docker run --network container:db -e FLYWAY_URL -e FLYWAY_USER -e FLYWAY_IGNORE_MISSING_MIGRATIONS -e FLYWAY_GROUP -e FLYWAY_SCHEMAS kindlyops/havenflyway:$CIRCLE_SHA1 migrate -placeholders.databaseUser=circleci
-            # create dummy DB to work around https://github.com/markbates/pop/issues/175
-            docker run --network container:db circleci/postgres:9.6.4-alpine /usr/local/bin/createdb -h localhost -U circleci circleci
             # creating dummy container which will hold a volume with config
             docker create -v /cfg --name configs alpine:3.4 /bin/true
             docker cp postgrest/keycloak-dev-public-key.json configs:/cfg
