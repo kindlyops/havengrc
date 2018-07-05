@@ -148,7 +148,7 @@ jobs:
             - POSTGRES_USER: circleci
             - POSTGRES_DB: mappamundi_dev
             - POSTGRES_PASSWORD: ""
-            - DB_DATABASE: mappadmundi_dev
+            - DB_DATABASE: mappamundi_dev
             - DB_ADDR: localhost
             - DB_USER: circleci
             - DATABASE_NAME: mappamundi_dev
