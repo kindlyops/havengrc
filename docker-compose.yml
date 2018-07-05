@@ -67,6 +67,9 @@ services:
       context: .
       dockerfile: ./apitest/Dockerfile
     working_dir: /usr/src/app
+    environment:
+      - API_SERVER=api:8180
+      - AUTH_SERVER=keycloak:8080
     volumes:
       - ./apitest:/usr/src/app
     links:
@@ -75,8 +78,6 @@ services:
     depends_on:
       - start_dependencies
     command: [cucumber]
-    environment:
-      - endpoint=http://api/
   api:
     build:
       dockerfile: ./postgrest/Dockerfile
