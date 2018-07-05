@@ -1,19 +1,22 @@
 <#macro mainLayout active bodyClass>
 <!doctype html>
 <html>
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <meta name="robots" content="noindex, nofollow">
+  <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      <meta name="robots" content="noindex, nofollow">
 
-    <title>Account Management</title>
-    <link rel="icon" href="${url.resourcesPath}/img/favicon-base.png" />
-    <#if properties.styles?has_content>
-        <#list properties.styles?split(' ') as style>
-            <link href="${url.resourcesPath}/${style}" rel="stylesheet" />
-        </#list>
-    </#if>
+      <title>Account Management</title>
+      <link rel="icon" href="${url.resourcesPath}/img/favicon-base.png" />
+      <#if properties.styles?has_content>
+          <#list properties.styles?split(' ') as style>
+              <link href="${url.resourcesPath}/${style}" rel="stylesheet" />
+          </#list>
+      </#if>
+      <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
     <#if properties.scripts?has_content>
         <#list properties.scripts?split(' ') as script>
             <script type="text/javascript" src="${url.resourcesPath}/${script}"></script>
@@ -22,105 +25,110 @@
     <script src="https://use.typekit.net/fru8myg.js"></script>
     <script>try{Typekit.load({ async: true });}catch(e){}</script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-</head>
-<body class="admin-console user ${bodyClass}">
-    <aside class="mdc-persistent-drawer mdc-typography sm-screen-drawer lg-screen-drawer" id="aside">
-        <nav class="mdc-persistent-drawer__drawer bs-sidebar">
-            <div class="nav-flex">
-                <div class="mdc-persistent-drawer__toolbar-spacer"></div>
-                <nav id="icon-with-text-demo" class="mdc-persistent-drawer__content mdc-list">
-                    <a href="${url.accountUrl}" class="<#if active=='account'>mdc-persistent-drawer--selected</#if> mdc-list-item">
-                        <i class="material-icons mdc-list-item__start-detail" aria-hidden="true">account_circle</i>
-                        ${msg("account")}
-                    </a>
-                    <#if features.passwordUpdateSupported>
-                        <a href="${url.passwordUrl}" class="<#if active=='password'>mdc-persistent-drawer--selected</#if> mdc-list-item">
-                            <i class="material-icons mdc-list-item__start-detail">fingerprint</i>
-                            ${msg("password")}
-                        </a>
-                    </#if>
-                        <a href="${url.totpUrl}" class="<#if active=='totp'>mdc-persistent-drawer--selected</#if> mdc-list-item">
-                            <i class="material-icons mdc-list-item__start-detail">verified_user</i>
-                            ${msg("authenticator")}
-                        </a>
-                    <#if features.identityFederation>
-                            <a href="${url.socialUrl}" class="<#if active=='social'>mdc-persistent-drawer--selected</#if> mdc-list-item">
-                                <i class="material-icons mdc-list-item__start-detail">arrow_back</i>
-                                ${msg("federatedIdentity")}
-                            </a>
-                    </#if>
-                        <a href="${url.sessionsUrl}" class="<#if active=='sessions'>mdc-persistent-drawer--selected</#if> mdc-list-item">
-                            <i class="material-icons mdc-list-item__start-detail">assignment</i>
-                            ${msg("sessions")}
-                        </a>
-                    <#if features.log>
-                            <a href="${url.logUrl}" class="<#if active=='log'>mdc-persistent-drawer--selected</#if> mdc-list-item">
-                                <i class="material-icons mdc-list-item__start-detail">arrow_back</i>
-                                ${msg("log")}
-                            </a>
-                    </#if>
-                    <a href="/" class="<#if active==''>mdc-persistent-drawer--selected</#if> mdc-list-item">
-                        <i class="material-icons mdc-list-item__start-detail">arrow_back</i>
-                        Return
-                    </a>
-                </nav>
+  </head>
+  <body class="admin-console user ${bodyClass}">
+    <header class="navbar navbar-expand-lg fixed-top navbar-dark bg-primary">
+      <button aria-controls="KCNavDrawer" aria-expanded="false" data-breakpoint="lg" data-target="#KCNavDrawer" data-toggle="navdrawer" data-type="permanent" class="navbar-toggler">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="navbar-brand mr-auto">Haven GRC</div>
+      <ul class="navbar-nav">
+        <#if realm.internationalizationEnabled>
+          <li class="nav-item">
+            <div class="kc-dropdown" id="kc-locale-dropdown">
+                <a href="#" id="kc-current-locale-link" class="nav-link">${locale.current}</a>
+                <ul>
+                    <#list locale.supported as l>
+                        <li class="kc-dropdown-item nav-item"><a class="nav-link" href="${l.url}">${l.label}</a></li>
+                    </#list>
+                </ul>
             </div>
-            <div class="drawer-logo">
-                <img src="${url.resourcesPath}/img/logo.png"  />
-            </div>
+          </li>
+        </#if>
+        <#if referrer?has_content && referrer.url?has_content>
+          <li class="nav-item">
+            <a href="${referrer.url}" id="referrer" class="nav-link">${msg("backTo",referrer.name)}</a>
+          </li>
+        </#if>
+        <li class="nav-item">
+          <a href="${url.logoutUrl}" class="nav-link">${msg("doSignOut")}</a>
+        </li>
+      </ul>
+    </header>
+    <div class="navdrawer navdrawer-permanent-lg navdrawer-permanent-clipped" id="KCNavDrawer" aria-hidden="true" tabindex="-1">
+      <div class="navdrawer-content">
+        <nav class="navdrawer-nav">
+          <li class="nav-item">
+            <a href="${url.accountUrl}" class="<#if active=='account'>active</#if> nav-link">
+                <i class="material-icons mr-3" aria-hidden="true">account_circle</i>
+                ${msg("account")}
+            </a>
+          </li>
+          <#if features.passwordUpdateSupported>
+          <li class="nav-item">
+                <a href="${url.passwordUrl}" class="<#if active=='password'>active</#if> nav-link">
+                    <i class="material-icons mr-3">fingerprint</i>
+                    ${msg("password")}
+                </a>
+          </li>
+          </#if>
+          <li class="nav-item">
+            <a href="${url.totpUrl}" class="<#if active=='totp'>active</#if> nav-link">
+                <i class="material-icons mr-3">verified_user</i>
+                ${msg("authenticator")}
+            </a>
+          </li>
+          <#if features.identityFederation>
+          <li class="nav-item">
+            <a href="${url.socialUrl}" class="<#if active=='social'>active</#if> nav-link">
+              <i class="material-icons mr-3">arrow_back</i>
+              ${msg("federatedIdentity")}
+            </a>
+          </li>
+          </#if>
+          <li class="nav-item">
+            <a href="${url.sessionsUrl}" class="<#if active=='sessions'>active</#if> nav-link">
+                <i class="material-icons mr-3">assignment</i>
+                ${msg("sessions")}
+            </a>
+          </li>
+          <#if features.log>
+          <li class="nav-item">
+            <a href="${url.logUrl}" class="<#if active=='log'>active</#if> nav-link">
+                <i class="material-icons mr-3">assignment</i>
+                ${msg("log")}
+            </a>
+          </li>
+          </#if>
+          <li class="nav-item">
+            <a href="/" class="<#if active==''>active</#if> nav-link">
+                <i class="material-icons mr-3">arrow_back</i>
+                Return
+            </a>
+          </li>
         </nav>
-    </aside>
-    <div class="content mdc-toolbar-fixed-adjust">
-        <header class="mdc-toolbar mdc-toolbar--fixed header">
-            <div class="mdc-toolbar__row">
-                <section class="mdc-toolbar__section mdc-toolbar__section--align-start">
-                    <button class="menu material-icons mdc-toolbar__icon--menu">menu</button>
-                    <h1 class="mdc-toolbar__title">Haven GRC</h1>
-                </section>
-                <section class="mdc-toolbar__section mdc-toolbar__section--align-end">
-                    <#if realm.internationalizationEnabled>
-                            <div class="kc-dropdown" id="kc-locale-dropdown">
-                                <a href="#" id="kc-current-locale-link">${locale.current}</a>
-                                <ul>
-                                    <#list locale.supported as l>
-                                        <li class="kc-dropdown-item"><a href="${l.url}">${l.label}</a></li>
-                                    </#list>
-                                </ul>
-                            </div>
-                    </#if>
-                    <#if referrer?has_content && referrer.url?has_content>
-                        <a href="${referrer.url}" id="referrer" class="mdc-toolbar__title">${msg("backTo",referrer.name)}</a>
-                    </#if>
-                    <a href="${url.logoutUrl}" class="mdc-toolbar__title" style="margin-right:24px;">${msg("doSignOut")}</a>
-                </section>
-            </div>
-        </header>
-        <main class="main">
+        <div class="drawer-logo">
+          <img src="${url.resourcesPath}/img/logo.png"  />
+        </div>
+      </div>
+    </div>
+
+    <main class="ml-lg-5 my-5 pt-3">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-11">
             <#if message?has_content>
-                <div class="alert alert-${message.type}">
+                <div class="alert alert-${message.type} mt-3 mb-1">
                     <#if message.type=='success' ><i class="material-icons">check_circle</i></#if>
                     <#if message.type=='error' ><i class="material-icons">error</i></#if>
                     <span class="alert-text">${message.summary}</span>
                 </div>
             </#if>
             <#nested "content">
-        </main>
-    </div>
-    <script>mdc.drawer.MDCPersistentDrawer.attachTo(document.querySelector('.mdc-persistent-drawer'));</script>
-    <script>window.mdc.autoInit();</script>
-    <script>
-        mdc.textfield.MDCTextfield.attachTo(document.querySelector('.mdc-textfield'));
-    </script>
-    <script>
-        mdc.ripple.MDCRipple.attachTo(document.querySelector('.mdc-button'));
-    </script>
-    <script>
-        let drawer = new mdc.drawer.MDCPersistentDrawer(document.querySelector('.mdc-persistent-drawer'));
-        document.querySelector('.menu').addEventListener('click', function() {
-          drawer.open = !drawer.open;
-        });
-    </script>
-
-</body>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
 </html>
 </#macro>
