@@ -71,7 +71,7 @@
 
             <div class="${properties.kcFormGroupClass!}">
                 <div id="kc-form-buttons" class="${properties.kcFormButtonsClass!}">
-                    <input class="mdc-button mdc-button--primary mdc-button--raised btn-primary" type="button" value="${msg("doRegister")}"/>
+                    <input class="mdc-button mdc-button--primary mdc-button--raised btn-primary" type="submit" value="${msg("doRegister")}"/>
                 </div>
                 <div id="kc-form-options" class="${properties.kcFormOptionsClass!}">
                     <div class="${properties.kcFormOptionsWrapperClass!}">
