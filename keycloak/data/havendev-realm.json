@@ -2286,11 +2286,6 @@
     } ],
     "disableableCredentialTypes" : [ "password" ],
     "requiredActions" : [ ],
-    "federatedIdentities" : [ {
-      "identityProvider" : "google",
-      "userId" : "110797033768165620589",
-      "userName" : "elliot.murphy@gmail.com"
-    } ],
     "realmRoles" : [ "offline_access", "uma_authorization", "member" ],
     "clientRoles" : {
       "havendev" : [ "member" ],
@@ -3402,7 +3397,7 @@
     "providerId" : "google",
     "enabled" : true,
     "updateProfileFirstLoginMode" : "on",
-    "trustEmail" : false,
+    "trustEmail" : true,
     "storeToken" : false,
     "addReadTokenRoleOnCreate" : false,
     "authenticateByDefault" : false,
