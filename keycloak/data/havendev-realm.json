@@ -3392,6 +3392,25 @@
   "adminEventsEnabled" : false,
   "adminEventsDetailsEnabled" : false,
   "identityProviders" : [ {
+    "alias" : "github",
+    "internalId" : "87b8b47f-b7fe-4cdf-8257-1343a9cb1a4c",
+    "providerId" : "github",
+    "enabled" : true,
+    "updateProfileFirstLoginMode" : "on",
+    "trustEmail" : true,
+    "storeToken" : false,
+    "addReadTokenRoleOnCreate" : false,
+    "authenticateByDefault" : false,
+    "linkOnly" : false,
+    "firstBrokerLoginFlowAlias" : "first broker login",
+    "config" : {
+      "hideOnLoginPage" : "",
+      "clientSecret" : "84f62e10bb04ff31b6d7c5d55df2e609d7137ec9",
+      "clientId" : "7fde7db51b0b63504754",
+      "disableUserInfo" : "",
+      "useJwksUrl" : "true"
+    }
+  }, {
     "alias" : "google",
     "internalId" : "97292e7a-d6dd-4393-83e2-afcb043537fa",
     "providerId" : "google",
