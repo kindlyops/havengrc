@@ -11,15 +11,6 @@
         <keycloak.version>4.0.0.Final</keycloak.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-    <url>https://havengrc.com</url>
-
-    <licenses>
-        <license>
-            <name>Apache License, Version 2.0</name>
-            <url>https://www.apache.org/licenses/LICENSE-2.0</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
     <dependencies>
         <dependency>
             <groupId>org.keycloak</groupId>
@@ -45,7 +36,6 @@
             <groupId>org.jboss.logging</groupId>
             <artifactId>jboss-logging</artifactId>
             <version>3.3.1.Final</version>
-            <type>pom</type>
         </dependency>
         <dependency>
             <groupId>com.chargebee</groupId>
