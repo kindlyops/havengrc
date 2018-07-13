@@ -199,6 +199,7 @@ jobs:
     docker:
       - image: circleci/ruby:2.4
     steps:
+      - checkout
       - add_ssh_keys
       - setup_remote_docker:
           docker_layer_caching: true
