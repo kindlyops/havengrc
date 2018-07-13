@@ -11,44 +11,11 @@ $secondary: (
 );
 $yiq-contrasted-threshold:  160;
 
-// Material Icons fonts
-@font-face {
-  font-family: 'Material Icons';
-  font-style: normal;
-  font-weight: 400;
-  src: url(/fonts/MaterialIcons-Regular.eot); /* For IE6-8 */
-  src: local('Material Icons'),
-    local('MaterialIcons-Regular'),
-    url(/fonts/MaterialIcons-Regular.woff2) format('woff2'),
-    url(/fonts/MaterialIcons-Regular.woff) format('woff'),
-    url(/fonts/MaterialIcons-Regular.ttf) format('truetype');
-}
+/* Material Icons fonts */
+@import "public/fonts/material-icons";
 
-.material-icons {
-  font-family: 'Material Icons';
-  font-weight: normal;
-  font-style: normal;
-  font-size: 24px;  /* Preferred icon size */
-  display: inline-block;
-  line-height: 1;
-  text-transform: none;
-  letter-spacing: normal;
-  word-wrap: normal;
-  white-space: nowrap;
-  direction: ltr;
-
-  /* Support for all WebKit browsers. */
-  -webkit-font-smoothing: antialiased;
-  /* Support for Safari and Chrome. */
-  text-rendering: optimizeLegibility;
-
-  /* Support for Firefox. */
-  -moz-osx-font-smoothing: grayscale;
-
-  /* Support for IE. */
-  font-feature-settings: 'liga';
-}
-// end Material Icons font
+/* Google fonts for Headings and body text */
+@import "public/fonts/google-fonts";
 
 @import "node_modules/daemonite-material/assets/scss/material";
 
@@ -57,6 +24,14 @@ $yiq-contrasted-threshold:  160;
     margin-left: $navdrawer-width;
   }
 }
+body p {
+  font-family: 'Bitter';
+}
+
+h1,h2,h2,h4,p.lead, a.nav-item, .navbar-brand, .navbar-nav {
+  font-family: 'Montserrat';
+}
+
 .content-wrapper {
     margin-top: 4rem;
 }
@@ -69,7 +44,8 @@ $yiq-contrasted-threshold:  160;
 
 .login-header {
     text-transform: uppercase;
-    font-family: "mr-eaves-modern", sans-serif; 
+    font-family: 'Montserrat';
+    font-weight: bold; 
 }
 
 #footer-image {
@@ -83,7 +59,7 @@ $yiq-contrasted-threshold:  160;
 #footer-container {
     overflow: hidden;
     position: relative;
-  z-index: 1;
+    z-index: 1;
 }
 
 .underline {
