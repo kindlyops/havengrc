@@ -56,7 +56,7 @@ jobs:
       - run: docker push kindlyops/havenweb:latest
       - run:
           name: notify failed job
-          command: ./notify-slack notifications "CircleCI pipeline for ${CIRCLE_PULL_REQUEST:-$CIRCLE_BRANCH} failed in $CIRCLE_JOB" circleci
+          command: ./notify-slack notifications "CircleCI pipeline for ${CIRCLE_PULL_REQUEST:-$CIRCLE_BRANCH} failed in $CIRCLE_JOB $CIRCLE_BUILD_URL" circleci
           when: on_fail
   flyway-build-job:
     docker:
@@ -75,7 +75,7 @@ jobs:
       - run: docker push kindlyops/havenflyway:latest
       - run:
           name: notify failed job
-          command: ./notify-slack notifications "CircleCI pipeline for ${CIRCLE_PULL_REQUEST:-$CIRCLE_BRANCH} failed in $CIRCLE_JOB" circleci
+          command: ./notify-slack notifications "CircleCI pipeline for ${CIRCLE_PULL_REQUEST:-$CIRCLE_BRANCH} failed in $CIRCLE_JOB $CIRCLE_BUILD_URL" circleci
           when: on_fail
   postgrest-build-job:
     docker:
@@ -94,7 +94,7 @@ jobs:
       - run: docker push kindlyops/postgrest:latest
       - run:
           name: notify failed job
-          command: ./notify-slack notifications "CircleCI pipeline for ${CIRCLE_PULL_REQUEST:-$CIRCLE_BRANCH} failed in $CIRCLE_JOB" circleci
+          command: ./notify-slack notifications "CircleCI pipeline for ${CIRCLE_PULL_REQUEST:-$CIRCLE_BRANCH} failed in $CIRCLE_JOB $CIRCLE_BUILD_URL" circleci
           when: on_fail
   keycloak-build-job:
     docker:
@@ -113,7 +113,7 @@ jobs:
       - run: docker push kindlyops/keycloak:latest
       - run:
           name: notify failed job
-          command: ./notify-slack notifications "CircleCI pipeline for ${CIRCLE_PULL_REQUEST:-$CIRCLE_BRANCH} failed in $CIRCLE_JOB" circleci
+          command: ./notify-slack notifications "CircleCI pipeline for ${CIRCLE_PULL_REQUEST:-$CIRCLE_BRANCH} failed in $CIRCLE_JOB $CIRCLE_BUILD_URL" circleci
           when: on_fail
   havenapi-build-job:
     docker:
@@ -132,7 +132,7 @@ jobs:
       - run: docker push kindlyops/havenapi:latest
       - run:
           name: notify failed job
-          command: ./notify-slack notifications "CircleCI pipeline for ${CIRCLE_PULL_REQUEST:-$CIRCLE_BRANCH} failed in $CIRCLE_JOB" circleci
+          command: ./notify-slack notifications "CircleCI pipeline for ${CIRCLE_PULL_REQUEST:-$CIRCLE_BRANCH} failed in $CIRCLE_JOB $CIRCLE_BUILD_URL" circleci
           when: on_fail
   havenapi-testing-job:
     docker:
@@ -193,12 +193,13 @@ jobs:
             docker run --volumes-from configs --network container:db --workdir /usr/src/app kindlyops/apitest cucumber
       - run:
           name: notify failed job
-          command: ./notify-slack notifications "CircleCI pipeline for ${CIRCLE_PULL_REQUEST:-$CIRCLE_BRANCH} failed in $CIRCLE_JOB" circleci
+          command: ./notify-slack notifications "CircleCI pipeline for ${CIRCLE_PULL_REQUEST:-$CIRCLE_BRANCH} failed in $CIRCLE_JOB $CIRCLE_BUILD_URL" circleci
           when: on_fail
   deploy-staging:
     docker:
       - image: circleci/ruby:2.4
     steps:
+      - checkout
       - add_ssh_keys
       - setup_remote_docker:
           docker_layer_caching: true
@@ -222,7 +223,7 @@ jobs:
             oc set image deployment/keycloak keycloak=havengrc-docker.jfrog.io/kindlyops/keycloak:$CIRCLE_SHA1
       - run:
           name: notify failed job
-          command: ./notify-slack notifications "CircleCI pipeline for ${CIRCLE_PULL_REQUEST:-$CIRCLE_BRANCH} failed in $CIRCLE_JOB" circleci
+          command: ./notify-slack notifications "CircleCI pipeline for ${CIRCLE_PULL_REQUEST:-$CIRCLE_BRANCH} failed in $CIRCLE_JOB $CIRCLE_BUILD_URL" circleci
           when: on_fail
 workflows:
   version: 2

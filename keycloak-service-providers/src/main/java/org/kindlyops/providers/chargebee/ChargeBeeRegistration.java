@@ -34,15 +34,12 @@ public class ChargeBeeRegistration implements FormAction, FormActionFactory, Con
     public static final String API_KEY = "api.key";
     public static final String PLAN_ID = "plan.id";
     public static final String SITE_NAME = "site.name";
-    private static Requirement[] REQUIREMENT_CHOICES = {
-            Requirement.REQUIRED,
-            Requirement.DISABLED
-    };
+    private static Requirement[] REQUIREMENT_CHOICES = { Requirement.REQUIRED, Requirement.DISABLED };
     private static final Logger LOG = Logger.getLogger(ChargeBeeRegistration.class);
     private static final ChargeBeeRegistration SINGLETON = new ChargeBeeRegistration();
 
     public ChargeBeeRegistration() {
-
+        // nothing to set up
     }
 
     public String getDisplayType() {
@@ -66,6 +63,7 @@ public class ChargeBeeRegistration implements FormAction, FormActionFactory, Con
     }
 
     public void setRequiredActions(KeycloakSession session, RealmModel realm, UserModel user) {
+        // we have no required actions here
     }
 
     public String getId() {
@@ -76,23 +74,19 @@ public class ChargeBeeRegistration implements FormAction, FormActionFactory, Con
     public void buildPage(FormContext context, LoginFormsProvider form) {
         AuthenticatorConfigModel chargebeeConfig = context.getAuthenticatorConfig();
         if (chargebeeConfig == null || chargebeeConfig.getConfig() == null
-                || chargebeeConfig.getConfig().get(API_KEY) == null
-                || chargebeeConfig.getConfig().get(PLAN_ID) == null
-                || chargebeeConfig.getConfig().get(SITE_NAME) == null
-                ) {
+                || chargebeeConfig.getConfig().get(API_KEY) == null || chargebeeConfig.getConfig().get(PLAN_ID) == null
+                || chargebeeConfig.getConfig().get(SITE_NAME) == null) {
             form.addError(new FormMessage(null, "Chargebee not configured."));
             return;
         }
         String apiKey = chargebeeConfig.getConfig().get(API_KEY);
         String planID = chargebeeConfig.getConfig().get(PLAN_ID);
         String siteName = chargebeeConfig.getConfig().get(SITE_NAME);
-        Environment.configure(siteName,apiKey);
+        Environment.configure(siteName, apiKey);
         Result finalResult;
         try {
-            finalResult = HostedPage.checkoutNew()
-                .subscriptionPlanId(planID)
-                .iframeMessaging(true)
-                .billingAddressCountry("US").request();
+            finalResult = HostedPage.checkoutNew().subscriptionPlanId(planID).iframeMessaging(true)
+                    .billingAddressCountry("US").request();
 
         } catch (Exception e) {
             LOG.errorv("chargebeeSPI ERROR caused by: <{0}>", e);
@@ -107,17 +101,7 @@ public class ChargeBeeRegistration implements FormAction, FormActionFactory, Con
 
     @Override
     public void validate(ValidationContext context) {
-        MultivaluedMap formData = context.getHttpRequest().getDecodedFormParameters();
-        ArrayList errors = new ArrayList();
-        // Check for users with the organization already.
-        // TODO should be smarter than this.
-        LOG.info("chargebeeSPI: validating");
-        List users = context.getSession().users().searchForUserByUserAttribute(ATTRIBUTE_ORGANIZATION,FIELD_ORGANIZATION, context.getRealm());
-        if (users.size() > 0) {
-            context.validationError(formData, errors);
-        } else {
-            context.success();
-        }
+        context.success();
     }
 
     @Override
@@ -128,7 +112,7 @@ public class ChargeBeeRegistration implements FormAction, FormActionFactory, Con
         String org = formData.getFirst(FIELD_ORGANIZATION).toString();
 
         if (!StringUtils.isBlank(org)) {
-            user.setSingleAttribute("organization", org);
+            user.setSingleAttribute(ATTRIBUTE_ORGANIZATION, org);
         }
     }
 
@@ -137,6 +121,7 @@ public class ChargeBeeRegistration implements FormAction, FormActionFactory, Con
     }
 
     public void close() {
+        // nothing to do here
     }
 
     public boolean configuredFor(KeycloakSession session, RealmModel realm, UserModel user) {
@@ -144,7 +129,8 @@ public class ChargeBeeRegistration implements FormAction, FormActionFactory, Con
     }
 
     public String getHelpText() {
-        LOG.warnv("chargebeeSPI: getHelpText called <{0}>", this);
+        // in order to log warnings, use something like this
+        // LOG.warnv("chargebeeSPI: getHelpText called <{0}>", this); // NOSONAR
         return "ChargeBee Registration";
 
     }
@@ -154,9 +140,11 @@ public class ChargeBeeRegistration implements FormAction, FormActionFactory, Con
     }
 
     public void init(Config.Scope config) {
+        // nothing to initialize
     }
 
     public void postInit(KeycloakSessionFactory factory) {
+        // nothing for postInit
     }
 
     private static final List<ProviderConfigProperty> configProperties = new ArrayList<ProviderConfigProperty>();

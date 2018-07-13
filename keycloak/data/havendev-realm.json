@@ -3863,8 +3863,8 @@
     "alias" : "terms_and_conditions",
     "name" : "Terms and Conditions",
     "providerId" : "terms_and_conditions",
-    "enabled" : false,
-    "defaultAction" : false,
+    "enabled" : true,
+    "defaultAction" : true,
     "config" : { }
   } ],
   "browserFlow" : "browser",
