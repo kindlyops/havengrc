@@ -14,3 +14,4 @@ npm-debug.log
 docs/plantuml/*.png
 .bazelrc
 /bazel-*
+.vs/
