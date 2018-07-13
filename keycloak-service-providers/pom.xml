@@ -4,7 +4,7 @@
     <description/>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.kindlyops.providers</groupId>
-    <artifactId>kindlyops-provider-chargebee-registration</artifactId>
+    <artifactId>kindlyops-keycloak-providers</artifactId>
     <version>0.1.0</version>
     <packaging>jar</packaging>
     <properties>
@@ -35,6 +35,7 @@
             <groupId>org.jboss.logging</groupId>
             <artifactId>jboss-logging</artifactId>
             <version>3.3.1.Final</version>
+            <type>pom</type>
         </dependency>
         <dependency>
             <groupId>com.chargebee</groupId>
