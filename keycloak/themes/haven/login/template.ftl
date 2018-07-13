@@ -15,8 +15,6 @@
     </#if>
     <title><#nested "title"></title>
     <link rel="icon" href="${url.resourcesPath}/img/favicon.ico" />
-    <script src="https://use.typekit.net/fru8myg.js"></script>
-    <script>try{Typekit.load({ async: true });}catch(e){}</script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <#if properties.styles?has_content>
         <#list properties.styles?split(' ') as style>
@@ -35,7 +33,7 @@
     </#if>
     <#if properties.chargebee_scripts?has_content>
         <#list properties.chargebee_scripts?split(' ') as chargebee_script>
-            <script src="${chargebee_script}" type="text/javascript"></script>
+            <script src="${url.resourcesPath}/${chargebee_script}" type="text/javascript"></script>
         </#list>
     </#if>
     <script type="text/javascript">

@@ -226,7 +226,7 @@ navDrawerItems =
     , { text = "Reports", iconName = "library_books", route = Just Route.Reports }
     , { text = "Comments", iconName = "gavel", route = Just Route.Comments }
     , { text = "Survey", iconName = "assignment", route = Just Route.Survey }
-    , { text = "SurveyResponses", iconName = "insert_chart_outlined", route = Just Route.SurveyResponses }
+    , { text = "SurveyResponses", iconName = "insert_chart", route = Just Route.SurveyResponses }
     ]
 
 
