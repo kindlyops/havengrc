@@ -11,7 +11,8 @@ body {
   -webkit-box-direction: normal;
   -ms-flex-direction: column;
   flex-direction: column;
-  font-family:"ff-tisa-web-pro",serif ;
+  /* font should be changed to Bitter as in webui */
+  font-family:"ff-tisa-web-pro",serif;
   min-height: 100%;
 }
 
