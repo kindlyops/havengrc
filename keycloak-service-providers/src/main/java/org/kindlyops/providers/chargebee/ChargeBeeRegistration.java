@@ -129,7 +129,8 @@ public class ChargeBeeRegistration implements FormAction, FormActionFactory, Con
     }
 
     public String getHelpText() {
-        LOG.warnv("chargebeeSPI: getHelpText called <{0}>", this);
+        // in order to log warnings, use something like this
+        // LOG.warnv("chargebeeSPI: getHelpText called <{0}>", this); // NOSONAR
         return "ChargeBee Registration";
 
     }
