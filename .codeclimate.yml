@@ -20,7 +20,8 @@ exclude_patterns:
 - "webui/node_modules/"
 - "webui/config/"
 - "contrib/curl-auth0/"
-
+- "keycloak/themes/haven/login/resources/js/"
+- "keycloak/themes/haven/account/resources/js/"
 
 checks:
   argument-count:
