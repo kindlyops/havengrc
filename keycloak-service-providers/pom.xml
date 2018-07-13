@@ -9,7 +9,17 @@
     <packaging>jar</packaging>
     <properties>
         <keycloak.version>4.0.0.Final</keycloak.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+    <url>https://havengrc.com</url>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
     <dependencies>
         <dependency>
             <groupId>org.keycloak</groupId>
@@ -75,11 +85,6 @@
                             <exclude>org.keycloak:*</exclude>
                         </excludes>
                     </artifactSet>
-                    <transformers>
-                        <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                            <mainClass>org.kindlyops.providers.chargebee.ChargeBeeRegistration</mainClass>
-                        </transformer>
-                    </transformers>
                     <filters>
                         <filter>
                             <artifact>*:*</artifact>
