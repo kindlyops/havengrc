@@ -254,3 +254,11 @@ Once you complete the challenge and get the key material, edit the secret.
     oc edit secrets/secretname
 
 Replace the values for fullkey.pem and privkey.pem with base64 encoded versions of the new certificates. Save and exit.
+
+### Bazel
+
+We are experimenting with the bazel build tool. Get it from https://bazel.build/
+
+To build the keycloak service providers jar
+
+    bazel build //keycloak-service-providers:spi_deploy.jar
