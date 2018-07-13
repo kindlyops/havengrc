@@ -1,6 +1,7 @@
-java_library(
-    name = "keycloak-chargebee-providers",
+java_binary(
+    name = "spi",
     srcs = glob(["src/main/java/**/*.java"]),
+    create_executable = 0,
     resources = glob(["src/main/resources/**"]),
     deps = [
         "//third_party:com_chargebee_chargebee_java",
