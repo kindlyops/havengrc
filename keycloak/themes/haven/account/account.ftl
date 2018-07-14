@@ -1,66 +1,51 @@
 <#import "template.ftl" as layout>
 <@layout.mainLayout active='account' bodyClass='user'; section>
 
-    <div class="mdc-layout-grid heading">
-        <div class="mdc-layout-grid__inner">
-            <h2 class="mdc-layout-grid__cell--span-8-desktop mdc-layout-grid__cell--span-4-phone mdc-layout-grid__cell--span-4-tablet">${msg("editAccountHtmlTitle")}</h2>
-            <span class="subtitle mdc-layout-grid__cell mdc-layout-grid--align-right">
-                <span class="required">*</span>
-                ${msg("requiredFields")}
-            </span>
-        </div>
+  <div class="heading py-3 mb-3">
+    <span class="subtitle float-right pt-lg-2">
+        <span class="required">*</span>
+        ${msg("requiredFields")}
+    </span>
+    <h2>${msg("editAccountHtmlTitle")}</h2>
+  </div>
+
+  <form action="${url.accountUrl}" class="px-4" id="AccountForm" method="post">
+    <input type="hidden" id="stateChecker" name="stateChecker" value="${stateChecker}"/>
+
+    <#if !realm.registrationEmailAsUsername>
+    <div class="form-group">
+      <div class="${messagesPerField.printIfExists('username','has-error')}">
+        <label for="username" class="">${msg("username")}*</label> <#if realm.editUsernameAllowed><span class="required">*</span></#if>
+        <input type="text" class="form-control" id="username" name="username" <#if !realm.editUsernameAllowed>disabled="disabled"</#if> value="${(account.username!'')}"/>
+      </div>
+    </div>
+    </#if>
+
+    <div class="form-group">
+      <div class="${messagesPerField.printIfExists('email','has-error')}">
+        <label for="email" class="">${msg("email")}</label><span class="required">*</span>
+        <input type="text" class="form-control" id="email" name="email" required autofocus value="${(account.email!'')}"/>
+      </div>
     </div>
 
-    <div class="mdc-layout-grid">
-        <div class="mdc-layout-grid__inner container-margin">
-            <form action="${url.accountUrl}" class="mdc-layout-grid__cell--span-12" id="AccountForm" method="post">
-                <input type="hidden" id="stateChecker" name="stateChecker" value="${stateChecker}">
-
-                <#if !realm.registrationEmailAsUsername>
-                    <div class="${messagesPerField.printIfExists('username','has-error')}">
-                        <div class="mdc-textfield" data-mdc-auto-init="MDCTextfield">
-                            <input type="text" class="mdc-textfield__input" id="username" name="username" <#if !realm.editUsernameAllowed>disabled="disabled"</#if> value="${(account.username!'')}"/>
-                            <label for="username" class="mdc-textfield__label">${msg("username")}</label> <#if realm.editUsernameAllowed><span class="required">*</span></#if>
-                        </div>
-                    </div>
-                </#if>
-
-                <div class="${messagesPerField.printIfExists('email','has-error')}">
-                    <div class="mdc-textfield" data-mdc-auto-init="MDCTextfield">
-                        <input type="text" class="mdc-textfield__input" id="email" name="email" required autofocus value="${(account.email!'')}"/>
-                        <label for="email" class="mdc-textfield__label">${msg("email")}</label>
-                    </div>
-                </div>
-
-                <div class="${messagesPerField.printIfExists('organization','has-error')}">
-                    <div class="mdc-textfield" data-mdc-auto-init="MDCTextfield">
-                        <input type="text" class="mdc-textfield__input" id="user.attributes.organization" name="user.attributes.organization" value="${(account.attributes.organization!'')}" required/>
-                        <label for="user.attributes.organization" class="mdc-textfield__label">${msg("organization")}</label>
-                    </div>
-                </div>
-
-                <div class="${messagesPerField.printIfExists('firstName','has-error')}">
-                    <div class="mdc-textfield" data-mdc-auto-init="MDCTextfield">
-                        <input type="text" class="mdc-textfield__input" id="firstName" name="firstName" value="${(account.firstName!'')}" required/>
-                        <label for="firstName" class="mdc-textfield__label">${msg("firstName")}</label>
-                    </div>
-                </div>
-
-                <div class="${messagesPerField.printIfExists('lastName','has-error')}">
-                    <div class="mdc-textfield" data-mdc-auto-init="MDCTextfield">
-                        <input type="text" class="mdc-textfield__input" id="lastName" name="lastName" value="${(account.lastName!'')}" required/>
-                        <label for="lastName" class="mdc-textfield__label">${msg("lastName")}</label>
-                    </div>
-                </div>
-
-
-                <div class="form-btn">
-                    <#if url.referrerURI??><a href="${url.referrerURI}">${msg("backToApplication")}/a></#if>
-                    <button type="submit" class="mdc-button mdc-button--raised mdc-button--accent" name="submitAction" value="Save">${msg("doSave")}</button>
-                    <button type="submit" class="mdc-button mdc-button--raised" name="submitAction" value="Cancel">${msg("doCancel")}</button>
-                </div>
-
-            </form>
-        </div>
+    <div class="form-group">
+      <div class="${messagesPerField.printIfExists('firstName','has-error')}">
+        <label for="firstName" class="">${msg("firstName")}</label><span class="required">*</span>
+        <input type="text" class="form-control" id="firstName" name="firstName" value="${(account.firstName!'')}" required/>
+      </div>
     </div>
+
+    <div class="form-group">
+      <div class="${messagesPerField.printIfExists('lastName','has-error')}">
+        <label for="lastName" class="">${msg("lastName")}</label><span class="required">*</span>
+        <input type="text" class="form-control" id="lastName" name="lastName" value="${(account.lastName!'')}" required/>
+      </div>
+    </div>
+
+    <div class="float-right mt-2">
+      <#if url.referrerURI??><a href="${url.referrerURI}" role="button" class="btn btn-default">${msg("backToApplication")}/a></#if>
+      <button class="btn btn-secondary" role="button" type="submit" name="submitAction" value="Save">${msg("doSave")}</button>
+      <button class="btn btn-default" role="button" type="submit" name="submitAction">${msg("doCancel")}</button>
+    </div>
+  </form>
 </@layout.mainLayout>

@@ -1,12 +1,17 @@
 Feature: Basic sqitch access control 
 
     Background: Setup environment without JWT Auth
-        Given I am a client
+        Given I send and accept JSON
         And I add Headers:
             | Prefer | return=representation |
         
 
     Scenario: Add/update a comment without a JWT to see access denied
-        When I request to create a comment with:
-            | message | string  | "The system must be tested" |
-        Then the request fails because we are unauthorized
+        When I set JSON request body to:
+        """
+        {
+        "message": "The system must be tested"
+        }
+        """
+        And  I send a POST request to "http://{api_server}/comments"
+        Then the response status should be "401"

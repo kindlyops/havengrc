@@ -100,3 +100,8 @@ elmApp.ports.showError.subscribe(function (messageString) {
     snackBarElement.classList.remove('show')
   }, 3000)
 })
+
+elmApp.ports.radarChart.subscribe(chartConfig => {
+  chartConfig.type = 'radar'
+  window.myRadar = new Chart(document.getElementById('chart'), chartConfig)
+})

@@ -1,17 +1,14 @@
+# Haven GRC is a modern risk & compliance dashboard for the cloud
+
 [![CircleCI](https://circleci.com/gh/kindlyops/mappamundi.svg?style=svg)](https://circleci.com/gh/kindlyops/mappamundi) [![experimental](http://badges.github.io/stability-badges/dist/experimental.svg)](http://github.com/badges/stability-badges) [![Say Thanks!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/statik) [![Maintainability](https://api.codeclimate.com/v1/badges/d2af9dcd5ad434172a27/maintainability)](https://codeclimate.com/github/kindlyops/mappamundi/maintainability)
 
-We use [BrowserStack](http://browserstack.com) to efficiently check cross-browser compatability while building Haven.
-We are using snyk.io and codeclimate.com for static scanning.
+We use [BrowserStack](http://browserstack.com) to efficiently check cross-browser compatibility while building Haven. We are using snyk.io and codeclimate.com for static scanning.
 
 <!-- markdownlint-disable MD033 -->
 [<img height="53" src="https://p3.zdusercontent.com/attachment/1015988/xfvLD5CuyeUcq2i40RYcw494H?token=eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0..BvyIxRLJz4phFf7cbIr8_Q.Fl9BR-ARcgvq38p546lM4djFcalediYWQaXV1_U_xi_zr5stXNUKLQNkTt-2zQbXWIIffLSoG8dUSZqL-GsqaTMbBX8OZi14qIHWmBIOPoRmyhwIcQfYIa79ngad69fKDltmq2H2KKWLByI-NWE9ygYpNs2IAXOQ72NICuWLbSyXIDGFVsq5VlV5ok7iCY0WxwXzIAiHbFu_BPufmP951-dpnBIGJAl4KfGk0eSbHKDOYvVkqHU2yZvNL8itCqkThmE7WNgPCS_KL6TyQiPxUQ.0ypOzE6XBmafR82vKRcIKg">](http://browserstack.com/)
 
-# Haven GRC is a modern risk & compliance dashboard for the cloud
-
-
-
 ## Design framework and tooling.
-=======
+
 We help organizations avoid getting bogged down in rules that no longer make sense, and empower people to update practices to use modern tools and techniques without abandoning responsible oversight and administrative controls.
 
 By connecting controls to policies to values & customer requirements, we break the cycle of inability to improve things "because security reasons".
@@ -35,8 +32,6 @@ If you don't have docker running, use [these instructions](https://docs.docker.c
 Before you continue, you need to configure git to auto-correct line ending formats:
 
      git config --global core.autocrlf false
-
-
 
 ## running the service
 
@@ -75,16 +70,12 @@ Open [localhost:8025](http://localhost:8025), you can use mailhog to see message
 
 ## to export keycloak realm data (to refresh the dev users)
 
-First enter the keycloak container
+After keycloak is running and you have made any desired config changes:
 
-    docker-compose run --entrypoint=/bin/bash keycloak
-
-Now run the keycloak server command with export strategies defined
-
-    /opt/jboss/keycloak/bin/standalone.sh \
+    docker-compose exec keycloak /opt/jboss/keycloak/bin/standalone.sh \
       -Dkeycloak.migration.action=export \
       -Dkeycloak.migration.provider=singleFile \
-      -Dkeycloak.migration.file=havendev-realm.json \
+      -Dkeycloak.migration.file=/keycloak/havendev-realm.json \
       -Djboss.http.port=8888 \
       -Djboss.https.port=9999 \
       -Djboss.management.http.port=7777
@@ -263,3 +254,11 @@ Once you complete the challenge and get the key material, edit the secret.
     oc edit secrets/secretname
 
 Replace the values for fullkey.pem and privkey.pem with base64 encoded versions of the new certificates. Save and exit.
+
+### Bazel
+
+We are experimenting with the bazel build tool. Get it from https://bazel.build/
+
+To build the keycloak service providers jar
+
+    bazel build //keycloak-service-providers:spi_deploy.jar

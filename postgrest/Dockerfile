@@ -1,7 +1,7 @@
 FROM        havengrc-docker.jfrog.io/postgrest/postgrest:v0.4.3.0
 MAINTAINER  Kindly Ops, LLC <support@kindlyops.com>
 COPY        postgrest/config /config
-#COPY        postgrest/vendor/postgrest /usr/local/bin/postgrest
+COPY        postgrest/vendor/postgrest /usr/local/bin/postgrest
 USER root
 RUN addgroup --system havenuser && adduser --system havenuser && adduser havenuser havenuser
 RUN chown -R havenuser:0 /config && \
@@ -20,4 +20,4 @@ ENV         HAVEN_JWK_PATH /keycloak-dev-public-key.json
 ENV         PGRST_JWT_AUD_CLAIM havendev
 ENV         PGRST_SERVER_PROXY_URI http://localhost:8180
 EXPOSE 8180
-CMD [postgrest, "/config"]
+CMD postgrest "/config"

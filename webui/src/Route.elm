@@ -23,6 +23,7 @@ type Location
     | Dashboard
     | Comments
     | Survey
+    | SurveyResponses
     | ShowComment Int
     | EditComment Int
 
@@ -79,6 +80,9 @@ titleFor route =
             Survey ->
                 "Survey"
 
+            SurveyResponses ->
+                "SurveyResponses"
+
             ShowComment _ ->
                 "Comment"
 
@@ -111,6 +115,9 @@ urlFor loc =
 
                 Survey ->
                     "/survey"
+
+                SurveyResponses ->
+                    "/surveyResponses"
 
                 ShowComment id ->
                     "/comments/" ++ (toString id)
@@ -171,6 +178,9 @@ locFor path =
 
                     [ "survey" ] ->
                         Just Survey
+
+                    [ "surveyResponses" ] ->
+                        Just SurveyResponses
 
                     _ ->
                         let
