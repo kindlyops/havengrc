@@ -29,13 +29,6 @@
     </div>
 
     <div class="form-group">
-      <div class="${messagesPerField.printIfExists('organization','has-error')}">
-        <label for="user.attributes.organization" class="">${msg("organization")}</label><span class="required">*</span>
-        <input type="text" class="form-control" id="user.attributes.organization" name="user.attributes.organization" value="${(account.attributes.organization!'')}" required/>
-      </div>
-    </div>
-
-    <div class="form-group">
       <div class="${messagesPerField.printIfExists('firstName','has-error')}">
         <label for="firstName" class="">${msg("firstName")}</label><span class="required">*</span>
         <input type="text" class="form-control" id="firstName" name="firstName" value="${(account.firstName!'')}" required/>
