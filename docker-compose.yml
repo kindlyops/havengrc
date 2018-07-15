@@ -45,7 +45,7 @@ services:
     volumes:
       - ./keycloak/themes/haven:/opt/jboss/keycloak/themes/haven
       - ./keycloak/data:/keycloak
-    command: ["-b", "0.0.0.0", "-Dkeycloak.migration.file=/keycloak/havendev-realm.json", "-Dkeycloak.migration.strategy=IGNORE_EXISTING", "-Dkeycloak.migration.provider=singleFile", "-Dkeycloak.migration.action=import"]
+    command: ["start-keycloak.sh", "-b", "0.0.0.0", "-Dkeycloak.migration.file=/keycloak/havendev-realm.json", "-Dkeycloak.migration.strategy=IGNORE_EXISTING", "-Dkeycloak.migration.provider=singleFile", "-Dkeycloak.migration.action=import"]
   flyway:
     build:
       context: flyway/
