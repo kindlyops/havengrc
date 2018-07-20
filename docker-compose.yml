@@ -29,6 +29,9 @@ services:
     build:
       context: .
       dockerfile: ./keycloak/Dockerfile
+    # to use the image line, you must first build & load the image
+    # bazel run //keycloak:keycloak
+    #image: bazel/keycloak:keycloak
     environment:
       - DB_DATABASE=mappamundi_dev
       - DB_USER=postgres
