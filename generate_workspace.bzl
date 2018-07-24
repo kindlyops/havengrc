@@ -4,6 +4,16 @@
 
 
 def generated_maven_jars():
+  # org.hibernate:hibernate-entitymanager:jar:5.1.14.Final got requested version
+  # org.hibernate:hibernate-core:jar:5.1.14.Final
+  native.maven_jar(
+      name = "dom4j_dom4j",
+      artifact = "dom4j:dom4j:1.6.1",
+      repository = "https://jcenter.bintray.com/",
+      sha1 = "5d3ccc056b6f056dbf0dddfdf43894b9065a8f94",
+  )
+
+
   # org.keycloak:keycloak-core:jar:4.0.0.Final
   native.maven_jar(
       name = "org_keycloak_keycloak_common",
@@ -15,11 +25,40 @@ def generated_maven_jars():
 
   # pom.xml got requested version
   # org.kindlyops.providers:kindlyops-keycloak-providers:jar:0.1.0
+  # org.keycloak:keycloak-model-jpa:jar:4.0.0.Final got requested version
   native.maven_jar(
       name = "org_keycloak_keycloak_server_spi",
       artifact = "org.keycloak:keycloak-server-spi:4.0.0.Final",
       repository = "https://jcenter.bintray.com/",
       sha1 = "0ed42a3777317d4e251f45c6c7d946dfbb097eb2",
+  )
+
+
+  # org.hibernate:hibernate-entitymanager:jar:5.1.14.Final
+  native.maven_jar(
+      name = "org_hibernate_hibernate_core",
+      artifact = "org.hibernate:hibernate-core:5.1.14.Final",
+      repository = "https://jcenter.bintray.com/",
+      sha1 = "7404ec36c5b2c881fe3f53ae74ed92494a801124",
+  )
+
+
+  # org.hibernate:hibernate-core:jar:5.1.14.Final
+  native.maven_jar(
+      name = "org_jboss_jandex",
+      artifact = "org.jboss:jandex:2.0.3.Final",
+      repository = "https://jcenter.bintray.com/",
+      sha1 = "bfc4d6257dbff7a33a357f0de116be6ff951d849",
+  )
+
+
+  # org.hibernate:hibernate-entitymanager:jar:5.1.14.Final got requested version
+  # org.hibernate:hibernate-core:jar:5.1.14.Final
+  native.maven_jar(
+      name = "org_apache_geronimo_specs_geronimo_jta_1_1_spec",
+      artifact = "org.apache.geronimo.specs:geronimo-jta_1.1_spec:1.1.1",
+      repository = "https://jcenter.bintray.com/",
+      sha1 = "aabab3165b8ea936b9360abbf448459c0d04a5a4",
   )
 
 
@@ -32,14 +71,26 @@ def generated_maven_jars():
   )
 
 
+  # org.hibernate:hibernate-entitymanager:jar:5.1.14.Final wanted version 3.3.0.Final
   # pom.xml got requested version
-  # org.kindlyops.providers:kindlyops-keycloak-providers:jar:0.1.0
-  # org.keycloak:keycloak-services:jar:4.0.0.Final got requested version
+  # org.hibernate:hibernate-core:jar:5.1.14.Final wanted version 3.3.0.Final
+  # org.hibernate.common:hibernate-commons-annotations:jar:5.0.1.Final wanted version 3.3.0.Final
+  # org.kindlyops.providers:kindlyops-keycloak-providers:jar:0.1.0 got requested version
+  # org.keycloak:keycloak-services:jar:4.0.0.Final
   native.maven_jar(
       name = "org_jboss_logging_jboss_logging",
       artifact = "org.jboss.logging:jboss-logging:3.3.1.Final",
       repository = "https://jcenter.bintray.com/",
       sha1 = "c46217ab74b532568c0ed31dc599db3048bd1b67",
+  )
+
+
+  # dom4j:dom4j:jar:1.6.1
+  native.maven_jar(
+      name = "xml_apis_xml_apis",
+      artifact = "xml-apis:xml-apis:1.0.b2",
+      repository = "https://jcenter.bintray.com/",
+      sha1 = "3136ca936f64c9d68529f048c2618bd356bf85c9",
   )
 
 
@@ -54,6 +105,27 @@ def generated_maven_jars():
   )
 
 
+  # org.hibernate:hibernate-entitymanager:jar:5.1.14.Final got requested version
+  # org.hibernate:hibernate-core:jar:5.1.14.Final
+  native.maven_jar(
+      name = "org_hibernate_common_hibernate_commons_annotations",
+      artifact = "org.hibernate.common:hibernate-commons-annotations:5.0.1.Final",
+      repository = "https://jcenter.bintray.com/",
+      sha1 = "71e1cff3fcb20d3b3af4f3363c3ddb24d33c6879",
+  )
+
+
+  # org.hibernate:hibernate-entitymanager:jar:5.1.14.Final got requested version
+  # org.keycloak:keycloak-model-jpa:jar:4.0.0.Final
+  # org.hibernate:hibernate-core:jar:5.1.14.Final got requested version
+  native.maven_jar(
+      name = "org_hibernate_javax_persistence_hibernate_jpa_2_1_api",
+      artifact = "org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final",
+      repository = "https://jcenter.bintray.com/",
+      sha1 = "5e731d961297e5a07290bfaf3db1fbc8bbbf405a",
+  )
+
+
   # org.keycloak:keycloak-services:jar:4.0.0.Final
   native.maven_jar(
       name = "org_twitter4j_twitter4j_core",
@@ -65,6 +137,7 @@ def generated_maven_jars():
 
   # pom.xml got requested version
   # org.kindlyops.providers:kindlyops-keycloak-providers:jar:0.1.0
+  # org.keycloak:keycloak-model-jpa:jar:4.0.0.Final got requested version
   native.maven_jar(
       name = "org_keycloak_keycloak_server_spi_private",
       artifact = "org.keycloak:keycloak-server-spi-private:4.0.0.Final",
@@ -83,6 +156,7 @@ def generated_maven_jars():
 
 
   # org.keycloak:keycloak-services:jar:4.0.0.Final
+  # org.keycloak:keycloak-model-jpa:jar:4.0.0.Final got requested version
   native.maven_jar(
       name = "org_jboss_resteasy_resteasy_jaxrs",
       artifact = "org.jboss.resteasy:resteasy-jaxrs:3.0.24.Final",
@@ -97,6 +171,15 @@ def generated_maven_jars():
       artifact = "org.jboss.spec.javax.transaction:jboss-transaction-api_1.2_spec:1.0.1.Final",
       repository = "https://jcenter.bintray.com/",
       sha1 = "4441f144a2a1f46ed48fcc6b476a4b6295e6d524",
+  )
+
+
+  # org.keycloak:keycloak-model-jpa:jar:4.0.0.Final
+  native.maven_jar(
+      name = "org_liquibase_liquibase_core",
+      artifact = "org.liquibase:liquibase-core:3.4.1",
+      repository = "https://jcenter.bintray.com/",
+      sha1 = "033731a68e31d2a77b46495f21db1079d6953703",
   )
 
 
@@ -129,9 +212,19 @@ def generated_maven_jars():
   )
 
 
+  # org.keycloak:keycloak-model-jpa:jar:4.0.0.Final
+  native.maven_jar(
+      name = "org_hibernate_hibernate_entitymanager",
+      artifact = "org.hibernate:hibernate-entitymanager:5.1.14.Final",
+      repository = "https://jcenter.bintray.com/",
+      sha1 = "3adbd8734f1949046ae33ecca01f889b560e9b85",
+  )
+
+
   # pom.xml got requested version
   # org.kindlyops.providers:kindlyops-keycloak-providers:jar:0.1.0
   # org.keycloak:keycloak-services:jar:4.0.0.Final got requested version
+  # org.keycloak:keycloak-model-jpa:jar:4.0.0.Final got requested version
   native.maven_jar(
       name = "org_keycloak_keycloak_core",
       artifact = "org.keycloak:keycloak-core:4.0.0.Final",
@@ -149,6 +242,15 @@ def generated_maven_jars():
   )
 
 
+  # org.hibernate:hibernate-core:jar:5.1.14.Final
+  native.maven_jar(
+      name = "com_fasterxml_classmate",
+      artifact = "com.fasterxml:classmate:1.3.0",
+      repository = "https://jcenter.bintray.com/",
+      sha1 = "183407ff982e9375f1a1c4a51ed0a9307c598fc7",
+  )
+
+
   # org.keycloak:keycloak-services:jar:4.0.0.Final got requested version
   # org.keycloak:keycloak-core:jar:4.0.0.Final
   native.maven_jar(
@@ -159,10 +261,21 @@ def generated_maven_jars():
   )
 
 
+  # org.hibernate:hibernate-entitymanager:jar:5.1.14.Final got requested version
+  # org.hibernate:hibernate-core:jar:5.1.14.Final
+  native.maven_jar(
+      name = "org_javassist_javassist",
+      artifact = "org.javassist:javassist:3.20.0-GA",
+      repository = "https://jcenter.bintray.com/",
+      sha1 = "a9cbcdfb7e9f86fbc74d3afae65f2248bfbf82a0",
+  )
+
+
   # org.bouncycastle:bcpkix-jdk15on:jar:1.56 got requested version
   # org.keycloak:keycloak-services:jar:4.0.0.Final got requested version
   # org.keycloak:keycloak-core:jar:4.0.0.Final got requested version
   # org.keycloak:keycloak-common:jar:4.0.0.Final
+  # org.keycloak:keycloak-model-jpa:jar:4.0.0.Final got requested version
   native.maven_jar(
       name = "org_bouncycastle_bcprov_jdk15on",
       artifact = "org.bouncycastle:bcprov-jdk15on:1.56",
@@ -190,7 +303,8 @@ def generated_maven_jars():
 
 
   # pom.xml got requested version
-  # org.kindlyops.providers:kindlyops-keycloak-providers:jar:0.1.0
+  # org.kindlyops.providers:kindlyops-keycloak-providers:jar:0.1.0 got requested version
+  # org.keycloak:keycloak-model-jpa:jar:4.0.0.Final
   native.maven_jar(
       name = "org_keycloak_keycloak_services",
       artifact = "org.keycloak:keycloak-services:4.0.0.Final",
@@ -239,11 +353,32 @@ def generated_maven_jars():
 
 
   # org.keycloak:keycloak-services:jar:4.0.0.Final
+  # org.kindlyops.providers:kindlyops-keycloak-providers:jar:0.1.0 wanted version 1.0.1.Final
+  # pom.xml wanted version 1.0.1.Final
   native.maven_jar(
       name = "org_jboss_spec_javax_ws_rs_jboss_jaxrs_api_2_0_spec",
       artifact = "org.jboss.spec.javax.ws.rs:jboss-jaxrs-api_2.0_spec:1.0.0.Final",
       repository = "https://jcenter.bintray.com/",
       sha1 = "dbf29e00dee135ef537b94167aa08b883f4d4cbf",
+  )
+
+
+  # pom.xml got requested version
+  # org.kindlyops.providers:kindlyops-keycloak-providers:jar:0.1.0
+  native.maven_jar(
+      name = "org_keycloak_keycloak_model_jpa",
+      artifact = "org.keycloak:keycloak-model-jpa:4.0.0.Final",
+      repository = "https://jcenter.bintray.com/",
+      sha1 = "a352a644967851e6c87732bf72eddf1bc56eea94",
+  )
+
+
+  # org.hibernate:hibernate-core:jar:5.1.14.Final
+  native.maven_jar(
+      name = "antlr_antlr",
+      artifact = "antlr:antlr:2.7.7",
+      repository = "https://jcenter.bintray.com/",
+      sha1 = "83cd2cd674a217ade95a4bb83a8a14f351f48bd0",
   )
 
 
@@ -259,6 +394,16 @@ def generated_maven_jars():
 
 
 def generated_java_libraries():
+  native.java_library(
+      name = "dom4j_dom4j",
+      visibility = ["//visibility:public"],
+      exports = ["@dom4j_dom4j//jar"],
+      runtime_deps = [
+          ":xml_apis_xml_apis",
+      ],
+  )
+
+
   native.java_library(
       name = "org_keycloak_keycloak_common",
       visibility = ["//visibility:public"],
@@ -278,6 +423,39 @@ def generated_java_libraries():
 
 
   native.java_library(
+      name = "org_hibernate_hibernate_core",
+      visibility = ["//visibility:public"],
+      exports = ["@org_hibernate_hibernate_core//jar"],
+      runtime_deps = [
+          ":antlr_antlr",
+          ":com_fasterxml_classmate",
+          ":dom4j_dom4j",
+          ":org_apache_geronimo_specs_geronimo_jta_1_1_spec",
+          ":org_hibernate_common_hibernate_commons_annotations",
+          ":org_hibernate_javax_persistence_hibernate_jpa_2_1_api",
+          ":org_javassist_javassist",
+          ":org_jboss_jandex",
+          ":org_jboss_logging_jboss_logging",
+          ":xml_apis_xml_apis",
+      ],
+  )
+
+
+  native.java_library(
+      name = "org_jboss_jandex",
+      visibility = ["//visibility:public"],
+      exports = ["@org_jboss_jandex//jar"],
+  )
+
+
+  native.java_library(
+      name = "org_apache_geronimo_specs_geronimo_jta_1_1_spec",
+      visibility = ["//visibility:public"],
+      exports = ["@org_apache_geronimo_specs_geronimo_jta_1_1_spec//jar"],
+  )
+
+
+  native.java_library(
       name = "commons_codec_commons_codec",
       visibility = ["//visibility:public"],
       exports = ["@commons_codec_commons_codec//jar"],
@@ -292,12 +470,36 @@ def generated_java_libraries():
 
 
   native.java_library(
+      name = "xml_apis_xml_apis",
+      visibility = ["//visibility:public"],
+      exports = ["@xml_apis_xml_apis//jar"],
+  )
+
+
+  native.java_library(
       name = "org_bouncycastle_bcpkix_jdk15on",
       visibility = ["//visibility:public"],
       exports = ["@org_bouncycastle_bcpkix_jdk15on//jar"],
       runtime_deps = [
           ":org_bouncycastle_bcprov_jdk15on",
       ],
+  )
+
+
+  native.java_library(
+      name = "org_hibernate_common_hibernate_commons_annotations",
+      visibility = ["//visibility:public"],
+      exports = ["@org_hibernate_common_hibernate_commons_annotations//jar"],
+      runtime_deps = [
+          ":org_jboss_logging_jboss_logging",
+      ],
+  )
+
+
+  native.java_library(
+      name = "org_hibernate_javax_persistence_hibernate_jpa_2_1_api",
+      visibility = ["//visibility:public"],
+      exports = ["@org_hibernate_javax_persistence_hibernate_jpa_2_1_api//jar"],
   )
 
 
@@ -337,6 +539,13 @@ def generated_java_libraries():
 
 
   native.java_library(
+      name = "org_liquibase_liquibase_core",
+      visibility = ["//visibility:public"],
+      exports = ["@org_liquibase_liquibase_core//jar"],
+  )
+
+
+  native.java_library(
       name = "org_json_json",
       visibility = ["//visibility:public"],
       exports = ["@org_json_json//jar"],
@@ -358,6 +567,26 @@ def generated_java_libraries():
       name = "com_fasterxml_jackson_core_jackson_annotations",
       visibility = ["//visibility:public"],
       exports = ["@com_fasterxml_jackson_core_jackson_annotations//jar"],
+  )
+
+
+  native.java_library(
+      name = "org_hibernate_hibernate_entitymanager",
+      visibility = ["//visibility:public"],
+      exports = ["@org_hibernate_hibernate_entitymanager//jar"],
+      runtime_deps = [
+          ":antlr_antlr",
+          ":com_fasterxml_classmate",
+          ":dom4j_dom4j",
+          ":org_apache_geronimo_specs_geronimo_jta_1_1_spec",
+          ":org_hibernate_common_hibernate_commons_annotations",
+          ":org_hibernate_hibernate_core",
+          ":org_hibernate_javax_persistence_hibernate_jpa_2_1_api",
+          ":org_javassist_javassist",
+          ":org_jboss_jandex",
+          ":org_jboss_logging_jboss_logging",
+          ":xml_apis_xml_apis",
+      ],
   )
 
 
@@ -384,6 +613,13 @@ def generated_java_libraries():
 
 
   native.java_library(
+      name = "com_fasterxml_classmate",
+      visibility = ["//visibility:public"],
+      exports = ["@com_fasterxml_classmate//jar"],
+  )
+
+
+  native.java_library(
       name = "com_fasterxml_jackson_core_jackson_databind",
       visibility = ["//visibility:public"],
       exports = ["@com_fasterxml_jackson_core_jackson_databind//jar"],
@@ -391,6 +627,13 @@ def generated_java_libraries():
           ":com_fasterxml_jackson_core_jackson_annotations",
           ":com_fasterxml_jackson_core_jackson_core",
       ],
+  )
+
+
+  native.java_library(
+      name = "org_javassist_javassist",
+      visibility = ["//visibility:public"],
+      exports = ["@org_javassist_javassist//jar"],
   )
 
 
@@ -478,6 +721,55 @@ def generated_java_libraries():
       name = "org_jboss_spec_javax_ws_rs_jboss_jaxrs_api_2_0_spec",
       visibility = ["//visibility:public"],
       exports = ["@org_jboss_spec_javax_ws_rs_jboss_jaxrs_api_2_0_spec//jar"],
+  )
+
+
+  native.java_library(
+      name = "org_keycloak_keycloak_model_jpa",
+      visibility = ["//visibility:public"],
+      exports = ["@org_keycloak_keycloak_model_jpa//jar"],
+      runtime_deps = [
+          ":antlr_antlr",
+          ":com_beust_jcommander",
+          ":com_fasterxml_classmate",
+          ":com_fasterxml_jackson_core_jackson_annotations",
+          ":com_fasterxml_jackson_core_jackson_core",
+          ":com_fasterxml_jackson_core_jackson_databind",
+          ":com_google_zxing_core",
+          ":com_google_zxing_javase",
+          ":dom4j_dom4j",
+          ":javax_mail_javax_mail_api",
+          ":org_apache_geronimo_specs_geronimo_jta_1_1_spec",
+          ":org_bouncycastle_bcpkix_jdk15on",
+          ":org_bouncycastle_bcprov_jdk15on",
+          ":org_glassfish_javax_json",
+          ":org_hibernate_common_hibernate_commons_annotations",
+          ":org_hibernate_hibernate_core",
+          ":org_hibernate_hibernate_entitymanager",
+          ":org_hibernate_javax_persistence_hibernate_jpa_2_1_api",
+          ":org_javassist_javassist",
+          ":org_jboss_jandex",
+          ":org_jboss_logging_jboss_logging",
+          ":org_jboss_resteasy_resteasy_jaxrs",
+          ":org_jboss_resteasy_resteasy_multipart_provider",
+          ":org_jboss_spec_javax_servlet_jboss_servlet_api_3_0_spec",
+          ":org_jboss_spec_javax_transaction_jboss_transaction_api_1_2_spec",
+          ":org_jboss_spec_javax_ws_rs_jboss_jaxrs_api_2_0_spec",
+          ":org_keycloak_keycloak_core",
+          ":org_keycloak_keycloak_server_spi",
+          ":org_keycloak_keycloak_server_spi_private",
+          ":org_keycloak_keycloak_services",
+          ":org_liquibase_liquibase_core",
+          ":org_twitter4j_twitter4j_core",
+          ":xml_apis_xml_apis",
+      ],
+  )
+
+
+  native.java_library(
+      name = "antlr_antlr",
+      visibility = ["//visibility:public"],
+      exports = ["@antlr_antlr//jar"],
   )
 
 
