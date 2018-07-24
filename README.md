@@ -125,6 +125,10 @@ The psql client is installed in the flyway image, and can connect to the DB serv
     SELECT * from foo LIMIT 1;  # run arbitrary queries
     \q                          # disconnect
 
+We also have pgadmin4 running on http://localhost:8081. You can sign in using user1@havengrc.com/password.
+Once inside pgadmin4, you will need to add a server, the server hostname is 'db' and the credentials are
+postgres/postgres.
+
 ## Use REST client to interact with the API
 
 [Postman](https://www.getpostman.com/) is a free GUI REST client that makes exploration easy. Run postman, and import a couple of predefined requests from the collection at postman/ComplianceOps.postman\_collection.json. Then execute the POST and GET requests to see how the API behaves.

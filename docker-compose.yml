@@ -116,6 +116,13 @@ services:
       - POSTGRES_DB=mappamundi_dev
     volumes:
       - ./postgresql-data:/var/lib/postgresql
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      - "PGADMIN_DEFAULT_EMAIL=user1@havengrc.com"
+      - "PGADMIN_DEFAULT_PASSWORD=password"
+    ports:
+      - "8081:80"
   havenapi:
     working_dir: /go/src/github.com/kindlyops/mappamundi/havenapi
     volumes:
