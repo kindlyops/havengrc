@@ -31,7 +31,8 @@ services:
       dockerfile: ./keycloak/Dockerfile
     # to use the image line, you must first build & load the image
     # bazel run //keycloak:keycloak
-    #image: bazel/keycloak:keycloak
+    # image: bazel/keycloak:keycloak
+    # TODO: trouble with neverlink, need to figure out how to neverlink antlr and dom4j
     environment:
       - DB_DATABASE=mappamundi_dev
       - DB_USER=postgres

@@ -27,39 +27,50 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "HAVEN_MEMBERSHIP")
-@NamedQueries({ @NamedQuery(name = "findByRealm", query = "from HavenMembership where realmId = :realmId") })
 public class HavenMembership {
 
     @Id
-    @Column(name = "ID")
-    private String id;
+    @Column(name = "ID", nullable = false)
+    private Integer id;
 
     @Column(name = "ORGANIZATION_ID", nullable = false)
-    private Integer organization;
+    private Integer organizationId;
 
     @Column(name = "REALM_ID", nullable = false)
     private String realmId;
 
     @Column(name = "ORG_ROLE_ID", nullable = false)
-    private Integer orgRole;
+    private Integer orgRoleId;
 
-    public String getId() {
+    public Integer getId() {
         return id;
+    }
+
+    public Integer getOrganization() {
+        return organizationId;
     }
 
     public String getRealmId() {
         return realmId;
     }
 
-    public Integer getOrganization() {
-        return organization;
+    public Integer getOrgRoleId() {
+        return orgRoleId;
     }
 
-    public void setId(String id) {
+    public void setId(Integer id) {
         this.id = id;
+    }
+
+    public void setOrganizationId(Integer id) {
+        this.organizationId = id;
     }
 
     public void setRealmId(String realmId) {
         this.realmId = realmId;
+    }
+
+    public void setOrgRoleId(Integer roleId) {
+        this.orgRoleId = roleId;
     }
 }

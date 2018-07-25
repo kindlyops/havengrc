@@ -4,12 +4,14 @@ import org.keycloak.connections.jpa.entityprovider.JpaEntityProvider;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Collections;
 
 public class HavenJpaEntityProvider implements JpaEntityProvider {
 
     @Override
     public List<Class<?>> getEntities() {
-        return Arrays.asList(HavenMembership.class);
+        return Collections.<Class<?>>singletonList(HavenMembership.class);
+        // return Arrays.asList(HavenMembership.class);
     }
 
     @Override
