@@ -1,5 +1,8 @@
 package(default_visibility = ["//visibility:public"])
 
+# make dom4j and hibernate neverlink to avoid crash when loading SPI
+# https://github.com/bazelbuild/bazel/issues/1402#issuecomment-407676080
+
 java_binary(
     name = "spi",
     srcs = glob(["src/main/java/**/*.java"]),

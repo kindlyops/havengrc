@@ -383,8 +383,7 @@ def generated_java_libraries():
         name = "org_hibernate_hibernate_core",
         visibility = ["//visibility:public"],
         exports = ["@org_hibernate_hibernate_core//jar"],
-        neverlink = 1,
-        deps = [
+        runtime_deps = [
             ":antlr_antlr",
             ":com_fasterxml_classmate",
             ":dom4j_dom4j",
@@ -450,7 +449,6 @@ def generated_java_libraries():
         name = "org_hibernate_javax_persistence_hibernate_jpa_2_1_api",
         visibility = ["//visibility:public"],
         exports = ["@org_hibernate_javax_persistence_hibernate_jpa_2_1_api//jar"],
-        neverlink = 1,
     )
 
     native.java_library(
@@ -515,8 +513,7 @@ def generated_java_libraries():
         name = "org_hibernate_hibernate_entitymanager",
         visibility = ["//visibility:public"],
         exports = ["@org_hibernate_hibernate_entitymanager//jar"],
-        neverlink = 1,
-        deps = [
+        runtime_deps = [
             ":antlr_antlr",
             ":com_fasterxml_classmate",
             ":dom4j_dom4j",
@@ -535,7 +532,6 @@ def generated_java_libraries():
         name = "org_keycloak_keycloak_core",
         visibility = ["//visibility:public"],
         exports = ["@org_keycloak_keycloak_core//jar"],
-        neverlink = 1,
         runtime_deps = [
             ":com_fasterxml_jackson_core_jackson_annotations",
             ":com_fasterxml_jackson_core_jackson_core",
@@ -656,8 +652,7 @@ def generated_java_libraries():
         name = "org_keycloak_keycloak_model_jpa",
         visibility = ["//visibility:public"],
         exports = ["@org_keycloak_keycloak_model_jpa//jar"],
-        neverlink = 1,
-        deps = [
+        runtime_deps = [
             ":antlr_antlr",
             ":com_beust_jcommander",
             ":com_fasterxml_classmate",
