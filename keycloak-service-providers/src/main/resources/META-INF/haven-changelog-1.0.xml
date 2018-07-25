@@ -14,7 +14,7 @@
             </column>
         </createTable>
 
-        <createTable tableName="HAVEN_MEMBERSHIP">
+        <!-- <createTable tableName="HAVEN_MEMBERSHIP">
             <column name="ID" type="int" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
@@ -43,7 +43,8 @@
             </column>
         </createTable>
         <addForeignKeyConstraint baseColumnNames="ORG_ROLE_ID" baseTableName="HAVEN_MEMBERSHIP" constraintName="fk_membership_role" deferrable="true" initiallyDeferred="true" onDelete="CASCADE" onUpdate="RESTRICT" referencedColumnNames="ID" referencedTableName="HAVEN_ORG_ROLE"/>
-        <addLookupTable constraintName="fk_role_name" existingColumnName="ROLE" existingTableName="HAVEN_ORG_ROLE" newColumnDataType="VARCHAR(36)" newColumnName="NAME" newTableName="HAVEN_ROLE"/>
+        
+        <addLookupTable constraintName="fk_role_name" existingColumnName="ROLE" existingTableName="HAVEN_ORG_ROLE" newColumnDataType="VARCHAR(36)" newColumnName="NAME" newTableName="HAVEN_ROLE"/> -->
 
     </changeSet>
 

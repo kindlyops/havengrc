@@ -9,17 +9,14 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 /*
-        <createTable tableName="HAVEN_MEMBERSHIP">
-            <column name="ID" type="int", autoIncrement="true">
+<createTable tableName="HAVEN_ORGANIZATION">
+            <column name="ID" type="int" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="ORGANIZATION_ID" type="int">
+            <column name="NAME" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
             <column name="REALM_ID" type="VARCHAR(36)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="ORG_ROLE_ID" type="int">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -34,29 +31,30 @@ public class HavenOrganization {
     @Column(name = "ID")
     private String id;
 
-    @Column(name = "ORGANIZATION_ID", nullable = false)
-    private Integer organization;
+    @Column(name = "NAME", nullable = false)
+    private String name;
 
     @Column(name = "REALM_ID", nullable = false)
     private String realmId;
 
-    @Column(name = "ORG_ROLE_ID", nullable = false)
-    private Integer orgRole;
-
     public String getId() {
         return id;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public String getRealmId() {
         return realmId;
     }
 
-    public Integer getOrganization() {
-        return organization;
-    }
-
     public void setId(String id) {
         this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public void setRealmId(String realmId) {

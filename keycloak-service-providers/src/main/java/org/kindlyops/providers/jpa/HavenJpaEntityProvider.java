@@ -10,7 +10,7 @@ public class HavenJpaEntityProvider implements JpaEntityProvider {
 
     @Override
     public List<Class<?>> getEntities() {
-        return Collections.<Class<?>>singletonList(HavenMembership.class);
+        return Collections.<Class<?>>singletonList(HavenOrganization.class);
         // return Arrays.asList(HavenMembership.class);
     }
 
