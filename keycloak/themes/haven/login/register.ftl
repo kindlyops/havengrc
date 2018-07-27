@@ -68,7 +68,7 @@
                 </div>
             </div>
             </#if>
-
+            <style>.sc-checkout-form .sc-payment-btn { display: none; }</style>
             <div class="${properties.kcFormGroupClass!}">
                 <div id="kc-form-buttons" class="${properties.kcFormButtonsClass!}">
 								   <script
@@ -76,13 +76,15 @@
 										class="stripe-button"
                     data-key="${stripe_pk}"
                     data-name="Haven GRC"
-                    data-description="Free Trial"
+                    data-description="Free Trial - valid credit card required"
                     data-image="${url.resourcesPath}/img/favicon-base.png"
                     data-locale="auto"
+										data-label="Validate payment card"
+										data-panel-label="Validate"
 										data-allow-remember-me="false"
                     data-zip-code="true">
                     </script> 
-                    <!-- <input class="mdc-button mdc-button--primary mdc-button--raised btn-primary" type="button" value="${msg("doRegister")}"/> -->
+                    <input class="mdc-button mdc-button--primary mdc-button--raised btn-primary" type="button" value="${msg("doRegister")}"/>
                 </div>
                 <div id="kc-form-options" class="${properties.kcFormOptionsClass!}">
                     <div class="${properties.kcFormOptionsWrapperClass!}">
