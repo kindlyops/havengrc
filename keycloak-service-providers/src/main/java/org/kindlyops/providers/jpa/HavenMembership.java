@@ -46,7 +46,7 @@ public class HavenMembership {
         return id;
     }
 
-    public Integer getOrganization() {
+    public Integer getOrganizationId() {
         return organizationId;
     }
 
