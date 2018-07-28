@@ -11,7 +11,12 @@ public class HavenJpaEntityProvider implements JpaEntityProvider {
     @Override
     public List<Class<?>> getEntities() {
         // return Collections.<Class<?>>singletonList(HavenOrganization.class);
-        Class<?> e[] = new Class<?>[] { HavenMembership.class, HavenOrganization.class };
+        Class<?> e[] = new Class<?>[] {
+					HavenMembership.class,
+					HavenOrganization.class,
+					HavenOrgRole.class,
+					HavenRole.class,
+				};
         return Arrays.asList(e);
     }
 
