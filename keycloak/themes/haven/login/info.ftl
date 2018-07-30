@@ -5,7 +5,7 @@
     <#elseif section = "header">
     <h2>${message.summary}</h2>
     <#elseif section = "form">
-    <div id="kc-info-message" class="align-center">
+    <div id="kc-info-message" class="text-center">
         <p class="instruction">${message.summary}<#if requiredActions??><#list requiredActions>: <b><#items as reqActionItem>${msg("requiredAction.${reqActionItem}")}<#sep>, </#items></b></#list><#else></#if></p>
         <#if skipLink??>
         <#else>
@@ -14,7 +14,7 @@
             <#elseif actionUri??>
                 <p><a href="${actionUri}">${msg("proceedWithAction")}</a></p>
             <#elseif client.baseUrl??>
-                <p><a href="${client.baseUrl}">${msg("backToApplication")}</a></p>
+                <p><a href="${client.baseUrl}">&laquo; ${msg("backToApplication")}</a></p>
             </#if>
         </#if>
     </div>
