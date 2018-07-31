@@ -76,7 +76,7 @@
           <#if features.identityFederation>
           <li class="nav-item">
             <a href="${url.socialUrl}" class="<#if active=='social'>active</#if> nav-link">
-              <i class="material-icons mr-3">arrow_back</i>
+              <i class="material-icons mr-3">supervisor_account</i>
               ${msg("federatedIdentity")}
             </a>
           </li>

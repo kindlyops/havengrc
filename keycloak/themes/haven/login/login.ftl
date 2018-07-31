@@ -7,7 +7,7 @@
     <#elseif section = "header">
     <h1 class="login-header">${msg("loginTitleHtml",(realm.displayNameHtml!''))}</h1>
     <#elseif section="form">
-    <div class="col-lg-6 d-lg-flex justify-content-lg-end pr-lg-5 login-box">
+    <div class="col-sm-6 d-sm-flex justify-content-sm-end pr-sm-5 login-box">
         <#if realm.password>
             <form id="kc-form-login" action="${url.loginAction}" method="post">
                     <div class="form-group">
@@ -49,22 +49,23 @@
         </#if>
     </div>
     <#elseif section="info">
-        <div class="col-lg-6 d-lg-flex align-items-lg-center pl-lg-5">
+        <div class="col-sm-6 d-sm-flex flex-column align-items-sm-start pl-sm-5 py-sm-4">
+        <div class="orText">OR</div>
+            <#if realm.password && social.providers??>
+                <div id="kc-social-providers" class="mb-auto text-center">
+                    <h5>Log In With:</h5>
+                        <#list social.providers as p>
+                            <p class="mb-1"><a href="${p.loginUrl}" id="zocial-${p.alias}" class="zocial ${p.providerId}"> <span class="text">${p.displayName}</span></a></p>
+                        </#list>
+                </div>
+            </#if>
             <#if realm.password && realm.registrationAllowed && !usernameEditDisabled??>
                 <div id="Registration" class="text-center">
                     <p>${msg("noAccount")} <a href="${url.registrationUrl}">${msg("doRegister")}</a></p>
                 </div>
             </#if>
 
-            <#if realm.password && social.providers??>
-                <div id="kc-social-providers">
-                    <ul>
-                        <#list social.providers as p>
-                            <li><a href="${p.loginUrl}" id="zocial-${p.alias}" class="zocial ${p.providerId}"> <span class="text">${p.displayName}</span></a></li>
-                        </#list>
-                    </ul>
-                </div>
-            </#if>
+
         </div>
     </#if> <#-- end section = "title" -->
 </@layout.registrationLayout>
