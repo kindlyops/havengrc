@@ -45,7 +45,13 @@ h1,h2,h2,h4,p.lead, a.nav-item, .navbar-brand, .navbar-nav {
 .login-header {
     text-transform: uppercase;
     font-family: 'Montserrat';
-    font-weight: bold; 
+    font-weight: bold;
+}
+
+.login-btn{
+  margin-top:25px;
+  border-radius: 25px;
+  max-width:255px;
 }
 
 #footer-image {
