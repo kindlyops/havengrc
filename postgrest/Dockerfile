@@ -1,7 +1,6 @@
-FROM        havengrc-docker.jfrog.io/postgrest/postgrest:v0.4.3.0
+FROM        havengrc-docker.jfrog.io/postgrest/postgrest:v0.5.0.0
 MAINTAINER  Kindly Ops, LLC <support@kindlyops.com>
 COPY        postgrest/config /config
-COPY        postgrest/vendor/postgrest /usr/local/bin/postgrest
 USER root
 RUN addgroup --system havenuser && adduser --system havenuser && adduser havenuser havenuser
 RUN chown -R havenuser:0 /config && \
