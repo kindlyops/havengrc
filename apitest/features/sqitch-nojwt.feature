@@ -19,6 +19,7 @@ Feature: Basic sqitch access control
         When I send a GET request to "http://{api_server}/likert_questions"
         Then the response status should be "200"
         And the JSON response root should be array
+	And the JSON response should have "$[0].title" of type string and value "Security Value of Failure"
 
     Scenario: Delete likert questions
         When I send a DELETE request to "http://{api_server}/likert_questions"
