@@ -11,13 +11,15 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Route
-import Page.Home as Home
-import Page.Dashboard as Dashboard
-import Page.Comments as Comments
 import Page.Activity as Activity
+import Page.Comments as Comments
+import Page.Dashboard as Dashboard
+import Page.Home as Home
+import Page.Privacy as Privacy
 import Page.Reports as Reports
 import Page.Survey as Survey
 import Page.SurveyResponses as SurveyResponses
+import Page.Terms as Terms
 
 
 type alias Model =
@@ -234,7 +236,20 @@ view : Model -> Html Msg
 view model =
     case Authentication.tryGetUserProfile model.authModel of
         Nothing ->
-            Home.view |> Html.map AuthenticationMsg
+            let
+                _ =
+                    Debug.log "model route is: " (toString model.route)
+            in
+                case model.route of
+                    Just (Route.Privacy) ->
+                        Privacy.view
+
+                    Just (Route.Terms) ->
+                        Terms.view
+
+                    -- everything else gets the front page
+                    _ ->
+                        Home.view |> Html.map AuthenticationMsg
 
         Just user ->
             viewMain model user
@@ -297,7 +312,7 @@ viewBody model =
             Just (Route.Survey) ->
                 Survey.view model.authModel model.surveyModel |> Html.map SurveyMsg
 
-            Just Route.SurveyResponses ->
+            Just (Route.SurveyResponses) ->
                 SurveyResponses.view model.authModel model.surveyResponseModel |> Html.map SurveyResponseMsg
 
             Just _ ->

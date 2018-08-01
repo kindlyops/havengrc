@@ -17,15 +17,17 @@ import Navigation
 
 type Location
     = Login
-    | Home
     | Activity
-    | Reports
-    | Dashboard
     | Comments
+    | Dashboard
+    | EditComment Int
+    | Home
+    | Privacy
+    | Reports
+    | ShowComment Int
     | Survey
     | SurveyResponses
-    | ShowComment Int
-    | EditComment Int
+    | Terms
 
 
 type alias Model =
@@ -59,35 +61,41 @@ titleFor : Location -> String
 titleFor route =
     "Haven GRC - "
         ++ case route of
-            Login ->
-                "Login"
-
-            Home ->
-                "Home"
-
             Activity ->
                 "Activity"
+
+            Comments ->
+                "Comments"
 
             Dashboard ->
                 "Dashboard"
 
+            EditComment _ ->
+                "Thread"
+
+            Home ->
+                "Home"
+
+            Login ->
+                "Login"
+
+            Privacy ->
+                "Privacy Policy"
+
             Reports ->
                 "Reports"
 
-            Comments ->
-                "Comments"
+            ShowComment _ ->
+                "Comment"
 
             Survey ->
                 "Survey"
 
             SurveyResponses ->
-                "SurveyResponses"
+                "Survey Responses"
 
-            ShowComment _ ->
-                "Comment"
-
-            EditComment _ ->
-                "Thread"
+            Terms ->
+                "Terms of Service"
 
 
 urlFor : Location -> String
@@ -95,23 +103,32 @@ urlFor loc =
     let
         url =
             case loc of
-                Login ->
-                    "/login"
-
-                Home ->
-                    "/"
-
-                Reports ->
-                    "/reports"
-
                 Activity ->
                     "/activity"
+
+                Comments ->
+                    "/comments"
 
                 Dashboard ->
                     "/dashboard"
 
-                Comments ->
-                    "/comments"
+                EditComment id ->
+                    "/comments/" ++ (toString id) ++ "/edit"
+
+                Home ->
+                    "/"
+
+                Login ->
+                    "/login"
+
+                Privacy ->
+                    "/privacy"
+
+                Reports ->
+                    "/reports"
+
+                ShowComment id ->
+                    "/comments/" ++ (toString id)
 
                 Survey ->
                     "/survey"
@@ -119,11 +136,8 @@ urlFor loc =
                 SurveyResponses ->
                     "/surveyResponses"
 
-                ShowComment id ->
-                    "/comments/" ++ (toString id)
-
-                EditComment id ->
-                    "/comments/" ++ (toString id) ++ "/edit"
+                Terms ->
+                    "/terms"
     in
         "#" ++ url
 
@@ -145,20 +159,11 @@ locFor path =
                     Debug.log "Route.locFor " (toString segments)
             in
                 case segments of
-                    [ "login" ] ->
-                        Just Login
-
                     [] ->
                         Just Home
 
                     [ "activity" ] ->
                         Just Activity
-
-                    [ "dashboard" ] ->
-                        Just Dashboard
-
-                    [ "reports" ] ->
-                        Just Reports
 
                     [ "comments" ] ->
                         Just Comments
@@ -176,11 +181,26 @@ locFor path =
                             |> Result.toMaybe
                             |> Maybe.map EditComment
 
+                    [ "dashboard" ] ->
+                        Just Dashboard
+
+                    [ "login" ] ->
+                        Just Login
+
+                    [ "privacy" ] ->
+                        Just Privacy
+
+                    [ "reports" ] ->
+                        Just Reports
+
                     [ "survey" ] ->
                         Just Survey
 
                     [ "surveyResponses" ] ->
                         Just SurveyResponses
+
+                    [ "terms" ] ->
+                        Just Terms
 
                     _ ->
                         let
