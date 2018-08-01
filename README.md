@@ -7,7 +7,7 @@ We use [BrowserStack](http://browserstack.com) to efficiently check cross-browse
 <!-- markdownlint-disable MD033 -->
 [<img height="53" src="https://p3.zdusercontent.com/attachment/1015988/xfvLD5CuyeUcq2i40RYcw494H?token=eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0..BvyIxRLJz4phFf7cbIr8_Q.Fl9BR-ARcgvq38p546lM4djFcalediYWQaXV1_U_xi_zr5stXNUKLQNkTt-2zQbXWIIffLSoG8dUSZqL-GsqaTMbBX8OZi14qIHWmBIOPoRmyhwIcQfYIa79ngad69fKDltmq2H2KKWLByI-NWE9ygYpNs2IAXOQ72NICuWLbSyXIDGFVsq5VlV5ok7iCY0WxwXzIAiHbFu_BPufmP951-dpnBIGJAl4KfGk0eSbHKDOYvVkqHU2yZvNL8itCqkThmE7WNgPCS_KL6TyQiPxUQ.0ypOzE6XBmafR82vKRcIKg">](http://browserstack.com/)
 
-## Design framework and tooling.
+## What is Haven GRC?
 
 We help organizations avoid getting bogged down in rules that no longer make sense, and empower people to update practices to use modern tools and techniques without abandoning responsible oversight and administrative controls.
 
@@ -37,8 +37,8 @@ Before you continue, you need to configure git to auto-correct line ending forma
 
 You will normally run all the services using:
 
-    docker-compose run start_dependencies
     docker-compose up
+    docker-compose run flyway # applies database migrations
 
 From this point on, you just just be able to use docker-compose up/down normally. Move on to access the main webUI in the next section.
 
@@ -195,7 +195,7 @@ Elm is also a language that compiles to javascript. Here are some resources for 
 
 ### Design framework and tooling
 
-We are making use of the [Material Design](https://material.io/guidelines/) system as a base for our design. We are also using the implementation at [Material Components for the Web](https://material.io/components/web/catalog/).
+We are making use of the [Material Design](https://material.io/guidelines/) system as a base for our design. We are also using the implementation at [Daemonite](http://daemonite.github.io/material/).
 
 Within the app we are using [SASS](http://sass-lang.com/), and the guidance from [Inverted Triangle CSS](https://www.xfive.co/blog/itcss-scalable-maintainable-css-architecture/) and [Reasonable CSS](http://rscss.io/) to try and keep the CSS manageable.
 

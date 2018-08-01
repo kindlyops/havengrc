@@ -1,4 +1,4 @@
-module Page.Home exposing (view)
+module Page.Landing exposing (view)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -23,7 +23,7 @@ view =
                         , text "Dashboard"
                         ]
                     , button
-                        [ class "btn btn-primary btn-block mx-auto login-btn"
+                        [ class "btn btn-primary mt-4"
                         , onClick (Authentication.ShowLogIn)
                         ]
                         [ text "Login" ]
@@ -57,9 +57,9 @@ view =
                         [ img [ alt "Award badge ribbon", class "img-responsive center-block", attribute "data-rjs" "2", src "/img/give_credit.png" ]
                             []
                         , h3 [ class "py-3" ]
-                            [ text "GIVE CREDIT" ]
+                            [ text "Landing" ]
                         , p [ class "homeparagraph" ]
-                            [ text "Compliance + risk work can seem never-ending and thankless. Resilience and safety comes from humans, and giving people credit for their work results in higher engagement and improved acuity for identifying and mitigating risks as they emerge. People get excited about how they are helping to improve the company risk profile rather than dragging their feet about the rules. Empower your team to innovate with confidence!" ]
+                            [ text "This is a landing page!" ]
                         ]
                     ]
                 ]

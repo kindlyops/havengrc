@@ -5,48 +5,40 @@
         ${msg("loginTitle",(realm.displayName!''))}
 
     <#elseif section = "header">
-        <h1 class="mdc-typography login-header">${msg("loginTitleHtml",(realm.displayNameHtml!''))}</h1>
-    <#elseif section = "form">
-    <div class="mdc-layout-grid__cell--span-4-tablet mdc-layout-grid__cell--span-6-phone mdc-layout-grid__cell--span-6-desktop login-box">
+    <h1 class="login-header">${msg("loginTitleHtml",(realm.displayNameHtml!''))}</h1>
+    <#elseif section="form">
+    <div class="col-sm-6 d-sm-flex justify-content-sm-end pr-sm-5 login-box">
         <#if realm.password>
             <form id="kc-form-login" action="${url.loginAction}" method="post">
-                <div>
-                    <div class="mdc-form-field">
-                        <div class="mdc-textfield" data-mdc-auto-init="MDCTextfield">
+                    <div class="form-group">
                             <#if usernameEditDisabled??>
-                                <input id="username" class="mdc-textfield__input" name="username" value="${(login.username!'')}" type="text" disabled required />
-                                <label for="username" class=" mdc-textfield__label"><#if !realm.loginWithEmailAllowed>${msg("username")}<#elseif !realm.registrationEmailAsUsername>${msg("usernameOrEmail")}<#else>${msg("email")}</#if></label>
+                                <label for="username" class=""><#if !realm.loginWithEmailAllowed>${msg("username")}<#elseif !realm.registrationEmailAsUsername>${msg("usernameOrEmail")}<#else>${msg("email")}</#if></label>
+                                <input id="username" class="form-control" name="username" value="${(login.username!'')}" type="text" disabled required />
                                 <#else>
-                                    <input id="username" class="mdc-textfield__input" name="username" value="${(login.username!'')}" type="text" autofocus autocomplete="off" required />
-                                    <label for="username" class="mdc-textfield__label"><#if !realm.loginWithEmailAllowed>${msg("username")}<#elseif !realm.registrationEmailAsUsername>${msg("usernameOrEmail")}<#else>${msg("email")}</#if></label>
+                                    <label for="username" class=""><#if !realm.loginWithEmailAllowed>${msg("username")}<#elseif !realm.registrationEmailAsUsername>${msg("usernameOrEmail")}<#else>${msg("email")}</#if></label>
+                                    <input id="username" class="form-control" name="username" value="${(login.username!'')}" type="text" autofocus autocomplete="off" required />
                             </#if>
-                        </div>
                     </div>
-                </div>
-                <div>
-                    <div class="mdc-form-field">
-                        <div class="mdc-textfield" data-mdc-auto-init="MDCTextfield">
-                            <input id="password" class="mdc-textfield__input" name="password" type="password" autocomplete="off" required/>
-                            <label for="password" class="mdc-textfield__label">${msg("password")}</label>
-                        </div>
+                    <div class="form-group">
+                        <label for="password" class="">${msg("password")}</label>
+                            <input id="password" class="form-control" name="password" type="password" autocomplete="off" required />
                     </div>
-                    <div class="forgot-password">
+                    <div class="form-group forgot-password">
                         <#if realm.resetPasswordAllowed>
                             <a href="${url.loginResetCredentialsUrl}">${msg("doForgotPassword")}</a>
                         </#if>
                     </div>
-                </div>
 
-                <div class="${properties.kcFormGroupClass!}">
-                    <button class="mdc-button mdc-button--primary mdc-button--raised btn-primary" name="login" id="kc-login" type="submit" value="${msg(" doLogIn")}">Log in</button>
+                <div class="form-group">
+                    <button class="btn btn-primary btn-block" style="border-radius:25px;" name="login" id="kc-login" type="submit" value="${msg(" doLogIn")}">Log in</button>
                     <div id="kc-form-options" class="${properties.kcFormOptionsClass!}">
                         <#if realm.rememberMe && !usernameEditDisabled??>
-                            <div class="checkbox">
-                                <label>
+                            <div class="form-check">
+                                <label class="form-check-label" for="rememberMe">
                                     <#if login.rememberMe??>
-                                        <input id="rememberMe" name="rememberMe" type="checkbox" tabindex="3" checked> ${msg("rememberMe")}
-                                    <#else>
-                                        <input id="rememberMe" name="rememberMe" type="checkbox" tabindex="3"> ${msg("rememberMe")}
+                                        <input id="rememberMe" name="rememberMe" class="form-check-input" type="checkbox" tabindex="3" checked> ${msg("rememberMe")}
+                                        <#else>
+                                            <input id="rememberMe" name="rememberMe" class="form-check-input" type="checkbox" tabindex="3"> ${msg("rememberMe")}
                                     </#if>
                                 </label>
                             </div>
@@ -56,23 +48,24 @@
             </form>
         </#if>
     </div>
-    <#elseif section = "info" >
-    <div class="mdc-layout-grid__cell--span-6-desktop mdc-layout-grid__cell--span-4-tablet mdc-layout-grid__cell--span-6-phone registration-link">
-        <#if realm.password && realm.registrationAllowed && !usernameEditDisabled??>
-            <div id="Registration" style="align-self:center;">
-                <span>${msg("noAccount")} <a href="${url.registrationUrl}">${msg("doRegister")}</a></span>
-            </div>
-        </#if>
+    <#elseif section="info">
+        <div class="col-sm-6 d-sm-flex flex-column align-items-sm-start pl-sm-5 py-sm-4">
+        <div class="orText">OR</div>
+            <#if realm.password && social.providers??>
+                <div id="kc-social-providers" class="mb-auto text-center">
+                    <h5>Log In With:</h5>
+                        <#list social.providers as p>
+                            <p class="mb-1"><a href="${p.loginUrl}" id="zocial-${p.alias}" class="zocial ${p.providerId}"> <span class="text">${p.displayName}</span></a></p>
+                        </#list>
+                </div>
+            </#if>
+            <#if realm.password && realm.registrationAllowed && !usernameEditDisabled??>
+                <div id="Registration" class="text-center">
+                    <p>${msg("noAccount")} <a href="${url.registrationUrl}">${msg("doRegister")}</a></p>
+                </div>
+            </#if>
 
-        <#if realm.password && social.providers??>
-            <div id="kc-social-providers">
-                <ul>
-                    <#list social.providers as p>
-                        <li><a href="${p.loginUrl}" id="zocial-${p.alias}" class="zocial ${p.providerId}"> <span class="text">${p.displayName}</span></a></li>
-                    </#list>
-                </ul>
-            </div>
-        </#if>
-    </div>
+
+        </div>
     </#if> <#-- end section = "title" -->
 </@layout.registrationLayout>

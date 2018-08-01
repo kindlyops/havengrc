@@ -76,7 +76,7 @@
           <#if features.identityFederation>
           <li class="nav-item">
             <a href="${url.socialUrl}" class="<#if active=='social'>active</#if> nav-link">
-              <i class="material-icons mr-3">arrow_back</i>
+              <i class="material-icons mr-3">supervisor_account</i>
               ${msg("federatedIdentity")}
             </a>
           </li>
@@ -108,10 +108,10 @@
       </div>
     </div>
 
-    <main class="ml-lg-5 my-5 pt-3">
+    <main class="ml-lg-5 m-lg-5 pt-3">
       <div class="container">
         <div class="row">
-          <div class="col-lg-11">
+          <div class="col-lg-11 mx-auto">
             <#if message?has_content>
                 <div class="alert alert-${message.type} mt-3 mb-1">
                     <#if message.type=='success' ><i class="material-icons">check_circle</i></#if>
