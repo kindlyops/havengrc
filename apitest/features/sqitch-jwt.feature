@@ -5,6 +5,7 @@ Feature: Basic sqitch API interaction with JWT
         And I sign in to keycloak with "user1@havengrc.com" and "password"
         And I add Headers:
             | Prefer | return=representation             |
+        And I wait for 2 seconds
 
 
     Scenario: Add/update a comment without ability to spoof the user_email
