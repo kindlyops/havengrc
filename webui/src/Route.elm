@@ -23,6 +23,7 @@ type Location
     | EditComment Int
     | Home
     | Privacy
+    | Landing
     | Reports
     | ShowComment Int
     | Survey
@@ -82,6 +83,9 @@ titleFor route =
             Privacy ->
                 "Privacy Policy"
 
+            Landing ->
+                "Landing Page"
+
             Reports ->
                 "Reports"
 
@@ -123,6 +127,9 @@ urlFor loc =
 
                 Privacy ->
                     "/privacy"
+
+                Landing ->
+                    "/l"
 
                 Reports ->
                     "/reports"
@@ -189,6 +196,9 @@ locFor path =
 
                     [ "privacy" ] ->
                         Just Privacy
+
+                    [ "l" ] ->
+                        Just Landing
 
                     [ "reports" ] ->
                         Just Reports

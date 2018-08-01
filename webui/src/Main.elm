@@ -16,6 +16,7 @@ import Page.Comments as Comments
 import Page.Dashboard as Dashboard
 import Page.Home as Home
 import Page.Privacy as Privacy
+import Page.Landing as Landing
 import Page.Reports as Reports
 import Page.Survey as Survey
 import Page.SurveyResponses as SurveyResponses
@@ -246,6 +247,9 @@ view model =
 
                     Just (Route.Terms) ->
                         Terms.view
+
+                    Just (Route.Landing) ->
+                        Landing.view |> Html.map AuthenticationMsg
 
                     -- everything else gets the front page
                     _ ->
