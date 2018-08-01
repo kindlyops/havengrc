@@ -304,6 +304,12 @@ viewBody model =
             Just (Route.Reports) ->
                 Reports.view
 
+            Just (Route.Privacy) ->
+                Privacy.view
+
+            Just (Route.Terms) ->
+                Terms.view
+
             Just (Route.Dashboard) ->
                 (Dashboard.view model.dashboardModel) |> Html.map DashboardMsg
 
