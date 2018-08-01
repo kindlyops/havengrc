@@ -5,7 +5,7 @@
     <#elseif section = "header">
         <h2>${msg("errorTitleHtml")}</h2>
     <#elseif section = "form">
-        <div class="align-center">
+        <div class="text-center">
             <p class="instruction">${message.summary}</p>
             <#if client?? && client.baseUrl?has_content>
                 <p><a id="backToApplication" href="${client.baseUrl}">${msg("backToApplication")}</a></p>

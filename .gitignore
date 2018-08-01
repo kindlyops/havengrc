@@ -12,3 +12,6 @@ docs/_book/*
 .vscode/*
 npm-debug.log
 docs/plantuml/*.png
+.bazelrc
+/bazel-*
+.vs/

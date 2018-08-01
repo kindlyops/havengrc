@@ -15,8 +15,6 @@
     </#if>
     <title><#nested "title"></title>
     <link rel="icon" href="${url.resourcesPath}/img/favicon.ico" />
-    <script src="https://use.typekit.net/fru8myg.js"></script>
-    <script>try{Typekit.load({ async: true });}catch(e){}</script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <#if properties.styles?has_content>
         <#list properties.styles?split(' ') as style>
@@ -35,42 +33,43 @@
     </#if>
 </head>
 
-<body class="mdc-typography body-other-pages">
-    <header class="mdc-toolbar header">
-        <div class="mdc-toolbar__row">
-            <section class="mdc-toolbar__section mdc-toolbar__section--align-start">
-                <h1 class="mdc-toolbar__title">Haven GRC</h1>
-            </section>
+<body class="body-other-pages">
+    <header class="navbar navbar-dark bg-primary">
+        <div class="navbar-brand">
+            Haven GRC
         </div>
-    </header>
-
-    <div class="mdc-layout-grid heading">
-        <div class="mdc-layout-grid__inner align-center">
-            <div class="mdc-layout-grid__cell--span-12">
-                <#nested "header">
-            </div>
-        </div>
-    </div>
-
-    <#if realm.internationalizationEnabled>
-        <div id="kc-locale" class="${properties.kcLocaleClass!}">
-            <div id="kc-locale-wrapper" class="${properties.kcLocaleWrapperClass!}">
-                <div class="kc-dropdown" id="kc-locale-dropdown">
-                    <a href="#" id="kc-current-locale-link">${locale.current}</a>
-                    <ul>
-                        <#list locale.supported as l>
-                            <li class="kc-dropdown-item"><a href="${l.url}">${l.label}</a></li>
-                        </#list>
-                    </ul>
+        <ul class="navbar-nav">
+          <#if realm.internationalizationEnabled>
+          <li class="nav-item">
+            <div id="kc-locale" class="${properties.kcLocaleClass!}">
+                <div id="kc-locale-wrapper" class="${properties.kcLocaleWrapperClass!}">
+                    <div class="kc-dropdown" id="kc-locale-dropdown">
+                        <a href="#" class="nav-link" id="kc-current-locale-link">${locale.current}</a>
+                        <ul>
+                            <#list locale.supported as l>
+                                <li class="kc-dropdown-item nav-item"><a href="${l.url}" class="nav-link">${l.label}</a></li>
+                            </#list>
+                        </ul>
+                    </div>
                 </div>
             </div>
-        </div>
-    </#if>
+          </li>
+          </#if>
+        </ul>
+    </header>
 
-    <div class="content-container-other mdc-layout-grid">
-        <div class="mdc-layout-grid__inner">
+    <main class="my-5">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-12">
+
+            <div class="heading pb-3 mb-4 text-center">
+              <#nested "header">
+            </div>
+
             <#if displayMessage && message?has_content>
-                <div class="align-center mdc-layout-grid__cell--span-12">
+                <div class="row justify-content-center">
+                  <div class="col-lg-6">
                     <div class="alert alert-${message.type}">
                         <#if message.type = 'success'><i class="material-icons">check_circle</i></#if>
                         <#if message.type = 'warning'><i class="material-icons">warning</i></#if>
@@ -78,29 +77,24 @@
                         <#if message.type = 'info'><i class="material-icons">info</i></#if>
                         <span class="alert-text">${message.summary}</span>
                     </div>
+                  </div>
                 </div>
             </#if>
 
-                <div class="mdc-layout-grid__cell--span-12">
-                    <#nested "form">
-                </div>
+            <#nested "form">
 
             <#if displayInfo>
-                <div id="kc-info-wrapper" class="mdc-layout-grid__cell--span-12">
+            <div class="row justify-content-center">
+                <div id="kc-info-wrapper" class="col-lg-6">
                     <#nested "info">
                 </div>
+            </div>
             </#if>
+
+          </div>
         </div>
-    </div>
-
-
-    <script>window.mdc.autoInit();</script>
-    <script>
-        mdc.textfield.MDCTextfield.attachTo(document.querySelector('.mdc-textfield'));
-    </script>
-    <script>
-        mdc.ripple.MDCRipple.attachTo(document.querySelector('.mdc-button'));
-    </script>
+      </div>
+    </main>
 
 </body>
 </html>

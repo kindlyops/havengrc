@@ -14,21 +14,21 @@ spec:
     spec:
       containers:
         - name: keycloak
-          image: havengrc-docker.jfrog.io/kindlyops/keycloak:3.4.2.Final.2
+          image: havengrc-docker.jfrog.io/kindlyops/keycloak:4.0.0.Final
           env:
-            - name: POSTGRES_DATABASE
+            - name: DB_DATABASE
               value: "havenstage"
-            - name: POSTGRES_USER
+            - name: DB_USER
               valueFrom:
                 secretKeyRef:
                   name: haven-database-credentials
                   key: username
-            - name: POSTGRES_PASSWORD
+            - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: haven-database-credentials
                   key: password
-            - name: POSTGRES_PORT_5432_TCP_ADDR
+            - name: DB_ADDR
               value: "db"
             - name: KEYCLOAK_USER
               value: "admin"

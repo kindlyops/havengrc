@@ -11,6 +11,11 @@ $secondary: (
 );
 $yiq-contrasted-threshold:  160;
 
+/* Material Icons fonts */
+@import "public/fonts/material-icons";
+
+/* Google fonts for Headings and body text */
+@import "public/fonts/google-fonts";
 
 @import "node_modules/daemonite-material/assets/scss/material";
 
@@ -19,6 +24,14 @@ $yiq-contrasted-threshold:  160;
     margin-left: $navdrawer-width;
   }
 }
+body p {
+  font-family: 'Bitter';
+}
+
+h1,h2,h2,h4,p.lead, a.nav-item, .navbar-brand, .navbar-nav {
+  font-family: 'Montserrat';
+}
+
 .content-wrapper {
     margin-top: 4rem;
 }
@@ -31,7 +44,14 @@ $yiq-contrasted-threshold:  160;
 
 .login-header {
     text-transform: uppercase;
-    font-family: "mr-eaves-modern", sans-serif; 
+    font-family: 'Montserrat';
+    font-weight: bold;
+}
+
+.login-btn{
+  margin-top:25px;
+  border-radius: 25px;
+  max-width:255px;
 }
 
 #footer-image {
@@ -45,7 +65,7 @@ $yiq-contrasted-threshold:  160;
 #footer-container {
     overflow: hidden;
     position: relative;
-  z-index: 1;
+    z-index: 1;
 }
 
 .underline {

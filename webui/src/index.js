@@ -13,8 +13,8 @@ var keycloak = Keycloak({
   realm: 'havendev',
   clientId: 'havendev'
 })
-var storedProfile = localStorage.getItem('profile')
-var storedToken = localStorage.getItem('token')
+var storedProfile = sessionStorage.getItem('profile')
+var storedToken = sessionStorage.getItem('token')
 var authData =
   storedProfile && storedToken
     ? { profile: JSON.parse(storedProfile), token: storedToken }
@@ -22,9 +22,9 @@ var authData =
 
 var elmApp = Main.embed(document.getElementById('root'), authData)
 
-function sendElmKeycloakToken () {
-  localStorage.setItem('profile', JSON.stringify(keycloak.profile))
-  localStorage.setItem('token', keycloak.token)
+function sendElmKeycloakToken() {
+  sessionStorage.setItem('profile', JSON.stringify(keycloak.profile))
+  sessionStorage.setItem('token', keycloak.token)
   var result = { err: null, ok: null }
   result.ok = { profile: keycloak.profile, token: keycloak.token }
   elmApp.ports.keycloakAuthResult.send(result)
@@ -40,27 +40,34 @@ keycloak.onAuthSuccess = function () {
     })
 }
 
-function tellElmLogout () {
-  /// alert("got keycloak logout callback");
+
+
+keycloak.onAuthLogout = function () {
+  console.log("got onAuthLogout callback");
   // send a null result to trigger our existing AuthResult code and logout.
   var result = { err: null, ok: null }
-  localStorage.removeItem('profile')
-  localStorage.removeItem('token')
+  sessionStorage.removeItem('profile')
+  sessionStorage.removeItem('token')
   elmApp.ports.keycloakAuthResult.send(result)
 }
 
-keycloak.onAuthLogout = tellElmLogout
-
 keycloak.onAuthRefreshSuccess = sendElmKeycloakToken
 
-keycloak.onAuthRefreshError = tellElmLogout
+keycloak.onAuthRefreshError = function () {
+  console.log("got AuthRefreshError callback");
+  // send a null result to trigger our existing AuthResult code and logout.
+  var result = { err: null, ok: null }
+  sessionStorage.removeItem('profile')
+  sessionStorage.removeItem('token')
+  elmApp.ports.keycloakAuthResult.send(result)
+}
 
 keycloak.onTokenExpired = function () {
   console.log('got keycloak token expired')
   keycloak.updateToken(300)
 }
 
-keycloak.init()
+keycloak.init({ onLoad: 'check-sso', checkLoginIframe: true })
 
 elmApp.ports.keycloakLogin.subscribe(function () {
   keycloak.login().error(function (/* errorData */) {
@@ -72,8 +79,8 @@ elmApp.ports.keycloakLogin.subscribe(function () {
 
 // Log out of keycloak
 elmApp.ports.keycloakLogout.subscribe(function () {
-  localStorage.removeItem('profile')
-  localStorage.removeItem('token')
+  sessionStorage.removeItem('profile')
+  sessionStorage.removeItem('token')
   keycloak.logout()
 })
 

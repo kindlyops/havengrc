@@ -1,17 +1,14 @@
+# Haven GRC is a modern risk & compliance dashboard for the cloud
+
 [![CircleCI](https://circleci.com/gh/kindlyops/mappamundi.svg?style=svg)](https://circleci.com/gh/kindlyops/mappamundi) [![experimental](http://badges.github.io/stability-badges/dist/experimental.svg)](http://github.com/badges/stability-badges) [![Say Thanks!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/statik) [![Maintainability](https://api.codeclimate.com/v1/badges/d2af9dcd5ad434172a27/maintainability)](https://codeclimate.com/github/kindlyops/mappamundi/maintainability)
 
-We use [BrowserStack](http://browserstack.com) to efficiently check cross-browser compatability while building Haven.
-We are using snyk.io and codeclimate.com for static scanning.
+We use [BrowserStack](http://browserstack.com) to efficiently check cross-browser compatibility while building Haven. We are using snyk.io and codeclimate.com for static scanning.
 
 <!-- markdownlint-disable MD033 -->
 [<img height="53" src="https://p3.zdusercontent.com/attachment/1015988/xfvLD5CuyeUcq2i40RYcw494H?token=eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0..BvyIxRLJz4phFf7cbIr8_Q.Fl9BR-ARcgvq38p546lM4djFcalediYWQaXV1_U_xi_zr5stXNUKLQNkTt-2zQbXWIIffLSoG8dUSZqL-GsqaTMbBX8OZi14qIHWmBIOPoRmyhwIcQfYIa79ngad69fKDltmq2H2KKWLByI-NWE9ygYpNs2IAXOQ72NICuWLbSyXIDGFVsq5VlV5ok7iCY0WxwXzIAiHbFu_BPufmP951-dpnBIGJAl4KfGk0eSbHKDOYvVkqHU2yZvNL8itCqkThmE7WNgPCS_KL6TyQiPxUQ.0ypOzE6XBmafR82vKRcIKg">](http://browserstack.com/)
 
-# Haven GRC is a modern risk & compliance dashboard for the cloud
+## What is Haven GRC?
 
-
-
-## Design framework and tooling.
-=======
 We help organizations avoid getting bogged down in rules that no longer make sense, and empower people to update practices to use modern tools and techniques without abandoning responsible oversight and administrative controls.
 
 By connecting controls to policies to values & customer requirements, we break the cycle of inability to improve things "because security reasons".
@@ -36,14 +33,12 @@ Before you continue, you need to configure git to auto-correct line ending forma
 
      git config --global core.autocrlf false
 
-
-
 ## running the service
 
 You will normally run all the services using:
 
-    docker-compose run start_dependencies
     docker-compose up
+    docker-compose run flyway # applies database migrations
 
 From this point on, you just just be able to use docker-compose up/down normally. Move on to access the main webUI in the next section.
 
@@ -75,16 +70,12 @@ Open [localhost:8025](http://localhost:8025), you can use mailhog to see message
 
 ## to export keycloak realm data (to refresh the dev users)
 
-First enter the keycloak container
+After keycloak is running and you have made any desired config changes:
 
-    docker-compose run --entrypoint=/bin/bash keycloak
-
-Now run the keycloak server command with export strategies defined
-
-    /opt/jboss/keycloak/bin/standalone.sh \
+    docker-compose exec keycloak /opt/jboss/keycloak/bin/standalone.sh \
       -Dkeycloak.migration.action=export \
       -Dkeycloak.migration.provider=singleFile \
-      -Dkeycloak.migration.file=havendev-realm.json \
+      -Dkeycloak.migration.file=/keycloak/havendev-realm.json \
       -Djboss.http.port=8888 \
       -Djboss.https.port=9999 \
       -Djboss.management.http.port=7777
@@ -133,6 +124,10 @@ The psql client is installed in the flyway image, and can connect to the DB serv
     SET ROLE member;            # assume the member role
     SELECT * from foo LIMIT 1;  # run arbitrary queries
     \q                          # disconnect
+
+We also have pgadmin4 running on http://localhost:8081. You can sign in using user1@havengrc.com/password.
+Once inside pgadmin4, you will need to add a server, the server hostname is 'db' and the credentials are
+postgres/postgres.
 
 ## Use REST client to interact with the API
 
@@ -200,7 +195,7 @@ Elm is also a language that compiles to javascript. Here are some resources for 
 
 ### Design framework and tooling
 
-We are making use of the [Material Design](https://material.io/guidelines/) system as a base for our design. We are also using the implementation at [Material Components for the Web](https://material.io/components/web/catalog/).
+We are making use of the [Material Design](https://material.io/guidelines/) system as a base for our design. We are also using the implementation at [Daemonite](http://daemonite.github.io/material/).
 
 Within the app we are using [SASS](http://sass-lang.com/), and the guidance from [Inverted Triangle CSS](https://www.xfive.co/blog/itcss-scalable-maintainable-css-architecture/) and [Reasonable CSS](http://rscss.io/) to try and keep the CSS manageable.
 
@@ -263,3 +258,11 @@ Once you complete the challenge and get the key material, edit the secret.
     oc edit secrets/secretname
 
 Replace the values for fullkey.pem and privkey.pem with base64 encoded versions of the new certificates. Save and exit.
+
+### Bazel
+
+We are experimenting with the bazel build tool. Get it from https://bazel.build/
+
+To build the keycloak service providers jar
+
+    bazel build //keycloak-service-providers:spi_deploy.jar

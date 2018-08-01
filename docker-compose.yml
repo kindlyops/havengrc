@@ -30,10 +30,10 @@ services:
       context: .
       dockerfile: ./keycloak/Dockerfile
     environment:
-      - POSTGRES_DATABASE=mappamundi_dev
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_PORT_5432_TCP_ADDR=postgres
+      - DB_DATABASE=mappamundi_dev
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_ADDR=postgres
       - KEYCLOAK_USER=admin
       - KEYCLOAK_PASSWORD=admin
       - PROXY_ADDRESS_FORWARDING=true
@@ -45,7 +45,7 @@ services:
     volumes:
       - ./keycloak/themes/haven:/opt/jboss/keycloak/themes/haven
       - ./keycloak/data:/keycloak
-    command: ["-b", "0.0.0.0", "-Dkeycloak.migration.file=/keycloak/havendev-realm.json", "-Dkeycloak.migration.strategy=IGNORE_EXISTING", "-Dkeycloak.migration.provider=singleFile", "-Dkeycloak.migration.action=import"]
+    command: ["start-keycloak.sh", "-b", "0.0.0.0", "-Dkeycloak.migration.file=/keycloak/havendev-realm.json", "-Dkeycloak.migration.strategy=IGNORE_EXISTING", "-Dkeycloak.migration.provider=singleFile", "-Dkeycloak.migration.action=import"]
   flyway:
     build:
       context: flyway/
@@ -67,6 +67,9 @@ services:
       context: .
       dockerfile: ./apitest/Dockerfile
     working_dir: /usr/src/app
+    environment:
+      - API_SERVER=api:8180
+      - AUTH_SERVER=keycloak:8080
     volumes:
       - ./apitest:/usr/src/app
     links:
@@ -75,8 +78,6 @@ services:
     depends_on:
       - start_dependencies
     command: [cucumber]
-    environment:
-      - endpoint=http://api/
   api:
     build:
       dockerfile: ./postgrest/Dockerfile
@@ -112,6 +113,13 @@ services:
       - POSTGRES_DB=mappamundi_dev
     volumes:
       - ./postgresql-data:/var/lib/postgresql
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      - "PGADMIN_DEFAULT_EMAIL=user1@havengrc.com"
+      - "PGADMIN_DEFAULT_PASSWORD=password"
+    ports:
+      - "8081:80"
   havenapi:
     working_dir: /go/src/github.com/kindlyops/mappamundi/havenapi
     volumes:
