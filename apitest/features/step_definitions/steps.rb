@@ -17,3 +17,7 @@ Given(/^I sign in to keycloak with "([^"]*)" and "([^"]*)"$/) do |username, pass
   @headers = {} if @headers.nil?
   @headers['Authorization'] = "Bearer #{access_token}"
 end
+
+Given /^I wait for (\d+) seconds?$/ do |n|
+  sleep(n.to_i)
+end
