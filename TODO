@@ -1,6 +1,3 @@
 Update the Elm UI
 
-- rework Regulation module to Comments, fix the decoder
-- add the JWT to the request in an Auth header
-- figure out how to control the shared secret used to sign the JWT so that
-  postgrest can authenticate a JWT signed by Keycloak
+
