@@ -1,12 +1,16 @@
 package org.kindlyops.providers.rest;
 
 import org.keycloak.models.KeycloakSession;
+import org.keycloak.services.resource.RealmResourceProvider;
+
 import org.keycloak.services.managers.AppAuthManager;
 import org.keycloak.services.managers.AuthenticationManager;
 
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.Path;
+import javax.ws.rs.GET;
+import javax.ws.rs.Produces;
 
 public class HavenRestResource {
 
@@ -18,18 +22,28 @@ public class HavenRestResource {
         this.auth = new AppAuthManager().authenticateBearerToken(session, session.getContext().getRealm());
     }
 
-    @Path("companies")
-    public CompanyResource getCompanyResource() {
-        return new CompanyResource(session);
+    @GET
+    @Produces("text/plain; charset=utf-8")
+    public String get() {
+        String name = session.getContext().getRealm().getDisplayName();
+        if (name == null) {
+            name = session.getContext().getRealm().getName();
+        }
+        return "Hello " + name;
+    }
+
+    @Path("organizations")
+    public OrganizationResource getOrganizationResource() {
+        return new OrganizationResource(session);
     }
 
     // Same like "companies" endpoint, but REST endpoint is authenticated with
     // Bearer token and user must be in realm role "admin"
     // Just for illustration purposes
-    @Path("companies-auth")
-    public CompanyResource getCompanyResourceAuthenticated() {
+    @Path("organizations-auth")
+    public OrganizationResource getOrganizationResourceAuthenticated() {
         checkRealmAdmin();
-        return new CompanyResource(session);
+        return new OrganizationResource(session);
     }
 
     private void checkRealmAdmin() {

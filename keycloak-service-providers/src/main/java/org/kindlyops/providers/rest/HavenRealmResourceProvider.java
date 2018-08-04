@@ -13,7 +13,7 @@ public class HavenRealmResourceProvider implements RealmResourceProvider {
 
     @Override
     public Object getResource() {
-        return new ExampleRestResource(session);
+        return new HavenRestResource(session);
     }
 
     @Override
