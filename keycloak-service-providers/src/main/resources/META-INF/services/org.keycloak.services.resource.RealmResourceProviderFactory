@@ -1,1 +1,1 @@
-org.keycloak.examples.domainextension.rest.HavenRealmResourceProviderFactory
+org.kindlyops.providers.rest.HavenRealmResourceProviderFactory
