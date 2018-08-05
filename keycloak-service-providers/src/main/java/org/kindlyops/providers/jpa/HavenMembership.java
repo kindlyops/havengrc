@@ -54,6 +54,17 @@ public class HavenMembership {
         return realmId;
     }
 
+    public String getOrgRole() {
+        // TODO implement
+        return "fake";
+    }
+
+    public void setOrgRole(String role) {
+        // TODO implement
+        // look up role ID in role table
+
+    }
+
     public Integer getOrgRoleId() {
         return orgRoleId;
     }

@@ -38,7 +38,16 @@ Finally, the Content Security Policy headers need to be configured in Keycloak t
 
 ## Custom Organizations REST API
 
-http://localhost:8080/auth/realms/havendev/haven http://localhost:8080/auth/realms/master/haven/organizations
+To interact with the custom organizations API via HTTP
+
+    export TOKEN=`./get-token`
+    curl -v -H "Authorization: Bearer $TOKEN" http://localhost:2015/auth/realms/havendev/haven/organizations
+
+-   get list of memberships
+-   ADMIN get list of all organizations
+-   ADMIN add user to organization with role
+-   ADMIN modify user orgnization role assignment (from one role to another)
+-   ADMIN add a role? or hard-code in SQL?
 
 ## Development
 

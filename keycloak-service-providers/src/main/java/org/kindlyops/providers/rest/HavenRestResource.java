@@ -32,18 +32,17 @@ public class HavenRestResource {
         return "Hello " + name;
     }
 
+    // REST endpoint is authenticated with
+    // Bearer token and user must be in realm role "admin"
     @Path("organizations")
     public OrganizationResource getOrganizationResource() {
+        checkRealmAdmin();
         return new OrganizationResource(session);
     }
 
-    // Same like "companies" endpoint, but REST endpoint is authenticated with
-    // Bearer token and user must be in realm role "admin"
-    // Just for illustration purposes
-    @Path("organizations-auth")
-    public OrganizationResource getOrganizationResourceAuthenticated() {
-        checkRealmAdmin();
-        return new OrganizationResource(session);
+    @Path("memberships")
+    public MembershipResource getMembershipResource() {
+        return new MembershipResource(session);
     }
 
     private void checkRealmAdmin() {
