@@ -218,12 +218,6 @@
   version = "v1.0.0"
 
 [[projects]]
-  name = "github.com/markbates/pop"
-  packages = [".","associations","columns","fizz","fizz/translators"]
-  revision = "36b03cd832288f82434d4213f4f81d6d31361a07"
-  version = "v3.60.6"
-
-[[projects]]
   name = "github.com/markbates/refresh"
   packages = ["refresh","refresh/web"]
   revision = "e1959f9df4acd56656997ab3ca6ce88f36e39b0c"
@@ -236,22 +230,10 @@
   version = "v1.0.0"
 
 [[projects]]
-  name = "github.com/markbates/validate"
-  packages = [".","validators"]
-  revision = "cd8cc34c703420d6b084fbbfd5085e8e71c5b830"
-  version = "v1.0.0"
-
-[[projects]]
   name = "github.com/markbates/willie"
   packages = ["."]
   revision = "0c170e37efa685c5d01e5f71998e9cc3816f659b"
   version = "v1.0.2"
-
-[[projects]]
-  name = "github.com/mattn/anko"
-  packages = ["ast","core","internal/corelib","parser","vm"]
-  revision = "cdc3b7317d35b9d24257e5f5079b3bac4d52705a"
-  version = "v0.0.6"
 
 [[projects]]
   name = "github.com/mattn/go-colorable"
@@ -312,11 +294,6 @@
   name = "github.com/russross/blackfriday"
   packages = ["."]
   revision = "46c73eb196baff5bb07288f245b223bd1a30fba6"
-
-[[projects]]
-  name = "github.com/satori/go.uuid"
-  packages = ["."]
-  revision = "36e9d2ebbde5e3f13ab2e25625fd453271d6522e"
 
 [[projects]]
   branch = "master"
@@ -459,6 +436,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "10855a86377252b5f9c99609cb3fd5a40daccc39120a502bb657304df6d29703"
+  inputs-digest = "25ca02d28993e266562a55755fa67a2a882f758eacde248a66abc12c24c83ba5"
   solver-name = "gps-cdcl"
   solver-version = 1
