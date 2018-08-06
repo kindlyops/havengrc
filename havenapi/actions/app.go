@@ -39,6 +39,9 @@ func App() *buffalo.App {
 		app = buffalo.New(buffalo.Options{
 			Env:          ENV,
 			SessionStore: sessions.Null{},
+			PreWares: []buffalo.PreWare{
+				cors.Default().Handler,
+			},
 			SessionName:  "_havenapi_session",
 		})
 
