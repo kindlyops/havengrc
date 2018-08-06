@@ -1,10 +1,11 @@
 0.0.0.0:2016 
 on startup npm run-script start &
 
+cors /swagger http://localhost:3002
+
 proxy / localhost:2015 {
   transparent
   websocket
-  except /swagger
 }
 
 proxy /auth keycloak:8080 {
