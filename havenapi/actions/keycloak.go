@@ -77,7 +77,9 @@ func KeycloakGetToken() error {
 
 	err = json.Unmarshal(bodyByte, &adminToken)
 	if err != nil {
-		return fmt.Errorf("Trouble processing the response body: %s", err.Error())
+		log.Info(string(bodyByte))
+		log.Info("StatusCode: %d", resp.StatusCode)
+		return fmt.Errorf("Trouble processing the json result: %s", err.Error())
 	}
 	expirationDate = currentTime.Unix() + int64(adminToken.Expires-5)
 	return err
@@ -117,6 +119,7 @@ func KeycloakGetUser(email string) error {
 	}
 
 	return err
+
 }
 
 // KeycloakCreateUser creates a new user.

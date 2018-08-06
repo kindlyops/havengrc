@@ -130,8 +130,8 @@ services:
       - HAVEN_JWK_PATH=/keycloak-dev-public-key.json
       - KC_ADMIN=admin
       - KC_PW=admin
-      - KC_HOST=http://localhost
-      - KC_PORT=2015
+      - KC_HOST=http://webui
+      - KC_PORT=2016
     build:
       context: .
       dockerfile: ./havenapi/Dockerfile-hotreload
