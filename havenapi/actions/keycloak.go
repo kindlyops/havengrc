@@ -8,10 +8,20 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"time"
+
+	"github.com/deis/helm/log"
 )
 
 type token struct {
-	Token string `json:"access_token"`
+	AccessToken    string `json:"access_token"`
+	Expires        int    `json:"expires_in"`
+	NotBefore      int    `json:"not-before-policy"`
+	RefreshExpires int    `json:"refresh_expires_in"`
+	RefreshToken   string `json:"refresh_token"`
+	Scope          string `json:"scope"`
+	SessionState   string `json:"session_state"`
+	TokenType      string `json:"token_type"`
 }
 
 // For example purposes
@@ -21,6 +31,8 @@ type users struct {
 }
 
 var adminToken = token{}
+var currentTime = time.Now()
+var expirationDate = currentTime.Unix()
 
 // Example env vars (KC_HOST=http://localhost | KC_PORT=2015)
 var adminUser = os.Getenv("KC_ADMIN")
@@ -30,7 +42,14 @@ var getTokenURL = "/auth/realms/master/protocol/openid-connect/token"
 var getUsersURL = "/auth/admin/realms/havendev/users"
 
 // KeycloakGetToken grabs the token for the admin api.
-func KeycloakGetToken() bool {
+func KeycloakGetToken() error {
+	currentTime = time.Now()
+	fmt.Println("Expiration: ", expirationDate)
+	if currentTime.Unix() < expirationDate {
+		log.Info("the admin api token is still valid.")
+		return nil
+	}
+	log.Info("the admin api token is being renewed.")
 
 	form := url.Values{
 		"username":   {adminUser},
@@ -46,45 +65,106 @@ func KeycloakGetToken() bool {
 		body,
 	)
 	if err != nil {
-		return false
+		return fmt.Errorf("Trouble fetching the token: %s", err.Error())
 	}
+
 	defer resp.Body.Close()
 
 	bodyByte, err := ioutil.ReadAll(resp.Body)
-
 	if err != nil {
-		return false
+		return fmt.Errorf("Trouble processing the response body: %s", err.Error())
 	}
 
 	err = json.Unmarshal(bodyByte, &adminToken)
 	if err != nil {
-		fmt.Println(err)
-		return false
+		return fmt.Errorf("Trouble processing the response body: %s", err.Error())
 	}
-	return true
+	expirationDate = currentTime.Unix() + int64(adminToken.Expires-5)
+	return err
 }
 
-// KeycloakGetUsers grabs the users from the admin api.
-func KeycloakGetUsers() {
+// KeycloakGetUser checks if the user exists first.
+func KeycloakGetUser(email string) error {
 	client := &http.Client{}
 
 	req, err := http.NewRequest("GET", keycloakHost+getUsersURL, nil)
-	req.Header.Add("Authorization", "bearer "+adminToken.Token)
-
 	if err != nil {
-		return
+		return fmt.Errorf("Trouble creating an http request: %s", err.Error())
 	}
+	req.Header.Add("Authorization", "bearer "+adminToken.AccessToken)
+	q := req.URL.Query()
+	q.Add("username", email)
+
+	req.URL.RawQuery = q.Encode()
+
 	resp, err := client.Do(req)
+	if err != nil {
+		return fmt.Errorf("Trouble getting the list of users: %s", err.Error())
+	}
+
 	defer resp.Body.Close()
+
 	data := []users{}
 
 	bodyByte, err := ioutil.ReadAll(resp.Body)
-	err = json.Unmarshal(bodyByte, &data)
+	if err != nil {
+		return fmt.Errorf("Trouble processing the response body: %s", err.Error())
+	}
 
-	//s := string(bodyByte[:])
-	fmt.Printf("%#v", data)
+	err = json.Unmarshal(bodyByte, &data)
+	if err != nil {
+		return fmt.Errorf("Error checking for existing user: %s", err.Error())
+	}
+
+	return err
+}
+
+// KeycloakCreateUser creates a new user.
+func KeycloakCreateUser(email string) error {
+	err := KeycloakGetToken()
+	if err != nil {
+		return fmt.Errorf("Trouble getting the auth token: %s", err.Error())
+	}
+	client := &http.Client{}
+	log.Info("Try to create: %s", email)
+	err = KeycloakGetUser(email)
+	if err != nil {
+		return fmt.Errorf("Could not create user:%s because of: %s", email, err.Error())
+	}
+
+	var jsonStr = []byte(fmt.Sprintf(`{"username": "%s"}`, email))
+
+	body := bytes.NewBuffer(jsonStr)
+	req, err := http.NewRequest(
+		"POST",
+		keycloakHost+getUsersURL,
+		body,
+	)
 
 	if err != nil {
-		return
+		return fmt.Errorf("Trouble creating new user: %s", err.Error())
 	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Add("Authorization", "bearer "+adminToken.AccessToken)
+	log.Info("Added headers")
+	resp, err := client.Do(req)
+	if err != nil {
+		return fmt.Errorf("Trouble processing the response body: %s", err.Error())
+	}
+	bodyByte, err := ioutil.ReadAll(resp.Body)
+
+	if err != nil {
+		return fmt.Errorf("Trouble processing the response body: %s", err.Error())
+	}
+	defer resp.Body.Close()
+	err = json.Unmarshal(bodyByte, &adminToken)
+	if err != nil {
+		return fmt.Errorf("Trouble processing the response body: %s", err.Error())
+	}
+	if resp.StatusCode != 201 {
+		return fmt.Errorf("Trouble creating user ")
+	}
+
+	return err
 }
