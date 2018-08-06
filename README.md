@@ -52,7 +52,9 @@ If you cannot connect to [localhost](http://localhost:2015), try getting the doc
 
 Open [localhost:3002](http://localhost:3002/)
 
-To refresh the swagger documentation, use these commands
+The swagger browser is loading the authenicated api by default. To view the public API, adjust the file being loaded to public.json.
+
+To refresh the swagger documentation, such as after modifying postgres to expose additional APIs, use these commands
 
     curl http://localhost:2015/api/ > webui/public/swagger/public.json
     export TOKEN=`./get-token`
