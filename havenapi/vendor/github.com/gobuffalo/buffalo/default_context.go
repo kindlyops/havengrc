@@ -7,13 +7,14 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"reflect"
 	"sort"
 	"strings"
 	"time"
 
 	"github.com/gobuffalo/buffalo/binding"
 	"github.com/gobuffalo/buffalo/render"
-	"github.com/gorilla/websocket"
+	"github.com/gobuffalo/pop"
 	"github.com/pkg/errors"
 )
 
@@ -113,10 +114,14 @@ func (d *DefaultContext) Render(status int, rr render.Renderer) error {
 		data["flash"] = d.Flash().data
 		data["session"] = d.Session()
 		data["request"] = d.Request()
+		data["status"] = status
 		bb := &bytes.Buffer{}
 
 		err := rr.Render(bb, data)
 		if err != nil {
+			if er, ok := errors.Cause(err).(render.ErrRedirect); ok {
+				return d.Redirect(er.Status, er.URL)
+			}
 			return HTTPError{Status: 500, Cause: errors.WithStack(err)}
 		}
 
@@ -126,6 +131,9 @@ func (d *DefaultContext) Render(status int, rr render.Renderer) error {
 		}
 
 		d.Response().Header().Set("Content-Type", rr.ContentType())
+		if p, ok := data["pagination"].(*pop.Paginator); ok {
+			d.Response().Header().Set("X-Pagination", p.String())
+		}
 		d.Response().WriteHeader(status)
 		_, err = io.Copy(d.Response(), bb)
 		if err != nil {
@@ -165,15 +173,35 @@ func (d *DefaultContext) Error(status int, err error) error {
 	return HTTPError{Status: status, Cause: errors.WithStack(err)}
 }
 
-// Websocket returns an upgraded github.com/gorilla/websocket.Conn
-// that can then be used to work with websockets easily.
-func (d *DefaultContext) Websocket() (*websocket.Conn, error) {
-	return defaultUpgrader.Upgrade(d.Response(), d.Request(), nil)
-}
+var mapType = reflect.ValueOf(map[string]interface{}{}).Type()
 
 // Redirect a request with the given status to the given URL.
 func (d *DefaultContext) Redirect(status int, url string, args ...interface{}) error {
 	d.Flash().persist(d.Session())
+
+	if strings.HasSuffix(url, "Path()") {
+		if len(args) > 1 {
+			return errors.WithStack(errors.Errorf("you must pass only a map[string]interface{} to a route path: %T", args))
+		}
+		var m map[string]interface{}
+		if len(args) == 1 {
+			rv := reflect.Indirect(reflect.ValueOf(args[0]))
+			if !rv.Type().ConvertibleTo(mapType) {
+				return errors.WithStack(errors.Errorf("you must pass only a map[string]interface{} to a route path: %T", args))
+			}
+			m = rv.Convert(mapType).Interface().(map[string]interface{})
+		}
+		h, ok := d.Value(strings.TrimSuffix(url, "()")).(RouteHelperFunc)
+		if !ok {
+			return errors.WithStack(errors.Errorf("could not find a route helper named %s", url))
+		}
+		url, err := h(m)
+		if err != nil {
+			return errors.WithStack(err)
+		}
+		http.Redirect(d.Response(), d.Request(), string(url), status)
+		return nil
+	}
 
 	if len(args) > 0 {
 		url = fmt.Sprintf(url, args...)
@@ -199,8 +227,19 @@ func (d *DefaultContext) String() string {
 	return strings.Join(bb, "\n\n")
 }
 
-var defaultUpgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-	CheckOrigin:     func(r *http.Request) bool { return true },
+// File returns an uploaded file by name, or an error
+func (d *DefaultContext) File(name string) (binding.File, error) {
+	req := d.Request()
+	if err := req.ParseMultipartForm(5 * 1024 * 1024); err != nil {
+		return binding.File{}, err
+	}
+	f, h, err := req.FormFile(name)
+	bf := binding.File{
+		File:       f,
+		FileHeader: h,
+	}
+	if err != nil {
+		return bf, errors.WithStack(err)
+	}
+	return bf, nil
 }

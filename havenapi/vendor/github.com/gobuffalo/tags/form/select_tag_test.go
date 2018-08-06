@@ -6,7 +6,7 @@ import (
 
 	"github.com/gobuffalo/tags"
 	"github.com/gobuffalo/tags/form"
-	"github.com/satori/go.uuid"
+	"github.com/gobuffalo/uuid"
 	"github.com/stretchr/testify/require"
 )
 
@@ -15,6 +15,35 @@ func Test_SelectTag(t *testing.T) {
 	f := form.New(tags.Options{})
 	s := f.SelectTag(tags.Options{})
 	r.Equal(`<select></select>`, s.String())
+}
+
+func Test_SelectTagWithOptions(t *testing.T) {
+	r := require.New(t)
+	f := form.New(tags.Options{})
+	s := f.SelectTag(tags.Options{
+		"options": []map[string]interface{}{
+			{"1/2 day": 1},
+			{"1-2 days": 2},
+			{"1 week": 7},
+			{"1-2 weeks": 14},
+		},
+	})
+	r.Equal(`<select><option value="1">1/2 day</option><option value="2">1-2 days</option><option value="7">1 week</option><option value="14">1-2 weeks</option></select>`, s.String())
+}
+
+func Test_SelectTagWithOptionsSelected(t *testing.T) {
+	r := require.New(t)
+	f := form.New(tags.Options{})
+	s := f.SelectTag(tags.Options{
+		"options": []map[string]interface{}{
+			{"1/2 day": 1},
+			{"1-2 days": 2},
+			{"1 week": 7},
+			{"1-2 weeks": 14},
+		},
+		"value": 1,
+	})
+	r.Equal(`<select><option value="1" selected>1/2 day</option><option value="2">1-2 days</option><option value="7">1 week</option><option value="14">1-2 weeks</option></select>`, s.String())
 }
 
 func Test_SelectTag_WithSelectOptions(t *testing.T) {
@@ -113,11 +142,26 @@ func Test_SelectTag_WithSlice_Selectable(t *testing.T) {
 	r.Contains(s, `<option value="2">Peter</option>`)
 }
 
+func Test_SelectTag_WithSlice_Selectable_Interface(t *testing.T) {
+	r := require.New(t)
+	f := form.New(tags.Options{})
+	st := f.SelectTag(tags.Options{
+		"options": []SelectableModel{
+			{"John", "1"},
+			{"Peter", "2"},
+		},
+		"value": SelectableModel{"John", "1"},
+	})
+	s := st.String()
+	r.Contains(s, `<option value="1" selected>John</option>`)
+	r.Contains(s, `<option value="2">Peter</option>`)
+}
+
 func Test_SelectTag_WithUUID_Selected(t *testing.T) {
 	r := require.New(t)
 	f := form.New(tags.Options{})
-	jid := uuid.NewV4()
-	pid := uuid.NewV4()
+	jid, _ := uuid.NewV4()
+	pid, _ := uuid.NewV4()
 	st := f.SelectTag(tags.Options{
 		"options": []SelectableUUIDModel{
 			{"John", jid},
@@ -133,8 +177,8 @@ func Test_SelectTag_WithUUID_Selected(t *testing.T) {
 func Test_SelectTag_WithUUID_Selected_withBlank(t *testing.T) {
 	r := require.New(t)
 	f := form.New(tags.Options{})
-	jid := uuid.NewV4()
-	pid := uuid.NewV4()
+	jid, _ := uuid.NewV4()
+	pid, _ := uuid.NewV4()
 	st := f.SelectTag(tags.Options{
 		"options": []SelectableUUIDModel{
 			{"John", jid},
@@ -152,8 +196,8 @@ func Test_SelectTag_WithUUID_Selected_withBlank(t *testing.T) {
 func Test_SelectTag_WithUUID_Selected_withBlankSelectOptions(t *testing.T) {
 	r := require.New(t)
 	f := form.New(tags.Options{})
-	jid := uuid.NewV4()
-	pid := uuid.NewV4()
+	jid, _ := uuid.NewV4()
+	pid, _ := uuid.NewV4()
 	st := f.SelectTag(tags.Options{
 		"options": form.SelectOptions{
 			form.SelectOption{Label: "John", Value: jid},
@@ -171,8 +215,8 @@ func Test_SelectTag_WithUUID_Selected_withBlankSelectOptions(t *testing.T) {
 func Test_SelectTag_WithUUID_Selected_withoutBlankSelectOptions(t *testing.T) {
 	r := require.New(t)
 	f := form.New(tags.Options{})
-	jid := uuid.NewV4()
-	pid := uuid.NewV4()
+	jid, _ := uuid.NewV4()
+	pid, _ := uuid.NewV4()
 	st := f.SelectTag(tags.Options{
 		"options": form.SelectOptions{
 			form.SelectOption{Label: "John", Value: jid},
@@ -185,6 +229,70 @@ func Test_SelectTag_WithUUID_Selected_withoutBlankSelectOptions(t *testing.T) {
 	r.NotContains(s, `<option value=""></option>`)
 	r.Contains(s, fmt.Sprintf(`<option value="%s">John</option>`, jid))
 	r.Contains(s, fmt.Sprintf(`<option value="%s" selected>Peter</option>`, pid))
+}
+
+func Test_SelectTag_Multiple(t *testing.T) {
+	r := require.New(t)
+	f := form.New(tags.Options{})
+	st := f.SelectTag(tags.Options{
+		"multiple": true,
+		"options":  []string{"one", "two"},
+	})
+	s := st.String()
+	r.Contains(s, `<select multiple>`)
+	r.Contains(s, `<option value="one">one</option>`)
+	r.Contains(s, `<option value="two">two</option>`)
+}
+
+func Test_SelectTag_Multiple_SelectOne(t *testing.T) {
+	r := require.New(t)
+	f := form.New(tags.Options{})
+	st := f.SelectTag(tags.Options{
+		"multiple": true,
+		"options":  []string{"one", "two"},
+		"value":    "one",
+	})
+	s := st.String()
+	r.Contains(s, `<select multiple>`)
+	r.Contains(s, `<option value="one" selected>one</option>`)
+	r.Contains(s, `<option value="two">two</option>`)
+}
+
+func Test_SelectTag_Multiple_SelectMultiple(t *testing.T) {
+	r := require.New(t)
+	f := form.New(tags.Options{})
+	st := f.SelectTag(tags.Options{
+		"multiple": true,
+		"options":  []string{"one", "two", "three"},
+		"value":    []string{"one", "two"},
+	})
+	s := st.String()
+	r.Contains(s, `<select multiple>`)
+	r.Contains(s, `<option value="one" selected>one</option>`)
+	r.Contains(s, `<option value="two" selected>two</option>`)
+	r.Contains(s, `<option value="three">three</option>`)
+}
+
+func Test_SelectTag_Multiple_SelectMultiple_Selectable_Interface(t *testing.T) {
+	r := require.New(t)
+	f := form.New(tags.Options{})
+	st := f.SelectTag(tags.Options{
+		"multiple": true,
+		"options": []SelectableModel{
+			{"John", "1"},
+			{"Peter", "2"},
+			{"Mark", "3"},
+		},
+		"value": []SelectableModel{
+			{"John", "1"},
+			{"Peter", "2"},
+		},
+	})
+	s := st.String()
+	r.Contains(s, `<select multiple>`)
+	r.Contains(s, `<option value="1" selected>John</option>`)
+	r.Contains(s, `<option value="2" selected>Peter</option>`)
+	r.Contains(s, `<option value="3">Mark</option>`)
 }
 
 type SelectableModel struct {

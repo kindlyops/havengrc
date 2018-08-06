@@ -5,12 +5,14 @@ type Type string
 
 // Token of a section of input source.
 type Token struct {
-	Type    Type
-	Literal string
+	Type       Type
+	Literal    string
+	LineNumber int
 }
 
 var keywords = map[string]Type{
 	"fn":     FUNCTION,
+	"func":   FUNCTION,
 	"let":    LET,
 	"true":   TRUE,
 	"false":  FALSE,
