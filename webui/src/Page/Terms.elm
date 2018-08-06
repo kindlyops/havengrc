@@ -17,7 +17,7 @@ view =
                     ]
                 ]
             ]
-        , div [ class "py-5 bg-light text-center " ]
+        , div [ class "py-5 bg-light" ]
             [ div [ class "" ]
                 [ div [ class "pb-5" ] 
                     [ 
@@ -27,45 +27,45 @@ view =
                             [
                                 p []
                                     [ dfn []
-                                        [ text "Provider" ] , text "and" 
+                                        [ text "Provider" ] , text " and " 
                                     , dfn []
-                                        [ text "Customer" ] , text "agree:" 
+                                        [ text "Customer" ] , text " agree: " 
                                     ]
                                 , section []
                                     [ h2 []
                                         [ text "Software" ]
                                     , section []
                                         [ p []
-                                            [ text "The" , dfn []
-                                                [ text "Software" ] , text "is" 
+                                            [ text "The " , dfn []
+                                                [ text "Software" ] , text " is " 
                                             , span [ class "blank" ]
-                                                [ text "Haven GRC" ] , text ", for" 
+                                                [ text "Haven GRC" ] , text " , for " 
                                             , span [ class "blank" ]
-                                                [ text "tamper proof evidence storage, compliance, and risk dashboard." ] , text "." 
+                                                [ text "tamper proof evidence storage, compliance, and risk dashboard" ] , text "." 
                                             ]
                                         ]
                                     , section []
                                         [ p []
-                                            [ text "The" , dfn []
-                                                [ text "Website" ] , text "is at" 
+                                            [ text "The " , dfn []
+                                                [ text "Website" ] , text " is at " 
                                             , span [ class "blank" ]
-                                                [ text "https://havengrc.com/" ] , text "." 
+                                                [ text " https://havengrc.com/ " ] , text "." 
                                             ]
                                         ]
                                     , section []
                                         [ p []
-                                            [ text "The" , dfn []
-                                                [ text "Account Dashboard" ] , text "is at" 
+                                            [ text "The " , dfn []
+                                                [ text "Account Dashboard" ] , text " is at " 
                                             , span [ class "blank" ]
-                                                [ text "https://account.havengrc.com/" ] , text "." 
+                                                [ text " https://account.havengrc.com/ " ] , text "." 
                                             ]
                                         ]
                                     , section []
                                         [ p []
-                                            [ text "The" , dfn []
-                                                [ text "Documentation" ] , text "is at" 
+                                            [ text "The " , dfn []
+                                                [ text "Documentation" ] , text " is at " 
                                             , span [ class "blank" ]
-                                                [ text "https://docs.havengrc.com/" ] , text "." 
+                                                [ text " https://docs.havengrc.com/ " ] , text "." 
                                             ]
                                         ]
                                     ]
