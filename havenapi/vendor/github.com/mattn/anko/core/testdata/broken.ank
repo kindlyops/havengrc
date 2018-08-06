@@ -1,6 +1,0 @@
-#!/usr/bin/env
-
-use strict;
-use warnings;
-
-die "Hey! I'm anko";

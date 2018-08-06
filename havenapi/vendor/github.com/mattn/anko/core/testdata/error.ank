@@ -1,3 +1,0 @@
-func X(a) {
-  a.notfound = 1
-}
