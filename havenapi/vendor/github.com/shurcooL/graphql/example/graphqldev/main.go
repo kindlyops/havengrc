@@ -14,9 +14,9 @@ import (
 	"net/http/httptest"
 	"os"
 
-	graphqlserver "github.com/neelance/graphql-go"
-	"github.com/neelance/graphql-go/example/starwars"
-	"github.com/neelance/graphql-go/relay"
+	graphqlserver "github.com/graph-gophers/graphql-go"
+	"github.com/graph-gophers/graphql-go/example/starwars"
+	"github.com/graph-gophers/graphql-go/relay"
 	"github.com/shurcooL/graphql"
 )
 
@@ -38,7 +38,7 @@ func run() error {
 	mux := http.NewServeMux()
 	mux.Handle("/query", &relay.Handler{Schema: schema})
 
-	client := graphql.NewClient("/query", &http.Client{Transport: localRoundTripper{handler: mux}}, nil)
+	client := graphql.NewClient("/query", &http.Client{Transport: localRoundTripper{handler: mux}})
 
 	/*
 		query {

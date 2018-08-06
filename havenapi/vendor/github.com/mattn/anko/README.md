@@ -1,108 +1,114 @@
-# anko
+# Anko
 
-[![Build Status](https://travis-ci.org/mattn/anko.png?branch=master)](https://travis-ci.org/mattn/anko)
-[![GoDoc](https://godoc.org/github.com/mattn/anko/vm?status.svg)](https://godoc.org/github.com/mattn/anko/vm)
+[![GoDoc Reference](https://godoc.org/github.com/mattn/anko/vm?status.svg)](http://godoc.org/github.com/mattn/anko/vm)
+[![Build Status](https://travis-ci.org/mattn/anko.svg)](https://travis-ci.org/mattn/anko)
+[![Coverage](https://codecov.io/gh/mattn/anko/branch/master/graph/badge.svg)](https://codecov.io/gh/mattn/anko)
+[![Go Report Card](https://goreportcard.com/badge/github.com/mattn/anko)](https://goreportcard.com/report/github.com/mattn/anko)
 
 Anko is a scriptable interpreter written in Go.
 
 ![](https://raw.githubusercontent.com/mattn/anko/master/anko.png)
 
-(Picture licensed under CC BY-SA 3.0 by wikipedia)
+(Picture licensed under CC BY-SA 3.0, photo by Ocdp)
 
-## Installation
-Requires Go.
-```
-$ go get -u github.com/mattn/anko
-```
 
-## Examples
+## Usage Example - Embedded
 
-```bash
-# declare function
-func plus(n){
-  return n + 1
+```go
+package main
+
+import (
+	"fmt"
+	"log"
+
+	"github.com/mattn/anko/vm"
+)
+
+func main() {
+	env := vm.NewEnv()
+
+	err := env.Define("println", fmt.Println)
+	if err != nil {
+		log.Fatalf("Define error: %v\n", err)
+	}
+
+	script := `
+println("Hello World :)")
+`
+
+	_, err = env.Execute(script)
+	if err != nil {
+		log.Fatalf("Execute error: %v\n", err)
+	}
+
+	// output: Hello World :)
 }
+```
 
-# declare variables
+More examples are located in the GoDoc:
+
+https://godoc.org/github.com/mattn/anko/vm
+
+
+## Usage Example - Command Line
+
+### Building
+```
+go get github.com/mattn/anko
+go install github.com/mattn/anko
+```
+
+### Running an Anko script file named script.ank
+```
+./anko script.ank
+```
+
+## Anko Script Quick Start
+```
+// declare variables
 x = 1
 y = x + 1
 
-# print values 
-println(x * (y + 2 * x + plus(x) / 2))
+// print using outside the script defined println function
+println(x + y) // 3
 
-# if/else condition
-if plus(y) > 1 {
-  println("こんにちわ世界")
+// if else statement
+if x < 1 || y < 1 {
+	println(x)
+} else if x < 1 && y < 1 {
+	println(y)
 } else {
-  println("Hello, World")
+	println(x + y)
 }
 
-# array type
-a = [1,2,3]
-println(a[2])
-println(len(a))
+// array
+a = [1, 2, 3]
+println(a) // [1 2 3]
+println(a[0]) // 1
 
-# map type
-m = {"foo": "bar", "far": "boo"}
-m.foo = "baz"
-for k in keys(m) {
-  println(m[k])
+// map
+a = {"x": 1}
+println(a) // map[x:1]
+a.b = 2
+a["c"] = 3
+println(a["b"]) // 2
+println(a.c) // 3
+
+// function
+func a (x) {
+	println(x + 1)
 }
+a(3) // 4
 ```
 
-See `_examples/scripts` for more examples.
+
+## Please note that the master branch is not stable
+
+The master branch language and API may change at any time.
+
+To mitigate breaking changes, please use tagged branches. New tagged branches will be created for breaking changes.
 
 
-
-## Usage
-
-Embedding the interpreter into your own program:
-
-```Go
-var env = vm.NewEnv()
-
-env.Define("foo", 1)
-env.Define("bar", func() int {
-	return 2
-})
-
-val, err := env.Execute(`foo + bar()`)
-if err != nil {
-	panic(err)
-}
-
-fmt.Println(val) 
-// output:
-// 3
-```
-
-To import all builtins, allowing the example scripts to work:
-
-```Go
-import anko_core "github.com/mattn/anko/builtins"
-
-var env = vm.NewEnv()
-anko_core.LoadAllBuiltins(env)
-
-_, err := env.Execute(`println("test")`)
-if err != nil {
-	panic(err)
-}
-// output:
-// "test"
-```
-
-Running scripts using anko command-line tool:
-
-```
-$ anko script.ank
-```
-
-# License
-
-MIT
-
-# Author
+## Author
 
 Yasuhiro Matsumoto (a.k.a mattn)
-

@@ -20,7 +20,7 @@ type Connection struct {
 	Store   store
 	Dialect dialect
 	Elapsed int64
-	TX      *tX
+	TX      *Tx
 }
 
 func (c *Connection) String() string {
@@ -50,6 +50,8 @@ func NewConnection(deets *ConnectionDetails) (*Connection, error) {
 	switch deets.Dialect {
 	case "postgres":
 		c.Dialect = newPostgreSQL(deets)
+	case "cockroach":
+		c.Dialect = newCockroach(deets)
 	case "mysql":
 		c.Dialect = newMySQL(deets)
 	case "sqlite3":

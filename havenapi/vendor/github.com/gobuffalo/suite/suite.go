@@ -5,7 +5,9 @@ import (
 
 	"github.com/gobuffalo/buffalo"
 	"github.com/gobuffalo/buffalo/middleware/csrf"
+	"github.com/gobuffalo/packr"
 	"github.com/markbates/willie"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -25,6 +27,18 @@ func NewAction(app *buffalo.App) *Action {
 	return as
 }
 
+func NewActionWithFixtures(app *buffalo.App, box packr.Box) (*Action, error) {
+	m, err := NewModelWithFixtures(box)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	as := &Action{
+		App:   app,
+		Model: m,
+	}
+	return as, nil
+}
+
 func Run(t *testing.T, s suite.TestingSuite) {
 	suite.Run(t, s)
 }
@@ -38,7 +52,7 @@ func (as *Action) JSON(u string, args ...interface{}) *willie.JSON {
 }
 
 func (as *Action) SetupTest() {
-	as.App.SessionStore = newSessionStore()
+	as.App.SessionStore = NewSessionStore()
 	s, _ := as.App.SessionStore.New(nil, as.App.SessionName)
 	as.Session = &buffalo.Session{
 		Session: s,

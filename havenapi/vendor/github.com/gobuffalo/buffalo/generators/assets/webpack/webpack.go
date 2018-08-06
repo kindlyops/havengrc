@@ -1,7 +1,6 @@
 package webpack
 
 import (
-	"fmt"
 	"os/exec"
 	"path/filepath"
 
@@ -9,8 +8,13 @@ import (
 	"github.com/gobuffalo/buffalo/generators/assets"
 	"github.com/gobuffalo/buffalo/generators/assets/standard"
 	"github.com/gobuffalo/makr"
+	"github.com/gobuffalo/packr"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
+
+// TemplateBox contains all templates needed for the webpack generator
+var TemplateBox = packr.NewBox("../webpack/templates")
 
 var logo = &makr.RemoteFile{
 	File:       makr.NewFile("assets/images/logo.svg", ""),
@@ -24,6 +28,13 @@ var BinPath = filepath.Join("node_modules", ".bin", "webpack")
 func (w Generator) Run(root string, data makr.Data) error {
 	g := makr.New()
 
+	// if there's no npm, return!
+	if _, err := exec.LookPath("npm"); err != nil {
+		logrus.Info("Could not find npm. Skipping webpack generation.")
+
+		return standard.Run(root, data)
+	}
+
 	command := "yarn"
 
 	if !w.WithYarn {
@@ -35,16 +46,9 @@ func (w Generator) Run(root string, data makr.Data) error {
 		}
 	}
 
-	// if there's no npm, return!
-	if _, err := exec.LookPath("npm"); err != nil {
-		fmt.Println("Could not find npm. Skipping webpack generation.")
-
-		return standard.Run(root, data)
-	}
-
 	g.Add(logo)
 
-	files, err := generators.Find(filepath.Join(generators.TemplatesPath, "assets", "webpack"))
+	files, err := generators.FindByBox(TemplateBox)
 	if err != nil {
 		return errors.WithStack(err)
 	}

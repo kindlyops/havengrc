@@ -10,12 +10,14 @@ import (
 )
 
 const (
-	EOF = -1   // End of file.
-	EOL = '\n' // End of line.
+	// EOF is short for End of file.
+	EOF = -1
+	// EOL is short for End of line.
+	EOL = '\n'
 )
 
 // Error provides a convenient interface for handling runtime error.
-// It can be Error inteface with type cast which can call Pos().
+// It can be Error interface with type cast which can call Pos().
 type Error struct {
 	Message  string
 	Pos      ast.Position
@@ -62,6 +64,9 @@ var opName = map[string]int{
 	"go":       GO,
 	"chan":     CHAN,
 	"make":     MAKE,
+	"type":     TYPE,
+	"len":      LEN,
+	"delete":   DELETE,
 }
 
 // Init resets code to scan.
@@ -105,7 +110,7 @@ retry:
 		}
 	case ch == '`':
 		tok = STRING
-		lit, err = s.scanRawString()
+		lit, err = s.scanRawString('`')
 		if err != nil {
 			return
 		}
@@ -135,6 +140,17 @@ retry:
 			case '=':
 				tok = EQEQ
 				lit = "=="
+			default:
+				s.back()
+				tok = int(ch)
+				lit = string(ch)
+			}
+		case '?':
+			s.next()
+			switch s.peek() {
+			case '?':
+				tok = NILCOALESCE
+				lit = "??"
 			default:
 				s.back()
 				tok = int(ch)
@@ -188,6 +204,25 @@ retry:
 			case '=':
 				tok = DIVEQ
 				lit = "/="
+			case '/':
+				for !isEOL(s.peek()) {
+					s.next()
+				}
+				goto retry
+			case '*':
+				for {
+					_, err = s.scanRawString('*')
+					if err != nil {
+						return
+					}
+
+					if s.peek() == '/' {
+						s.next()
+						goto retry
+					}
+
+					s.back()
+				}
 			default:
 				s.back()
 				tok = int(ch)
@@ -259,7 +294,7 @@ retry:
 				if s.peek() == '.' {
 					tok = VARARG
 				} else {
-					err = fmt.Errorf(`syntax error "%s"`, "..")
+					err = fmt.Errorf("syntax error on '%v' at %v:%v", string(ch), pos.Line, pos.Column)
 					return
 				}
 			} else {
@@ -267,30 +302,11 @@ retry:
 				tok = int(ch)
 				lit = string(ch)
 			}
-		case '\n':
+		case '\n', '(', ')', ':', ';', '%', '{', '}', '[', ']', ',', '^':
 			tok = int(ch)
 			lit = string(ch)
-		case '(', ')', ':', ';', '%', '?', '{', '}', ',', '[', ']', '^':
-			s.next()
-			if ch == '[' && s.peek() == ']' {
-				s.next()
-				if isLetter(s.peek()) {
-					s.back()
-					tok = ARRAYLIT
-					lit = "[]"
-				} else {
-					s.back()
-					s.back()
-					tok = int(ch)
-					lit = string(ch)
-				}
-			} else {
-				s.back()
-				tok = int(ch)
-				lit = string(ch)
-			}
 		default:
-			err = fmt.Errorf(`syntax error "%s"`, string(ch))
+			err = fmt.Errorf("syntax error on '%v' at %v:%v", string(ch), pos.Line, pos.Column)
 			tok = int(ch)
 			lit = string(ch)
 			return
@@ -323,6 +339,14 @@ func isEOL(ch rune) bool {
 // isBlank returns true if the rune is empty character..
 func isBlank(ch rune) bool {
 	return ch == ' ' || ch == '\t' || ch == '\r'
+}
+
+func appendNumberAndPoint(s *Scanner, ret []rune) []rune {
+	for isDigit(s.peek()) || s.peek() == '.' {
+		ret = append(ret, s.peek())
+		s.next()
+	}
+	return ret
 }
 
 // peek returns current rune in the code.
@@ -376,7 +400,7 @@ func (s *Scanner) skipBlank() {
 	}
 }
 
-// scanIdentifier returns identifier begining at current position.
+// scanIdentifier returns identifier beginning at current position.
 func (s *Scanner) scanIdentifier() (string, error) {
 	var ret []rune
 	for {
@@ -389,7 +413,7 @@ func (s *Scanner) scanIdentifier() (string, error) {
 	return string(ret), nil
 }
 
-// scanNumber returns number begining at current position.
+// scanNumber returns number beginning at current position.
 func (s *Scanner) scanNumber() (string, error) {
 	var ret []rune
 	ch := s.peek()
@@ -403,25 +427,16 @@ func (s *Scanner) scanNumber() (string, error) {
 			s.next()
 		}
 	} else {
-		for isDigit(s.peek()) || s.peek() == '.' {
-			ret = append(ret, s.peek())
-			s.next()
-		}
+		ret = appendNumberAndPoint(s, ret)
 		if s.peek() == 'e' {
 			ret = append(ret, s.peek())
 			s.next()
 			if isDigit(s.peek()) || s.peek() == '+' || s.peek() == '-' {
 				ret = append(ret, s.peek())
 				s.next()
-				for isDigit(s.peek()) || s.peek() == '.' {
-					ret = append(ret, s.peek())
-					s.next()
-				}
+				ret = appendNumberAndPoint(s, ret)
 			}
-			for isDigit(s.peek()) || s.peek() == '.' {
-				ret = append(ret, s.peek())
-				s.next()
-			}
+			ret = appendNumberAndPoint(s, ret)
 		}
 		if isLetter(s.peek()) {
 			return "", errors.New("identifier starts immediately after numeric literal")
@@ -431,15 +446,14 @@ func (s *Scanner) scanNumber() (string, error) {
 }
 
 // scanRawString returns raw-string starting at current position.
-func (s *Scanner) scanRawString() (string, error) {
+func (s *Scanner) scanRawString(l rune) (string, error) {
 	var ret []rune
 	for {
 		s.next()
 		if s.peek() == EOF {
 			return "", errors.New("unexpected EOF")
-			break
 		}
-		if s.peek() == '`' {
+		if s.peek() == l {
 			s.next()
 			break
 		}
@@ -491,7 +505,7 @@ eos:
 	return string(ret), nil
 }
 
-// Lexer provides inteface to parse codes.
+// Lexer provides interface to parse codes.
 type Lexer struct {
 	s     *Scanner
 	lit   string
@@ -504,7 +518,7 @@ type Lexer struct {
 func (l *Lexer) Lex(lval *yySymType) int {
 	tok, lit, pos, err := l.s.Scan()
 	if err != nil {
-		l.e = &Error{Message: fmt.Sprintf("%s", err.Error()), Pos: pos, Fatal: true}
+		l.e = &Error{Message: err.Error(), Pos: pos, Fatal: true}
 	}
 	lval.tok = ast.Token{Tok: tok, Lit: lit}
 	lval.tok.SetPosition(pos)
@@ -518,7 +532,7 @@ func (l *Lexer) Error(msg string) {
 	l.e = &Error{Message: msg, Pos: l.pos, Fatal: false}
 }
 
-// Parser provides way to parse the code using Scanner.
+// Parse provides way to parse the code using Scanner.
 func Parse(s *Scanner) ([]ast.Stmt, error) {
 	l := Lexer{s: s}
 	if yyParse(&l) != 0 {
@@ -527,11 +541,12 @@ func Parse(s *Scanner) ([]ast.Stmt, error) {
 	return l.stmts, l.e
 }
 
+// EnableErrorVerbose enabled verbose errors from the parser
 func EnableErrorVerbose() {
 	yyErrorVerbose = true
 }
 
-// ParserSrc provides way to parse the code from source.
+// ParseSrc provides way to parse the code from source.
 func ParseSrc(src string) ([]ast.Stmt, error) {
 	scanner := &Scanner{
 		src: []rune(src),

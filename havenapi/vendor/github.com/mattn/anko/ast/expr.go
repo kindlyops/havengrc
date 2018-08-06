@@ -1,5 +1,9 @@
 package ast
 
+import (
+	"reflect"
+)
+
 // Expr provides all of interfaces for expression.
 type Expr interface {
 	Pos
@@ -32,17 +36,10 @@ type ArrayExpr struct {
 	Exprs []Expr
 }
 
-// PairExpr provide one of Map key/value pair.
-type PairExpr struct {
-	ExprImpl
-	Key   string
-	Value Expr
-}
-
 // MapExpr provide Map expression.
 type MapExpr struct {
 	ExprImpl
-	MapExpr map[string]Expr
+	MapExpr map[Expr]Expr
 }
 
 // IdentExpr provide identity expression.
@@ -84,6 +81,14 @@ type BinOpExpr struct {
 	Rhs      Expr
 }
 
+// NilCoalescingOpExpr provide if invalid operator expression.
+type NilCoalescingOpExpr struct {
+	ExprImpl
+	Lhs Expr
+	Rhs Expr
+}
+
+// TernaryOpExpr provide ternary operator expression.
 type TernaryOpExpr struct {
 	ExprImpl
 	Expr Expr
@@ -94,7 +99,7 @@ type TernaryOpExpr struct {
 // CallExpr provide calling expression.
 type CallExpr struct {
 	ExprImpl
-	Func     interface{}
+	Func     reflect.Value
 	Name     string
 	SubExprs []Expr
 	VarArg   bool
@@ -110,7 +115,7 @@ type AnonCallExpr struct {
 	Go       bool
 }
 
-// MemberExpr provide expression to refer menber.
+// MemberExpr provide expression to refer member.
 type MemberExpr struct {
 	ExprImpl
 	Expr Expr
@@ -137,15 +142,8 @@ type FuncExpr struct {
 	ExprImpl
 	Name   string
 	Stmts  []Stmt
-	Args   []string
+	Params []string
 	VarArg bool
-}
-
-// LetExpr provide expression to let variable.
-type LetExpr struct {
-	ExprImpl
-	Lhs Expr
-	Rhs Expr
 }
 
 // LetsExpr provide multiple expression of let.
@@ -164,42 +162,69 @@ type AssocExpr struct {
 	Rhs      Expr
 }
 
-// NewExpr provide expression to make new instance.
-type NewExpr struct {
-	ExprImpl
-	Type string
-}
-
 // ConstExpr provide expression for constant variable.
 type ConstExpr struct {
 	ExprImpl
 	Value string
 }
 
+// ChanExpr provide chan expression.
 type ChanExpr struct {
 	ExprImpl
 	Lhs Expr
 	Rhs Expr
 }
 
-type Type struct {
-	Name string
-}
-
-type MakeExpr struct {
+// NewExpr provide expression to make new instance.
+type NewExpr struct {
 	ExprImpl
 	Type string
 }
 
+// MakeChanExpr provide expression to make chan instance.
 type MakeChanExpr struct {
 	ExprImpl
 	Type     string
 	SizeExpr Expr
 }
 
-type MakeArrayExpr struct {
+// ArrayCount is used in MakeExpr to provide Dimensions
+type ArrayCount struct {
+	Count int
+}
+
+// MakeExpr provide expression to make instance.
+type MakeExpr struct {
 	ExprImpl
-	Type    string
-	LenExpr Expr
-	CapExpr Expr
+	Dimensions int
+	Type       string
+	LenExpr    Expr
+	CapExpr    Expr
+}
+
+// MakeTypeExpr provide expression to make type.
+type MakeTypeExpr struct {
+	ExprImpl
+	Name string
+	Type Expr
+}
+
+// LenExpr provide expression to get length of array, map, etc.
+type LenExpr struct {
+	ExprImpl
+	Expr Expr
+}
+
+// DeleteExpr provide delete expression
+type DeleteExpr struct {
+	ExprImpl
+	WhatExpr Expr
+	KeyExpr  Expr
+}
+
+// IncludeExpr provide in expression
+type IncludeExpr struct {
+	ExprImpl
+	ItemExpr Expr
+	ListExpr Expr
 }

@@ -41,7 +41,7 @@ type TryStmt struct {
 // ForStmt provide "for in" expression statement.
 type ForStmt struct {
 	StmtImpl
-	Var   string
+	Vars  []string
 	Value Expr
 	Stmts []Stmt
 }
@@ -72,7 +72,7 @@ type ContinueStmt struct {
 	StmtImpl
 }
 
-// ForStmt provide "return" expression statement.
+// ReturnStmt provide "return" expression statement.
 type ReturnStmt struct {
 	StmtImpl
 	Exprs []Expr
@@ -124,4 +124,17 @@ type LetsStmt struct {
 	Lhss     []Expr
 	Operator string
 	Rhss     []Expr
+}
+
+// LetMapItemStmt provide statement of let for map item.
+type LetMapItemStmt struct {
+	StmtImpl
+	Lhss []Expr
+	Rhs  Expr
+}
+
+// GoroutineStmt provide statement of groutine.
+type GoroutineStmt struct {
+	StmtImpl
+	Expr Expr
 }

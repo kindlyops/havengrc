@@ -14,14 +14,16 @@ import (
 %type<stmt_default> stmt_default
 %type<stmt_case> stmt_case
 %type<stmt_cases> stmt_cases
-%type<typ> typ
 %type<expr> expr
 %type<exprs> exprs
 %type<expr_many> expr_many
 %type<expr_lets> expr_lets
-%type<expr_pair> expr_pair
-%type<expr_pairs> expr_pairs
+%type<map_expr> map_expr
 %type<expr_idents> expr_idents
+%type<expr_type> expr_type
+%type<array_count> array_count
+%type<expr_slice> expr_slice
+%type<stmt_multi_case> stmt_multi_case
 
 %union{
 	compstmt               []ast.Stmt
@@ -31,26 +33,27 @@ import (
 	stmt_cases             []ast.Stmt
 	stmts                  []ast.Stmt
 	stmt                   ast.Stmt
-	typ                    ast.Type
 	expr                   ast.Expr
 	exprs                  []ast.Expr
 	expr_many              []ast.Expr
 	expr_lets              ast.Expr
-	expr_pair              ast.Expr
-	expr_pairs             []ast.Expr
+	map_expr              map[ast.Expr]ast.Expr
 	expr_idents            []string
+	expr_type              string
 	tok                    ast.Token
-	term                   ast.Token
-	terms                  ast.Token
-	opt_terms              ast.Token
+	array_count            ast.ArrayCount
+	expr_slice             ast.Expr
+	stmt_multi_case        []ast.Stmt
 }
 
-%token<tok> IDENT NUMBER STRING ARRAY VARARG FUNC RETURN VAR THROW IF ELSE FOR IN EQEQ NEQ GE LE OROR ANDAND NEW TRUE FALSE NIL MODULE TRY CATCH FINALLY PLUSEQ MINUSEQ MULEQ DIVEQ ANDEQ OREQ BREAK CONTINUE PLUSPLUS MINUSMINUS POW SHIFTLEFT SHIFTRIGHT SWITCH CASE DEFAULT GO CHAN MAKE OPCHAN ARRAYLIT
+%token<tok> IDENT NUMBER STRING ARRAY VARARG FUNC RETURN VAR THROW IF ELSE FOR IN EQEQ NEQ GE LE OROR ANDAND NEW TRUE FALSE NIL NILCOALESCE MODULE TRY CATCH FINALLY PLUSEQ MINUSEQ MULEQ DIVEQ ANDEQ OREQ BREAK CONTINUE PLUSPLUS MINUSMINUS POW SHIFTLEFT SHIFTRIGHT SWITCH CASE DEFAULT GO CHAN MAKE OPCHAN TYPE LEN DELETE
 
 %right '='
 %right '?' ':'
+%right NILCOALESCE
 %left OROR
 %left ANDAND
+%right IN
 %left IDENT
 %nonassoc EQEQ NEQ ','
 %left '>' GE '<' LE SHIFTLEFT SHIFTRIGHT
@@ -61,30 +64,29 @@ import (
 
 %%
 
-compstmt : opt_terms
+compstmt :
+	opt_term
 	{
 		$$ = nil
 	}
-	| stmts opt_terms
+	| stmts opt_term
 	{
 		$$ = $1
 	}
 
 stmts :
+	opt_term stmt
 	{
-		$$ = nil
+		if $2 != nil {
+			$$ = []ast.Stmt{$2}
+		} else {
+			$$ = []ast.Stmt{}
+		}
 		if l, ok := yylex.(*Lexer); ok {
 			l.stmts = $$
 		}
 	}
-	| opt_terms stmt
-	{
-		$$ = []ast.Stmt{$2}
-		if l, ok := yylex.(*Lexer); ok {
-			l.stmts = $$
-		}
-	}
-	| stmts terms stmt
+	| stmts term stmt
 	{
 		if $3 != nil {
 			$$ = append($1, $3)
@@ -95,6 +97,11 @@ stmts :
 	}
 
 stmt :
+	/* nothing */
+	{
+		$$ = nil
+	}
+	|
 	VAR expr_idents '=' expr_many
 	{
 		$$ = &ast.VarStmt{Names: $2, Exprs: $4}
@@ -106,7 +113,15 @@ stmt :
 	}
 	| expr_many '=' expr_many
 	{
-		$$ = &ast.LetsStmt{Lhss: $1, Operator: "=", Rhss: $3}
+		if len($1) == 2 && len($3) == 1 {
+			if _, ok := $3[0].(*ast.ItemExpr); ok {
+				$$ = &ast.LetMapItemStmt{Lhss: $1, Rhs: $3[0]}
+			} else {
+				$$ = &ast.LetsStmt{Lhss: $1, Operator: "=", Rhss: $3}
+			}
+		} else {
+			$$ = &ast.LetsStmt{Lhss: $1, Operator: "=", Rhss: $3}
+		}
 	}
 	| BREAK
 	{
@@ -143,9 +158,9 @@ stmt :
 		$$ = &ast.LoopStmt{Stmts: $3}
 		$$.SetPosition($1.Position())
 	}
-	| FOR IDENT IN expr '{' compstmt '}'
+	| FOR expr_idents IN expr '{' compstmt '}'
 	{
-		$$ = &ast.ForStmt{Var: $2.Lit, Value: $4, Stmts: $6}
+		$$ = &ast.ForStmt{Vars: $2, Value: $4, Stmts: $6}
 		$$.SetPosition($1.Position())
 	}
 	| FOR expr_lets ';' expr ';' expr '{' compstmt '}'
@@ -178,9 +193,29 @@ stmt :
 		$$ = &ast.TryStmt{Try: $3, Catch: $7}
 		$$.SetPosition($1.Position())
 	}
-	| SWITCH expr '{' stmt_cases '}'
+	| SWITCH expr '{' opt_newlines stmt_cases opt_newlines '}'
 	{
-		$$ = &ast.SwitchStmt{Expr: $2, Cases: $4}
+		$$ = &ast.SwitchStmt{Expr: $2, Cases: $5}
+		$$.SetPosition($1.Position())
+	}
+	| GO IDENT '(' exprs VARARG ')'
+	{
+		$$ = &ast.GoroutineStmt{Expr: &ast.CallExpr{Name: $2.Lit, SubExprs: $4, VarArg: true, Go: true}}
+		$$.SetPosition($2.Position())
+	}
+	| GO IDENT '(' exprs ')'
+	{
+		$$ = &ast.GoroutineStmt{Expr: &ast.CallExpr{Name: $2.Lit, SubExprs: $4, Go: true}}
+		$$.SetPosition($2.Position())
+	}
+	| GO expr '(' exprs VARARG ')'
+	{
+		$$ = &ast.GoroutineStmt{Expr: &ast.AnonCallExpr{Expr: $2, SubExprs: $4, VarArg: true, Go: true}}
+		$$.SetPosition($2.Position())
+	}
+	| GO expr '(' exprs ')'
+	{
+		$$ = &ast.GoroutineStmt{Expr: &ast.AnonCallExpr{Expr: $2, SubExprs: $4, Go: true}}
 		$$.SetPosition($1.Position())
 	}
 	| expr
@@ -191,41 +226,49 @@ stmt :
 
 
 stmt_if :
-	stmt_if ELSE IF expr '{' compstmt '}'
+	IF expr '{' compstmt '}'
+	{
+		$$ = &ast.IfStmt{If: $2, Then: $4, Else: nil}
+		$$.SetPosition($1.Position())
+	}
+	| stmt_if ELSE IF expr '{' compstmt '}'
 	{
 		$1.(*ast.IfStmt).ElseIf = append($1.(*ast.IfStmt).ElseIf, &ast.IfStmt{If: $4, Then: $6})
 		$$.SetPosition($1.Position())
 	}
 	| stmt_if ELSE '{' compstmt '}'
 	{
+		$$.SetPosition($1.Position())
 		if $$.(*ast.IfStmt).Else != nil {
 			yylex.Error("multiple else statement")
 		} else {
-			$$.(*ast.IfStmt).Else = append($$.(*ast.IfStmt).Else, $4...)
+			$$.(*ast.IfStmt).Else = $4
 		}
-		$$.SetPosition($1.Position())
-	}
-	| IF expr '{' compstmt '}'
-	{
-		$$ = &ast.IfStmt{If: $2, Then: $4, Else: nil}
-		$$.SetPosition($1.Position())
 	}
 
 stmt_cases :
 	{
 		$$ = []ast.Stmt{}
 	}
-	| opt_terms stmt_case
+	| stmt_case
 	{
-		$$ = []ast.Stmt{$2}
+		$$ = []ast.Stmt{$1}
 	}
-	| opt_terms stmt_default
+	| stmt_default
 	{
-		$$ = []ast.Stmt{$2}
+		$$ = []ast.Stmt{$1}
 	}
 	| stmt_cases stmt_case
 	{
 		$$ = append($1, $2)
+	}
+	| stmt_multi_case
+	{
+		$$ = $1
+	}
+	| stmt_cases stmt_multi_case
+	{
+		$$ = append($1, $2...)
 	}
 	| stmt_cases stmt_default
 	{
@@ -238,34 +281,56 @@ stmt_cases :
 	}
 
 stmt_case :
-	CASE expr ':' opt_terms compstmt
+	CASE expr ':' compstmt
 	{
-		$$ = &ast.CaseStmt{Expr: $2, Stmts: $5}
+		$$ = &ast.CaseStmt{Expr: $2, Stmts: $4}
+	}
+
+stmt_multi_case :
+	CASE expr_many ':' compstmt
+	{
+	    var cases = []ast.Stmt{}
+		for _, stmt := range $2 {
+			cases = append(cases, &ast.CaseStmt{Expr: stmt, Stmts: $4})
+		}
+		$$ = cases
 	}
 
 stmt_default :
-	DEFAULT ':' opt_terms compstmt
+	DEFAULT ':' compstmt
 	{
-		$$ = &ast.DefaultStmt{Stmts: $4}
+		$$ = &ast.DefaultStmt{Stmts: $3}
 	}
 
-expr_pair :
-	STRING ':' expr
+array_count :
 	{
-		$$ = &ast.PairExpr{Key: $1.Lit, Value: $3}
+		$$ = ast.ArrayCount{Count: 0}
+	}
+	| '[' ']'
+	{
+		$$ = ast.ArrayCount{Count: 1}
+	}
+	| array_count '[' ']'
+	{
+		$$.Count = $$.Count + 1
 	}
 
-expr_pairs :
+map_expr :
 	{
-		$$ = []ast.Expr{}
+		$$ = make(map[ast.Expr]ast.Expr)
 	}
-	| expr_pair
+	| expr ':' expr
 	{
-		$$ = []ast.Expr{$1}
+		mapExpr := make(map[ast.Expr]ast.Expr)
+		mapExpr[$1] = $3
+		$$ = mapExpr
 	}
-	| expr_pairs ',' opt_terms expr_pair
+	| map_expr ',' opt_newlines expr ':' expr
 	{
-		$$ = append($1, $4)
+		if len($1) == 0 {
+			yylex.Error("syntax error: unexpected ','")
+		}
+		$1[$4] = $6
 	}
 
 expr_idents :
@@ -276,9 +341,22 @@ expr_idents :
 	{
 		$$ = []string{$1.Lit}
 	}
-	| expr_idents ',' opt_terms IDENT
+	| expr_idents ',' opt_newlines IDENT
 	{
+		if len($1) == 0 {
+			yylex.Error("syntax error: unexpected ','")
+		}
 		$$ = append($1, $4.Lit)
+	}
+
+expr_type :
+	IDENT
+	{
+		$$ = $1.Lit
+	}
+	| expr_type '.' IDENT
+	{
+		$$ = $$ + "." + $3.Lit
 	}
 
 expr_lets : expr_many '=' expr_many
@@ -291,22 +369,13 @@ expr_many :
 	{
 		$$ = []ast.Expr{$1}
 	}
-	| exprs ',' opt_terms expr
+	| exprs ',' opt_newlines expr
 	{
 		$$ = append($1, $4)
 	}
-	| exprs ',' opt_terms IDENT
+	| exprs ',' opt_newlines IDENT
 	{
 		$$ = append($1, &ast.IdentExpr{Lit: $4.Lit})
-	}
-
-typ : IDENT
-	{
-		$$ = ast.Type{Name: $1.Lit}
-	}
-	| typ '.' IDENT
-	{
-		$$ = ast.Type{Name: $1.Name + "." + $3.Lit}
 	}
 
 exprs :
@@ -317,13 +386,45 @@ exprs :
 	{
 		$$ = []ast.Expr{$1}
 	}
-	| exprs ',' opt_terms expr
+	| exprs ',' opt_newlines expr
 	{
+		if len($1) == 0 {
+			yylex.Error("syntax error: unexpected ','")
+		}
 		$$ = append($1, $4)
 	}
-	| exprs ',' opt_terms IDENT
+	| exprs ',' opt_newlines IDENT
 	{
+		if len($1) == 0 {
+			yylex.Error("syntax error: unexpected ','")
+		}
 		$$ = append($1, &ast.IdentExpr{Lit: $4.Lit})
+	}
+
+expr_slice :
+	IDENT '[' expr ':' expr ']'
+	{
+		$$ = &ast.SliceExpr{Value: &ast.IdentExpr{Lit: $1.Lit}, Begin: $3, End: $5}
+	}
+	| IDENT '[' expr ':' ']'
+	{
+		$$ = &ast.SliceExpr{Value: &ast.IdentExpr{Lit: $1.Lit}, Begin: $3, End: nil}
+	}
+	| IDENT '[' ':' expr ']'
+	{
+		$$ = &ast.SliceExpr{Value: &ast.IdentExpr{Lit: $1.Lit}, Begin: nil, End: $4}
+	}
+	| expr '[' expr ':' expr ']'
+	{
+		$$ = &ast.SliceExpr{Value: $1, Begin: $3, End: $5}
+	}
+	| expr '[' expr ':' ']'
+	{
+		$$ = &ast.SliceExpr{Value: $1, Begin: $3, End: nil}
+	}
+	| expr '[' ':' expr ']'
+	{
+		$$ = &ast.SliceExpr{Value: $1, Begin: nil, End: $4}
 	}
 
 expr :
@@ -397,6 +498,11 @@ expr :
 		$$ = &ast.TernaryOpExpr{Expr: $1, Lhs: $3, Rhs: $5}
 		$$.SetPosition($1.Position())
 	}
+	| expr NILCOALESCE expr
+	{
+		$$ = &ast.NilCoalescingOpExpr{Lhs: $1, Rhs: $3}
+		$$.SetPosition($1.Position())
+	}
 	| expr '.' IDENT
 	{
 		$$ = &ast.MemberExpr{Expr: $1, Name: $3.Lit}
@@ -404,61 +510,38 @@ expr :
 	}
 	| FUNC '(' expr_idents ')' '{' compstmt '}'
 	{
-		$$ = &ast.FuncExpr{Args: $3, Stmts: $6}
+		$$ = &ast.FuncExpr{Params: $3, Stmts: $6}
 		$$.SetPosition($1.Position())
 	}
-	| FUNC '(' IDENT VARARG ')' '{' compstmt '}'
+	| FUNC '(' expr_idents VARARG ')' '{' compstmt '}'
 	{
-		$$ = &ast.FuncExpr{Args: []string{$3.Lit}, Stmts: $7, VarArg: true}
+		$$ = &ast.FuncExpr{Params: $3, Stmts: $7, VarArg: true}
 		$$.SetPosition($1.Position())
 	}
 	| FUNC IDENT '(' expr_idents ')' '{' compstmt '}'
 	{
-		$$ = &ast.FuncExpr{Name: $2.Lit, Args: $4, Stmts: $7}
+		$$ = &ast.FuncExpr{Name: $2.Lit, Params: $4, Stmts: $7}
 		$$.SetPosition($1.Position())
 	}
-	| FUNC IDENT '(' IDENT VARARG ')' '{' compstmt '}'
+	| FUNC IDENT '(' expr_idents VARARG ')' '{' compstmt '}'
 	{
-		$$ = &ast.FuncExpr{Name: $2.Lit, Args: []string{$4.Lit}, Stmts: $8, VarArg: true}
+		$$ = &ast.FuncExpr{Name: $2.Lit, Params: $4, Stmts: $8, VarArg: true}
 		$$.SetPosition($1.Position())
 	}
-	| '[' opt_terms exprs opt_terms ']'
+	| '[' opt_newlines exprs opt_comma_newlines ']'
 	{
 		$$ = &ast.ArrayExpr{Exprs: $3}
 		if l, ok := yylex.(*Lexer); ok { $$.SetPosition(l.pos) }
 	}
-	| '[' opt_terms exprs ',' opt_terms ']'
+	| '{' opt_newlines map_expr opt_comma_newlines '}'
 	{
-		$$ = &ast.ArrayExpr{Exprs: $3}
-		if l, ok := yylex.(*Lexer); ok { $$.SetPosition(l.pos) }
-	}
-	| '{' opt_terms expr_pairs opt_terms '}'
-	{
-		mapExpr := make(map[string]ast.Expr)
-		for _, v := range $3 {
-			mapExpr[v.(*ast.PairExpr).Key] = v.(*ast.PairExpr).Value
-		}
-		$$ = &ast.MapExpr{MapExpr: mapExpr}
-		if l, ok := yylex.(*Lexer); ok { $$.SetPosition(l.pos) }
-	}
-	| '{' opt_terms expr_pairs ',' opt_terms '}'
-	{
-		mapExpr := make(map[string]ast.Expr)
-		for _, v := range $3 {
-			mapExpr[v.(*ast.PairExpr).Key] = v.(*ast.PairExpr).Value
-		}
-		$$ = &ast.MapExpr{MapExpr: mapExpr}
+		$$ = &ast.MapExpr{MapExpr: $3}
 		if l, ok := yylex.(*Lexer); ok { $$.SetPosition(l.pos) }
 	}
 	| '(' expr ')'
 	{
 		$$ = &ast.ParenExpr{SubExpr: $2}
 		if l, ok := yylex.(*Lexer); ok { $$.SetPosition(l.pos) }
-	}
-	| NEW '(' typ ')'
-	{
-		$$ = &ast.NewExpr{Type: $3.Name}
-		$$.SetPosition($1.Position())
 	}
 	| expr '+' expr
 	{
@@ -600,16 +683,6 @@ expr :
 		$$ = &ast.CallExpr{Name: $1.Lit, SubExprs: $3}
 		$$.SetPosition($1.Position())
 	}
-	| GO IDENT '(' exprs VARARG ')'
-	{
-		$$ = &ast.CallExpr{Name: $2.Lit, SubExprs: $4, VarArg: true, Go: true}
-		$$.SetPosition($2.Position())
-	}
-	| GO IDENT '(' exprs ')'
-	{
-		$$ = &ast.CallExpr{Name: $2.Lit, SubExprs: $4, Go: true}
-		$$.SetPosition($2.Position())
-	}
 	| expr '(' exprs VARARG ')'
 	{
 		$$ = &ast.AnonCallExpr{Expr: $1, SubExprs: $3, VarArg: true}
@@ -618,16 +691,6 @@ expr :
 	| expr '(' exprs ')'
 	{
 		$$ = &ast.AnonCallExpr{Expr: $1, SubExprs: $3}
-		$$.SetPosition($1.Position())
-	}
-	| GO expr '(' exprs VARARG ')'
-	{
-		$$ = &ast.AnonCallExpr{Expr: $2, SubExprs: $4, VarArg: true, Go: true}
-		$$.SetPosition($2.Position())
-	}
-	| GO expr '(' exprs ')'
-	{
-		$$ = &ast.AnonCallExpr{Expr: $2, SubExprs: $4, Go: true}
 		$$.SetPosition($1.Position())
 	}
 	| IDENT '[' expr ']'
@@ -640,39 +703,49 @@ expr :
 		$$ = &ast.ItemExpr{Value: $1, Index: $3}
 		$$.SetPosition($1.Position())
 	}
-	| IDENT '[' expr ':' expr ']'
+	| expr_slice
 	{
-		$$ = &ast.SliceExpr{Value: &ast.IdentExpr{Lit: $1.Lit}, Begin: $3, End: $5}
+		$$ = $1
 		$$.SetPosition($1.Position())
 	}
-	| expr '[' expr ':' expr ']'
+	| LEN '(' expr ')'
 	{
-		$$ = &ast.SliceExpr{Value: $1, Begin: $3, End: $5}
+		$$ = &ast.LenExpr{Expr: $3}
 		$$.SetPosition($1.Position())
 	}
-	| MAKE '(' typ ')'
+	| NEW '(' expr_type ')'
 	{
-		$$ = &ast.MakeExpr{Type: $3.Name}
+		$$ = &ast.NewExpr{Type: $3}
 		$$.SetPosition($1.Position())
 	}
-	| MAKE '(' CHAN typ ')'
+	| MAKE '(' CHAN expr_type ')'
 	{
-		$$ = &ast.MakeChanExpr{Type: $4.Name, SizeExpr: nil}
+		$$ = &ast.MakeChanExpr{Type: $4, SizeExpr: nil}
 		$$.SetPosition($1.Position())
 	}
-	| MAKE '(' CHAN typ ',' expr ')'
+	| MAKE '(' CHAN expr_type ',' expr ')'
 	{
-		$$ = &ast.MakeChanExpr{Type: $4.Name, SizeExpr: $6}
+		$$ = &ast.MakeChanExpr{Type: $4, SizeExpr: $6}
 		$$.SetPosition($1.Position())
 	}
-	| MAKE '(' ARRAYLIT typ ',' expr ')'
+	| MAKE '(' array_count expr_type ')'
 	{
-		$$ = &ast.MakeArrayExpr{Type: $4.Name, LenExpr: $6}
+		$$ = &ast.MakeExpr{Dimensions: $3.Count, Type: $4}
 		$$.SetPosition($1.Position())
 	}
-	| MAKE '(' ARRAYLIT typ ',' expr ',' expr ')'
+	| MAKE '(' array_count expr_type ',' expr ')'
 	{
-		$$ = &ast.MakeArrayExpr{Type: $4.Name, LenExpr: $6, CapExpr: $8}
+		$$ = &ast.MakeExpr{Dimensions: $3.Count,Type: $4, LenExpr: $6}
+		$$.SetPosition($1.Position())
+	}
+	| MAKE '(' array_count expr_type ',' expr ',' expr ')'
+	{
+		$$ = &ast.MakeExpr{Dimensions: $3.Count,Type: $4, LenExpr: $6, CapExpr: $8}
+		$$.SetPosition($1.Position())
+	}
+	| MAKE '(' TYPE IDENT ',' expr ')'
+	{
+		$$ = &ast.MakeTypeExpr{Name: $4.Lit, Type: $6}
 		$$.SetPosition($1.Position())
 	}
 	| expr OPCHAN expr
@@ -685,26 +758,46 @@ expr :
 		$$ = &ast.ChanExpr{Rhs: $2}
 		$$.SetPosition($2.Position())
 	}
-
-opt_terms : /* none */
-	| terms
-	;
-
-
-terms : term
+	| DELETE '(' expr ')'
 	{
+		$$ = &ast.DeleteExpr{WhatExpr: $3}
+		$$.SetPosition($1.Position())
 	}
-	| terms term
+	| DELETE '(' expr ',' expr ')'
 	{
+		$$ = &ast.DeleteExpr{WhatExpr: $3, KeyExpr: $5}
+		$$.SetPosition($1.Position())
 	}
-	;
+	| expr IN expr
+	{
+		$$ = &ast.IncludeExpr{ItemExpr: $1, ListExpr: &ast.SliceExpr{Value: $3, Begin: nil, End: nil}}
+		$$.SetPosition($1.Position())
+	}
 
-term : ';'
-	{
-	}
-	| '\n'
-	{
-	}
-	;
+
+opt_term : 
+	/* nothing */
+	| term
+	
+term :
+	';' newlines
+	| newlines
+	| ';'
+
+opt_newlines : 
+	/* nothing */
+	| newlines
+
+newlines : 
+	newline
+	| newlines newline
+
+newline : '\n'
+
+opt_comma_newlines : 
+	/* nothing */
+	| ',' newlines
+	| newlines
+	| ','
 
 %%

@@ -2,16 +2,18 @@ package cmd
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"runtime"
 
 	"github.com/fatih/color"
 	"github.com/gobuffalo/buffalo/generators/assets/webpack"
 	rg "github.com/gobuffalo/buffalo/generators/refresh"
+	"github.com/gobuffalo/buffalo/meta"
 	"github.com/markbates/refresh/refresh"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"golang.org/x/sync/errgroup"
 )
@@ -39,7 +41,7 @@ This behavior can be changed in your .buffalo.dev.yml file.`,
 					cause = err.Error()
 				}
 			}
-			fmt.Printf(msg, cause)
+			logrus.Errorf(msg, cause)
 		}()
 		os.Setenv("GO_ENV", "development")
 
@@ -65,12 +67,29 @@ This behavior can be changed in your .buffalo.dev.yml file.`,
 }
 
 func startWebpack(ctx context.Context) error {
-	cfgFile := "./webpack.config.js"
-	_, err := os.Stat(cfgFile)
-	if err != nil {
+	app := meta.New(".")
+	if !app.WithWebpack {
 		// there's no webpack, so don't do anything
 		return nil
 	}
+
+	if _, err := os.Stat(filepath.Join(app.Root, "node_modules")); err != nil {
+		tool := "yarn"
+		if !app.WithYarn {
+			tool = "npm"
+		}
+		if _, err := exec.LookPath(tool); err != nil {
+			return errors.Errorf("no node_modules directory found, and couldn't find %s to install it with", tool)
+		}
+		cmd := exec.CommandContext(ctx, tool, "install")
+		cmd.Stdin = os.Stdin
+		cmd.Stderr = os.Stderr
+		cmd.Stdout = os.Stdout
+		if err := cmd.Run(); err != nil {
+			return errors.WithStack(err)
+		}
+	}
+
 	cmd := exec.CommandContext(ctx, webpack.BinPath, "--watch")
 	cmd.Stdin = os.Stdin
 	cmd.Stderr = os.Stderr
@@ -80,18 +99,27 @@ func startWebpack(ctx context.Context) error {
 
 func startDevServer(ctx context.Context) error {
 	cfgFile := "./.buffalo.dev.yml"
-	_, err := os.Stat(cfgFile)
-	if err != nil {
+	if _, err := os.Stat(cfgFile); err != nil {
 		err = rg.Run("./", map[string]interface{}{
 			"name": "buffalo",
 		})
+		if err != nil {
+			return err
+		}
 	}
 	c := &refresh.Configuration{}
-	err = c.Load(cfgFile)
-	if err != nil {
+	if err := c.Load(cfgFile); err != nil {
 		return err
 	}
 	c.Debug = devOptions.Debug
+
+	app := meta.New(".")
+	bt := app.BuildTags("development")
+	var tf []string
+	for _, b := range bt {
+		tf = append(tf, "-tags", b)
+	}
+	c.BuildFlags = append(c.BuildFlags, tf...)
 	r := refresh.NewWithContext(c, ctx)
 	return r.Start()
 }

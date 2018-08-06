@@ -8,20 +8,35 @@ import (
 )
 
 // Run executes statements in the specified environment.
-func Run(stmts []ast.Stmt, env *Env) (reflect.Value, error) {
-	rv := NilValue
+func Run(stmts []ast.Stmt, env *Env) (interface{}, error) {
+	rv, err := run(stmts, env)
+	if err == ErrReturn {
+		err = nil
+	}
+	if !rv.IsValid() || !rv.CanInterface() {
+		return nil, err
+	}
+	return rv.Interface(), err
+}
+
+// run executes statements in the specified environment.
+func run(stmts []ast.Stmt, env *Env) (reflect.Value, error) {
+	rv := nilValue
 	var err error
 	for _, stmt := range stmts {
 		switch stmt.(type) {
 		case *ast.BreakStmt:
-			return NilValue, BreakError
+			return nilValue, ErrBreak
 		case *ast.ContinueStmt:
-			return NilValue, ContinueError
+			return nilValue, ErrContinue
 		case *ast.ReturnStmt:
-			rv, err = RunSingleStmt(stmt, env)
-			return rv, ReturnError
+			rv, err = runSingleStmt(stmt, env)
+			if err != nil {
+				return rv, err
+			}
+			return rv, ErrReturn
 		default:
-			rv, err = RunSingleStmt(stmt, env)
+			rv, err = runSingleStmt(stmt, env)
 			if err != nil {
 				return rv, err
 			}
@@ -31,141 +46,166 @@ func Run(stmts []ast.Stmt, env *Env) (reflect.Value, error) {
 }
 
 // RunSingleStmt executes one statement in the specified environment.
-func RunSingleStmt(stmt ast.Stmt, env *Env) (reflect.Value, error) {
-	if env.catchInterrupt() {
-		return NilValue, InterruptError
+func RunSingleStmt(stmt ast.Stmt, env *Env) (interface{}, error) {
+	rv, err := runSingleStmt(stmt, env)
+	if !rv.IsValid() || !rv.CanInterface() {
+		return nil, err
+	}
+	return rv.Interface(), err
+}
+
+// runSingleStmt executes one statement in the specified environment.
+func runSingleStmt(stmt ast.Stmt, env *Env) (reflect.Value, error) {
+	if *(env.interrupt) {
+		return nilValue, ErrInterrupt
 	}
 	switch stmt := stmt.(type) {
 	case *ast.ExprStmt:
 		rv, err := invokeExpr(stmt.Expr, env)
 		if err != nil {
-			return rv, NewError(stmt, err)
+			return rv, newError(stmt, err)
 		}
 		return rv, nil
 	case *ast.VarStmt:
-		rv := NilValue
 		var err error
-		rvs := []reflect.Value{}
-		for _, expr := range stmt.Exprs {
-			rv, err = invokeExpr(expr, env)
+		rvs := make([]reflect.Value, len(stmt.Exprs))
+		for i, expr := range stmt.Exprs {
+			rvs[i], err = invokeExpr(expr, env)
 			if err != nil {
-				return rv, NewError(expr, err)
+				return nilValue, newError(expr, err)
 			}
-			rvs = append(rvs, rv)
 		}
-		result := []interface{}{}
 		for i, name := range stmt.Names {
-			if i < len(rvs) {
-				env.Define(name, rvs[i])
-				result = append(result, rvs[i].Interface())
+			if i >= len(rvs) {
+				break
 			}
+			env.defineValue(name, rvs[i])
 		}
-		return reflect.ValueOf(result), nil
+		return rvs[len(rvs)-1], nil
 	case *ast.LetsStmt:
-		rv := NilValue
 		var err error
-		vs := []interface{}{}
-		for _, rhs := range stmt.Rhss {
-			rv, err = invokeExpr(rhs, env)
+		rvs := make([]reflect.Value, len(stmt.Rhss))
+		for i, rhs := range stmt.Rhss {
+			rvs[i], err = invokeExpr(rhs, env)
 			if err != nil {
-				return rv, NewError(rhs, err)
-			}
-			if rv == NilValue {
-				vs = append(vs, nil)
-			} else if rv.IsValid() && rv.CanInterface() {
-				vs = append(vs, rv.Interface())
-			} else {
-				vs = append(vs, nil)
+				return nilValue, newError(rhs, err)
 			}
 		}
-		rvs := reflect.ValueOf(vs)
-		if len(stmt.Lhss) > 1 && rvs.Len() == 1 {
-			item := rvs.Index(0)
-			if item.Kind() == reflect.Interface {
-				item = item.Elem()
+		if len(stmt.Lhss) > 1 && len(rvs) == 1 {
+			v := rvs[0]
+			if v.Kind() == reflect.Interface && !v.IsNil() {
+				v = v.Elem()
 			}
-			if item.Kind() == reflect.Slice {
-				rvs = item
+			if v.Kind() == reflect.Slice {
+				rvs = make([]reflect.Value, v.Len())
+				for i := 0; i < v.Len(); i++ {
+					rvs[i] = v.Index(i)
+				}
 			}
 		}
 		for i, lhs := range stmt.Lhss {
-			if i >= rvs.Len() {
+			if i >= len(rvs) {
 				break
 			}
-			v := rvs.Index(i)
+			v := rvs[i]
 			if v.Kind() == reflect.Interface && !v.IsNil() {
 				v = v.Elem()
 			}
 			_, err = invokeLetExpr(lhs, v, env)
 			if err != nil {
-				return NilValue, NewError(lhs, err)
+				return nilValue, newError(lhs, err)
 			}
 		}
-		if rvs.Len() == 1 {
-			return rvs.Index(0), nil
+		return rvs[len(rvs)-1], nil
+	case *ast.LetMapItemStmt:
+		rv, err := invokeExpr(stmt.Rhs, env)
+		if err != nil {
+			return nilValue, newError(stmt, err)
 		}
-		return rvs, nil
+		var rvs []reflect.Value
+		if rv != zeroValue {
+			rvs = []reflect.Value{rv, trueValue}
+		} else {
+			rvs = []reflect.Value{nilValue, falseValue}
+		}
+		for i, lhs := range stmt.Lhss {
+			v := rvs[i]
+			if v.Kind() == reflect.Interface && !v.IsNil() {
+				v = v.Elem()
+			}
+			_, err = invokeLetExpr(lhs, v, env)
+			if err != nil {
+				return nilValue, newError(lhs, err)
+			}
+		}
+		return rvs[0], nil
 	case *ast.IfStmt:
-		// If
+		// if
 		rv, err := invokeExpr(stmt.If, env)
 		if err != nil {
-			return rv, NewError(stmt, err)
+			return rv, newError(stmt.If, err)
 		}
+
 		if toBool(rv) {
-			// Then
+			// then
 			newenv := env.NewEnv()
-			defer newenv.Destroy()
-			rv, err = Run(stmt.Then, newenv)
+			rv, err = run(stmt.Then, newenv)
+			newenv.Destroy()
 			if err != nil {
-				return rv, NewError(stmt, err)
+				return rv, newError(stmt, err)
 			}
 			return rv, nil
 		}
-		done := false
-		if len(stmt.ElseIf) > 0 {
-			for _, stmt := range stmt.ElseIf {
-				stmt_if := stmt.(*ast.IfStmt)
-				// ElseIf
-				rv, err = invokeExpr(stmt_if.If, env)
-				if err != nil {
-					return rv, NewError(stmt, err)
-				}
-				if !toBool(rv) {
-					continue
-				}
-				// ElseIf Then
-				done = true
-				rv, err = Run(stmt_if.Then, env)
-				if err != nil {
-					return rv, NewError(stmt, err)
-				}
-				break
-			}
-		}
-		if !done && len(stmt.Else) > 0 {
-			// Else
+
+		for _, statment := range stmt.ElseIf {
+			elseIf := statment.(*ast.IfStmt)
+			// else if - if
 			newenv := env.NewEnv()
-			defer newenv.Destroy()
-			rv, err = Run(stmt.Else, newenv)
+			rv, err = invokeExpr(elseIf.If, newenv)
+			newenv.Destroy()
 			if err != nil {
-				return rv, NewError(stmt, err)
+				return rv, newError(elseIf.If, err)
+			}
+			if !toBool(rv) {
+				continue
+			}
+
+			// else if - then
+			newenv = env.NewEnv()
+			rv, err = run(elseIf.Then, newenv)
+			newenv.Destroy()
+			if err != nil {
+				return rv, newError(elseIf, err)
+			}
+			return rv, nil
+		}
+
+		if len(stmt.Else) > 0 {
+			// else
+			newenv := env.NewEnv()
+			rv, err = run(stmt.Else, newenv)
+			newenv.Destroy()
+			if err != nil {
+				return rv, newError(stmt, err)
 			}
 		}
+
 		return rv, nil
+
 	case *ast.TryStmt:
 		newenv := env.NewEnv()
 		defer newenv.Destroy()
-		_, err := Run(stmt.Try, newenv)
+		_, err := run(stmt.Try, newenv)
 		if err != nil {
 			// Catch
 			cenv := env.NewEnv()
 			defer cenv.Destroy()
 			if stmt.Var != "" {
-				cenv.Define(stmt.Var, reflect.ValueOf(err))
+				cenv.defineValue(stmt.Var, reflect.ValueOf(err))
 			}
-			_, e1 := Run(stmt.Catch, cenv)
+			_, e1 := run(stmt.Catch, cenv)
 			if e1 != nil {
-				err = NewError(stmt.Catch[0], e1)
+				err = newError(stmt.Catch[0], e1)
 			} else {
 				err = nil
 			}
@@ -174,18 +214,18 @@ func RunSingleStmt(stmt ast.Stmt, env *Env) (reflect.Value, error) {
 			// Finally
 			fenv := env.NewEnv()
 			defer fenv.Destroy()
-			_, e2 := Run(stmt.Finally, newenv)
+			_, e2 := run(stmt.Finally, newenv)
 			if e2 != nil {
-				err = NewError(stmt.Finally[0], e2)
+				err = newError(stmt.Finally[0], e2)
 			}
 		}
-		return NilValue, NewError(stmt, err)
+		return nilValue, newError(stmt, err)
 	case *ast.LoopStmt:
 		newenv := env.NewEnv()
 		defer newenv.Destroy()
 		for {
-			if env.catchInterrupt() {
-				return NilValue, InterruptError
+			if *(env.interrupt) {
+				return nilValue, ErrInterrupt
 			}
 			if stmt.Expr != nil {
 				ev, ee := invokeExpr(stmt.Expr, newenv)
@@ -197,65 +237,84 @@ func RunSingleStmt(stmt ast.Stmt, env *Env) (reflect.Value, error) {
 				}
 			}
 
-			rv, err := Run(stmt.Stmts, newenv)
-			if err != nil {
-				if err == BreakError {
-					err = nil
+			rv, err := run(stmt.Stmts, newenv)
+			if err != nil && err != ErrContinue {
+				if err == ErrBreak {
 					break
 				}
-				if err == ContinueError {
-					err = nil
-					continue
-				}
-				if err == ReturnError {
+				if err == ErrReturn {
 					return rv, err
 				}
-				return NilValue, NewError(stmt, err)
+				return nilValue, newError(stmt, err)
 			}
 		}
-		return NilValue, nil
+		return nilValue, nil
 	case *ast.ForStmt:
 		val, ee := invokeExpr(stmt.Value, env)
 		if ee != nil {
 			return val, ee
 		}
-		if val.Kind() == reflect.Interface {
+		if val.Kind() == reflect.Interface && !val.IsNil() {
 			val = val.Elem()
 		}
-		if val.Kind() == reflect.Array || val.Kind() == reflect.Slice {
+		switch val.Kind() {
+		case reflect.Slice, reflect.Array:
 			newenv := env.NewEnv()
 			defer newenv.Destroy()
 
 			for i := 0; i < val.Len(); i++ {
+				if *(env.interrupt) {
+					return nilValue, ErrInterrupt
+				}
 				iv := val.Index(i)
-				if iv.Kind() == reflect.Interface || iv.Kind() == reflect.Ptr {
+				if iv.Kind() == reflect.Ptr || (iv.Kind() == reflect.Interface && !iv.IsNil()) {
 					iv = iv.Elem()
 				}
-				newenv.Define(stmt.Var, iv)
-				rv, err := Run(stmt.Stmts, newenv)
-				if err != nil {
-					if err == BreakError {
-						err = nil
+				newenv.defineValue(stmt.Vars[0], iv)
+				rv, err := run(stmt.Stmts, newenv)
+				if err != nil && err != ErrContinue {
+					if err == ErrBreak {
 						break
 					}
-					if err == ContinueError {
-						err = nil
-						continue
-					}
-					if err == ReturnError {
+					if err == ErrReturn {
 						return rv, err
 					}
-					return NilValue, NewError(stmt, err)
+					return nilValue, newError(stmt, err)
 				}
 			}
-			return NilValue, nil
-		} else if val.Kind() == reflect.Chan {
+			return nilValue, nil
+		case reflect.Map:
+			newenv := env.NewEnv()
+			defer newenv.Destroy()
+
+			keys := val.MapKeys()
+			for i := 0; i < len(keys); i++ {
+				if *(env.interrupt) {
+					return nilValue, ErrInterrupt
+				}
+				newenv.defineValue(stmt.Vars[0], keys[i])
+				if len(stmt.Vars) > 1 {
+					newenv.defineValue(stmt.Vars[1], val.MapIndex(keys[i]))
+				}
+				rv, err := run(stmt.Stmts, newenv)
+				if err != nil && err != ErrContinue {
+					if err == ErrBreak {
+						break
+					}
+					if err == ErrReturn {
+						return rv, err
+					}
+					return nilValue, newError(stmt, err)
+				}
+			}
+			return nilValue, nil
+		case reflect.Chan:
 			newenv := env.NewEnv()
 			defer newenv.Destroy()
 
 			for {
-				if env.catchInterrupt() {
-					return NilValue, InterruptError
+				if *(env.interrupt) {
+					return nilValue, ErrInterrupt
 				}
 				iv, ok := val.Recv()
 				if !ok {
@@ -264,146 +323,138 @@ func RunSingleStmt(stmt ast.Stmt, env *Env) (reflect.Value, error) {
 				if iv.Kind() == reflect.Interface || iv.Kind() == reflect.Ptr {
 					iv = iv.Elem()
 				}
-				newenv.Define(stmt.Var, iv)
-				rv, err := Run(stmt.Stmts, newenv)
-				if err != nil {
-					if err == BreakError {
-						err = nil
+				newenv.defineValue(stmt.Vars[0], iv)
+				rv, err := run(stmt.Stmts, newenv)
+				if err != nil && err != ErrContinue {
+					if err == ErrBreak {
 						break
 					}
-					if err == ContinueError {
-						err = nil
-						continue
-					}
-					if err == ReturnError {
+					if err == ErrReturn {
 						return rv, err
 					}
-					return NilValue, NewError(stmt, err)
+					return nilValue, newError(stmt, err)
 				}
 			}
-			return NilValue, nil
-		} else {
-			return NilValue, NewStringError(stmt, "Invalid operation for non-array value")
+			return nilValue, nil
+		default:
+			return nilValue, newStringError(stmt, "for cannot loop over type "+val.Kind().String())
 		}
 	case *ast.CForStmt:
 		newenv := env.NewEnv()
 		defer newenv.Destroy()
 		_, err := invokeExpr(stmt.Expr1, newenv)
 		if err != nil {
-			return NilValue, err
+			return nilValue, err
 		}
 		for {
-			if env.catchInterrupt() {
-				return NilValue, InterruptError
+			if *(env.interrupt) {
+				return nilValue, ErrInterrupt
 			}
 			fb, err := invokeExpr(stmt.Expr2, newenv)
 			if err != nil {
-				return NilValue, err
+				return nilValue, err
 			}
 			if !toBool(fb) {
 				break
 			}
 
-			rv, err := Run(stmt.Stmts, newenv)
-			if err != nil {
-				if err == BreakError {
-					err = nil
+			rv, err := run(stmt.Stmts, newenv)
+			if err != nil && err != ErrContinue {
+				if err == ErrBreak {
 					break
 				}
-				if err == ContinueError {
-					err = nil
-					continue
-				}
-				if err == ReturnError {
+				if err == ErrReturn {
 					return rv, err
 				}
-				return NilValue, NewError(stmt, err)
+				return nilValue, newError(stmt, err)
 			}
 			_, err = invokeExpr(stmt.Expr3, newenv)
 			if err != nil {
-				return NilValue, err
+				return nilValue, err
 			}
 		}
-		return NilValue, nil
+		return nilValue, nil
 	case *ast.ReturnStmt:
+		var err error
+		rv := nilValue
 		switch len(stmt.Exprs) {
 		case 0:
-			return NilValue, nil
+			return rv, nil
 		case 1:
-			rv, err := invokeExpr(stmt.Exprs[0], env)
+			rv, err = invokeExpr(stmt.Exprs[0], env)
 			if err != nil {
-				return rv, NewError(stmt, err)
+				return rv, newError(stmt, err)
 			}
 			return rv, nil
 		}
-		rvs := []interface{}{}
-		for _, expr := range stmt.Exprs {
-			rv, err := invokeExpr(expr, env)
+		rvs := make([]interface{}, len(stmt.Exprs))
+		for i, expr := range stmt.Exprs {
+			rv, err = invokeExpr(expr, env)
 			if err != nil {
-				return rv, NewError(stmt, err)
+				return rv, newError(stmt, err)
 			}
-			if isNil(rv) {
-				rvs = append(rvs, nil)
-			} else if rv.IsValid() && rv.CanInterface() {
-				rvs = append(rvs, rv.Interface())
+			if !rv.IsValid() || !rv.CanInterface() {
+				rvs[i] = nil
 			} else {
-				rvs = append(rvs, nil)
+				rvs[i] = rv.Interface()
 			}
 		}
 		return reflect.ValueOf(rvs), nil
 	case *ast.ThrowStmt:
 		rv, err := invokeExpr(stmt.Expr, env)
 		if err != nil {
-			return rv, NewError(stmt, err)
+			return rv, newError(stmt, err)
 		}
 		if !rv.IsValid() {
-			return NilValue, NewError(stmt, err)
+			return nilValue, newError(stmt, err)
 		}
-		return rv, NewStringError(stmt, fmt.Sprint(rv.Interface()))
+		return rv, newStringError(stmt, fmt.Sprint(rv.Interface()))
 	case *ast.ModuleStmt:
 		newenv := env.NewEnv()
 		newenv.SetName(stmt.Name)
-		rv, err := Run(stmt.Stmts, newenv)
+		rv, err := run(stmt.Stmts, newenv)
 		if err != nil {
-			return rv, NewError(stmt, err)
+			return rv, newError(stmt, err)
 		}
-		env.DefineGlobal(stmt.Name, reflect.ValueOf(newenv))
+		env.defineGlobalValue(stmt.Name, reflect.ValueOf(newenv))
 		return rv, nil
 	case *ast.SwitchStmt:
 		rv, err := invokeExpr(stmt.Expr, env)
 		if err != nil {
-			return rv, NewError(stmt, err)
+			return rv, newError(stmt, err)
 		}
 		done := false
-		var default_stmt *ast.DefaultStmt
+		var defaultStmt *ast.DefaultStmt
 		for _, ss := range stmt.Cases {
 			if ssd, ok := ss.(*ast.DefaultStmt); ok {
-				default_stmt = ssd
+				defaultStmt = ssd
 				continue
 			}
-			case_stmt := ss.(*ast.CaseStmt)
-			cv, err := invokeExpr(case_stmt.Expr, env)
+			caseStmt := ss.(*ast.CaseStmt)
+			cv, err := invokeExpr(caseStmt.Expr, env)
 			if err != nil {
-				return NilValue, NewError(stmt, err)
+				return nilValue, newError(stmt, err)
 			}
 			if !equal(rv, cv) {
 				continue
 			}
-			rv, err = Run(case_stmt.Stmts, env)
+			rv, err = run(caseStmt.Stmts, env)
 			if err != nil {
-				return rv, NewError(stmt, err)
+				return rv, newError(stmt, err)
 			}
 			done = true
 			break
 		}
-		if !done && default_stmt != nil {
-			rv, err = Run(default_stmt.Stmts, env)
+		if !done && defaultStmt != nil {
+			rv, err = run(defaultStmt.Stmts, env)
 			if err != nil {
-				return rv, NewError(stmt, err)
+				return rv, newError(stmt, err)
 			}
 		}
 		return rv, nil
+	case *ast.GoroutineStmt:
+		return invokeExpr(stmt.Expr, env)
 	default:
-		return NilValue, NewStringError(stmt, "unknown statement")
+		return nilValue, newStringError(stmt, "unknown statement")
 	}
 }

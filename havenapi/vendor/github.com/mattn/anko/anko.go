@@ -6,179 +6,163 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
-	"path/filepath"
-	"reflect"
 	"strings"
 
-	"github.com/daviddengcn/go-colortext"
+	"github.com/mattn/anko/core"
+	"github.com/mattn/anko/packages"
 	"github.com/mattn/anko/parser"
 	"github.com/mattn/anko/vm"
-	"github.com/mattn/go-isatty"
-
-	anko_core "github.com/mattn/anko/builtins"
 )
 
-const version = "0.0.1"
+const version = "0.0.5"
 
 var (
-	fs   = flag.NewFlagSet(os.Args[0], 1)
-	line = fs.String("e", "", "One line of program")
-	v    = fs.Bool("v", false, "Display version")
-
-	istty = isatty.IsTerminal(os.Stdout.Fd())
+	flagExecute string
+	file        string
+	args        []string
+	env         *vm.Env
 )
 
-func colortext(color ct.Color, bright bool, f func()) {
-	if istty {
-		ct.ChangeColor(color, bright, ct.None, false)
-		f()
-		ct.ResetColor()
+func main() {
+	var exitCode int
+
+	parseFlags()
+	setupEnv()
+	if flagExecute != "" || flag.NArg() > 0 {
+		exitCode = runNonInteractive()
 	} else {
-		f()
+		exitCode = runInteractive()
 	}
+
+	os.Exit(exitCode)
 }
 
-func main() {
-	fs.Parse(os.Args[1:])
-	if *v {
+func parseFlags() {
+	flagVersion := flag.Bool("v", false, "prints out the version and then exits")
+	flag.StringVar(&flagExecute, "e", "", "execute the Anko code")
+	flag.Parse()
+
+	if *flagVersion {
 		fmt.Println(version)
 		os.Exit(0)
 	}
 
-	var (
-		code      string
-		b         []byte
-		reader    *bufio.Reader
-		following bool
-		source    string
-	)
-
-	env := vm.NewEnv()
-	interactive := fs.NArg() == 0 && *line == ""
-
-	env.Define("args", fs.Args())
-
-	if interactive {
-		reader = bufio.NewReader(os.Stdin)
-		source = "typein"
-		os.Args = append([]string{os.Args[0]}, fs.Args()...)
-	} else {
-		if *line != "" {
-			b = []byte(*line)
-			source = "argument"
-		} else {
-			var err error
-			b, err = ioutil.ReadFile(fs.Arg(0))
-			if err != nil {
-				colortext(ct.Red, false, func() {
-					fmt.Fprintln(os.Stderr, err)
-				})
-				os.Exit(1)
-			}
-			env.Define("args", fs.Args()[1:])
-			source = filepath.Clean(fs.Arg(0))
-		}
-		os.Args = fs.Args()
+	if flagExecute != "" || flag.NArg() < 1 {
+		args = flag.Args()
+		return
 	}
 
-	anko_core.LoadAllBuiltins(env)
+	file = flag.Arg(0)
+	args = flag.Args()[1:]
+}
+
+func setupEnv() {
+	env = vm.NewEnv()
+	env.Define("args", args)
+	core.Import(env)
+	packages.DefineImport(env)
+}
+
+func runNonInteractive() int {
+	var source string
+	if flagExecute != "" {
+		source = flagExecute
+	} else {
+		sourceBytes, err := ioutil.ReadFile(file)
+		if err != nil {
+			fmt.Println("ReadFile error:", err)
+			return 2
+		}
+		source = string(sourceBytes)
+	}
+
+	_, err := env.Execute(source)
+	if err != nil {
+		fmt.Println("Execute error:", err)
+		return 4
+	}
+
+	return 0
+}
+
+func runInteractive() int {
+	var following bool
+	var source string
+	scanner := bufio.NewScanner(os.Stdin)
+
+	parser.EnableErrorVerbose()
 
 	for {
-		if interactive {
-			colortext(ct.Green, true, func() {
-				if following {
-					fmt.Print("  ")
-				} else {
-					fmt.Print("> ")
-				}
-			})
-			var err error
-			b, _, err = reader.ReadLine()
-			if err != nil {
-				break
-			}
-			if len(b) == 0 {
-				continue
-			}
-			if code != "" {
-				code += "\n"
-			}
-			code += string(b)
+		if following {
+			source += "\n"
+			fmt.Print("  ")
 		} else {
-			code = string(b)
+			fmt.Print("> ")
 		}
 
-		parser.EnableErrorVerbose()
+		if !scanner.Scan() {
+			break
+		}
+		source += scanner.Text()
+		if source == "" {
+			continue
+		}
+		if source == "quit()" {
+			break
+		}
 
-		stmts, err := parser.ParseSrc(code)
+		stmts, err := parser.ParseSrc(source)
 
-		if interactive {
-			if e, ok := err.(*parser.Error); ok {
-				es := e.Error()
-				if strings.HasPrefix(es, "syntax error: unexpected") {
-					if strings.HasPrefix(es, "syntax error: unexpected $end,") {
-						following = true
-						continue
-					}
-				} else {
-					if e.Pos.Column == len(b) && !e.Fatal {
-						println(e.Error())
-						following = true
-						continue
-					}
-					if e.Error() == "unexpected EOF" {
-						following = true
-						continue
-					}
+		if e, ok := err.(*parser.Error); ok {
+			es := e.Error()
+			if strings.HasPrefix(es, "syntax error: unexpected") {
+				if strings.HasPrefix(es, "syntax error: unexpected $end,") {
+					following = true
+					continue
+				}
+			} else {
+				if e.Pos.Column == len(source) && !e.Fatal {
+					fmt.Fprintln(os.Stderr, e)
+					following = true
+					continue
+				}
+				if e.Error() == "unexpected EOF" {
+					following = true
+					continue
 				}
 			}
 		}
 
 		following = false
-		code = ""
-		v := vm.NilValue
+		source = ""
+		var v interface{}
 
 		if err == nil {
 			v, err = vm.Run(stmts, env)
 		}
 		if err != nil {
-			colortext(ct.Red, false, func() {
-				if e, ok := err.(*vm.Error); ok {
-					fmt.Fprintf(os.Stderr, "%s:%d:%d %s\n", source, e.Pos.Line, e.Pos.Column, err)
-				} else if e, ok := err.(*parser.Error); ok {
-					if e.Filename != "" {
-						source = e.Filename
-					}
-					fmt.Fprintf(os.Stderr, "%s:%d:%d %s\n", source, e.Pos.Line, e.Pos.Column, err)
-				} else {
-					fmt.Fprintln(os.Stderr, err)
-				}
-			})
+			if e, ok := err.(*vm.Error); ok {
+				fmt.Fprintf(os.Stderr, "%d:%d %s\n", e.Pos.Line, e.Pos.Column, err)
+			} else if e, ok := err.(*parser.Error); ok {
+				fmt.Fprintf(os.Stderr, "%d:%d %s\n", e.Pos.Line, e.Pos.Column, err)
+			} else {
+				fmt.Fprintln(os.Stderr, err)
+			}
+			continue
+		}
 
-			if interactive {
-				continue
-			} else {
-				os.Exit(1)
-			}
-		} else {
-			if interactive {
-				colortext(ct.Black, true, func() {
-					if v == vm.NilValue || !v.IsValid() {
-						fmt.Println("nil")
-					} else {
-						s, ok := v.Interface().(fmt.Stringer)
-						if v.Kind() != reflect.String && ok {
-							fmt.Println(s)
-						} else {
-							fmt.Printf("%#v\n", v.Interface())
-						}
-					}
-				})
-			} else {
-				break
-			}
+		fmt.Printf("%#v\n", v)
+	}
+
+	if err := scanner.Err(); err != nil {
+		if err != io.EOF {
+			fmt.Fprintln(os.Stderr, "ReadString error:", err)
+			return 12
 		}
 	}
+
+	return 0
 }

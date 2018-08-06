@@ -8,8 +8,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/gobuffalo/pop/nulls"
 	"github.com/gobuffalo/x/httpx"
-	"github.com/markbates/pop/nulls"
 	"github.com/monoculum/formam"
 	"github.com/pkg/errors"
 )
@@ -30,6 +30,7 @@ var timeFormats = []string{
 	"2006-01-02T15:04:05Z07:00",
 	"01/02/2006",
 	"2006-01-02",
+	"2006-01-02T03:04",
 	time.ANSIC,
 	time.UnixDate,
 	time.RubyDate,
@@ -122,7 +123,6 @@ func init() {
 	binders["application/html"] = sb
 	binders["text/html"] = sb
 	binders["application/x-www-form-urlencoded"] = sb
-	binders["multipart/form-data"] = sb
 	binders["html"] = sb
 }
 

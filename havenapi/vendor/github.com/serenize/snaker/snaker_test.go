@@ -51,6 +51,10 @@ var _ = Describe("Snaker", func() {
 		It("sould work with concat initialisms", func() {
 			Expect(CamelToSnake("HTTPSID")).To(Equal("https_id"))
 		})
+
+		It("sould work with initialism where only certain characters are uppercase", func() {
+			Expect(CamelToSnake("OAuthClient")).To(Equal("oauth_client"))
+		})
 	})
 
 	Describe("SnakeToCamel test", func() {
@@ -77,6 +81,10 @@ var _ = Describe("Snaker", func() {
 
 		It("should simply work with id", func() {
 			Expect(SnakeToCamel("id")).To(Equal("ID"))
+		})
+
+		It("sould work with initialism where only certain characters are uppercase", func() {
+			Expect(SnakeToCamel("oauth_client")).To(Equal("OAuthClient"))
 		})
 	})
 
