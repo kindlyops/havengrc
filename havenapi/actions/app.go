@@ -13,6 +13,7 @@ import (
 	"github.com/gobuffalo/envy"
 	"github.com/gobuffalo/pop"
 	"github.com/gobuffalo/x/sessions"
+	"github.com/rs/cors"
 	"github.com/unrolled/secure"
 	jose "gopkg.in/square/go-jose.v2"
 	jwt "gopkg.in/square/go-jose.v2/jwt"
@@ -42,7 +43,7 @@ func App() *buffalo.App {
 			PreWares: []buffalo.PreWare{
 				cors.Default().Handler,
 			},
-			SessionName:  "_havenapi_session",
+			SessionName: "_havenapi_session",
 		})
 
 		rawKey, err := ioutil.ReadFile(KEY)

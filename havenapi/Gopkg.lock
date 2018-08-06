@@ -290,6 +290,12 @@
   version = "v1.0.0"
 
 [[projects]]
+  name = "github.com/rs/cors"
+  packages = ["."]
+  revision = "3fb1b69b103a84de38a19c3c6ec073dd6caa4d3f"
+  version = "v1.5.0"
+
+[[projects]]
   branch = "master"
   name = "github.com/russross/blackfriday"
   packages = ["."]
@@ -436,6 +442,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "25ca02d28993e266562a55755fa67a2a882f758eacde248a66abc12c24c83ba5"
+  inputs-digest = "018ed0b99dd33db7f5b4d8f40db304845db24d32362b621c12cf8748dc4318eb"
   solver-name = "gps-cdcl"
   solver-version = 1
