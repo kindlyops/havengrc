@@ -11,9 +11,11 @@ import (
 )
 
 type jBody struct {
-	Method  string `json:"method"`
-	Name    string `json:"name"`
-	Message string `json:"message"`
+	Method   string `json:"method"`
+	Name     string `json:"name"`
+	Message  string `json:"message"`
+	Username string `json:"username"`
+	Password string `json:"password"`
 }
 
 func JSONApp() http.Handler {
@@ -34,6 +36,10 @@ func JSONApp() http.Handler {
 	})
 	p.Post("/post", func(res http.ResponseWriter, req *http.Request) {
 		jb := jBody{}
+		if u, p, ok := req.BasicAuth(); ok {
+			jb.Username = u
+			jb.Password = p
+		}
 		json.NewDecoder(req.Body).Decode(&jb)
 		jb.Method = req.Method
 		json.NewEncoder(res).Encode(jb)
@@ -131,6 +137,25 @@ func Test_JSON_Post_Struct_Pointer(t *testing.T) {
 	res.Bind(jb)
 	r.Equal("POST", jb.Method)
 	r.Equal("Mark", jb.Name)
+	r.Equal("", jb.Username)
+	r.Equal("", jb.Password)
+}
+
+func Test_JSON_Post_Set_Basic_Auth(t *testing.T) {
+	r := require.New(t)
+	w := willie.New(JSONApp())
+
+	req := w.JSON("/post")
+	req.Username = "willie_username"
+	req.Password = "willie_password"
+	res := req.Post(&User{Name: "Mark"})
+
+	jb := &jBody{}
+	res.Bind(jb)
+	r.Equal("POST", jb.Method)
+	r.Equal("Mark", jb.Name)
+	r.Equal("willie_username", jb.Username)
+	r.Equal("willie_password", jb.Password)
 }
 
 func Test_JSON_Put(t *testing.T) {

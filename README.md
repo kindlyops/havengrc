@@ -52,6 +52,14 @@ If you cannot connect to [localhost](http://localhost:2015), try getting the doc
 
 Open [localhost:3002](http://localhost:3002/)
 
+The swagger browser is loading the authenicated api by default. To view the public API, adjust the file being loaded to public.json.
+
+To refresh the swagger documentation, such as after modifying postgres to expose additional APIs, use these commands
+
+    curl http://localhost:2015/api/ > webui/public/swagger/public.json
+    export TOKEN=`./get-token`
+    curl -H "Authorization: Bearer $TOKEN" http://localhost:2015/api/ > webui/public/swagger/authenticated.json
+
 ## to access keycloak
 
 Open [localhost:8080](http://localhost:8080/), you can sign in with admin/admin
@@ -125,9 +133,7 @@ The psql client is installed in the flyway image, and can connect to the DB serv
     SELECT * from foo LIMIT 1;  # run arbitrary queries
     \q                          # disconnect
 
-We also have pgadmin4 running on http://localhost:8081. You can sign in using user1@havengrc.com/password.
-Once inside pgadmin4, you will need to add a server, the server hostname is 'db' and the credentials are
-postgres/postgres.
+We also have pgadmin4 running on http://localhost:8081. You can sign in using user1\@havengrc.com/password. Once inside pgadmin4, you will need to add a server, the server hostname is 'db' and the credentials are postgres/postgres.
 
 ## Use REST client to interact with the API
 

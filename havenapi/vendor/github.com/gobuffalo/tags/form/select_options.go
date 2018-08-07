@@ -5,21 +5,21 @@ import (
 	"html/template"
 )
 
+// SelectOption describes a HTML <select> tag <option> meta data.
 type SelectOption struct {
-	Value         interface{}
-	Label         interface{}
-	SelectedValue interface{}
+	Value    interface{}
+	Label    interface{}
+	Selected bool
 }
 
 func (s SelectOption) String() string {
 	v := template.HTMLEscaper(s.Value)
-	sv := template.HTMLEscaper(s.SelectedValue)
 	l := template.HTMLEscaper(s.Label)
 	bb := &bytes.Buffer{}
 	bb.WriteString(`<option value="`)
 	bb.WriteString(v)
 	bb.WriteString(`"`)
-	if v == sv {
+	if s.Selected {
 		bb.WriteString(` selected`)
 	}
 	bb.WriteString(`>`)
@@ -28,4 +28,5 @@ func (s SelectOption) String() string {
 	return bb.String()
 }
 
+// SelectOptions is a slice of SelectOption
 type SelectOptions []SelectOption

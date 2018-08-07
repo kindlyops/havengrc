@@ -10,9 +10,10 @@ import (
 func (b *Builder) buildAssets() error {
 
 	if b.WithWebpack && b.Options.WithAssets {
-		envy.Set("NODE_ENV", "production")
-		err := b.exec(webpack.BinPath)
-		if err != nil {
+		if err := envy.MustSet("NODE_ENV", "production"); err != nil {
+			return errors.WithStack(err)
+		}
+		if err := b.exec(webpack.BinPath); err != nil {
 			return errors.WithStack(err)
 		}
 	}
@@ -22,6 +23,8 @@ func (b *Builder) buildAssets() error {
 
 	if !b.Options.WithAssets {
 		p.IgnoredBoxes = append(p.IgnoredBoxes, "../public/assets")
+	} else {
+		p.IgnoredFolders = p.IgnoredFolders[1:]
 	}
 
 	if b.ExtractAssets && b.Options.WithAssets {

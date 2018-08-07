@@ -2,17 +2,20 @@ package packr
 
 import (
 	"bytes"
+	"compress/gzip"
 	"io/ioutil"
 	"net/http"
 	"os"
+	"path"
 	"path/filepath"
 	"runtime"
 	"strings"
 
-	"compress/gzip"
-
-	"github.com/gobuffalo/envy"
 	"github.com/pkg/errors"
+)
+
+var (
+	ErrResOutsideBox = errors.New("Can't find a resource outside the box")
 )
 
 // NewBox returns a Box that can be used to
@@ -29,21 +32,31 @@ func NewBox(path string) Box {
 	cov := filepath.Join("_test", "_obj_test")
 	cd = strings.Replace(cd, string(filepath.Separator)+cov, "", 1)
 	if !filepath.IsAbs(cd) && cd != "" {
-		cd = filepath.Join(envy.GoPath(), "src", cd)
+		cd = filepath.Join(GoPath(), "src", cd)
 	}
 
 	return Box{
 		Path:       path,
 		callingDir: cd,
+		data:       map[string][]byte{},
 	}
 }
 
 // Box represent a folder on a disk you want to
 // have access to in the built Go binary.
 type Box struct {
-	Path       string
-	callingDir string
-	data       map[string][]byte
+	Path        string
+	callingDir  string
+	data        map[string][]byte
+	directories map[string]bool
+}
+
+func (b Box) AddString(path string, t string) {
+	b.AddBytes(path, []byte(t))
+}
+
+func (b Box) AddBytes(path string, t []byte) {
+	b.data[path] = t
 }
 
 // String of the file asked for or an empty string.
@@ -73,10 +86,10 @@ func (b Box) MustBytes(name string) ([]byte, error) {
 		bb.ReadFrom(f)
 		return bb.Bytes(), err
 	}
-	p := filepath.Join(b.callingDir, b.Path, name)
-	return ioutil.ReadFile(p)
+	return nil, err
 }
 
+// Has returns true if the resource exists in the box
 func (b Box) Has(name string) bool {
 	_, err := b.find(name)
 	if err != nil {
@@ -98,47 +111,69 @@ func (b Box) decompress(bb []byte) []byte {
 }
 
 func (b Box) find(name string) (File, error) {
-	name = strings.TrimPrefix(name, "/")
-	name = filepath.ToSlash(name)
-	if _, ok := data[b.Path]; ok {
-		if bb, ok := data[b.Path][name]; ok {
-			bb = b.decompress(bb)
-			return newVirtualFile(name, bb), nil
-		}
-		if filepath.Ext(name) != "" {
-			return nil, errors.Errorf("could not find virtual file: %s", name)
-		}
-		return newVirtualDir(name), nil
+	if bb, ok := b.data[name]; ok {
+		return newVirtualFile(name, bb), nil
+	}
+	if b.directories == nil {
+		b.indexDirectories()
 	}
 
-	p := filepath.Join(b.callingDir, b.Path, name)
-	if f, err := os.Open(p); err == nil {
-		return physicalFile{f}, nil
+	cleanName := filepath.ToSlash(filepath.Clean(name))
+	// Ensure name is not outside the box
+	if strings.HasPrefix(cleanName, "../") {
+		return nil, ErrResOutsideBox
 	}
-	// make one last ditch effort to find the file below the PWD:
-	pwd, _ := os.Getwd()
-	p = filepath.Join(pwd, b.Path, name)
-	if f, err := os.Open(p); err == nil {
-		return physicalFile{f}, nil
+	// Absolute name is considered as relative to the box root
+	cleanName = strings.TrimPrefix(cleanName, "/")
+
+	// Try to get the resource from the box
+	if _, ok := data[b.Path]; ok {
+		if bb, ok := data[b.Path][cleanName]; ok {
+			bb = b.decompress(bb)
+			return newVirtualFile(cleanName, bb), nil
+		}
+		if filepath.Ext(cleanName) != "" {
+			// The Handler created by http.FileSystem checks for those errors and
+			// returns http.StatusNotFound instead of http.StatusInternalServerError.
+			return nil, os.ErrNotExist
+		}
+		if _, ok := b.directories[cleanName]; ok {
+			return newVirtualDir(cleanName), nil
+		}
+		return nil, os.ErrNotExist
 	}
-	return nil, errors.Errorf("could not find %s in box %s", name, b.Path)
+
+	// Not found in the box virtual fs, try to get it from the file system
+	cleanName = filepath.FromSlash(cleanName)
+	p := filepath.Join(b.callingDir, b.Path, cleanName)
+	return fileFor(p, cleanName)
 }
 
 type WalkFunc func(string, File) error
 
 func (b Box) Walk(wf WalkFunc) error {
 	if data[b.Path] == nil {
-		base := filepath.Join(b.callingDir, b.Path)
+		base, err := filepath.EvalSymlinks(filepath.Join(b.callingDir, b.Path))
+		if err != nil {
+			return errors.WithStack(err)
+		}
 		return filepath.Walk(base, func(path string, info os.FileInfo, err error) error {
-			shortPath := strings.TrimPrefix(path, base)
+			cleanName, err := filepath.Rel(base, path)
+			if err != nil {
+				cleanName = strings.TrimPrefix(path, base)
+			}
+			cleanName = filepath.ToSlash(filepath.Clean(cleanName))
+			cleanName = strings.TrimPrefix(cleanName, "/")
+			cleanName = filepath.FromSlash(cleanName)
 			if info == nil || info.IsDir() {
 				return nil
 			}
-			f, err := os.Open(path)
+
+			file, err := fileFor(path, cleanName)
 			if err != nil {
 				return err
 			}
-			return wf(shortPath, physicalFile{f})
+			return wf(cleanName, file)
 		})
 	}
 	for n := range data[b.Path] {
@@ -163,7 +198,7 @@ func (b Box) Open(name string) (http.File, error) {
 func (b Box) List() []string {
 	var keys []string
 
-	if b.data == nil {
+	if b.data == nil || len(b.data) == 0 {
 		b.Walk(func(path string, info File) error {
 			finfo, _ := info.FileInfo()
 			if !finfo.IsDir() {
@@ -177,4 +212,30 @@ func (b Box) List() []string {
 		}
 	}
 	return keys
+}
+
+func (b *Box) indexDirectories() {
+	b.directories = map[string]bool{}
+	if _, ok := data[b.Path]; ok {
+		for name := range data[b.Path] {
+			prefix, _ := path.Split(name)
+			// Even on Windows the suffix appears to be a /
+			prefix = strings.TrimSuffix(prefix, "/")
+			b.directories[prefix] = true
+		}
+	}
+}
+
+func fileFor(p string, name string) (File, error) {
+	fi, err := os.Stat(p)
+	if err != nil {
+		return nil, err
+	}
+	if fi.IsDir() {
+		return newVirtualDir(p), nil
+	}
+	if bb, err := ioutil.ReadFile(p); err == nil {
+		return newVirtualFile(name, bb), nil
+	}
+	return nil, os.ErrNotExist
 }

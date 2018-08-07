@@ -80,7 +80,6 @@ func randStringBytes(n int) string {
 }
 
 func initDatabase(t *testing.T, db *sql.DB, rowCount int64) {
-	t.Logf("Executing db initializing statements")
 	for _, query := range testTableStatements {
 		_, err := db.Exec(query)
 		if err != nil {
@@ -132,5 +131,26 @@ func TestShortTimeout(t *testing.T) {
 	}
 	if ctx.Err() != nil && ctx.Err() != context.DeadlineExceeded {
 		t.Fatal(ctx.Err())
+	}
+}
+
+func TestExecCancel(t *testing.T) {
+	db, err := sql.Open("sqlite3", ":memory:")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+
+	if _, err = db.Exec("create table foo (id integer primary key)"); err != nil {
+		t.Fatal(err)
+	}
+
+	for n := 0; n < 100; n++ {
+		ctx, cancel := context.WithCancel(context.Background())
+		_, err = db.ExecContext(ctx, "insert into foo (id) values (?)", n)
+		cancel()
+		if err != nil {
+			t.Fatal(err)
+		}
 	}
 }

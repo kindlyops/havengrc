@@ -51,6 +51,19 @@ func (w *Willie) JSON(u string, args ...interface{}) *JSON {
 	}
 }
 
+func (w *Willie) XML(u string, args ...interface{}) *XML {
+	hs := map[string]string{}
+	for key, val := range w.Headers {
+		hs[key] = val
+	}
+	hs["Content-Type"] = "application/xml"
+	return &XML{
+		URL:     fmt.Sprintf(u, args...),
+		Willie:  w,
+		Headers: hs,
+	}
+}
+
 func New(h http.Handler) *Willie {
 	return &Willie{
 		Handler: h,

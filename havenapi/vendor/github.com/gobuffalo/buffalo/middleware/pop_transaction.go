@@ -6,14 +6,15 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/gobuffalo/buffalo"
-	"github.com/markbates/pop"
+	"github.com/gobuffalo/pop"
 )
 
 // PopTransaction is a piece of Buffalo middleware that wraps each
-// request in a transaction that will automatically get committed or
-// rolledback. It will also add a field to the log, "db", that
-// shows the total duration spent during the request making database
-// calls.
+// request in a transaction. The transaction will automatically get
+// committed if there's no errors and the response status code is a
+// 2xx or 3xx, otherwise it'll be rolled back. It will also add a
+// field to the log, "db", that shows the total duration spent during
+// the request making database calls.
 var PopTransaction = func(db *pop.Connection) buffalo.MiddlewareFunc {
 	return func(h buffalo.Handler) buffalo.Handler {
 		return func(c buffalo.Context) error {

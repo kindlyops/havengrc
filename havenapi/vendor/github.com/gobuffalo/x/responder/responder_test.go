@@ -39,12 +39,18 @@ func Test_Wants(t *testing.T) {
 		return nil
 	})
 
+	res.Wants("json", func(c buffalo.Context) error {
+		value = "json!"
+		return nil
+	})
+
 	err := res.Respond(htmlCtx)
 	r.NoError(err)
 	r.Equal("html!", value)
 
 	err = res.Respond(jsonCtx)
-	r.Error(err)
+	r.NoError(err)
+	r.Equal("json!", value)
 
 	value = ""
 	err = res.Respond(formCtx)
@@ -59,6 +65,9 @@ func Test_Wants_Chain(t *testing.T) {
 	res := Wants("html", func(c buffalo.Context) error {
 		value = "html!"
 		return nil
+	}).Wants("json", func(c buffalo.Context) error {
+		value = "json!"
+		return nil
 	})
 
 	err := res.Respond(htmlCtx)
@@ -66,7 +75,8 @@ func Test_Wants_Chain(t *testing.T) {
 	r.Equal("html!", value)
 
 	err = res.Respond(jsonCtx)
-	r.Error(err)
+	r.NoError(err)
+	r.Equal("json!", value)
 
 	value = ""
 	err = res.Respond(formCtx)

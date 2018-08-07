@@ -3,12 +3,14 @@ package buffalo
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"path"
 	"reflect"
 	"sort"
 	"strings"
 
 	"github.com/markbates/inflect"
+	"github.com/pkg/errors"
 )
 
 // GET maps an HTTP "GET" request to the path and the specified handler.
@@ -54,22 +56,21 @@ func (a *App) Redirect(status int, from, to string) *RouteInfo {
 }
 
 // Mount mounts a http.Handler (or Buffalo app) and passes through all requests to it.
-/*
-func muxer() http.Handler {
-	f := func(res http.ResponseWriter, req *http.Request) {
-		fmt.Fprintf(res, "%s - %s", req.Method, req.URL.String())
-	}
-	mux := mux.NewRouter()
-	mux.HandleFunc("/foo", f).Methods("GET")
-	mux.HandleFunc("/bar", f).Methods("POST")
-	mux.HandleFunc("/baz/baz", f).Methods("DELETE")
-	return mux
-}
-
-a.Mount("/admin", muxer())
-
-$ curl -X DELETE http://localhost:3000/admin/baz/baz
-*/
+//
+//	func muxer() http.Handler {
+//		f := func(res http.ResponseWriter, req *http.Request) {
+//			fmt.Fprintf(res, "%s - %s", req.Method, req.URL.String())
+//		}
+//		mux := mux.NewRouter()
+//		mux.HandleFunc("/foo", f).Methods("GET")
+//		mux.HandleFunc("/bar", f).Methods("POST")
+//		mux.HandleFunc("/baz/baz", f).Methods("DELETE")
+//		return mux
+//	}
+//
+//	a.Mount("/admin", muxer())
+//
+//	$ curl -X DELETE http://localhost:3000/admin/baz/baz
 func (a *App) Mount(p string, h http.Handler) {
 	prefix := path.Join(a.Prefix, p)
 	path := path.Join(p, "{path:.+}")
@@ -83,7 +84,20 @@ func (a *App) Mount(p string, h http.Handler) {
 */
 func (a *App) ServeFiles(p string, root http.FileSystem) {
 	path := path.Join(a.Prefix, p)
-	a.router.PathPrefix(path).Handler(http.StripPrefix(path, http.FileServer(root)))
+	a.router.PathPrefix(path).Handler(http.StripPrefix(path, a.fileServer(root)))
+}
+
+func (a *App) fileServer(fs http.FileSystem) http.Handler {
+	fsh := http.FileServer(fs)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, err := fs.Open(path.Clean(r.URL.Path))
+		if os.IsNotExist(err) {
+			eh := a.ErrorHandlers.Get(404)
+			eh(404, errors.Errorf("could not find %s", r.URL.Path), a.newContext(RouteInfo{}, w, r))
+			return
+		}
+		fsh.ServeHTTP(w, r)
+	})
 }
 
 // Resource maps an implementation of the Resource interface
@@ -117,10 +131,18 @@ func (a *App) Resource(p string, r Resource) *App {
 	rt := rv.Type()
 	rname := fmt.Sprintf("%s.%s", rt.PkgPath(), rt.Name()) + ".%s"
 
-	name := strings.Replace(rt.Name(), "Resource", "", 1)
-	paramName := inflect.Singularize(inflect.Underscore(name))
+	name := strings.TrimSuffix(rt.Name(), "Resource")
+	paramName := inflect.Name(name).ParamID()
 
-	spath := path.Join(p, fmt.Sprintf("{%s_id}", paramName))
+	type paramKeyable interface {
+		ParamKey() string
+	}
+
+	if pk, ok := r.(paramKeyable); ok {
+		paramName = pk.ParamKey()
+	}
+
+	spath := path.Join(p, "{"+paramName+"}")
 	setFuncKey(r.List, fmt.Sprintf(rname, "List"))
 	g.GET(p, r.List)
 	setFuncKey(r.New, fmt.Sprintf(rname, "New"))

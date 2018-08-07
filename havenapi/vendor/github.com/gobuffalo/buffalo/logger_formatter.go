@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"regexp"
 	"sort"
 	"strings"
 	"sync"
@@ -17,12 +18,10 @@ import (
 )
 
 const (
-	nocolor = 0
-	red     = 31
-	green   = 32
-	yellow  = 33
-	blue    = 36
-	gray    = 37
+	red    = 31
+	yellow = 33
+	blue   = 36
+	gray   = 37
 )
 
 // textFormatter formats logs into text
@@ -118,15 +117,11 @@ func (f *textFormatter) needsQuoting(text string) bool {
 	if len(text) == 0 {
 		return true
 	}
-	for _, ch := range text {
-		if !((ch >= 'a' && ch <= 'z') ||
-			(ch >= 'A' && ch <= 'Z') ||
-			(ch >= '0' && ch <= '9') ||
-			ch == '-' || ch == '.' || ch == '_' || ch == '/' || ch == '@' || ch == '^' || ch == '+') {
-			return true
-		}
+	matched, err := regexp.MatchString("[^a-zA-Z\\-\\._\\/@\\^\\+]", text)
+	if err != nil {
+		return false
 	}
-	return false
+	return matched
 }
 
 func (f *textFormatter) appendKeyValue(b *bytes.Buffer, key string, value interface{}) {
