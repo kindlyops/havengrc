@@ -4,6 +4,10 @@ plugins:
     enabled: true
   gofmt:
     enabled: true
+  golint:
+    enabled: true
+  govet:
+    enabled: true
   sonar-java:
     enabled: true
     config:
@@ -12,7 +16,17 @@ plugins:
     enabled: true
   markdownlint:
     enabled: true
-
+exclude_paths:
+  - grifts/**/*
+  - "**/*_test.go"
+  - "*_test.go"
+  - "**_test.go"
+  - logs/*
+  - public/*
+  - templates/*
+ratings:
+  paths:
+    - "**.go"
 exclude_patterns:
 - "**/vendor/"
 - "webui/public/"
