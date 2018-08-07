@@ -34,6 +34,17 @@ spec:
                   key: password
             - name: HAVEN_JWK_PATH
               value: "/etc/haven-credentials/jwk.json"
+            - name: KC_HOST
+              value: "http://webui"
+            - name: KC_PORT
+              value: "8443"
+            - name: KC_ADMIN
+              value: "admin"
+            - name: KC_PW
+              valueFrom:
+                secretKeyRef:
+                  name: haven-database-credentials
+                  key: password
           volumeMounts:
             - name: secret-volume
               mountPath: /etc/haven-credentials/
