@@ -37,9 +37,9 @@ view =
                                     , section []
                                         [ p []
                                             [ text "The " , dfn []
-                                                [ text "Software" ] , text " is " 
+                                                [ text "Software " ] , text "is " 
                                             , span [ class "blank" ]
-                                                [ text "Haven GRC" ] , text " , for " 
+                                                [ text "Haven GRC" ] , text ", for  " 
                                             , span [ class "blank" ]
                                                 [ text "tamper proof evidence storage, compliance, and risk dashboard" ] , text "." 
                                             ]
@@ -47,25 +47,25 @@ view =
                                     , section []
                                         [ p []
                                             [ text "The " , dfn []
-                                                [ text "Website" ] , text " is at " 
+                                                [ text "Website " ] , text "is at " 
                                             , span [ class "blank" ]
-                                                [ text " https://havengrc.com/ " ] , text "." 
+                                                [ text "https://havengrc.com/ " ] , text "." 
                                             ]
                                         ]
                                     , section []
                                         [ p []
                                             [ text "The " , dfn []
-                                                [ text "Account Dashboard" ] , text " is at " 
+                                                [ text "Account Dashboard " ] , text "is at " 
                                             , span [ class "blank" ]
-                                                [ text " https://account.havengrc.com/ " ] , text "." 
+                                                [ text "https://account.havengrc.com/ " ] , text "." 
                                             ]
                                         ]
                                     , section []
                                         [ p []
                                             [ text "The " , dfn []
-                                                [ text "Documentation" ] , text " is at " 
+                                                [ text "Documentation " ] , text "is at " 
                                             , span [ class "blank" ]
-                                                [ text " https://docs.havengrc.com/ " ] , text "." 
+                                                [ text "https://docs.havengrc.com/ " ] , text "." 
                                             ]
                                         ]
                                     ]
@@ -74,39 +74,39 @@ view =
                                         [ text "Order" ]
                                     , section []
                                         [ p []
-                                            [ text "These terms, together with the specifics of the accompanying" , span [ class "term" ]
-                                                [ text "Order" ] , text ", govern" 
+                                            [ text "These terms, together with the specifics of the accompanying " , span [ class "term" ]
+                                                [ text "Order" ] , text ", govern " 
                                             , span [ class "term" ]
-                                                [ text "Customer" ] , text "'"  , text "s use of the" 
+                                                [ text "Customer" ] , text "'"  , text "s use of the " 
                                             , span [ class "term" ]
-                                                [ text "Software" ] , text ". The" 
+                                                [ text "Software" ] , text ". The " 
                                             , dfn []
-                                                [ text "Order" ] , text "is either:" 
+                                                [ text "Order " ] , text "is either: " 
                                             ]
                                         , section []
                                             [ p []
-                                                [ text "the order" , span [ class "term" ]
-                                                    [ text "Customer" ] , text "submitted through the" 
+                                                [ text "the order " , span [ class "term" ]
+                                                    [ text "Customer " ] , text "submitted through the " 
                                                 , span [ class "term" ]
-                                                    [ text "Account Dashboard" ] , text ", for a" 
+                                                    [ text "Account Dashboard" ] , text ", for a " 
                                                 , span [ class "term" ]
-                                                    [ text "Product Package" ] , text "that" 
+                                                    [ text "Product Package " ] , text "that " 
                                                 , span [ class "term" ]
-                                                    [ text "Provider" ] , text "offered through the" 
+                                                    [ text "Provider " ] , text "offered through the " 
                                                 , span [ class "term" ]
                                                     [ text "Account Dashboard" ]
                                                 ]
                                             ]
                                         , section []
                                             [ p []
-                                                [ text "the purchase order" , span [ class "term" ]
-                                                    [ text "Customer" ] , text "sent" 
+                                                [ text "the purchase order " , span [ class "term" ]
+                                                    [ text "Customer " ] , text "sent " 
                                                 , span [ class "term" ]
-                                                    [ text "Provider" ] , text ", for a" 
+                                                    [ text "Provider" ] , text ", for a " 
                                                 , span [ class "term" ]
-                                                    [ text "Product Package" ] , text "that" 
+                                                    [ text "Product Package " ] , text "that " 
                                                 , span [ class "term" ]
-                                                    [ text "Provider" ] , text "quoted to" 
+                                                    [ text "Provider " ] , text "quoted to " 
                                                 , span [ class "term" ]
                                                     [ text "Customer" ]
                                                 ]
@@ -114,27 +114,27 @@ view =
                                         ]
                                     , section []
                                         [ p []
-                                            [ text "A"  , dfn []
-                                                [ text "Product Package" ] , text "is an offer of specific" 
+                                            [ text "A "  , dfn []
+                                                [ text "Product Package " ] , text "is an offer of specific " 
                                             , dfn []
-                                                [ text "Deal Terms" ] , text "from" 
+                                                [ text "Deal Terms " ] , text "from " 
                                             , span [ class "term" ]
                                                 [ text "Provider" ] , text ":" 
                                             ]
                                         , section []
                                             [ p []
                                                 [ span [ class "term" ]
-                                                    [ text "Hosted Software" ] , text "or" 
+                                                    [ text "Hosted Software " ] , text "or " 
                                                 , span [ class "term" ]
-                                                    [ text "Licensed Software" ]
+                                                    [ text "Licensed Software " ]
                                                 ]
                                             ]
                                         , section []
                                             [ p []
                                                 [ text "a" , dfn []
-                                                    [ text "Feature Set" ] , text "of" 
+                                                    [ text "Feature Set " ] , text "of " 
                                                 , span [ class "term" ]
-                                                    [ text "Software Features" ]
+                                                    [ text "Software Features " ]
                                                 ]
                                             ]
                                         , section []
