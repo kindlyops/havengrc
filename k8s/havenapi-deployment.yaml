@@ -35,7 +35,7 @@ spec:
             - name: HAVEN_JWK_PATH
               value: "/etc/haven-credentials/jwk.json"
             - name: KC_HOST
-              value: "http://webui"
+              value: "https://webui"
             - name: KC_PORT
               value: "8443"
             - name: KC_ADMIN
