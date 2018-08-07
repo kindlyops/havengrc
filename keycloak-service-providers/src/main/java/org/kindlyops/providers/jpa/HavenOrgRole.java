@@ -13,9 +13,6 @@ import javax.persistence.Table;
             <column name="ID" type="int", autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="ORGANIZATION_ID" type="int">
-                <constraints nullable="false"/>
-            </column>
             <column name="ROLE" type="VARCHAR(36)">
                 <constraints nullable="false"/>
             </column>
@@ -24,15 +21,11 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "HAVEN_ORG_ROLE")
-@NamedQueries({ @NamedQuery(name = "findByRole", query = "from HavenOrgRole where role = :role") })
 public class HavenOrgRole {
 
     @Id
     @Column(name = "ID")
     private String id;
-
-    @Column(name = "ORGANIZATION_ID", nullable = false)
-    private Integer organization;
 
     @Column(name = "ROLE", nullable = false)
     private String role;
@@ -43,10 +36,6 @@ public class HavenOrgRole {
 
     public String getRole() {
         return role;
-    }
-
-    public Integer getOrganization() {
-        return organization;
     }
 
     public void setId(String id) {
