@@ -16,17 +16,6 @@ plugins:
     enabled: true
   markdownlint:
     enabled: true
-exclude_paths:
-  - grifts/**/*
-  - "**/*_test.go"
-  - "*_test.go"
-  - "**_test.go"
-  - logs/*
-  - public/*
-  - templates/*
-ratings:
-  paths:
-    - "**.go"
 exclude_patterns:
 - "**/vendor/"
 - "webui/public/"
@@ -36,6 +25,13 @@ exclude_patterns:
 - "contrib/curl-auth0/"
 - "keycloak/themes/haven/login/resources/js/"
 - "keycloak/themes/haven/account/resources/js/"
+- "grifts/**/*"
+- "**/*_test.go"
+- "*_test.go"
+- "**_test.go"
+- "logs/*"
+- "public/*"
+- "templates/*"
 
 checks:
   argument-count:
