@@ -19,9 +19,9 @@ func Test_SelectionOption_String(t *testing.T) {
 func Test_SelectionOption_Selected_String(t *testing.T) {
 	r := require.New(t)
 	so := form.SelectOption{
-		Value:         1,
-		Label:         "one",
-		SelectedValue: "1",
+		Value:    1,
+		Label:    "one",
+		Selected: true,
 	}
 	r.Equal(`<option value="1" selected>one</option>`, so.String())
 }

@@ -1,4 +1,4 @@
-# Plush [![Code Climate](https://codeclimate.com/github/gobuffalo/plush/badges/gpa.svg)](https://codeclimate.com/github/gobuffalo/plush) [![Build Status](https://travis-ci.org/gobuffalo/plush.svg?branch=master)](https://travis-ci.org/gobuffalo/plush) [![GoDoc](https://godoc.org/github.com/gobuffalo/plush?status.svg)](https://godoc.org/github.com/gobuffalo/plush)
+# Plush  [![Build Status](https://travis-ci.org/gobuffalo/plush.svg?branch=master)](https://travis-ci.org/gobuffalo/plush) [![GoDoc](https://godoc.org/github.com/gobuffalo/plush?status.svg)](https://godoc.org/github.com/gobuffalo/plush)
 
 Plush is the templating system that [Go](http://golang.org) both needs _and_ deserves. Powerful, flexible, and extendable, Plush is there to make writing your templates that much easier.
 
@@ -12,7 +12,7 @@ $ go get -u github.com/gobuffalo/plush
 
 ## Usage
 
-Plush allows for the ebedding of dynamic code inside of your templates. Take the following example:
+Plush allows for the embedding of dynamic code inside of your templates. Take the following example:
 
 ```erb
 <!-- input -->
@@ -83,13 +83,23 @@ fmt.Print(s)
 // 		</ul>
 // </html>
 ```
+## Comments
+
+You can add comments like this:
+
+```erb
+<%# This is a comment %>
+```
+
 ## If/Else Statements
 
-The basic syntax of `if/else` statements is as follows:
+The basic syntax of `if/else if/else` statements is as follows:
 
 ```erb
 <%
 if (true) {
+  # do something
+} else if (false) {
   # do something
 } else {
   # do something else
@@ -113,6 +123,7 @@ Complex `if` statements can be built in Plush using "common" operators:
 
 * `==` - checks equality of two expressions
 * `!=` - checks that the two expressions are not equal
+* `~=` - checks a string against a regular expression (`foo ~= "^fo"`)
 * `<` - checks the left expression is less than the right expression
 * `<=` - checks the left expression is less than or equal to the right expression
 * `>` - checks the left expression is greater than the right expression
@@ -274,6 +285,45 @@ fmt.Print(s)
 * `truncate` - truncates a string to a specified length
 * `form` - support for the [github.com/gobuffalo/tags/form](https://github.com/gobuffalo/tags/tree/master/form) package (Bootstrap version)
 * `form_for` - support for the [github.com/gobuffalo/tags/form](https://github.com/gobuffalo/tags/tree/master/form) package (Bootstrap version) to build a form for a model
+
+#### contentFor and contentOf
+
+Use the `contentFor` and `contentOf` helpers to dry up your templates with reusable components.
+
+For example, we can define a snippet that generates a fancy title using `contentFor`:
+
+```
+<% contentFor("fancy-title") { %>
+  <h1 class='fancy'><%= title %></h1>
+<% } %>
+```
+
+The `fancy-title` name is how we will invoke this with `contentOf` elsewhere 
+in our template:
+
+```
+<%= contentOf("fancy-title", {"title":"Welcome to Plush"}) %>
+```
+
+* The second map argument is optional, for static content just use `<%= contentOf("fancy-title") %>`
+
+Rendering this would generate this output:
+
+```
+<h1 class='fancy'>Welcome to Plush</h1>
+```
+
+As you can see, the `<%= title %>` has been replaced with the `Welcome to Plush` string.
+
+#### truncate
+
+`truncate` takes two optional parameters:
+* `size` - the maximum length of the returned string
+* `trail` - the string to append at the end of a truncated string, defaults to `...`
+
+```html
+<p><%= truncate("a long string", {"size": 10, "trail": "[more]"})%></p>
+```
 
 ### From github.com/markbates/inflect
 

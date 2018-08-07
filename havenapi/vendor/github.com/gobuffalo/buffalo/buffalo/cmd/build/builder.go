@@ -29,6 +29,7 @@ func New(ctx context.Context, opts Options) *Builder {
 
 	b.steps = []func() error{
 		b.prepTarget,
+		b.validateTemplates,
 		b.transformMain,
 		b.createBuildMain,
 		b.prepAPackage,
@@ -45,6 +46,12 @@ func New(ctx context.Context, opts Options) *Builder {
 func (b *Builder) Run() error {
 	defer b.Cleanup()
 	logrus.Debug(b.Options)
+
+	if b.Debug {
+		builder.DebugLog = func(m string, a ...interface{}) {
+			logrus.Debugf(m, a...)
+		}
+	}
 
 	for _, s := range b.steps {
 		err := s()
