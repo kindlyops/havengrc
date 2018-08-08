@@ -5,6 +5,27 @@ import Html.Attributes exposing (..)
 import Markdown exposing (..)
 
 
+viewTerms : Html msg
+viewTerms =
+    Markdown.toHtml [ class "terms" ] """
+**Haven GRC Software Service Terms**
+
+**first edition, second update**
+
+**Provider** and **Customer** agree:
+
+1. _Software_.
+
+(a) The **Software** is Haven GRC, for tamper proof evidence storage, security culture metrics, and risk dashboard.
+
+(b) The **Website** is at https://havengrc.com/.
+
+(c) The **Account Dashboard** is at https://account.havengrc.com/.
+
+(d) The **Documentation** is at https://docs.havengrc.com/.
+"""
+
+
 view : Html msg
 view =
     div [ class "" ]
@@ -23,21 +44,7 @@ view =
                 [ div [ class "pb-5" ]
                     [ div [ class "row px-5" ]
                         [ div [ class "col-12 px-12" ]
-                            [ Markdown.toHtml [ class "terms" ] """**Haven GRC Software Service Terms**
-
-**first edition, second update**
-
-**Provider** and **Customer** agree:
-
-1. _Software_.
-
-(a) The **Software** is Haven GRC, for tamper proof evidence storage, security culture metrics, and risk dashboard.
-
-(b) The **Website** is at https://havengrc.com/.
-
-(c) The **Account Dashboard** is at https://account.havengrc.com/.
-
-(d) The **Documentation** is at https://docs.havengrc.com/.""" ]
+                            [ viewTerms ]
                         ]
                     ]
                 ]
