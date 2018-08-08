@@ -20,12 +20,10 @@ view =
             ]
         , div [ class "py-5 bg-light" ]
             [ div [ class "" ]
-                [ div [ class "pb-5" ] 
-                    [ 
-                    div [ class "row px-5" ]
-                    [ div [ class "col-12 px-12" ]
-                        [ Markdown.toHtml [class "terms"] """ 
-                        **Haven GRC Software Service Terms**
+                [ div [ class "pb-5" ]
+                    [ div [ class "row px-5" ]
+                        [ div [ class "col-12 px-12" ]
+                            [ Markdown.toHtml [ class "terms" ] """**Haven GRC Software Service Terms**
 
 **first edition, second update**
 
@@ -39,8 +37,11 @@ view =
 
 (c) The **Account Dashboard** is at https://account.havengrc.com/.
 
-(d) The **Documentation** is at https://docs.havengrc.com/.
-                        """ ]
+(d) The **Documentation** is at https://docs.havengrc.com/.""" ]
+                        ]
+                    ]
+                ]
+            ]
         , div [ class "text-center bg-light", id "footer-container" ]
             [ img [ class "", id "footer-image", alt "Wireframe graphic of compliance and risk dashboard Haven GRC", src "/img/footer_lines@2x.png" ]
                 []
