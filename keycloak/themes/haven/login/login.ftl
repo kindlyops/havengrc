@@ -47,10 +47,10 @@
                 </div>
             </form>
         </#if>
+        <div class="orText">OR</div>
     </div>
     <#elseif section="info">
         <div class="col-sm-6 d-sm-flex flex-column align-items-sm-start pl-sm-5 py-sm-4">
-        <div class="orText">OR</div>
             <#if realm.password && social.providers??>
                 <div id="kc-social-providers" class="mb-auto text-center">
                     <h5>Log In With:</h5>

@@ -2,7 +2,7 @@
   <@layout.mainLayout active='password' bodyClass='password' ; section>
 
     <div class="heading py-3 mb-3">
-      <span class="subtitle float-right pt-lg-2">
+      <span class="subtitle float-sm-right pt-lg-2">
           <span class="required">*</span>
           ${msg("requiredFields")}
       </span>

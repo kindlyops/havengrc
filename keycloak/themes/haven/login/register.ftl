@@ -47,7 +47,7 @@
                   </#if>
                   <div class="form-group ${properties.kcFormGroupClass!}">
                       <div id="kc-form-buttons" class="${properties.kcFormButtonsClass!}">
-                          <input class="btn btn-block btn-primary" style="border-radius:25px;" type="submit" value="${msg(" doRegister")}" />
+                          <input class="btn btn-block btn-primary" style="border-radius:25px;" type="submit" value="${msg(" Register")}" />
                       </div>
                   </div>
                       <div id="kc-form-options" class=" form-group ${properties.kcFormOptionsClass!}">
