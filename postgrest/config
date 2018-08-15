@@ -23,6 +23,8 @@ server-proxy-uri = "$(PGRST_SERVER_PROXY_URI)"
 jwt-secret = "@$(HAVEN_JWK_PATH)"
 jwt-aud = "$(PGRST_JWT_AUD_CLAIM)"
 
+role-claim-key = ".resource_access.havendev.roles[0]"
+
 # secret-is-base64 = false
 
 ## limit rows in response
