@@ -9,7 +9,6 @@ import Html exposing (Html, div, nav, button, span, text, ul, li, a, img, i)
 import Html.Attributes exposing (class, attribute, id, href, style, classList)
 import Html.Events exposing (onClick)
 import Route
-import Data.Survey
 import Page.Activity as Activity
 import Page.Comments as Comments
 import Page.Dashboard as Dashboard
@@ -21,7 +20,6 @@ import Page.Survey as Survey
 import Page.SurveyResponses as SurveyResponses
 import Page.Terms as Terms
 import Json.Decode as Decode
-import Json.Decode.Pipeline
 
 
 type alias Model =
