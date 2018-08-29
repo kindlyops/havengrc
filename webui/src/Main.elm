@@ -9,6 +9,7 @@ import Html exposing (Html, div, nav, button, span, text, ul, li, a, img, i)
 import Html.Attributes exposing (class, attribute, id, href, style, classList)
 import Html.Events exposing (onClick)
 import Route
+import Data.Survey
 import Page.Activity as Activity
 import Page.Comments as Comments
 import Page.Dashboard as Dashboard
@@ -19,6 +20,8 @@ import Page.Reports as Reports
 import Page.Survey as Survey
 import Page.SurveyResponses as SurveyResponses
 import Page.Terms as Terms
+import Json.Decode as Decode
+import Json.Decode.Pipeline
 
 
 type alias Model =
@@ -34,15 +37,31 @@ type alias Model =
 type alias MenuItem =
     { text : String
     , iconName : String
-    , route : Maybe Route.Location
+    , route : Maybe Route.Route
     }
 
 
-init : Maybe Keycloak.LoggedInUser -> Navigation.Location -> ( Model, Cmd Msg )
-init initialUser location =
+decodeKeyCloak : Decode.Value -> Maybe Keycloak.LoggedInUser
+decodeKeyCloak json =
+    json
+        |> Decode.decodeValue Decode.string
+        |> Result.toMaybe
+        |> Maybe.andThen (Decode.decodeString Keycloak.loggedInUserDecoder >> Result.toMaybe)
+
+
+decodeSavedState : Decode.Value -> Maybe Survey.TestStructure
+decodeSavedState json =
+    json
+        |> Decode.decodeValue Decode.string
+        |> Result.toMaybe
+        |> Maybe.andThen (Decode.decodeString Survey.testDecoder >> Result.toMaybe)
+
+
+init : Decode.Value -> Navigation.Location -> ( Model, Cmd Msg )
+init sessionStorage location =
     let
         initialAuthModel =
-            Authentication.init Ports.keycloakLogin Ports.keycloakLogout initialUser
+            Authentication.init Ports.keycloakLogin Ports.keycloakLogout (decodeKeyCloak sessionStorage)
 
         ( route, routeCmd ) =
             Route.init (Just location)
@@ -51,7 +70,12 @@ init initialUser location =
             Comments.init initialAuthModel
 
         ( surveyModel, surveyCmd ) =
-            Survey.init initialAuthModel
+            case Result.toMaybe (Decode.decodeValue Survey.testDecoder sessionStorage) of
+                Just savedState ->
+                    Survey.initWithSave initialAuthModel savedState
+
+                Nothing ->
+                    Survey.init initialAuthModel
 
         ( surveyResponseModel, surveyResponsesCmd ) =
             SurveyResponses.init initialAuthModel
@@ -80,7 +104,7 @@ subscriptions model =
     Ports.keycloakAuthResult (Authentication.handleAuthResult >> AuthenticationMsg)
 
 
-main : Program (Maybe Keycloak.LoggedInUser) Model Msg
+main : Program Decode.Value Model Msg
 main =
     Navigation.programWithFlags UrlChange
         { init = init
@@ -91,7 +115,7 @@ main =
 
 
 type Msg
-    = NavigateTo (Maybe Route.Location)
+    = NavigateTo (Maybe Route.Route)
     | UrlChange Navigation.Location
     | AuthenticationMsg Authentication.Msg
     | DashboardMsg Dashboard.Msg
@@ -128,19 +152,14 @@ update msg model =
 
                 ( commentsModel, commentsCmd ) =
                     Comments.init authModel
-
-                ( surveyModel, surveyCmd ) =
-                    Survey.init authModel
             in
                 ( { model
                     | authModel = authModel
                     , commentsModel = commentsModel
-                    , surveyModel = surveyModel
                   }
                 , Cmd.batch
                     [ Cmd.map AuthenticationMsg cmd
                     , Cmd.map CommentsMsg commentsCmd
-                    , Cmd.map SurveyMsg surveyCmd
                     ]
                 )
 

@@ -2,9 +2,14 @@ module Page.Survey
     exposing
         ( Model
         , init
+        , initWithSave
         , update
         , Msg
         , view
+        , SavedState
+        , decodeSavedState
+        , TestStructure
+        , testDecoder
         )
 
 import Data.Survey
@@ -19,6 +24,13 @@ import Data.Survey
         , IpsativeAnswer
         , LikertAnswer
         , SurveyMetaData
+        , encodeSurvey
+        , encodeSurveyData
+        , encodeSurveyMetaData
+        , InitialSurvey
+        , upgradeSurvey
+        , decodeSurveyMetaData
+        , decodeInitialSurvey
         )
 import Html exposing (Html, div, h1, text, p, button, hr, br, table, tbody, tr, td, i, thead, th, ul, li, h3, h4)
 import Html.Attributes exposing (class, disabled, style, type_)
@@ -30,6 +42,9 @@ import Request.Survey
 import Ports
 import Views.SurveyCard
 import Utils exposing (getHTTPErrorMessage)
+import Json.Encode as Encode
+import Json.Decode as Decode exposing (Decoder, decodeString, int, andThen, oneOf)
+import Json.Decode.Pipeline exposing (decode, required)
 
 
 type SurveyPage
@@ -43,7 +58,6 @@ type SurveyPage
 type alias Model =
     { currentSurvey : Survey
     , currentPage : SurveyPage
-    , numberOfGroups : Int
     , availableIpsativeSurveys : List SurveyMetaData
     , availableLikertSurveys : List SurveyMetaData
     , selectedSurveyMetaData : SurveyMetaData
@@ -56,23 +70,143 @@ type alias Model =
 --TODO: change currentSurvey to Maybe
 
 
+type alias TestStructure =
+    { storedSurvey : SavedState
+    }
+
+
+testDecoder : Decoder TestStructure
+testDecoder =
+    decode TestStructure
+        |> required "storedSurvey" decodeSavedState
+
+
+type alias SavedState =
+    { currentPage : SurveyPage
+    , surveyData : InitialSurvey
+    , selectedSurveyMetaData : SurveyMetaData
+    , isSurveyReady : Bool
+    }
+
+
+decodeSavedState : Decoder SavedState
+decodeSavedState =
+    decode SavedState
+        |> required "currentPage" (decodeCurrentPage)
+        |> required "surveyData" (decodeInitialSurvey)
+        |> required "selectedSurveyMetaData" (decodeSurveyMetaData)
+        |> required "isSurveyReady" Decode.bool
+
+
+decodeCurrentPage : Decoder SurveyPage
+decodeCurrentPage =
+    Decode.string
+        |> Decode.andThen
+            (\str ->
+                case str of
+                    "Home" ->
+                        Decode.succeed Home
+
+                    "SurveyInstructions" ->
+                        Decode.succeed SurveyInstructions
+
+                    "Survey" ->
+                        Decode.succeed Survey
+
+                    "IncompleteSurvey" ->
+                        Decode.succeed IncompleteSurvey
+
+                    "Finished" ->
+                        Decode.succeed Finished
+
+                    somethingElse ->
+                        Decode.fail <| "Unknown theme: " ++ somethingElse
+            )
+
+
 init : Authentication.Model -> ( Model, Cmd Msg )
 init authModel =
     initialModel
         ! initialCommands authModel
 
 
+initWithSave : Authentication.Model -> TestStructure -> ( Model, Cmd Msg )
+initWithSave authModel testStructure =
+    let
+        savedState =
+            testStructure.storedSurvey
+
+        upgradedSurvey =
+            upgradeSurvey savedState.surveyData
+
+        upgradedModel =
+            case upgradedSurvey of
+                Ipsative survey ->
+                    { initialModel
+                        | currentSurvey = upgradedSurvey
+                        , currentPage = savedState.currentPage
+                        , selectedSurveyMetaData = savedState.selectedSurveyMetaData
+                        , isSurveyReady = savedState.isSurveyReady
+                    }
+
+                Likert survey ->
+                    { initialModel
+                        | currentSurvey = upgradedSurvey
+                        , currentPage = savedState.currentPage
+                        , selectedSurveyMetaData = savedState.selectedSurveyMetaData
+                        , isSurveyReady = savedState.isSurveyReady
+                    }
+    in
+        upgradedModel
+            ! initialCommands authModel
+
+
 initialModel : Model
 initialModel =
     { currentSurvey = Ipsative Data.Survey.emptyIpsativeServerSurvey
     , currentPage = Home
-    , numberOfGroups = 2
     , availableIpsativeSurveys = []
     , availableLikertSurveys = []
     , selectedSurveyMetaData = Data.Survey.emptyIpsativeServerMetaData
     , isSurveyReady = False
     , inBoundLikertData = Nothing
     }
+
+
+storeSurvey : Model -> Cmd msg
+storeSurvey model =
+    encodeApplicationPage model
+        |> Just
+        |> Ports.saveSurveyState
+
+
+encodeApplicationPage : Model -> Encode.Value
+encodeApplicationPage model =
+    Encode.object
+        [ ( "currentPage", Encode.string (encodeSurveyPage model.currentPage) )
+        , ( "surveyData", encodeSurveyData model.currentSurvey )
+        , ( "selectedSurveyMetaData", encodeSurveyMetaData model.selectedSurveyMetaData )
+        , ( "isSurveyReady", Encode.bool model.isSurveyReady )
+        ]
+
+
+encodeSurveyPage : SurveyPage -> String
+encodeSurveyPage surveyPage =
+    case surveyPage of
+        Home ->
+            "Home"
+
+        SurveyInstructions ->
+            "SurveyInstructions"
+
+        Survey ->
+            "Survey"
+
+        IncompleteSurvey ->
+            "IncompleteSurvey"
+
+        Finished ->
+            "Finished"
 
 
 initialCommands : Authentication.Model -> List (Cmd Msg)
@@ -212,22 +346,22 @@ update msg model authModel =
                         _ ->
                             model.currentSurvey
             in
-                { model | currentSurvey = newSurvey } ! []
+                { model | currentSurvey = newSurvey } ! [ storeSurvey model ]
 
         GoToHome ->
-            { model | currentPage = Home } ! []
+            { model | currentPage = Home } ! [ storeSurvey model ]
 
         FinishSurvey ->
             if validateSurvey model.currentSurvey then
-                { model | currentPage = Finished } ! []
+                { model | currentPage = Finished } ! [ storeSurvey model ]
             else
-                { model | currentPage = IncompleteSurvey } ! []
+                { model | currentPage = IncompleteSurvey } ! [ storeSurvey model ]
 
         BeginLikertSurvey ->
-            { model | currentPage = Survey } ! []
+            { model | currentPage = Survey } ! [ storeSurvey model ]
 
         BeginIpsativeSurvey ->
-            { model | currentPage = Survey } ! []
+            { model | currentPage = Survey } ! [ storeSurvey model ]
 
         StartLikertSurvey metaData ->
             { model | currentPage = SurveyInstructions, selectedSurveyMetaData = metaData } ! [ Http.send GotLikertServerData (Request.Survey.getLikertSurvey authModel metaData.uuid) ]
@@ -240,7 +374,7 @@ update msg model authModel =
                 Ipsative survey ->
                     case Zipper.next survey.questions of
                         Just x ->
-                            { model | currentSurvey = Ipsative { survey | questions = x } } ! []
+                            { model | currentSurvey = Ipsative { survey | questions = x } } ! [ storeSurvey model ]
 
                         _ ->
                             { model | currentSurvey = Ipsative survey } ! []
@@ -248,7 +382,7 @@ update msg model authModel =
                 Likert survey ->
                     case Zipper.next survey.questions of
                         Just x ->
-                            { model | currentSurvey = Likert { survey | questions = x } } ! []
+                            { model | currentSurvey = Likert { survey | questions = x } } ! [ storeSurvey model ]
 
                         _ ->
                             { model | currentSurvey = Likert survey } ! []
@@ -258,7 +392,7 @@ update msg model authModel =
                 Ipsative survey ->
                     case Zipper.previous survey.questions of
                         Just x ->
-                            { model | currentSurvey = Ipsative { survey | questions = x } } ! []
+                            { model | currentSurvey = Ipsative { survey | questions = x } } ! [ storeSurvey model ]
 
                         _ ->
                             { model | currentSurvey = Ipsative survey } ! []
@@ -266,7 +400,7 @@ update msg model authModel =
                 Likert survey ->
                     case Zipper.previous survey.questions of
                         Just x ->
-                            { model | currentSurvey = Likert { survey | questions = x } } ! []
+                            { model | currentSurvey = Likert { survey | questions = x } } ! [ storeSurvey model ]
 
                         _ ->
                             { model | currentSurvey = Likert survey } ! []
@@ -284,7 +418,7 @@ update msg model authModel =
                         _ ->
                             model.currentSurvey
             in
-                { model | currentSurvey = newSurvey } ! []
+                { model | currentSurvey = newSurvey } ! [ storeSurvey model ]
 
         IncrementAnswer answer groupNumber ->
             --    --if points left in group > 0,
@@ -299,14 +433,14 @@ update msg model authModel =
                         _ ->
                             model.currentSurvey
             in
-                { model | currentSurvey = newSurvey } ! []
+                { model | currentSurvey = newSurvey } ! [ storeSurvey model ]
 
         GotoQuestion _ questionNumber ->
             case model.currentSurvey of
                 Ipsative survey ->
                     case Zipper.find (\x -> x.orderNumber == questionNumber) (Zipper.first survey.questions) of
                         Just x ->
-                            { model | currentSurvey = Ipsative { survey | questions = x }, currentPage = Survey } ! []
+                            { model | currentSurvey = Ipsative { survey | questions = x }, currentPage = Survey } ! [ storeSurvey model ]
 
                         _ ->
                             { model | currentSurvey = Ipsative survey } ! []
@@ -314,7 +448,7 @@ update msg model authModel =
                 Likert survey ->
                     case Zipper.find (\x -> x.orderNumber == questionNumber) (Zipper.first survey.questions) of
                         Just x ->
-                            { model | currentSurvey = Likert { survey | questions = x }, currentPage = Survey } ! []
+                            { model | currentSurvey = Likert { survey | questions = x }, currentPage = Survey } ! [ storeSurvey model ]
 
                         _ ->
                             { model | currentSurvey = Likert survey } ! []

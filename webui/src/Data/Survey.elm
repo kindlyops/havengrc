@@ -4,10 +4,13 @@ module Data.Survey
         , createLikertSurvey
         , emptyIpsativeServerMetaData
         , emptyIpsativeServerSurvey
+        , encodeSurvey
+        , encodeSurveyData
         , groupIpsativeSurveyData
         , groupLikertSurveyData
         , IpsativeAnswer
-        , ipsativeMetaDataDecoder
+        , decodeSurveyMetaData
+        , InitialSurvey
         , IpsativeQuestion
         , IpsativeResponse
         , ipsativeResponseDecoder
@@ -16,7 +19,6 @@ module Data.Survey
         , IpsativeSurvey
         , ipsativeSurveyDataDecoder
         , LikertAnswer
-        , likertMetaDataDecoder
         , LikertQuestion
         , LikertResponse
         , likertResponseDecoder
@@ -30,9 +32,12 @@ module Data.Survey
         , PointsLeft
         , Survey(..)
         , SurveyMetaData
+        , encodeSurveyMetaData
+        , upgradeSurvey
+        , decodeInitialSurvey
         )
 
-import Json.Decode as Decode exposing (Decoder)
+import Json.Decode as Decode exposing (Decoder, decodeString, int, andThen, oneOf)
 import Json.Decode.Pipeline exposing (decode, required)
 import Json.Encode as Encode
 import List.Zipper as Zipper
@@ -44,11 +49,32 @@ type Survey
     | Likert LikertSurvey
 
 
+type InitialSurvey
+    = IpsativeWithoutZipper IpsativeSurveyWithoutZipper
+    | LikertWithoutZipper LikertSurveyWithoutZipper
+
+
+decodeInitialSurvey : Decoder InitialSurvey
+decodeInitialSurvey =
+    Decode.oneOf
+        [ Decode.map IpsativeWithoutZipper <| decodeIpsativeSurveyWithoutZipper
+        , Decode.map LikertWithoutZipper <| decodeLikertSurveyWithoutZipper
+        ]
+
+
 type alias IpsativeSurvey =
     { metaData : SurveyMetaData
     , pointsPerQuestion : Int
     , numGroups : Int
     , questions : Zipper.Zipper IpsativeQuestion
+    }
+
+
+type alias IpsativeSurveyWithoutZipper =
+    { metaData : SurveyMetaData
+    , pointsPerQuestion : Int
+    , numGroups : Int
+    , questions : List IpsativeQuestion
     }
 
 
@@ -61,6 +87,263 @@ type alias IpsativeResponse =
     , group_number : Int
     , points_assigned : Int
     }
+
+
+encodeSurvey : Survey -> Encode.Value
+encodeSurvey survey =
+    Encode.object
+        [ ( "type", Encode.string (encodeSurveyType survey) )
+        , ( "data", encodeSurveyData survey )
+        ]
+
+
+encodeSurveyType : Survey -> String
+encodeSurveyType survey =
+    case survey of
+        Ipsative survey ->
+            "Ipsative"
+
+        Likert survey ->
+            "Likert"
+
+
+encodeSurveyData : Survey -> Encode.Value
+encodeSurveyData survey =
+    case survey of
+        Ipsative survey ->
+            let
+                ipsativeSurveyWithoutZipper =
+                    downgradeIpsativeSurvey survey
+            in
+                encodeipsativeSurveyWithoutZipper ipsativeSurveyWithoutZipper
+
+        Likert survey ->
+            let
+                likertSurveyWithoutZipper =
+                    downgradeLikertSurvey survey
+            in
+                encodeLikertSurveyWithoutZipper likertSurveyWithoutZipper
+
+
+upgradeSurvey : InitialSurvey -> Survey
+upgradeSurvey initialSurvey =
+    Ipsative
+        { metaData = emptyIpsativeServerMetaData
+        , pointsPerQuestion = 42
+        , numGroups = 5
+        , questions = Zipper.singleton emptyIpsativeQuestion
+        }
+
+
+upgradeIpsativeSurvey : IpsativeSurveyWithoutZipper -> IpsativeSurvey
+upgradeIpsativeSurvey survey =
+    emptyIpsativeServerSurvey
+
+
+downgradeIpsativeSurvey : IpsativeSurvey -> IpsativeSurveyWithoutZipper
+downgradeIpsativeSurvey survey =
+    let
+        downgraded =
+            { metaData = survey.metaData
+            , pointsPerQuestion = survey.pointsPerQuestion
+            , numGroups = survey.numGroups
+            , questions = Zipper.toList survey.questions
+            }
+    in
+        downgraded
+
+
+downgradeLikertSurvey : LikertSurvey -> LikertSurveyWithoutZipper
+downgradeLikertSurvey survey =
+    let
+        downgraded =
+            { metaData = survey.metaData
+            , questions = Zipper.toList survey.questions
+            }
+    in
+        downgraded
+
+
+encodeipsativeSurveyWithoutZipper : IpsativeSurveyWithoutZipper -> Encode.Value
+encodeipsativeSurveyWithoutZipper surveyWithoutZipper =
+    Encode.object
+        [ ( "metaData", encodeSurveyMetaData <| surveyWithoutZipper.metaData )
+        , ( "pointsPerQuestion", Encode.int <| surveyWithoutZipper.pointsPerQuestion )
+        , ( "numGroups", Encode.int <| surveyWithoutZipper.numGroups )
+        , ( "questions", Encode.list <| List.map encodeIpsativeQuestion <| surveyWithoutZipper.questions )
+        ]
+
+
+encodeLikertSurveyWithoutZipper : LikertSurveyWithoutZipper -> Encode.Value
+encodeLikertSurveyWithoutZipper surveyWithoutZipper =
+    Encode.object
+        [ ( "metaData", encodeSurveyMetaData <| surveyWithoutZipper.metaData )
+        , ( "questions", Encode.list <| List.map encodeLikertQuestion <| surveyWithoutZipper.questions )
+        ]
+
+
+encodeSurveyMetaData : SurveyMetaData -> Encode.Value
+encodeSurveyMetaData surveyMetaData =
+    Encode.object
+        [ ( "uuid", Encode.string <| surveyMetaData.uuid )
+        , ( "created_at", Encode.string <| surveyMetaData.created_at )
+        , ( "name", Encode.string <| surveyMetaData.name )
+        , ( "description", Encode.string <| surveyMetaData.description )
+        , ( "instructions", Encode.string <| surveyMetaData.instructions )
+        , ( "author", Encode.string <| surveyMetaData.author )
+        ]
+
+
+encodeIpsativeQuestion : IpsativeQuestion -> Encode.Value
+encodeIpsativeQuestion ipsativeQuestion =
+    Encode.object
+        [ ( "id", Encode.string <| ipsativeQuestion.id )
+        , ( "title", Encode.string <| ipsativeQuestion.title )
+        , ( "orderNumber", Encode.int <| ipsativeQuestion.orderNumber )
+        , ( "pointsLeft", Encode.list <| List.map encodePointsLeft <| ipsativeQuestion.pointsLeft )
+        , ( "answers", Encode.list <| List.map encodeIpsativeAnswer <| ipsativeQuestion.answers )
+        ]
+
+
+encodeLikertQuestion : LikertQuestion -> Encode.Value
+encodeLikertQuestion likertQuestion =
+    Encode.object
+        [ ( "id", Encode.string <| likertQuestion.id )
+        , ( "title", Encode.string <| likertQuestion.title )
+        , ( "orderNumber", Encode.int <| likertQuestion.orderNumber )
+        , ( "choices", Encode.list <| List.map Encode.string <| likertQuestion.choices )
+        , ( "answers", Encode.list <| List.map encodeLikertAnswer <| likertQuestion.answers )
+        ]
+
+
+encodePointsLeft : PointsLeft -> Encode.Value
+encodePointsLeft pointsLeft =
+    Encode.object
+        [ ( "group", Encode.int <| pointsLeft.group )
+        , ( "pointsLeft", Encode.int <| pointsLeft.pointsLeft )
+        ]
+
+
+encodeIpsativeAnswer : IpsativeAnswer -> Encode.Value
+encodeIpsativeAnswer ipsativeAnswer =
+    Encode.object
+        [ ( "id", Encode.string <| ipsativeAnswer.id )
+        , ( "answer", Encode.string <| ipsativeAnswer.answer )
+        , ( "orderNumber", Encode.int <| ipsativeAnswer.orderNumber )
+        , ( "pointsAssigned", Encode.list <| List.map encodePointsAssigned <| ipsativeAnswer.pointsAssigned )
+        ]
+
+
+encodeLikertAnswer : LikertAnswer -> Encode.Value
+encodeLikertAnswer likertAnswer =
+    Encode.object
+        [ ( "id", Encode.string <| likertAnswer.id )
+        , ( "answer", Encode.string <| likertAnswer.answer )
+        , ( "selectedChoice", Encode.string <| Maybe.withDefault "" <| likertAnswer.selectedChoice )
+        ]
+
+
+encodePointsAssigned : PointsAssigned -> Encode.Value
+encodePointsAssigned pointsAssigned =
+    Encode.object
+        [ ( "group", Encode.int <| pointsAssigned.group )
+        , ( "points", Encode.int <| pointsAssigned.points )
+        ]
+
+
+decodeIpsativeSurveyWithoutZipper : Decoder IpsativeSurveyWithoutZipper
+decodeIpsativeSurveyWithoutZipper =
+    decode IpsativeSurveyWithoutZipper
+        |> required "metaData" decodeSurveyMetaData
+        |> required "pointsPerQuestion" int
+        |> required "numGroups" int
+        |> required "questions" (Decode.list decodeIpsativeQuestion)
+
+
+decodeLikertSurveyWithoutZipper : Decoder LikertSurveyWithoutZipper
+decodeLikertSurveyWithoutZipper =
+    decode LikertSurveyWithoutZipper
+        |> required "metaData" decodeSurveyMetaData
+        |> required "questions" (Decode.list decodeLikertQuestion)
+
+
+testZipperCreation : List IpsativeQuestion -> Zipper.Zipper IpsativeQuestion
+testZipperCreation test =
+    Zipper.fromList [ emptyIpsativeQuestion ] |> Zipper.withDefault emptyIpsativeQuestion
+
+
+decodeIpsativeQuestion : Decoder IpsativeQuestion
+decodeIpsativeQuestion =
+    decode IpsativeQuestion
+        |> required "id" Decode.string
+        |> required "title" Decode.string
+        |> required "orderNumber" int
+        |> required "pointsLeft" (Decode.list decodePointsLeft)
+        |> required "answers" (Decode.list decodeIpsativeAnswer)
+
+
+decodePointsLeft : Decoder PointsLeft
+decodePointsLeft =
+    decode PointsLeft
+        |> required "group" Decode.int
+        |> required "pointsLeft" Decode.int
+
+
+decodeIpsativeAnswer : Decoder IpsativeAnswer
+decodeIpsativeAnswer =
+    decode IpsativeAnswer
+        |> required "id" Decode.string
+        |> required "answer" Decode.string
+        |> required "orderNumber" Decode.int
+        |> required "pointsAssigned" (Decode.list decodePointsAssigned)
+
+
+decodePointsAssigned : Decoder PointsAssigned
+decodePointsAssigned =
+    decode PointsAssigned
+        |> required "group" Decode.int
+        |> required "points" Decode.int
+
+
+decodeLikertQuestion : Decoder LikertQuestion
+decodeLikertQuestion =
+    decode LikertQuestion
+        |> required "id" Decode.string
+        |> required "title" Decode.string
+        |> required "orderNumber" int
+        |> required "choices" (Decode.list Decode.string)
+        |> required "answers" (Decode.list decodeLikertAnswer)
+
+
+decodeLikertAnswer : Decoder LikertAnswer
+decodeLikertAnswer =
+    decode LikertAnswer
+        |> required "id" Decode.string
+        |> required "answer" Decode.string
+        |> required "selectedChoice" decodeSelectedChoice
+
+
+decodeSelectedChoice : Decoder (Maybe String)
+decodeSelectedChoice =
+    Decode.map
+        (\selectedChoice ->
+            if selectedChoice == "" then
+                Nothing
+            else
+                Just selectedChoice
+        )
+        Decode.string
+
+
+decodeSurveyMetaData : Decoder SurveyMetaData
+decodeSurveyMetaData =
+    decode SurveyMetaData
+        |> required "uuid" Decode.string
+        |> required "created_at" Decode.string
+        |> required "name" Decode.string
+        |> required "description" Decode.string
+        |> required "instructions" Decode.string
+        |> required "author" Decode.string
 
 
 ipsativeResponseDecoder : Decoder IpsativeResponse
@@ -195,17 +478,6 @@ likertSingleResponseEncoder singleResponse =
         [ ( "answer_id", Encode.string <| singleResponse.answer_id )
         , ( "choice", Encode.string <| singleResponse.choice )
         ]
-
-
-ipsativeMetaDataDecoder : Decoder SurveyMetaData
-ipsativeMetaDataDecoder =
-    decode SurveyMetaData
-        |> required "uuid" Decode.string
-        |> required "created_at" Decode.string
-        |> required "name" Decode.string
-        |> required "description" Decode.string
-        |> required "instructions" Decode.string
-        |> required "author" Decode.string
 
 
 type alias SurveyMetaData =
@@ -447,15 +719,10 @@ type alias LikertSurvey =
     }
 
 
-likertMetaDataDecoder : Decoder SurveyMetaData
-likertMetaDataDecoder =
-    decode SurveyMetaData
-        |> required "uuid" Decode.string
-        |> required "created_at" Decode.string
-        |> required "name" Decode.string
-        |> required "description" Decode.string
-        |> required "instructions" Decode.string
-        |> required "author" Decode.string
+type alias LikertSurveyWithoutZipper =
+    { metaData : SurveyMetaData
+    , questions : List LikertQuestion
+    }
 
 
 type alias LikertQuestion =

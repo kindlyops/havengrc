@@ -11,11 +11,13 @@ module Request.Survey
 
 import Http
 import Json.Decode as Decode
+import Json.Encode as Encode
 import Authentication
-import Data.Survey
+import Ports
+import Data.Survey as Survey exposing (Survey)
 
 
-getIpsativeSurveys : Authentication.Model -> Http.Request (List Data.Survey.SurveyMetaData)
+getIpsativeSurveys : Authentication.Model -> Http.Request (List Survey.SurveyMetaData)
 getIpsativeSurveys authModel =
     let
         request =
@@ -24,7 +26,7 @@ getIpsativeSurveys authModel =
                 , headers = Authentication.tryGetAuthHeader authModel
                 , url = "/api/ipsative_surveys"
                 , body = Http.emptyBody
-                , expect = Http.expectJson (Decode.list Data.Survey.ipsativeMetaDataDecoder)
+                , expect = Http.expectJson (Decode.list Survey.decodeSurveyMetaData)
                 , timeout = Nothing
                 , withCredentials = True
                 }
@@ -32,7 +34,7 @@ getIpsativeSurveys authModel =
         request
 
 
-getIpsativeSurvey : Authentication.Model -> String -> Http.Request (List Data.Survey.IpsativeServerData)
+getIpsativeSurvey : Authentication.Model -> String -> Http.Request (List Survey.IpsativeServerData)
 getIpsativeSurvey authModel id =
     let
         request =
@@ -41,7 +43,7 @@ getIpsativeSurvey authModel id =
                 , headers = Authentication.tryGetAuthHeader authModel
                 , url = "/api/ipsative_data?survey_id=eq." ++ id
                 , body = Http.emptyBody
-                , expect = Http.expectJson (Decode.list Data.Survey.ipsativeSurveyDataDecoder)
+                , expect = Http.expectJson (Decode.list Survey.ipsativeSurveyDataDecoder)
                 , timeout = Nothing
                 , withCredentials = True
                 }
@@ -49,25 +51,23 @@ getIpsativeSurvey authModel id =
         request
 
 
-postIpsativeResponse : Authentication.Model -> Data.Survey.IpsativeSurvey -> Http.Request (List Data.Survey.IpsativeResponse)
+postIpsativeResponse : Authentication.Model -> Survey.IpsativeSurvey -> Http.Request (List Survey.IpsativeResponse)
 postIpsativeResponse authModel ipsativeSurvey =
     let
         body =
-            Data.Survey.ipsativeResponseEncoder ipsativeSurvey
+            Survey.ipsativeResponseEncoder ipsativeSurvey
                 |> Http.jsonBody
 
         headers =
             Authentication.tryGetAuthHeader authModel ++ Authentication.getReturnHeaders
 
-        --_ =
-        --Debug.log "Ipsative Response: " newComment.message
         request =
             Http.request
                 { method = "POST"
                 , headers = headers
                 , url = "api/ipsative_responses"
                 , body = body
-                , expect = Http.expectJson (Decode.list Data.Survey.ipsativeResponseDecoder)
+                , expect = Http.expectJson (Decode.list Survey.ipsativeResponseDecoder)
                 , timeout = Nothing
                 , withCredentials = True
                 }
@@ -75,7 +75,7 @@ postIpsativeResponse authModel ipsativeSurvey =
         request
 
 
-getLikertSurveys : Authentication.Model -> Http.Request (List Data.Survey.SurveyMetaData)
+getLikertSurveys : Authentication.Model -> Http.Request (List Survey.SurveyMetaData)
 getLikertSurveys authModel =
     let
         request =
@@ -84,7 +84,7 @@ getLikertSurveys authModel =
                 , headers = Authentication.tryGetAuthHeader authModel
                 , url = "/api/likert_surveys"
                 , body = Http.emptyBody
-                , expect = Http.expectJson (Decode.list Data.Survey.likertMetaDataDecoder)
+                , expect = Http.expectJson (Decode.list Survey.decodeSurveyMetaData)
                 , timeout = Nothing
                 , withCredentials = True
                 }
@@ -92,7 +92,7 @@ getLikertSurveys authModel =
         request
 
 
-getLikertSurvey : Authentication.Model -> String -> Http.Request (List Data.Survey.LikertServerData)
+getLikertSurvey : Authentication.Model -> String -> Http.Request (List Survey.LikertServerData)
 getLikertSurvey authModel id =
     let
         request =
@@ -101,7 +101,7 @@ getLikertSurvey authModel id =
                 , headers = Authentication.tryGetAuthHeader authModel
                 , url = "/api/likert_data?survey_id=eq." ++ id
                 , body = Http.emptyBody
-                , expect = Http.expectJson (Decode.list Data.Survey.likertSurveyDataDecoder)
+                , expect = Http.expectJson (Decode.list Survey.likertSurveyDataDecoder)
                 , timeout = Nothing
                 , withCredentials = True
                 }
@@ -109,7 +109,7 @@ getLikertSurvey authModel id =
         request
 
 
-getLikertChoices : Authentication.Model -> String -> Http.Request (List Data.Survey.LikertServerChoice)
+getLikertChoices : Authentication.Model -> String -> Http.Request (List Survey.LikertServerChoice)
 getLikertChoices authModel id =
     let
         request =
@@ -118,7 +118,7 @@ getLikertChoices authModel id =
                 , headers = Authentication.tryGetAuthHeader authModel
                 , url = "/api/likert_distinct_choice_groups?survey_id=eq." ++ id
                 , body = Http.emptyBody
-                , expect = Http.expectJson (Decode.list Data.Survey.likertSurveyChoicesDecoder)
+                , expect = Http.expectJson (Decode.list Survey.likertSurveyChoicesDecoder)
                 , timeout = Nothing
                 , withCredentials = True
                 }
@@ -126,11 +126,11 @@ getLikertChoices authModel id =
         request
 
 
-postLikertResponses : Authentication.Model -> Data.Survey.LikertSurvey -> Http.Request (List Data.Survey.LikertResponse)
+postLikertResponses : Authentication.Model -> Survey.LikertSurvey -> Http.Request (List Survey.LikertResponse)
 postLikertResponses authModel likertSurvey =
     let
         body =
-            Data.Survey.likertResponseEncoder likertSurvey
+            Survey.likertResponseEncoder likertSurvey
                 |> Http.jsonBody
 
         headers =
@@ -142,7 +142,7 @@ postLikertResponses authModel likertSurvey =
                 , headers = headers
                 , url = "api/likert_responses"
                 , body = body
-                , expect = Http.expectJson (Decode.list Data.Survey.likertResponseDecoder)
+                , expect = Http.expectJson (Decode.list Survey.likertResponseDecoder)
                 , timeout = Nothing
                 , withCredentials = True
                 }
