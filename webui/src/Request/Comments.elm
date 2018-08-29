@@ -3,7 +3,7 @@ module Request.Comments exposing (get, post)
 import Json.Decode as Decode
 import Authentication
 import Http
-import Data.Comment exposing (decode, encode)
+import Data.Comment
 
 
 commentsUrl : String
@@ -32,7 +32,7 @@ post authModel newComment =
                 |> Http.jsonBody
 
         headers =
-            (Authentication.tryGetAuthHeader authModel) ++ Authentication.getReturnHeaders
+            Authentication.tryGetAuthHeader authModel ++ Authentication.getReturnHeaders
 
         _ =
             Debug.log "postComment called with " newComment.message

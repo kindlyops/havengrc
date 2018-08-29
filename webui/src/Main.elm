@@ -1,15 +1,13 @@
-module Main exposing (..)
+module Main exposing (main)
 
 import Keycloak
 import Navigation
 import Gravatar
 import Authentication
-import Http
-import Keycloak
 import Ports
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Html.Events exposing (..)
+import Html exposing (Html, div, nav, button, span, text, ul, li, a, img, i)
+import Html.Attributes exposing (class, attribute, id, href, style, classList)
+import Html.Events exposing (onClick)
 import Route
 import Page.Activity as Activity
 import Page.Comments as Comments
@@ -21,6 +19,7 @@ import Page.Reports as Reports
 import Page.Survey as Survey
 import Page.SurveyResponses as SurveyResponses
 import Page.Terms as Terms
+import Json.Decode as Decode
 
 
 type alias Model =
@@ -36,15 +35,31 @@ type alias Model =
 type alias MenuItem =
     { text : String
     , iconName : String
-    , route : Maybe Route.Location
+    , route : Maybe Route.Route
     }
 
 
-init : Maybe Keycloak.LoggedInUser -> Navigation.Location -> ( Model, Cmd Msg )
-init initialUser location =
+decodeKeyCloak : Decode.Value -> Maybe Keycloak.LoggedInUser
+decodeKeyCloak json =
+    json
+        |> Decode.decodeValue Decode.string
+        |> Result.toMaybe
+        |> Maybe.andThen (Decode.decodeString Keycloak.loggedInUserDecoder >> Result.toMaybe)
+
+
+decodeSavedState : Decode.Value -> Maybe Survey.TestStructure
+decodeSavedState json =
+    json
+        |> Decode.decodeValue Decode.string
+        |> Result.toMaybe
+        |> Maybe.andThen (Decode.decodeString Survey.testDecoder >> Result.toMaybe)
+
+
+init : Decode.Value -> Navigation.Location -> ( Model, Cmd Msg )
+init sessionStorage location =
     let
         initialAuthModel =
-            Authentication.init Ports.keycloakLogin Ports.keycloakLogout initialUser
+            Authentication.init Ports.keycloakLogin Ports.keycloakLogout (decodeKeyCloak sessionStorage)
 
         ( route, routeCmd ) =
             Route.init (Just location)
@@ -53,7 +68,12 @@ init initialUser location =
             Comments.init initialAuthModel
 
         ( surveyModel, surveyCmd ) =
-            Survey.init initialAuthModel
+            case Result.toMaybe (Decode.decodeValue Survey.testDecoder sessionStorage) of
+                Just savedState ->
+                    Survey.initWithSave initialAuthModel savedState
+
+                Nothing ->
+                    Survey.init initialAuthModel
 
         ( surveyResponseModel, surveyResponsesCmd ) =
             SurveyResponses.init initialAuthModel
@@ -70,9 +90,9 @@ init initialUser location =
         ( model
         , Cmd.batch
             [ routeCmd
-            , (Cmd.map CommentsMsg commentsCmd)
-            , (Cmd.map SurveyMsg surveyCmd)
-            , (Cmd.map SurveyResponseMsg surveyResponsesCmd)
+            , Cmd.map CommentsMsg commentsCmd
+            , Cmd.map SurveyMsg surveyCmd
+            , Cmd.map SurveyResponseMsg surveyResponsesCmd
             ]
         )
 
@@ -82,9 +102,9 @@ subscriptions model =
     Ports.keycloakAuthResult (Authentication.handleAuthResult >> AuthenticationMsg)
 
 
-main : Program (Maybe Keycloak.LoggedInUser) Model Msg
+main : Program Decode.Value Model Msg
 main =
-    Navigation.programWithFlags (UrlChange)
+    Navigation.programWithFlags UrlChange
         { init = init
         , update = update
         , subscriptions = subscriptions
@@ -93,9 +113,8 @@ main =
 
 
 type Msg
-    = NavigateTo (Maybe Route.Location)
+    = NavigateTo (Maybe Route.Route)
     | UrlChange Navigation.Location
-    | ShowError String
     | AuthenticationMsg Authentication.Msg
     | DashboardMsg Dashboard.Msg
     | CommentsMsg Comments.Msg
@@ -124,9 +143,6 @@ update msg model =
             in
                 { model | route = Route.locFor (Just location) } ! []
 
-        ShowError value ->
-            model ! [ Ports.showError value ]
-
         AuthenticationMsg authMsg ->
             let
                 ( authModel, cmd ) =
@@ -135,18 +151,17 @@ update msg model =
                 ( commentsModel, commentsCmd ) =
                     Comments.init authModel
 
-                ( surveyModel, surveyCmd ) =
+                ( _, surveyCmd ) =
                     Survey.init authModel
             in
                 ( { model
                     | authModel = authModel
                     , commentsModel = commentsModel
-                    , surveyModel = surveyModel
                   }
                 , Cmd.batch
                     [ Cmd.map AuthenticationMsg cmd
-                    , (Cmd.map CommentsMsg commentsCmd)
-                    , (Cmd.map SurveyMsg surveyCmd)
+                    , Cmd.map CommentsMsg commentsCmd
+                    , Cmd.map SurveyMsg surveyCmd
                     ]
                 )
 
@@ -177,22 +192,6 @@ update msg model =
                     SurveyResponses.update surveyResponseMsg model.surveyResponseModel model.authModel
             in
                 ( { model | surveyResponseModel = surveyResponseModel }, Cmd.map SurveyResponseMsg cmd )
-
-
-getHTTPErrorMessage : Http.Error -> String
-getHTTPErrorMessage error =
-    case error of
-        Http.NetworkError ->
-            "Is the server running?"
-
-        Http.BadStatus response ->
-            (toString response.status)
-
-        Http.BadPayload message _ ->
-            "Decoding Failed: " ++ message
-
-        _ ->
-            (toString error)
 
 
 selectedItem : Route.Model -> String
@@ -242,13 +241,13 @@ view model =
                     Debug.log "model route is: " (toString model.route)
             in
                 case model.route of
-                    Just (Route.Privacy) ->
+                    Just Route.Privacy ->
                         Privacy.view
 
-                    Just (Route.Terms) ->
+                    Just Route.Terms ->
                         Terms.view
 
-                    Just (Route.Landing) ->
+                    Just Route.Landing ->
                         Landing.view |> Html.map AuthenticationMsg
 
                     -- everything else gets the front page
@@ -296,33 +295,33 @@ viewBody model =
     div [ id "content", class "content-wrapper container" ]
         [ case model.route of
             Nothing ->
-                (Dashboard.view model.dashboardModel) |> Html.map DashboardMsg
+                Dashboard.view model.dashboardModel |> Html.map DashboardMsg
 
-            Just (Route.Home) ->
-                (Dashboard.view model.dashboardModel) |> Html.map DashboardMsg
+            Just Route.Home ->
+                Dashboard.view model.dashboardModel |> Html.map DashboardMsg
 
-            Just (Route.Reports) ->
+            Just Route.Reports ->
                 Reports.view
 
-            Just (Route.Privacy) ->
+            Just Route.Privacy ->
                 Privacy.view
 
-            Just (Route.Terms) ->
+            Just Route.Terms ->
                 Terms.view
 
-            Just (Route.Dashboard) ->
-                (Dashboard.view model.dashboardModel) |> Html.map DashboardMsg
+            Just Route.Dashboard ->
+                Dashboard.view model.dashboardModel |> Html.map DashboardMsg
 
-            Just (Route.Comments) ->
+            Just Route.Comments ->
                 Comments.view model.authModel model.commentsModel |> Html.map CommentsMsg
 
-            Just (Route.Activity) ->
+            Just Route.Activity ->
                 Activity.view
 
-            Just (Route.Survey) ->
+            Just Route.Survey ->
                 Survey.view model.authModel model.surveyModel |> Html.map SurveyMsg
 
-            Just (Route.SurveyResponses) ->
+            Just Route.SurveyResponses ->
                 SurveyResponses.view model.authModel model.surveyResponseModel |> Html.map SurveyResponseMsg
 
             Just _ ->
@@ -333,23 +332,6 @@ viewBody model =
 notFoundBody : Model -> Html Msg
 notFoundBody model =
     div [] [ text "This is the notFound view" ]
-
-
-viewHeader : Model -> Html Msg
-viewHeader model =
-    div [ class "mdc-toolbar mdc-toolbar--fixed header" ]
-        [ div [ class "mdc-toolbar__row" ]
-            [ section [ class "mdc-toolbar__section mdc-toolbar__section--align-start" ]
-                [ button
-                    [ id "MenuButton"
-                    , class "menu material-icons mdc-toolbar__icon--menu"
-                    ]
-                    [ text "menu" ]
-                , h1 [ class "mdc-toolbar__title" ]
-                    [ text "Haven GRC" ]
-                ]
-            ]
-        ]
 
 
 viewNavUser : Model -> Keycloak.UserProfile -> Html Msg
@@ -376,49 +358,6 @@ viewNavUser model user =
         ]
 
 
-viewUser : Model -> Keycloak.UserProfile -> Html Msg
-viewUser model user =
-    div [ class "user-container" ]
-        [ img
-            [ attribute "sizing" "contain"
-            , attribute "src" (getGravatar user.username)
-            , class "user-avatar"
-            ]
-            []
-        , span [ class "user-name" ]
-            [ text user.firstName ]
-        , div [ class "mdc-menu-anchor" ]
-            [ button
-                [ id "UserDropdownButton"
-                , class "user-menu-btn"
-                ]
-                [ i [ class "material-icons" ]
-                    [ text "arrow_drop_down" ]
-                ]
-            , div
-                [ id "UserDropdownMenu"
-                , class "mdc-simple-menu"
-                , attribute "tabindex" "-1"
-                ]
-                [ ul [ class "mdc-simple-menu__items mdc-list" ]
-                    [ a
-                        [ class "mdc-list-item"
-                        , href "/auth/realms/havendev/account/"
-                        , attribute "tabindex" "0"
-                        ]
-                        [ text "Edit Account" ]
-                    , li
-                        [ class "mdc-list-item"
-                        , onClick (AuthenticationMsg Authentication.LogOut)
-                        , attribute "tabindex" "0"
-                        ]
-                        [ text "Log Out" ]
-                    ]
-                ]
-            ]
-        ]
-
-
 viewNavDrawerItems : List MenuItem -> Route.Model -> Html Msg
 viewNavDrawerItems menuItems route =
     nav [ class "navdrawer-nav" ]
@@ -435,12 +374,11 @@ viewNavDrawerItem menuItem route =
     a
         [ attribute "name" (String.toLower menuItem.text)
         , onClick <| NavigateTo <| menuItem.route
-          --, href "#"
         , style [ ( "cursor", "pointer" ) ]
         , classList
             [ ( "nav-item", True )
             , ( "nav-link", True )
-            , ( "active", (String.toLower menuItem.text) == (selectedItem route) )
+            , ( "active", String.toLower menuItem.text == selectedItem route )
             ]
         ]
         [ i [ class "material-icons" ] [ text menuItem.iconName ]

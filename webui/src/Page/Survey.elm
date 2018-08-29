@@ -1,4 +1,16 @@
-module Page.Survey exposing (..)
+module Page.Survey
+    exposing
+        ( Model
+        , init
+        , initWithSave
+        , update
+        , Msg
+        , view
+        , SavedState
+        , decodeSavedState
+        , TestStructure
+        , testDecoder
+        )
 
 import Data.Survey
     exposing
@@ -12,19 +24,27 @@ import Data.Survey
         , IpsativeAnswer
         , LikertAnswer
         , SurveyMetaData
-        , IpsativeServerData
-        , IpsativeServerQuestion
+        , encodeSurvey
+        , encodeSurveyData
+        , encodeSurveyMetaData
+        , InitialSurvey
+        , upgradeSurvey
+        , decodeSurveyMetaData
+        , decodeInitialSurvey
         )
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Html.Events exposing (..)
-import List.Zipper as Zipper exposing (..)
+import Html exposing (Html, div, h1, text, p, button, hr, br, table, tbody, tr, td, i, thead, th, ul, li, h3, h4)
+import Html.Attributes exposing (class, disabled, style, type_)
+import Html.Events exposing (onClick)
+import List.Zipper as Zipper
 import Authentication
 import Http
 import Request.Survey
 import Ports
 import Views.SurveyCard
 import Utils exposing (getHTTPErrorMessage)
+import Json.Encode as Encode
+import Json.Decode as Decode exposing (Decoder, decodeString, int, andThen, oneOf)
+import Json.Decode.Pipeline exposing (decode, required)
 
 
 type SurveyPage
@@ -38,7 +58,6 @@ type SurveyPage
 type alias Model =
     { currentSurvey : Survey
     , currentPage : SurveyPage
-    , numberOfGroups : Int
     , availableIpsativeSurveys : List SurveyMetaData
     , availableLikertSurveys : List SurveyMetaData
     , selectedSurveyMetaData : SurveyMetaData
@@ -51,17 +70,103 @@ type alias Model =
 --TODO: change currentSurvey to Maybe
 
 
+type alias TestStructure =
+    { storedSurvey : SavedState
+    }
+
+
+testDecoder : Decoder TestStructure
+testDecoder =
+    decode TestStructure
+        |> required "storedSurvey" decodeSavedState
+
+
+type alias SavedState =
+    { currentPage : SurveyPage
+    , surveyData : InitialSurvey
+    , selectedSurveyMetaData : SurveyMetaData
+    , isSurveyReady : Bool
+    , currentQuestionNumber : Int
+    }
+
+
+decodeSavedState : Decoder SavedState
+decodeSavedState =
+    decode SavedState
+        |> required "currentPage" (decodeCurrentPage)
+        |> required "surveyData" (decodeInitialSurvey)
+        |> required "selectedSurveyMetaData" (decodeSurveyMetaData)
+        |> required "isSurveyReady" Decode.bool
+        |> required "currentQuestionNumber" Decode.int
+
+
+decodeCurrentPage : Decoder SurveyPage
+decodeCurrentPage =
+    Decode.string
+        |> Decode.andThen
+            (\str ->
+                case str of
+                    "Home" ->
+                        Decode.succeed Home
+
+                    "SurveyInstructions" ->
+                        Decode.succeed SurveyInstructions
+
+                    "Survey" ->
+                        Decode.succeed Survey
+
+                    "IncompleteSurvey" ->
+                        Decode.succeed IncompleteSurvey
+
+                    "Finished" ->
+                        Decode.succeed Finished
+
+                    somethingElse ->
+                        Decode.fail <| "Unknown theme: " ++ somethingElse
+            )
+
+
 init : Authentication.Model -> ( Model, Cmd Msg )
 init authModel =
     initialModel
         ! initialCommands authModel
 
 
+initWithSave : Authentication.Model -> TestStructure -> ( Model, Cmd Msg )
+initWithSave authModel testStructure =
+    let
+        savedState =
+            testStructure.storedSurvey
+
+        upgradedSurvey =
+            upgradeSurvey savedState.surveyData savedState.selectedSurveyMetaData savedState.currentQuestionNumber
+
+        upgradedModel =
+            case upgradedSurvey of
+                Ipsative survey ->
+                    { initialModel
+                        | currentSurvey = upgradedSurvey
+                        , currentPage = savedState.currentPage
+                        , selectedSurveyMetaData = savedState.selectedSurveyMetaData
+                        , isSurveyReady = savedState.isSurveyReady
+                    }
+
+                Likert survey ->
+                    { initialModel
+                        | currentSurvey = upgradedSurvey
+                        , currentPage = savedState.currentPage
+                        , selectedSurveyMetaData = savedState.selectedSurveyMetaData
+                        , isSurveyReady = savedState.isSurveyReady
+                    }
+    in
+        upgradedModel
+            ! initialCommands authModel
+
+
 initialModel : Model
 initialModel =
     { currentSurvey = Ipsative Data.Survey.emptyIpsativeServerSurvey
     , currentPage = Home
-    , numberOfGroups = 2
     , availableIpsativeSurveys = []
     , availableLikertSurveys = []
     , selectedSurveyMetaData = Data.Survey.emptyIpsativeServerMetaData
@@ -70,19 +175,59 @@ initialModel =
     }
 
 
+storeSurvey : Model -> Int -> Cmd msg
+storeSurvey model currentQuestionNumber =
+    encodeApplicationPage model currentQuestionNumber
+        |> Just
+        |> Ports.saveSurveyState
+
+
+encodeApplicationPage : Model -> Int -> Encode.Value
+encodeApplicationPage model currentQuestionNumber =
+    Encode.object
+        [ ( "currentPage", Encode.string (encodeSurveyPage model.currentPage) )
+        , ( "surveyData", encodeSurveyData model.currentSurvey )
+        , ( "selectedSurveyMetaData", encodeSurveyMetaData model.selectedSurveyMetaData )
+        , ( "isSurveyReady", Encode.bool model.isSurveyReady )
+        , ( "currentQuestionNumber", Encode.int currentQuestionNumber )
+        ]
+
+
+encodeSurveyPage : SurveyPage -> String
+encodeSurveyPage surveyPage =
+    case surveyPage of
+        Home ->
+            "Home"
+
+        SurveyInstructions ->
+            "SurveyInstructions"
+
+        Survey ->
+            "Survey"
+
+        IncompleteSurvey ->
+            "IncompleteSurvey"
+
+        Finished ->
+            "Finished"
+
+
 initialCommands : Authentication.Model -> List (Cmd Msg)
 initialCommands authModel =
     if Authentication.isLoggedIn authModel then
-        [ Http.send GotServerIpsativeSurveys (Request.Survey.getIpsativeSurveys authModel)
-        , Http.send GotServerLikertSurveys (Request.Survey.getLikertSurveys authModel)
-        ]
+        surveyRequests authModel
     else
         []
 
 
+surveyRequests authModel =
+    [ Http.send GotServerIpsativeSurveys (Request.Survey.getIpsativeSurveys authModel)
+    , Http.send GotServerLikertSurveys (Request.Survey.getLikertSurveys authModel)
+    ]
+
+
 type Msg
-    = NoOp
-    | BeginLikertSurvey
+    = BeginLikertSurvey
     | BeginIpsativeSurvey
     | StartLikertSurvey SurveyMetaData
     | StartIpsativeSurvey SurveyMetaData
@@ -93,7 +238,7 @@ type Msg
     | GoToHome
     | FinishSurvey
     | SelectLikertAnswer String String
-    | GotoQuestion Survey Int
+    | GotoQuestion Int
     | GetIpsativeSurveys
     | GetLikertSurveys
     | GotServerIpsativeSurveys (Result Http.Error (List Data.Survey.SurveyMetaData))
@@ -109,9 +254,6 @@ type Msg
 update : Msg -> Model -> Authentication.Model -> ( Model, Cmd Msg )
 update msg model authModel =
     case msg of
-        NoOp ->
-            model ! []
-
         SaveCurrentSurvey ->
             case model.currentSurvey of
                 Ipsative survey ->
@@ -210,23 +352,42 @@ update msg model authModel =
 
                         _ ->
                             model.currentSurvey
+
+                newModel =
+                    { model | currentSurvey = newSurvey }
             in
-                { model | currentSurvey = newSurvey } ! []
+                newModel ! [ (storeSurvey newModel (getQuestionNumber newModel)) ]
 
         GoToHome ->
-            { model | currentPage = Home } ! []
+            let
+                newModel =
+                    { model | currentPage = Home }
+            in
+                newModel ! ((storeSurvey newModel (getQuestionNumber newModel)) :: (surveyRequests authModel))
 
         FinishSurvey ->
-            if validateSurvey model.currentSurvey then
-                { model | currentPage = Finished } ! []
-            else
-                { model | currentPage = IncompleteSurvey } ! []
+            let
+                newModel =
+                    if validateSurvey model.currentSurvey then
+                        { model | currentPage = Finished }
+                    else
+                        { model | currentPage = IncompleteSurvey }
+            in
+                newModel ! [ (storeSurvey newModel (getQuestionNumber newModel)) ]
 
         BeginLikertSurvey ->
-            { model | currentPage = Survey } ! []
+            let
+                newModel =
+                    { model | currentPage = Survey }
+            in
+                newModel ! [ (storeSurvey newModel (getQuestionNumber newModel)) ]
 
         BeginIpsativeSurvey ->
-            { model | currentPage = Survey } ! []
+            let
+                newModel =
+                    { model | currentPage = Survey }
+            in
+                newModel ! [ (storeSurvey newModel (getQuestionNumber newModel)) ]
 
         StartLikertSurvey metaData ->
             { model | currentPage = SurveyInstructions, selectedSurveyMetaData = metaData } ! [ Http.send GotLikertServerData (Request.Survey.getLikertSurvey authModel metaData.uuid) ]
@@ -239,36 +400,52 @@ update msg model authModel =
                 Ipsative survey ->
                     case Zipper.next survey.questions of
                         Just x ->
-                            { model | currentSurvey = Ipsative { survey | questions = x } } ! []
+                            let
+                                newModel =
+                                    { model | currentSurvey = Ipsative { survey | questions = x } }
+                            in
+                                newModel ! [ (storeSurvey newModel (getQuestionNumber newModel)) ]
 
                         _ ->
-                            { model | currentSurvey = Ipsative survey } ! []
+                            model ! []
 
                 Likert survey ->
                     case Zipper.next survey.questions of
                         Just x ->
-                            { model | currentSurvey = Likert { survey | questions = x } } ! []
+                            let
+                                newModel =
+                                    { model | currentSurvey = Likert { survey | questions = x } }
+                            in
+                                newModel ! [ (storeSurvey newModel (getQuestionNumber newModel)) ]
 
                         _ ->
-                            { model | currentSurvey = Likert survey } ! []
+                            model ! []
 
         PreviousQuestion ->
             case model.currentSurvey of
                 Ipsative survey ->
                     case Zipper.previous survey.questions of
                         Just x ->
-                            { model | currentSurvey = Ipsative { survey | questions = x } } ! []
+                            let
+                                newModel =
+                                    { model | currentSurvey = Ipsative { survey | questions = x } }
+                            in
+                                newModel ! [ (storeSurvey newModel (getQuestionNumber newModel)) ]
 
                         _ ->
-                            { model | currentSurvey = Ipsative survey } ! []
+                            model ! []
 
                 Likert survey ->
                     case Zipper.previous survey.questions of
                         Just x ->
-                            { model | currentSurvey = Likert { survey | questions = x } } ! []
+                            let
+                                newModel =
+                                    { model | currentSurvey = Likert { survey | questions = x } }
+                            in
+                                newModel ! [ (storeSurvey newModel (getQuestionNumber newModel)) ]
 
                         _ ->
-                            { model | currentSurvey = Likert survey } ! []
+                            model ! []
 
         DecrementAnswer answer groupNumber ->
             --if points for this answer is > 0,
@@ -282,8 +459,11 @@ update msg model authModel =
 
                         _ ->
                             model.currentSurvey
+
+                newModel =
+                    { model | currentSurvey = newSurvey }
             in
-                { model | currentSurvey = newSurvey } ! []
+                newModel ! [ (storeSurvey newModel (getQuestionNumber newModel)) ]
 
         IncrementAnswer answer groupNumber ->
             --    --if points left in group > 0,
@@ -297,26 +477,47 @@ update msg model authModel =
 
                         _ ->
                             model.currentSurvey
-            in
-                { model | currentSurvey = newSurvey } ! []
 
-        GotoQuestion survey questionNumber ->
+                newModel =
+                    { model | currentSurvey = newSurvey }
+            in
+                newModel ! [ (storeSurvey newModel (getQuestionNumber newModel)) ]
+
+        GotoQuestion questionNumber ->
             case model.currentSurvey of
                 Ipsative survey ->
                     case Zipper.find (\x -> x.orderNumber == questionNumber) (Zipper.first survey.questions) of
                         Just x ->
-                            { model | currentSurvey = Ipsative { survey | questions = x }, currentPage = Survey } ! []
+                            let
+                                newModel =
+                                    { model | currentSurvey = Ipsative { survey | questions = x }, currentPage = Survey }
+                            in
+                                newModel ! [ (storeSurvey newModel (getQuestionNumber newModel)) ]
 
                         _ ->
-                            { model | currentSurvey = Ipsative survey } ! []
+                            model ! []
 
                 Likert survey ->
                     case Zipper.find (\x -> x.orderNumber == questionNumber) (Zipper.first survey.questions) of
                         Just x ->
-                            { model | currentSurvey = Likert { survey | questions = x }, currentPage = Survey } ! []
+                            let
+                                newModel =
+                                    { model | currentSurvey = Likert { survey | questions = x }, currentPage = Survey }
+                            in
+                                newModel ! [ (storeSurvey newModel (getQuestionNumber newModel)) ]
 
                         _ ->
-                            { model | currentSurvey = Likert survey } ! []
+                            model ! []
+
+
+getQuestionNumber : Model -> Int
+getQuestionNumber model =
+    case model.currentSurvey of
+        Ipsative survey ->
+            survey.questions |> Zipper.mapAfter (\x -> []) |> Zipper.toList |> List.length
+
+        Likert survey ->
+            survey.questions |> Zipper.mapAfter (\x -> []) |> Zipper.toList |> List.length
 
 
 validateSurvey : Survey -> Bool
@@ -600,7 +801,7 @@ viewIncompleteButtons : Survey -> List Int -> List (Html Msg)
 viewIncompleteButtons survey questionNumbers =
     List.map
         (\questionNumber ->
-            div [ class "my-2" ] [ button [ class "btn btn-primary", onClick (GotoQuestion survey questionNumber) ] [ text ("Click to go back to question " ++ (toString questionNumber)) ] ]
+            div [ class "my-2" ] [ button [ class "btn btn-primary", onClick (GotoQuestion questionNumber) ] [ text ("Click to go back to question " ++ toString questionNumber) ] ]
         )
         questionNumbers
 
@@ -665,12 +866,12 @@ viewHero model =
         , button [ class "btn btn-primary", onClick GetIpsativeSurveys ] [ text "get ipsative surveys (debug)" ]
         , button [ class "btn btn-primary", onClick GetLikertSurveys ] [ text "get likert surveys (debug)" ]
         , hr [ class "my-4" ] []
-        , p [ class "" ] [ text ("There are currently " ++ (toString (getTotalAvailableSurveys model)) ++ " surveys to choose from.") ]
+        , p [ class "" ] [ text ("There are currently " ++ toString (getTotalAvailableSurveys model) ++ " surveys to choose from.") ]
         , div [ class "row" ]
             (List.map
                 (\availableSurvey ->
                     div [ class "col-6 mb-4" ]
-                        [ (Views.SurveyCard.view availableSurvey "Ipsative" (StartIpsativeSurvey availableSurvey))
+                        [ Views.SurveyCard.view availableSurvey "Ipsative" (StartIpsativeSurvey availableSurvey)
                         ]
                 )
                 model.availableIpsativeSurveys
@@ -679,7 +880,7 @@ viewHero model =
             (List.map
                 (\availableSurvey ->
                     div [ class "col-6 mb-4" ]
-                        [ (Views.SurveyCard.view availableSurvey "Likert" (StartLikertSurvey availableSurvey))
+                        [ Views.SurveyCard.view availableSurvey "Likert" (StartLikertSurvey availableSurvey)
                         ]
                 )
                 model.availableLikertSurveys
@@ -740,18 +941,17 @@ viewLikertSurveyTableRows question =
             (\answer ->
                 tr [ class "" ]
                     (td [] [ text answer.answer ]
-                        :: (List.map
-                                (\choice ->
-                                    if isLikertSelected answer choice then
-                                        td [ class "bg-success text-white text-center align-middle", onClick (SelectLikertAnswer answer.id choice) ]
-                                            [ i [ class "material-icons" ] [ text "check" ] ]
-                                    else
-                                        td [ class "", onClick (SelectLikertAnswer answer.id choice) ]
-                                            [ div [ class "" ] []
-                                            ]
-                                )
-                                question.choices
-                           )
+                        :: List.map
+                            (\choice ->
+                                if isLikertSelected answer choice then
+                                    td [ class "bg-success text-white text-center align-middle", onClick (SelectLikertAnswer answer.id choice) ]
+                                        [ i [ class "material-icons" ] [ text "check" ] ]
+                                else
+                                    td [ class "", onClick (SelectLikertAnswer answer.id choice) ]
+                                        [ div [ class "" ] []
+                                        ]
+                            )
+                            question.choices
                     )
             )
             question.answers
@@ -776,12 +976,11 @@ viewLikertSurveyTableHeader surveyQuestion =
     thead [ class "thead-light" ]
         [ tr [ class "" ]
             (th [ class " " ] [ text "Statement" ]
-                :: (List.map
-                        (\choice ->
-                            th [ class " " ] [ text choice ]
-                        )
-                        surveyQuestion.choices
-                   )
+                :: List.map
+                    (\choice ->
+                        th [ class " " ] [ text choice ]
+                    )
+                    surveyQuestion.choices
             )
         ]
 
@@ -794,33 +993,6 @@ viewIpsativeSurvey survey =
         , viewIpsativeSurveyBoxes (Zipper.current survey.questions)
         , br [] []
         , viewSurveyFooter
-        ]
-
-
-viewNavbar : Html Msg
-viewNavbar =
-    nav [ class "navbar navbar-expand-lg navbar-light bg-light" ]
-        [ a [ class "navbar-brand", style [ ( "cursor", "pointer" ) ], onClick GoToHome ]
-            [ text "Haven Survey" ]
-        , button [ attribute "aria-controls" "navbarSupportedContent", attribute "aria-expanded" "false", attribute "aria-label" "Toggle navigation", class "navbar-toggler", attribute "data-target" "#navbarSupportedContent", attribute "data-toggle" "collapse", type_ "button" ]
-            [ span [ class "navbar-toggler-icon" ]
-                []
-            ]
-        , div [ class "collapse navbar-collapse", id "navbarSupportedContent" ]
-            [ ul [ class "navbar-nav mr-auto" ]
-                [ li [ class "nav-item active" ]
-                    [ a [ class "nav-link", style [ ( "cursor", "pointer" ) ], onClick GoToHome ]
-                        [ text "Home "
-                        , span [ class "sr-only" ]
-                            [ text "(current)" ]
-                        ]
-                    ]
-                , li [ class "nav-item" ]
-                    [ a [ class "nav-link", href "https://github.com/kindlyops/elm-survey-prototype" ]
-                        [ text "Github" ]
-                    ]
-                ]
-            ]
         ]
 
 
@@ -841,7 +1013,7 @@ viewLikertSurveyTitle survey =
     in
         div [ class "row" ]
             [ div [ class "col-lg ", style [ ( "text-align", "center" ) ] ]
-                [ h3 [ class "" ] [ text ("Question " ++ questionNumber ++ " of " ++ (toString totalQuestions)) ]
+                [ h3 [ class "" ] [ text ("Question " ++ questionNumber ++ " of " ++ toString totalQuestions) ]
                 , h4 [] [ text questionTitle ]
                 ]
             ]
@@ -864,7 +1036,7 @@ viewIpsativeSurveyTitle survey =
     in
         div [ class "row" ]
             [ div [ class "col-lg ", style [ ( "text-align", "center" ) ] ]
-                [ h3 [ class "" ] [ text ("Question " ++ (toString questionNumber) ++ " of " ++ (toString totalQuestions)) ]
+                [ h3 [ class "" ] [ text ("Question " ++ toString questionNumber ++ " of " ++ toString totalQuestions) ]
                 , h4 [] [ text questionTitle ]
                 , div [ class "row" ] (viewPointsLeft currentQuestion.pointsLeft survey.pointsPerQuestion)
                 ]
@@ -876,9 +1048,9 @@ viewPointsLeft pointsLeft pointsPerQuestion =
     List.map
         (\x ->
             div [ class "col-md" ]
-                [ p [] [ text ("Group " ++ (toString x.group) ++ ": " ++ (toString x.pointsLeft) ++ "/" ++ (toString pointsPerQuestion)) ]
+                [ p [] [ text ("Group " ++ toString x.group ++ ": " ++ toString x.pointsLeft ++ "/" ++ toString pointsPerQuestion) ]
                 , div [ class "progress" ]
-                    [ div [ class "progress-bar bg-primary", style [ (calculateProgressBarPercent x.pointsLeft pointsPerQuestion) ] ] []
+                    [ div [ class "progress-bar bg-primary", style [ calculateProgressBarPercent x.pointsLeft pointsPerQuestion ] ] []
                     ]
                 ]
         )
@@ -889,7 +1061,7 @@ calculateProgressBarPercent : Int -> Int -> ( String, String )
 calculateProgressBarPercent current max =
     let
         percent =
-            100 * ((toFloat current) / (toFloat max))
+            100 * (toFloat current / toFloat max)
 
         percentString =
             toString percent ++ "%"
