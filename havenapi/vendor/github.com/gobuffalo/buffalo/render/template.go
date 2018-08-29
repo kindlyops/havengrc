@@ -3,13 +3,13 @@ package render
 import (
 	"html/template"
 	"io"
-	"log"
 	"os"
 	"path/filepath"
 	"sort"
 	"strings"
 
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 
 	// this blank import is here because dep doesn't
 	// handle transitive dependencies correctly
@@ -20,13 +20,15 @@ type templateRenderer struct {
 	*Engine
 	contentType string
 	names       []string
+	data        Data
 }
 
 func (s templateRenderer) ContentType() string {
 	return s.contentType
 }
 
-func (s templateRenderer) Render(w io.Writer, data Data) error {
+func (s *templateRenderer) Render(w io.Writer, data Data) error {
+	s.data = data
 	var body template.HTML
 	var err error
 	for _, name := range s.names {
@@ -43,16 +45,65 @@ func (s templateRenderer) Render(w io.Writer, data Data) error {
 func (s templateRenderer) partial(name string, dd Data) (template.HTML, error) {
 	d, f := filepath.Split(name)
 	name = filepath.Join(d, "_"+f)
-	return s.exec(name, dd)
+	m := Data{}
+	for k, v := range s.data {
+		m[k] = v
+	}
+	for k, v := range dd {
+		m[k] = v
+	}
+	return s.exec(name, m)
 }
 
 func (s templateRenderer) exec(name string, data Data) (template.HTML, error) {
-	source, err := s.TemplatesBox.MustBytes(name)
+	ct := strings.ToLower(s.contentType)
+	data["contentType"] = ct
+
+	if filepath.Ext(name) == "" {
+		switch {
+		case strings.Contains(ct, "html"):
+			name += ".html"
+		case strings.Contains(ct, "javascript"):
+			name += ".js"
+		case strings.Contains(ct, "markdown"):
+			name += ".md"
+		}
+	}
+
+	// Try to use localized version
+	templateName := name
+	if languages, ok := data["languages"].([]string); ok {
+		ll := len(languages)
+		if ll > 0 {
+			// Default language is the last in the list
+			defaultLanguage := languages[ll-1]
+			ext := filepath.Ext(name)
+			rawName := strings.TrimSuffix(name, ext)
+
+			for _, l := range languages {
+				var candidateName string
+				if l == defaultLanguage {
+					break
+				}
+				candidateName = rawName + "." + strings.ToLower(l) + ext
+				if s.TemplatesBox.Has(candidateName) {
+					// Replace name with the existing suffixed version
+					templateName = candidateName
+					break
+				}
+			}
+		}
+	}
+
+	// Set current_template to context
+	if _, ok := data["current_template"]; !ok {
+		data["current_template"] = templateName
+	}
+
+	source, err := s.TemplatesBox.MustBytes(templateName)
 	if err != nil {
 		return "", err
 	}
-
-	data["contentType"] = strings.ToLower(s.contentType)
 
 	helpers := map[string]interface{}{
 		"partial": s.partial,
@@ -68,7 +119,7 @@ func (s templateRenderer) exec(name string, data Data) (template.HTML, error) {
 	for _, ext := range s.exts(name) {
 		te, ok := s.TemplateEngines[ext]
 		if !ok {
-			log.Printf("could not find a template engine for %s\n", ext)
+			logrus.Errorf("could not find a template engine for %s\n", ext)
 			continue
 		}
 		body, err = te(body, data, helpers)
@@ -103,7 +154,10 @@ func (s templateRenderer) assetPath(file string) (string, error) {
 		manifest, err := s.AssetsBox.MustString("manifest.json")
 
 		if err != nil {
-			return assetPathFor(file), nil
+			manifest, err = s.AssetsBox.MustString("assets/manifest.json")
+			if err != nil {
+				return assetPathFor(file), nil
+			}
 		}
 
 		err = loadManifest(manifest)
@@ -133,7 +187,7 @@ func Template(c string, names ...string) Renderer {
 // and the first file will be the "content" file which will
 // be placed into the "layout" using "{{yield}}".
 func (e *Engine) Template(c string, names ...string) Renderer {
-	return templateRenderer{
+	return &templateRenderer{
 		Engine:      e,
 		contentType: c,
 		names:       names,

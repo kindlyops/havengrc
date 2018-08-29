@@ -1,7 +1,7 @@
 $primary: (
-  color: #5AB4AC,
-  dark:  darken(#5AB4AC, 30%),
-  light: lighten(#5AB4AC, 30%)
+  color: #2fa09d,
+  dark:  darken(#2fa09d, 30%),
+  light: lighten(#2fa09d, 30%)
 );
 
 $secondary: (
@@ -42,16 +42,30 @@ h1,h2,h2,h4,p.lead, a.nav-item, .navbar-brand, .navbar-nav {
     max-height: 37px;
 }
 
+.jumbotron{
+  padding-bottom: 150px;
+}
+
 .login-header {
     text-transform: uppercase;
-    font-family: 'Montserrat';
-    font-weight: bold;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size:60px;
 }
 
 .login-btn{
   margin-top:25px;
   border-radius: 25px;
   max-width:255px;
+}
+
+img#Wireframe{
+  margin-top: -150px;
+}
+
+h3{
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
 }
 
 #footer-image {
@@ -74,4 +88,16 @@ h1,h2,h2,h4,p.lead, a.nav-item, .navbar-brand, .navbar-nav {
 
 .homeparagraph {
   line-height: 1.6875;
+}
+
+@media screen and (max-width:768px){
+  .login-header{
+    font-size: 36px;
+  }
+}
+
+@media screen and (max-width:320px){
+  .login-header{
+    font-size: 30px;
+  }
 }

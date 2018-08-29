@@ -16,46 +16,15 @@ import (
 func Test_Template(t *testing.T) {
 	r := require.New(t)
 
-	tmpFile, err := ioutil.TempFile("", "test")
-	r.NoError(err)
-	defer os.Remove(tmpFile.Name())
-
-	_, err = tmpFile.Write([]byte("<%= name %>"))
-	r.NoError(err)
-
-	type ji func(string, ...string) render.Renderer
-
-	table := []ji{
-		render.New(render.Options{}).Template,
-	}
-
-	for _, j := range table {
-		re := j("foo/bar", tmpFile.Name())
-		r.Equal("foo/bar", re.ContentType())
-		bb := &bytes.Buffer{}
-		err = re.Render(bb, render.Data{"name": "Mark"})
-		r.NoError(err)
-		r.Equal("Mark", strings.TrimSpace(bb.String()))
-	}
-}
-
-func Test_Template_Partial(t *testing.T) {
-	r := require.New(t)
-
 	tPath, err := ioutil.TempDir("", "")
 	r.NoError(err)
 	defer os.Remove(tPath)
 
-	partFile, err := os.Create(filepath.Join(tPath, "_foo.html"))
+	tmpFile, err := os.Create(filepath.Join(tPath, "test"))
 	r.NoError(err)
+	defer os.Remove(tmpFile.Name())
 
-	_, err = partFile.Write([]byte("Foo > <%= name %>"))
-	r.NoError(err)
-
-	tmpFile, err := os.Create(filepath.Join(tPath, "index.html"))
-	r.NoError(err)
-
-	_, err = tmpFile.Write([]byte(`<%= partial("foo.html") %>`))
+	_, err = tmpFile.Write([]byte("<%= name %>"))
 	r.NoError(err)
 
 	type ji func(string, ...string) render.Renderer
@@ -67,12 +36,12 @@ func Test_Template_Partial(t *testing.T) {
 	}
 
 	for _, j := range table {
-		re := j("foo/bar", "index.html")
+		re := j("foo/bar", filepath.Base(tmpFile.Name()))
 		r.Equal("foo/bar", re.ContentType())
 		bb := &bytes.Buffer{}
 		err = re.Render(bb, render.Data{"name": "Mark"})
 		r.NoError(err)
-		r.Equal("Foo > Mark", strings.TrimSpace(bb.String()))
+		r.Equal("Mark", strings.TrimSpace(bb.String()))
 	}
 }
 
@@ -86,28 +55,34 @@ func Test_AssetPath(t *testing.T) {
 		"application.css":       "/assets/application.aabbc123.css",
 	}
 
-	tdir, err := ioutil.TempDir("", "test")
+	tDir, err := ioutil.TempDir("", "templates")
 	if err != nil {
-		r.Fail("Could not set the Temp dir")
+		r.Fail("Could not set the templates dir")
+	}
+
+	aDir, err := ioutil.TempDir("", "assets")
+	if err != nil {
+		r.Fail("Could not set the assets dir")
 	}
 
 	re := render.New(render.Options{
-		AssetsBox: packr.NewBox(tdir),
+		TemplatesBox: packr.NewBox(tDir),
+		AssetsBox:    packr.NewBox(aDir),
 	}).Template
 
-	ioutil.WriteFile(filepath.Join(tdir, "manifest.json"), []byte(`{
+	ioutil.WriteFile(filepath.Join(aDir, "manifest.json"), []byte(`{
 		"application.css": "application.aabbc123.css"
 	}`), 0644)
 
 	for original, expected := range cases {
 
-		tmpFile, err := ioutil.TempFile(tdir, "test")
+		tmpFile, err := os.Create(filepath.Join(tDir, "test.html"))
 		r.NoError(err)
 
 		_, err = tmpFile.Write([]byte("<%= assetPath(\"" + original + "\") %>"))
 		r.NoError(err)
 
-		result := re("text/html", tmpFile.Name())
+		result := re("text/html", filepath.Base(tmpFile.Name()))
 
 		bb := &bytes.Buffer{}
 		err = result.Render(bb, render.Data{})
@@ -125,24 +100,30 @@ func Test_AssetPathNoManifest(t *testing.T) {
 		"something.txt": "/assets/something.txt",
 	}
 
-	tdir, err := ioutil.TempDir("", "test")
+	tDir, err := ioutil.TempDir("", "templates")
 	if err != nil {
-		r.Fail("Could not set the Temp dir")
+		r.Fail("Could not set the templates dir")
+	}
+
+	aDir, err := ioutil.TempDir("", "assets")
+	if err != nil {
+		r.Fail("Could not set the assets dir")
 	}
 
 	re := render.New(render.Options{
-		AssetsBox: packr.NewBox(tdir),
+		TemplatesBox: packr.NewBox(tDir),
+		AssetsBox:    packr.NewBox(aDir),
 	}).Template
 
 	for original, expected := range cases {
 
-		tmpFile, err := ioutil.TempFile(tdir, "test")
+		tmpFile, err := os.Create(filepath.Join(tDir, "test.html"))
 		r.NoError(err)
 
 		_, err = tmpFile.Write([]byte("<%= assetPath(\"" + original + "\") %>"))
 		r.NoError(err)
 
-		result := re("text/html", tmpFile.Name())
+		result := re("text/html", filepath.Base(tmpFile.Name()))
 
 		bb := &bytes.Buffer{}
 		err = result.Render(bb, render.Data{})
@@ -160,24 +141,32 @@ func Test_AssetPathManifestCorrupt(t *testing.T) {
 		"other.txt":     "manifest.json is not correct",
 	}
 
-	tdir, err := ioutil.TempDir("", "test")
-	r.NoError(err)
+	tDir, err := ioutil.TempDir("", "templates")
+	if err != nil {
+		r.Fail("Could not set the templates dir")
+	}
 
-	ioutil.WriteFile(filepath.Join(tdir, "manifest.json"), []byte(`//shdnn Corrupt!`), 0644)
+	aDir, err := ioutil.TempDir("", "assets")
+	if err != nil {
+		r.Fail("Could not set the assets dir")
+	}
+
+	ioutil.WriteFile(filepath.Join(aDir, "manifest.json"), []byte(`//shdnn Corrupt!`), 0644)
 
 	re := render.New(render.Options{
-		AssetsBox: packr.NewBox(tdir),
+		TemplatesBox: packr.NewBox(tDir),
+		AssetsBox:    packr.NewBox(aDir),
 	}).Template
 
 	for original, expected := range cases {
 
-		tmpFile, err := ioutil.TempFile(tdir, "test")
+		tmpFile, err := os.Create(filepath.Join(tDir, "test.html"))
 		r.NoError(err)
 
 		_, err = tmpFile.Write([]byte("<%= assetPath(\"" + original + "\") %>"))
 		r.NoError(err)
 
-		result := re("text/html", tmpFile.Name())
+		result := re("text/html", filepath.Base(tmpFile.Name()))
 
 		bb := &bytes.Buffer{}
 		err = result.Render(bb, render.Data{})

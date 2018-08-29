@@ -5,7 +5,7 @@ import (
 
 	"github.com/gobuffalo/envy"
 	"github.com/gobuffalo/packr"
-	"github.com/markbates/pop"
+	"github.com/gobuffalo/pop"
 	"github.com/nleof/goyesql"
 )
 

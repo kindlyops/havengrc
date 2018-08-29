@@ -20,6 +20,17 @@ proxy /api/files havenapi:3000 {
   transparent
 }
 
+# this rewrite makes it so anything we are not proxying to api or auth
+# is rewritten to index.html, so that the SPA is served. This is necessary
+# to support path-based-routing in a single page application in cases where
+# the page is reloaded with a path, so that the browser gets the app sent
+# and then the app can interpret the path and render the correct page
+rewrite {
+  if {path} not_starts_with /api
+  if {path} not_starts_with /auth
+  to {path} {path}/ /
+}
+
 log / stdout "{combined}"
 
 errors stdout

@@ -6,8 +6,8 @@ import (
 
 	"github.com/deis/helm/log"
 	"github.com/gobuffalo/buffalo"
+	"github.com/gobuffalo/pop"
 	"github.com/kindlyops/mappamundi/havenapi/models"
-	"github.com/markbates/pop"
 )
 
 // UploadHandler accepts a file upload

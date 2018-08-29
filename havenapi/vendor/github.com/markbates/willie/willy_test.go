@@ -14,7 +14,7 @@ import (
 var Store sessions.Store = sessions.NewCookieStore([]byte("something-very-secret"))
 
 type User struct {
-	Name string `form:"name"`
+	Name string `form:"name" xml:"name"`
 }
 
 func App() http.Handler {
@@ -47,6 +47,19 @@ func App() http.Handler {
 		if sess.Values["name"] != nil {
 			fmt.Fprint(res, "NAME:"+sess.Values["name"].(string))
 		}
+	})
+	p.Post("/up", func(res http.ResponseWriter, req *http.Request) {
+		if err := req.ParseMultipartForm(5 * 1024); err != nil {
+			res.WriteHeader(500)
+			fmt.Fprint(res, err.Error())
+		}
+		_, h, err := req.FormFile("MyFile")
+		if err != nil {
+			res.WriteHeader(500)
+			fmt.Fprint(res, err.Error())
+		}
+		fmt.Fprintln(res, req.FormValue("Name"))
+		fmt.Fprintln(res, h.Filename)
 	})
 	return p
 }

@@ -1,13 +1,19 @@
 FROM gobuffalo/buffalo:development
 
-RUN buffalo version
+ARG CODECOV_TOKEN
+ARG CI
+ARG TRAVIS
+ARG TRAVIS_BRANCH
+ARG TRAVIS_COMMIT
+ARG TRAVIS_JOB_ID
+ARG TRAVIS_JOB_NUMBER
+ARG TRAVIS_OS_NAME
+ARG TRAVIS_PULL_REQUEST
+ARG TRAVIS_PULL_REQUEST_SHA
+ARG TRAVIS_REPO_SLUG
+ARG TRAVIS_TAG
 
-RUN go get -v -u github.com/golang/lint/golint
-RUN go get -v -u github.com/markbates/filetest
-RUN go get -v -u github.com/gobuffalo/makr
-RUN go get -v -u github.com/markbates/grift
-RUN go get -v -u github.com/markbates/refresh
-RUN go get -v -u github.com/gobuffalo/tags
+RUN buffalo version
 
 ENV BP=$GOPATH/src/github.com/gobuffalo/buffalo
 
@@ -17,22 +23,44 @@ RUN mkdir -p $BP
 WORKDIR $BP
 ADD . .
 
-RUN go get -v -t $(go list ./... | grep -v /vendor/)
+RUN go get -v -t ./...
+RUN make install
 
-RUN go install -v ./buffalo
+RUN go test -tags sqlite -race  ./...
+RUN go test -tags sqlite -coverprofile cover.out -covermode count ./...
 
-RUN go test -race $(go list ./... | grep -v /vendor/)
+RUN if [ -z "$CODECOV_TOKEN"  ] ; then \
+    echo codecov not enabled ; \
+    else curl -s https://codecov.io/bash -o codecov && \
+    bash codecov -f cover.out -X fix; fi
 
-RUN golint -set_exit_status $(go list ./... | grep -v /vendor/)
-
+RUN go get -u github.com/alecthomas/gometalinter
+RUN gometalinter --install
+RUN gometalinter --vendor --deadline=5m ./... --skip=internal
 
 WORKDIR $GOPATH/src/
+
+# START: tests bins are built with tags properly
+RUN mkdir -p $GOPATH/src/github.com/markbates
+WORKDIR $GOPATH/src/github.com/markbates
+RUN buffalo new --skip-webpack coke --db-type=sqlite3
+WORKDIR $GOPATH/src/github.com/markbates/coke
+RUN buffalo db create -a -d
+RUN buffalo g resource widget name
+RUN buffalo b -d
+# works fine:
+RUN ./bin/coke migrate
+RUN rm -rfv $GOPATH/src/github.com/markbates/coke
+# :END
+
+WORKDIR $GOPATH/src/
+
 RUN buffalo new  --db-type=sqlite3 hello_world --ci-provider=travis
 WORKDIR ./hello_world
 
 RUN filetest -c $GOPATH/src/github.com/gobuffalo/buffalo/buffalo/cmd/filetests/new_travis.json
 
-RUN go vet -x $(go list ./... | grep -v /vendor/)
+RUN go vet ./...
 RUN buffalo db create -a
 RUN buffalo db migrate -e test
 RUN buffalo test -race
@@ -51,24 +79,14 @@ RUN buffalo build -static
 RUN buffalo g resource users name:text email:text
 RUN filetest -c $GOPATH/src/github.com/gobuffalo/buffalo/buffalo/cmd/filetests/resource_model_migration.json
 
+RUN buffalo g resource admins --use-model users
+RUN filetest -c $GOPATH/src/github.com/gobuffalo/buffalo/buffalo/cmd/filetests/resource_use_model.json
+
+RUN rm actions/admins_test.go
 RUN rm models/user_test.go
 RUN rm models/user.go
 RUN rm actions/users_test.go
 RUN rm -rv templates/users
-
-RUN buffalo g resource --type=json users name:text email:text
-RUN filetest -c $GOPATH/src/github.com/gobuffalo/buffalo/buffalo/cmd/filetests/resource_json-xml.json
-
-RUN rm models/user_test.go
-RUN rm models/user.go
-RUN rm actions/users_test.go
-
-RUN buffalo g resource --type=xml users name:text email:text
-RUN filetest -c $GOPATH/src/github.com/gobuffalo/buffalo/buffalo/cmd/filetests/resource_json-xml.json
-
-RUN rm models/user_test.go
-RUN rm models/user.go
-RUN rm actions/users_test.go
 
 RUN buffalo g resource ouch
 RUN buffalo d resource -y ouch
@@ -123,6 +141,9 @@ RUN filetest -c $GOPATH/src/github.com/gobuffalo/buffalo/buffalo/cmd/filetests/g
 
 RUN buffalo g resource person_event
 RUN filetest -c $GOPATH/src/github.com/gobuffalo/buffalo/buffalo/cmd/filetests/generate_underscore.json
+
+RUN buffalo g mailer welcome_email
+RUN filetest -c $GOPATH/src/github.com/gobuffalo/buffalo/buffalo/cmd/filetests/generate_mailer.json
 
 RUN rm -rf bin
 RUN buffalo build -k -e

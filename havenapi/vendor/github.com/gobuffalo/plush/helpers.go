@@ -5,13 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
-	"os"
 	"reflect"
 	"strings"
 	"sync"
 
 	"github.com/gobuffalo/plush/ast"
 
+	"github.com/gobuffalo/envy"
 	"github.com/markbates/inflect"
 	"github.com/pkg/errors"
 )
@@ -31,7 +31,7 @@ func init() {
 	Helpers.Add("downcase", strings.ToLower)
 	Helpers.Add("contentFor", contentForHelper)
 	Helpers.Add("contentOf", contentOfHelper)
-	Helpers.Add("markdown", markdownHelper)
+	Helpers.Add("markdown", MarkdownHelper)
 	Helpers.Add("len", lenHelper)
 	Helpers.Add("debug", debugHelper)
 	Helpers.Add("inspect", inspectHelper)
@@ -42,6 +42,8 @@ func init() {
 	Helpers.Add("form", BootstrapFormHelper)
 	Helpers.Add("form_for", BootstrapFormForHelper)
 	Helpers.Add("truncate", truncateHelper)
+	Helpers.Add("env", envy.MustGet)
+	Helpers.Add("envOr", envy.Get)
 	Helpers.Add("raw", func(s string) template.HTML {
 		return template.HTML(s)
 	})
@@ -116,15 +118,11 @@ func lenHelper(v interface{}) int {
 
 // Debug by verbosely printing out using 'pre' tags.
 func debugHelper(v interface{}) template.HTML {
-	return template.HTML(fmt.Sprintf("<pre>%+v</pre>", v))
+	return template.HTML(fmt.Sprintf("<pre>%s</pre>", inspectHelper(v)))
 }
 
 func inspectHelper(v interface{}) string {
 	return fmt.Sprintf("%+v", v)
-}
-
-func envHelper(k string) string {
-	return os.Getenv(k)
 }
 
 func htmlEscape(s string, help HelperContext) (string, error) {
@@ -150,5 +148,8 @@ func truncateHelper(s string, opts map[string]interface{}) string {
 		return s
 	}
 	trail := opts["trail"].(string)
+	if len(trail) >= size {
+		return trail
+	}
 	return s[:size-len(trail)] + trail
 }
