@@ -125,32 +125,56 @@ encodeSurveyData survey =
                 encodeLikertSurveyWithoutZipper likertSurveyWithoutZipper
 
 
-upgradeSurvey : InitialSurvey -> SurveyMetaData -> Survey
-upgradeSurvey initialSurvey metaData =
+upgradeSurvey : InitialSurvey -> SurveyMetaData -> Int -> Survey
+upgradeSurvey initialSurvey metaData currentQuestionNumber =
     case initialSurvey of
         IpsativeWithoutZipper survey ->
-            upgradeIpsativeSurvey survey metaData 5
+            upgradeIpsativeSurvey survey metaData currentQuestionNumber
 
         LikertWithoutZipper survey ->
-            upgradeLikertSurvey survey metaData 5
+            upgradeLikertSurvey survey metaData currentQuestionNumber
 
 
 upgradeIpsativeSurvey : IpsativeSurveyWithoutZipper -> SurveyMetaData -> Int -> Survey
-upgradeIpsativeSurvey survey metaData questionNumber =
-    Ipsative
-        { metaData = metaData
-        , pointsPerQuestion = survey.pointsPerQuestion
-        , numGroups = survey.numGroups
-        , questions = Zipper.fromList survey.questions |> Zipper.withDefault emptyIpsativeQuestion
-        }
+upgradeIpsativeSurvey survey metaData currentQuestionNumber =
+    let
+        initialQuestions =
+            Zipper.fromList survey.questions |> Zipper.withDefault emptyIpsativeQuestion
+
+        focusedQuestions =
+            case Zipper.find (\x -> x.orderNumber == currentQuestionNumber) (Zipper.first initialQuestions) of
+                Just x ->
+                    x
+
+                _ ->
+                    Zipper.singleton emptyIpsativeQuestion
+    in
+        Ipsative
+            { metaData = metaData
+            , pointsPerQuestion = survey.pointsPerQuestion
+            , numGroups = survey.numGroups
+            , questions = focusedQuestions
+            }
 
 
 upgradeLikertSurvey : LikertSurveyWithoutZipper -> SurveyMetaData -> Int -> Survey
-upgradeLikertSurvey survey metaData questionNumber =
-    Likert
-        { metaData = metaData
-        , questions = Zipper.fromList survey.questions |> Zipper.withDefault emptyLikertQuestion
-        }
+upgradeLikertSurvey survey metaData currentQuestionNumber =
+    let
+        initialQuestions =
+            Zipper.fromList survey.questions |> Zipper.withDefault emptyLikertQuestion
+
+        focusedQuestions =
+            case Zipper.find (\x -> x.orderNumber == currentQuestionNumber) (Zipper.first initialQuestions) of
+                Just x ->
+                    x
+
+                _ ->
+                    Zipper.singleton emptyLikertQuestion
+    in
+        Likert
+            { metaData = metaData
+            , questions = focusedQuestions
+            }
 
 
 downgradeIpsativeSurvey : IpsativeSurvey -> IpsativeSurveyWithoutZipper

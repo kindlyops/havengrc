@@ -86,6 +86,7 @@ type alias SavedState =
     , surveyData : InitialSurvey
     , selectedSurveyMetaData : SurveyMetaData
     , isSurveyReady : Bool
+    , currentQuestionNumber : Int
     }
 
 
@@ -96,6 +97,7 @@ decodeSavedState =
         |> required "surveyData" (decodeInitialSurvey)
         |> required "selectedSurveyMetaData" (decodeSurveyMetaData)
         |> required "isSurveyReady" Decode.bool
+        |> required "currentQuestionNumber" Decode.int
 
 
 decodeCurrentPage : Decoder SurveyPage
@@ -137,7 +139,7 @@ initWithSave authModel testStructure =
             testStructure.storedSurvey
 
         upgradedSurvey =
-            upgradeSurvey savedState.surveyData savedState.selectedSurveyMetaData
+            upgradeSurvey savedState.surveyData savedState.selectedSurveyMetaData savedState.currentQuestionNumber
 
         upgradedModel =
             case upgradedSurvey of
@@ -173,20 +175,21 @@ initialModel =
     }
 
 
-storeSurvey : Model -> Cmd msg
-storeSurvey model =
-    encodeApplicationPage model
+storeSurvey : Model -> Int -> Cmd msg
+storeSurvey model currentQuestionNumber =
+    encodeApplicationPage model currentQuestionNumber
         |> Just
         |> Ports.saveSurveyState
 
 
-encodeApplicationPage : Model -> Encode.Value
-encodeApplicationPage model =
+encodeApplicationPage : Model -> Int -> Encode.Value
+encodeApplicationPage model currentQuestionNumber =
     Encode.object
         [ ( "currentPage", Encode.string (encodeSurveyPage model.currentPage) )
         , ( "surveyData", encodeSurveyData model.currentSurvey )
         , ( "selectedSurveyMetaData", encodeSurveyMetaData model.selectedSurveyMetaData )
         , ( "isSurveyReady", Encode.bool model.isSurveyReady )
+        , ( "currentQuestionNumber", Encode.int currentQuestionNumber )
         ]
 
 
@@ -353,14 +356,14 @@ update msg model authModel =
                 newModel =
                     { model | currentSurvey = newSurvey }
             in
-                newModel ! [ storeSurvey newModel ]
+                newModel ! [ (storeSurvey newModel (getQuestionNumber newModel)) ]
 
         GoToHome ->
             let
                 newModel =
                     { model | currentPage = Home }
             in
-                newModel ! (storeSurvey newModel :: (surveyRequests authModel))
+                newModel ! ((storeSurvey newModel (getQuestionNumber newModel)) :: (surveyRequests authModel))
 
         FinishSurvey ->
             let
@@ -370,21 +373,21 @@ update msg model authModel =
                     else
                         { model | currentPage = IncompleteSurvey }
             in
-                newModel ! [ storeSurvey newModel ]
+                newModel ! [ (storeSurvey newModel (getQuestionNumber newModel)) ]
 
         BeginLikertSurvey ->
             let
                 newModel =
                     { model | currentPage = Survey }
             in
-                newModel ! [ storeSurvey newModel ]
+                newModel ! [ (storeSurvey newModel (getQuestionNumber newModel)) ]
 
         BeginIpsativeSurvey ->
             let
                 newModel =
                     { model | currentPage = Survey }
             in
-                newModel ! [ storeSurvey newModel ]
+                newModel ! [ (storeSurvey newModel (getQuestionNumber newModel)) ]
 
         StartLikertSurvey metaData ->
             { model | currentPage = SurveyInstructions, selectedSurveyMetaData = metaData } ! [ Http.send GotLikertServerData (Request.Survey.getLikertSurvey authModel metaData.uuid) ]
@@ -401,7 +404,7 @@ update msg model authModel =
                                 newModel =
                                     { model | currentSurvey = Ipsative { survey | questions = x } }
                             in
-                                newModel ! [ storeSurvey newModel ]
+                                newModel ! [ (storeSurvey newModel (getQuestionNumber newModel)) ]
 
                         _ ->
                             model ! []
@@ -413,7 +416,7 @@ update msg model authModel =
                                 newModel =
                                     { model | currentSurvey = Likert { survey | questions = x } }
                             in
-                                newModel ! [ storeSurvey newModel ]
+                                newModel ! [ (storeSurvey newModel (getQuestionNumber newModel)) ]
 
                         _ ->
                             model ! []
@@ -427,7 +430,7 @@ update msg model authModel =
                                 newModel =
                                     { model | currentSurvey = Ipsative { survey | questions = x } }
                             in
-                                newModel ! [ storeSurvey newModel ]
+                                newModel ! [ (storeSurvey newModel (getQuestionNumber newModel)) ]
 
                         _ ->
                             model ! []
@@ -439,7 +442,7 @@ update msg model authModel =
                                 newModel =
                                     { model | currentSurvey = Likert { survey | questions = x } }
                             in
-                                newModel ! [ storeSurvey newModel ]
+                                newModel ! [ (storeSurvey newModel (getQuestionNumber newModel)) ]
 
                         _ ->
                             model ! []
@@ -460,7 +463,7 @@ update msg model authModel =
                 newModel =
                     { model | currentSurvey = newSurvey }
             in
-                newModel ! [ storeSurvey newModel ]
+                newModel ! [ (storeSurvey newModel (getQuestionNumber newModel)) ]
 
         IncrementAnswer answer groupNumber ->
             --    --if points left in group > 0,
@@ -478,7 +481,7 @@ update msg model authModel =
                 newModel =
                     { model | currentSurvey = newSurvey }
             in
-                newModel ! [ storeSurvey newModel ]
+                newModel ! [ (storeSurvey newModel (getQuestionNumber newModel)) ]
 
         GotoQuestion questionNumber ->
             case model.currentSurvey of
@@ -489,7 +492,7 @@ update msg model authModel =
                                 newModel =
                                     { model | currentSurvey = Ipsative { survey | questions = x }, currentPage = Survey }
                             in
-                                newModel ! [ storeSurvey newModel ]
+                                newModel ! [ (storeSurvey newModel (getQuestionNumber newModel)) ]
 
                         _ ->
                             model ! []
@@ -501,10 +504,20 @@ update msg model authModel =
                                 newModel =
                                     { model | currentSurvey = Likert { survey | questions = x }, currentPage = Survey }
                             in
-                                newModel ! [ storeSurvey newModel ]
+                                newModel ! [ (storeSurvey newModel (getQuestionNumber newModel)) ]
 
                         _ ->
                             model ! []
+
+
+getQuestionNumber : Model -> Int
+getQuestionNumber model =
+    case model.currentSurvey of
+        Ipsative survey ->
+            survey.questions |> Zipper.mapAfter (\x -> []) |> Zipper.toList |> List.length
+
+        Likert survey ->
+            survey.questions |> Zipper.mapAfter (\x -> []) |> Zipper.toList |> List.length
 
 
 validateSurvey : Survey -> Bool
