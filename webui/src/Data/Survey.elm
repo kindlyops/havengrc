@@ -125,19 +125,32 @@ encodeSurveyData survey =
                 encodeLikertSurveyWithoutZipper likertSurveyWithoutZipper
 
 
-upgradeSurvey : InitialSurvey -> Survey
-upgradeSurvey initialSurvey =
+upgradeSurvey : InitialSurvey -> SurveyMetaData -> Survey
+upgradeSurvey initialSurvey metaData =
+    case initialSurvey of
+        IpsativeWithoutZipper survey ->
+            upgradeIpsativeSurvey survey metaData 5
+
+        LikertWithoutZipper survey ->
+            upgradeLikertSurvey survey metaData 5
+
+
+upgradeIpsativeSurvey : IpsativeSurveyWithoutZipper -> SurveyMetaData -> Int -> Survey
+upgradeIpsativeSurvey survey metaData questionNumber =
     Ipsative
-        { metaData = emptyIpsativeServerMetaData
-        , pointsPerQuestion = 42
-        , numGroups = 5
-        , questions = Zipper.singleton emptyIpsativeQuestion
+        { metaData = metaData
+        , pointsPerQuestion = survey.pointsPerQuestion
+        , numGroups = survey.numGroups
+        , questions = Zipper.fromList survey.questions |> Zipper.withDefault emptyIpsativeQuestion
         }
 
 
-upgradeIpsativeSurvey : IpsativeSurveyWithoutZipper -> IpsativeSurvey
-upgradeIpsativeSurvey survey =
-    emptyIpsativeServerSurvey
+upgradeLikertSurvey : LikertSurveyWithoutZipper -> SurveyMetaData -> Int -> Survey
+upgradeLikertSurvey survey metaData questionNumber =
+    Likert
+        { metaData = metaData
+        , questions = Zipper.fromList survey.questions |> Zipper.withDefault emptyLikertQuestion
+        }
 
 
 downgradeIpsativeSurvey : IpsativeSurvey -> IpsativeSurveyWithoutZipper
