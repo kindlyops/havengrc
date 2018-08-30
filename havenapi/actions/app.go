@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/deis/helm/log"
 	"github.com/gobuffalo/buffalo"
 	"github.com/gobuffalo/buffalo/middleware"
 	"github.com/gobuffalo/buffalo/middleware/ssl"
@@ -80,6 +81,16 @@ func App() *buffalo.App {
 
 // validate JWT and set context compatible with PostgREST
 func JwtMiddleware(next buffalo.Handler) buffalo.Handler {
+	// {"resource_access":{"havendev":{"roles":["member"]}}
+
+	type Token struct {
+		ResourceAccess struct {
+			Client struct {
+				Roles []string `json:"roles",omitempty`
+			} `json:"havendev,omitempty`
+		} `json:"resource_access,omitempty"`
+	}
+
 	return func(c buffalo.Context) error {
 		header := c.Request().Header.Get("Authorization")
 		parts := strings.Split(header, "Bearer ")
@@ -113,6 +124,16 @@ func JwtMiddleware(next buffalo.Handler) buffalo.Handler {
 		if err != nil {
 			return c.Error(401, fmt.Errorf("invalid token: %s", err.Error()))
 		}
+
+		// look for the role that we should assume
+		// {"resource_access":{"havendev":{"roles":["member"]}}
+		access := allClaims["resource_access"]
+		// TODO assert the type
+		// actions/app.go:132:21: invalid operation: access["havendev"] (type interface {} does not support indexing)
+		havendev := access["havendev"]
+		roles := havendev["roles"]
+
+		log.Info("The roles we got are %s", roles)
 
 		sub := allClaims["sub"]
 		c.Set("sub", sub)
