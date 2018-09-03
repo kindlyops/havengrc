@@ -144,7 +144,7 @@ titleFor route =
                 "Privacy Policy"
 
             Landing ->
-                "Landing Page"
+                "Welcome"
 
             Reports ->
                 "Reports"
@@ -176,8 +176,14 @@ urlFor loc =
                 Dashboard ->
                     "/dashboard/"
 
+                EditComment id ->
+                    "/comments/" ++ toString id ++ "/edit"
+
                 Home ->
                     "/"
+
+                Landing ->
+                    "/l/"
 
                 Login ->
                     "/login/"
@@ -185,23 +191,17 @@ urlFor loc =
                 Privacy ->
                     "/privacy/"
 
-                Landing ->
-                    "/l/"
-
                 Reports ->
                     "/reports/"
+
+                ShowComment id ->
+                    "/comments/" ++ toString id
 
                 Survey ->
                     "/survey/"
 
                 SurveyResponses ->
                     "/surveyResponses/"
-
-                ShowComment id ->
-                    "/comments/" ++ toString id
-
-                EditComment id ->
-                    "/comments/" ++ toString id ++ "/edit"
 
                 Terms ->
                     "/terms/"
