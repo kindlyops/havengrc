@@ -9,7 +9,7 @@ RUN mvn -f /keycloak-service-providers/pom.xml dependency:resolve
 COPY keycloak-service-providers /keycloak-service-providers
 RUN mvn -f /keycloak-service-providers/pom.xml clean package
 
-FROM                havengrc-docker.jfrog.io/jboss/keycloak-openshift:4.0.0.Final
+FROM                havengrc-docker.jfrog.io/jboss/keycloak-openshift:4.3.0.Final
 MAINTAINER          Kindly Ops, LLC <support@kindlyops.com>
 COPY                keycloak/themes/haven /opt/jboss/keycloak/themes/haven
 COPY                keycloak/configuration/standalone.xml /opt/jboss/keycloak/standalone/configuration/standalone.xml
