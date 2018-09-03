@@ -3,15 +3,10 @@ package buffalo
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
-	"strings"
 	"testing"
-	"time"
-
-	"golang.org/x/net/websocket"
 
 	"github.com/gobuffalo/buffalo/render"
 	"github.com/markbates/willie"
@@ -39,6 +34,47 @@ func Test_DefaultContext_Redirect(t *testing.T) {
 	w := willie.New(a)
 	res := w.Request("/").Get()
 	r.Equal(u, res.Location())
+}
+
+func Test_DefaultContext_Redirect_Helper(t *testing.T) {
+	r := require.New(t)
+
+	table := []struct {
+		E string
+		I map[string]interface{}
+		S int
+	}{
+		{
+			E: "/foo/baz",
+			I: map[string]interface{}{"bar": "baz"},
+			S: 302,
+		},
+		{
+			S: 500,
+		},
+	}
+
+	for _, tt := range table {
+		a := New(Options{})
+		a.GET("/foo/{bar}", func(c Context) error {
+			return c.Render(200, render.String(c.Param("bar")))
+		})
+		a.GET("/", func(c Context) error {
+			return c.Redirect(302, "fooPath()", tt.I)
+		})
+		a.GET("/nomap", func(c Context) error {
+			return c.Redirect(302, "rootPath()")
+		})
+
+		w := willie.New(a)
+		res := w.Request("/").Get()
+		r.Equal(tt.S, res.Code)
+		r.Equal(tt.E, res.Location())
+
+		res = w.Request("/nomap").Get()
+		r.Equal(302, res.Code)
+		r.Equal("/", res.Location())
+	}
 }
 
 func Test_DefaultContext_Param(t *testing.T) {
@@ -219,74 +255,4 @@ func Test_DefaultContext_Bind_JSON(t *testing.T) {
 	r.Equal(201, res.Code)
 
 	r.Equal("Mark", user.FirstName)
-}
-
-func Test_DefaultContext_Websocket(t *testing.T) {
-	r := require.New(t)
-
-	type Message struct {
-		Original  string    `json:"original"`
-		Formatted string    `json:"formatted"`
-		Received  time.Time `json:"received"`
-	}
-
-	a := New(Options{})
-	a.GET("/socket", func(c Context) error {
-		conn, err := c.Websocket()
-		if err != nil {
-			return err
-		}
-		for {
-
-			_, m, err := conn.ReadMessage()
-			if err != nil {
-				return err
-			}
-
-			data := string(m)
-
-			msg := Message{
-				Original:  data,
-				Formatted: strings.ToUpper(data),
-				Received:  time.Now(),
-			}
-
-			if err := conn.WriteJSON(msg); err != nil {
-				return err
-			}
-		}
-	})
-
-	ts := httptest.NewServer(a)
-	defer ts.Close()
-
-	wsURL := strings.Replace(ts.URL, "http", "ws", 1) + "/socket"
-
-	ws, err := websocket.Dial(wsURL, "", "http://127.0.0.1")
-	r.NoError(err)
-
-	_, err = ws.Write([]byte("hello, world!"))
-	r.NoError(err)
-
-	msg := make([]byte, 512)
-	read, err := ws.Read(msg)
-	r.NoError(err)
-
-	var message Message
-	err = json.NewDecoder(bytes.NewReader(msg[:read])).Decode(&message)
-	r.NoError(err)
-
-	// Create a table of what we expect.
-	tests := []struct {
-		Got  string
-		Want string
-	}{
-		{message.Formatted, "HELLO, WORLD!"},
-		{message.Original, "hello, world!"},
-	}
-
-	// Check the different fields.
-	for _, tt := range tests {
-		r.Equal(tt.Want, tt.Got)
-	}
 }

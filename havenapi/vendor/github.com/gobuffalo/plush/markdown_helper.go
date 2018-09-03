@@ -3,12 +3,11 @@ package plush
 import (
 	"html/template"
 
-	_ "github.com/russross/blackfriday"
-	"github.com/shurcooL/github_flavored_markdown"
+	"github.com/gobuffalo/github_flavored_markdown"
 )
 
 // Markdown converts the string into HTML using GitHub flavored markdown.
-func markdownHelper(body string, help HelperContext) (template.HTML, error) {
+func MarkdownHelper(body string, help HelperContext) (template.HTML, error) {
 	var err error
 	if help.HasBlock() {
 		body, err = help.Block()

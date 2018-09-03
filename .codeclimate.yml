@@ -4,6 +4,10 @@ plugins:
     enabled: true
   gofmt:
     enabled: true
+  golint:
+    enabled: true
+  govet:
+    enabled: true
   sonar-java:
     enabled: true
     config:
@@ -12,7 +16,6 @@ plugins:
     enabled: true
   markdownlint:
     enabled: true
-
 exclude_patterns:
 - "**/vendor/"
 - "webui/public/"
@@ -22,6 +25,13 @@ exclude_patterns:
 - "contrib/curl-auth0/"
 - "keycloak/themes/haven/login/resources/js/"
 - "keycloak/themes/haven/account/resources/js/"
+- "grifts/**/*"
+- "**/*_test.go"
+- "*_test.go"
+- "**_test.go"
+- "logs/*"
+- "public/*"
+- "templates/*"
 
 checks:
   argument-count:
@@ -47,7 +57,7 @@ checks:
       threshold: 4
   return-statements:
     config:
-      threshold: 4
+      threshold: 10
   similar-code:
     config:
       threshold: # language-specific defaults. an override will affect all languages.

@@ -1,4 +1,15 @@
-# Buffalo [![GoDoc](https://godoc.org/github.com/gobuffalo/buffalo?status.svg)](https://godoc.org/github.com/gobuffalo/buffalo) [![Build Status](https://travis-ci.org/gobuffalo/buffalo.svg?branch=master)](https://travis-ci.org/gobuffalo/buffalo) [![Code Climate](https://codeclimate.com/github/gobuffalo/buffalo/badges/gpa.svg)](https://codeclimate.com/github/gobuffalo/buffalo) [![Go Report Card](https://goreportcard.com/badge/github.com/gobuffalo/buffalo)](https://goreportcard.com/report/github.com/gobuffalo/buffalo)
+<p align="center"><img src="https://github.com/gobuffalo/buffalo/blob/master/logo.svg" width="360"></p>
+
+<p align="center">
+<a href="https://godoc.org/github.com/gobuffalo/buffalo"><img src="https://godoc.org/github.com/gobuffalo/buffalo?status.svg" alt="GoDoc" /></a>
+<a href="https://travis-ci.org/gobuffalo/buffalo"><img src="https://travis-ci.org/gobuffalo/buffalo.svg?branch=master" alt="Build Status" /></a>
+<a href="https://ci.appveyor.com/project/markbates/buffalo/branch/master"><img src="https://ci.appveyor.com/api/projects/status/fjv5u499p78uvbxa/branch/master?svg=true&passingText=Windows%20-%20OK&failingText=Windows%20-%20failed&pendingText=Windows%20-%20pending" alt="Windows Build status" /></a>
+<a href="https://codecov.io/gh/gobuffalo/buffalo"><img src="https://codecov.io/gh/gobuffalo/buffalo/branch/master/graph/badge.svg" alt="Code coverage status" /></a>
+<a href="https://goreportcard.com/report/github.com/gobuffalo/buffalo"><img src="https://goreportcard.com/badge/github.com/gobuffalo/buffalo" alt="Go Report Card" /></a>
+<a href="https://www.codetriage.com/gobuffalo/buffalo"><img src="https://www.codetriage.com/gobuffalo/buffalo/badges/users.svg" alt="Open Source Helpers" /></a>
+</p>
+
+# Buffalo
 
 Buffalo is a Go web development eco-system. Designed to make the life of a Go web developer easier.
 
@@ -14,16 +25,8 @@ Please visit [http://gobuffalo.io](http://gobuffalo.io) for the latest documenta
 
 ## Installation
 
-Let's get the source first, with its dependencies:
-
 ```bash
-$ go get -u -v github.com/gobuffalo/buffalo
-```
-
-Then, install the `buffalo` tool:
-
-```bash
-$ go install -v github.com/gobuffalo/buffalo/buffalo
+$ go get -u -v github.com/gobuffalo/buffalo/buffalo
 ```
 
 _NOTE_: Buffalo has a minimum Go dependency of `1.8.1`.
@@ -88,12 +91,18 @@ Buffalo would not be possible if not for all of the great projects it depends on
 
 ### Models/ORM (Optional)
 
-[github.com/markbates/pop](https://github.com/markbates/pop) - Accessing databases is nothing new in web applications. Pop, and its command line tool, Soda, were chosen because they strike a nice balance between simplifying common tasks, being idiomatic, and giving you the flexibility you need to built your app. Pop and Soda share the same core philosphies as Buffalo so they were a natural choice.
+[github.com/gobuffalo/pop](https://github.com/gobuffalo/pop) - Accessing databases is nothing new in web applications. Pop, and its command line tool, Soda, were chosen because they strike a nice balance between simplifying common tasks, being idiomatic, and giving you the flexibility you need to built your app. Pop and Soda share the same core philosphies as Buffalo so they were a natural choice.
 
 ### Sessions, Cookies, Websockets, and more...
 
-[github.com/gorilla](https://github.com/gorilla) - The Gorilla toolkit is a great set of packages designed to improve upon the standard libary for a variety of web-related packages. With these high quality packages Buffalo is able to keep its "core" code to a minimum and focus on its goal of glueing them all together to make your life better.
+[github.com/gorilla](https://github.com/gorilla) - The Gorilla toolkit is a great set of packages designed to improve upon the standard library for a variety of web-related packages. With these high quality packages Buffalo is able to keep its "core" code to a minimum and focus on its goal of glueing them all together to make your life better.
 
 ## Benchmarks
 
 Oh, yeah, everyone wants benchmarks! What would a web framework be without its benchmarks? Well, guess what? I'm not giving you any! That's right. This is Go! I assure you that it is plenty fast enough for you. If you want benchmarks you can either a) checkout any benchmarks that the [GIANTS](SHOULDERS.md) Buffalo is built upon have published, or b) run your own. I have no interest in playing the benchmark game, and neither should you.
+
+## Contributing
+
+First, thank you so much for wanting to contribute! It means so much that you care enough to want to contribute. We appreciate every PR from the smallest of typos to the be biggest of features.
+
+To contribute, please read the contribution guidelines: [CONTRIBUTING](CONTRIBUTING.md)

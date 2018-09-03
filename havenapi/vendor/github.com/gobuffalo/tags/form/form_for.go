@@ -8,11 +8,12 @@ import (
 	"sync"
 
 	"github.com/gobuffalo/tags"
+	"github.com/gobuffalo/uuid"
+	"github.com/gobuffalo/validate"
 	"github.com/markbates/inflect"
-	"github.com/markbates/validate"
-	"github.com/satori/go.uuid"
 )
 
+//FormFor is a form made for a struct
 type FormFor struct {
 	*Form
 	Model      interface{}
@@ -22,6 +23,7 @@ type FormFor struct {
 	Errors     *validate.Errors
 }
 
+//NewFormFor creates a new Formfor with passed options, it also creates the id of the form from the struct name and adds errors if present.
 func NewFormFor(model interface{}, opts tags.Options) *FormFor {
 	rv := reflect.ValueOf(model)
 	if rv.Kind() == reflect.Ptr {
@@ -66,17 +68,33 @@ func loadErrors(opts tags.Options) *validate.Errors {
 	return errors
 }
 
+//CheckboxTag creates a checkbox for a field on the form Struct
 func (f FormFor) CheckboxTag(field string, opts tags.Options) *tags.Tag {
 	f.buildOptions(field, opts)
 	return f.Form.CheckboxTag(opts)
 }
 
+//InputTag creates an input for a field on the form Struct
 func (f FormFor) InputTag(field string, opts tags.Options) *tags.Tag {
 	f.buildOptions(field, opts)
 	f.addFormatTag(field, opts)
 	return f.Form.InputTag(opts)
 }
 
+//HiddenTag adds a wrappter for input type hidden on the form
+func (f FormFor) HiddenTag(field string, opts tags.Options) *tags.Tag {
+	f.buildOptions(field, opts)
+	return f.Form.HiddenTag(opts)
+}
+
+//FileTag creates a input[type=file] for a field name passed
+func (f FormFor) FileTag(field string, opts tags.Options) *tags.Tag {
+	f.buildOptions(field, opts)
+	f.addFormatTag(field, opts)
+	return f.Form.FileTag(opts)
+}
+
+//DateTimeTag creates a input[type=datetime-local] for a field name passed
 func (f FormFor) DateTimeTag(field string, opts tags.Options) *tags.Tag {
 	f.buildOptions(field, opts)
 	f.addFormatTag(field, opts)
@@ -106,17 +124,30 @@ func (f FormFor) addFormatTag(field string, opts tags.Options) {
 	}
 }
 
+//RadioButton creates a radio button for a struct field
 func (f FormFor) RadioButton(field string, opts tags.Options) *tags.Tag {
-	f.buildOptions(field, opts)
-	return f.Form.RadioButton(opts)
+	return f.RadioButtonTag(field, opts)
 }
 
-func (f FormFor) SelectTag(field string, opts tags.Options) *SelectTag {
+//RadioButtonTag creates a radio button for a struct field
+func (f FormFor) RadioButtonTag(field string, opts tags.Options) *tags.Tag {
+	f.buildOptions(field, opts)
+	return f.Form.RadioButtonTag(opts)
+}
+
+//SelectTag creates a select tag for a specified struct field and loads options from the options opject
+func (f FormFor) SelectTag(field string, opts tags.Options) *tags.Tag {
 	f.buildOptions(field, opts)
 	return f.Form.SelectTag(opts)
 }
 
+//TextArea creates text area for the specified struct field
 func (f FormFor) TextArea(field string, opts tags.Options) *tags.Tag {
+	return f.TextAreaTag(field, opts)
+}
+
+//TextAreaTag creates text area for the specified struct field
+func (f FormFor) TextAreaTag(field string, opts tags.Options) *tags.Tag {
 	f.buildOptions(field, opts)
 	return f.Form.TextArea(opts)
 }
@@ -139,6 +170,7 @@ func (f FormFor) buildOptions(field string, opts tags.Options) {
 	if opts["id"] == nil {
 		opts["id"] = fmt.Sprintf("%s-%s", f.dashedName, opts["name"])
 	}
+
 }
 
 type interfacer interface {

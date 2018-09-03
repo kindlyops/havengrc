@@ -26,3 +26,13 @@ func Test_Options_String_Escaped(t *testing.T) {
 	s := o.String()
 	r.Equal(`&lt;b&gt;="&lt;p&gt;"`, s)
 }
+
+func Test_Options_String_Empty_Attribute(t *testing.T) {
+	r := require.New(t)
+	o := tags.Options{
+		"value":   "Mark",
+		"checked": nil,
+	}
+	s := o.String()
+	r.Equal(`checked value="Mark"`, s)
+}

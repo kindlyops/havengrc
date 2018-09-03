@@ -8,7 +8,10 @@ import (
 	"strings"
 
 	"github.com/gobuffalo/buffalo/meta"
+	"github.com/gobuffalo/buffalo/runtime"
 	"github.com/gobuffalo/envy"
+	"github.com/gobuffalo/pop"
+	"github.com/markbates/inflect"
 	"github.com/pkg/errors"
 )
 
@@ -26,10 +29,10 @@ type Generator struct {
 	AsWeb       bool   `json:"as_web"`
 	AsAPI       bool   `json:"as_api"`
 	Docker      string `json:"docker"`
-	VCS         string `json:"vcs"`
 	SkipPop     bool   `json:"skip_pop"`
 	SkipWebpack bool   `json:"skip_webpack"`
 	SkipYarn    bool   `json:"skip_yarn"`
+	Bootstrap   int    `json:"bootstrap"`
 }
 
 // New app generator
@@ -40,11 +43,12 @@ func New(name string) (Generator, error) {
 		CIProvider: "none",
 		AsWeb:      true,
 		Docker:     "multi",
+		Version:    runtime.Version,
 	}
-	g.Name = meta.Name(name)
+	g.Name = inflect.Name(name)
 
 	if g.Name == "." {
-		g.Name = meta.Name(filepath.Base(g.Root))
+		g.Name = inflect.Name(filepath.Base(g.Root))
 	} else {
 		g.Root = filepath.Join(g.Root, g.Name.File())
 	}
@@ -58,8 +62,15 @@ func (g Generator) Validate() error {
 		return errors.New("you must enter a name for your new application")
 	}
 
-	if g.DBType != "postgres" && g.DBType != "mysql" && g.DBType != "sqlite3" {
-		return fmt.Errorf("Unknown db-type %s expecting one of postgres, mysql or sqlite3", g.DBType)
+	var found bool
+	for _, d := range pop.AvailableDialects {
+		if d == g.DBType {
+			found = true
+			break
+		}
+	}
+	if !found {
+		return fmt.Errorf("Unknown db-type %s expecting one of %s", g.DBType, strings.Join(pop.AvailableDialects, ", "))
 	}
 
 	for _, n := range forbiddenAppNames {
@@ -84,7 +95,8 @@ func (g Generator) Validate() error {
 func (g Generator) validateInGoPath() error {
 	gpMultiple := envy.GoPaths()
 
-	larp := strings.ToLower(g.Root)
+	larp := strings.ToLower(meta.ResolveSymlinks(filepath.Dir(g.Root)))
+
 	for i := 0; i < len(gpMultiple); i++ {
 		lgpm := strings.ToLower(filepath.Join(gpMultiple[i], "src"))
 		if strings.HasPrefix(larp, lgpm) {
@@ -96,4 +108,4 @@ func (g Generator) validateInGoPath() error {
 }
 
 var forbiddenAppNames = []string{"buffalo"}
-var nameRX = regexp.MustCompile("^[\\w-]+$")
+var nameRX = regexp.MustCompile(`^[\w-]+$`)

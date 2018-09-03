@@ -83,6 +83,21 @@ func TestStaticKeyGen(t *testing.T) {
 	}
 }
 
+func TestAeadInvalidInput(t *testing.T) {
+	sample := []byte("1234567890123456")
+	tt := []aeadParts{
+		{},
+		{iv: sample, tag: sample},
+	}
+	for _, tc := range tt {
+		aead := newAESGCM(16).(*aeadContentCipher)
+		_, err := aead.decrypt(sample, []byte{}, &tc)
+		if err != ErrCryptoFailure {
+			t.Error("should handle aead failure")
+		}
+	}
+}
+
 func TestVectorsAESGCM(t *testing.T) {
 	// Source: http://tools.ietf.org/html/draft-ietf-jose-json-web-encryption-29#appendix-A.1
 	plaintext := []byte{

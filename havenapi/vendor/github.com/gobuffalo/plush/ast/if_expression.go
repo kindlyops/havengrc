@@ -2,22 +2,23 @@ package ast
 
 import (
 	"bytes"
-	"github.com/gobuffalo/plush/token"
 )
 
 type IfExpression struct {
-	Token     token.Token
+	TokenAble
 	Condition Expression
 	Block     *BlockStatement
+	ElseIf    []*ElseIfExpression
 	ElseBlock *BlockStatement
 }
 
-func (ie *IfExpression) expressionNode() {
+type ElseIfExpression struct {
+	TokenAble
+	Condition Expression
+	Block     *BlockStatement
 }
 
-func (ie *IfExpression) TokenLiteral() string {
-	return ie.Token.Literal
-}
+func (ie *IfExpression) expressionNode() {}
 
 func (ie *IfExpression) String() string {
 	var out bytes.Buffer
@@ -27,6 +28,14 @@ func (ie *IfExpression) String() string {
 	out.WriteString(") { ")
 	out.WriteString(ie.Block.String())
 	out.WriteString(" }")
+
+	for _, elseIf := range ie.ElseIf {
+		out.WriteString(" } else if (")
+		out.WriteString(elseIf.Condition.String())
+		out.WriteString(") { ")
+		out.WriteString(elseIf.Block.String())
+		out.WriteString(" }")
+	}
 
 	if ie.ElseBlock != nil {
 		out.WriteString(" } else { ")

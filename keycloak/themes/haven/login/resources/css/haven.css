@@ -24,7 +24,7 @@
 body {
   background-color:white;;
   /*-- font should be changed to Bitter as in webui -----------------------------------*/
-  font-family: Arial, sans-serif;
+  font-family: 'Bitter', serif;
   font-size: 16px !important;
 }
 
@@ -33,7 +33,7 @@ header{
 }
 
 label{
-  font-family: "ff-tisa-web-pro", serif
+  font-family: 'Bitter', serif
 }
 
 .custom-select:focus, .form-control-file:focus, .form-control:focus, .custom-select:hover, .form-control-file:hover, .form-control:hover {
@@ -43,15 +43,15 @@ label{
 } /*This overwrites the form lines being black*/
 
 button{
-  font-family: "mr-eaves-modern", sans-serif;
+  font-family: 'Montserrat', sans-serif;
 }
 
 p{
-    font-family: "ff-tisa-web-pro",serif ;
+    font-family: 'Bitter', serif ;
 }
 
 h2{
-  font-family: "mr-eaves-modern", sans-serif;
+  font-family: 'Montserrat', sans-serif;
   text-transform: uppercase;
   font-size: 28px;
 }
@@ -84,7 +84,7 @@ h2{
 }
 
 .login-header{
-  font-family: "mr-eaves-modern", sans-serif;
+  font-family: 'Montserrat', sans-serif;
   text-transform: uppercase;
   color: var(--secondary);
   margin-top:27px
@@ -100,12 +100,8 @@ h2{
 }
 
 .orText{
-  display: inline-table;
-  height: 0;
   background:#fff;
-  position:absolute;
-  margin-left: -60px;
-  margin-top: 86px;
+  margin: auto -62px auto 62px;
 }
 
 .bottom-container{
@@ -126,7 +122,7 @@ footer{
 
 footer a, footer p{
 	color:#fff;
-  font-family: "mr-eaves-modern", sans-serif !important;
+  font-family: 'Montserrat', sans-serif !important;
 }
 
 #footer-lines{
@@ -157,11 +153,11 @@ a:hover, a:focus{
     border-bottom: 1px solid #E4E4E4;
 }
 
-.heading h1{
-    font-family: "mr-eaves-modern", sans-serif;
+/*.heading h1{
+    font-family: 'Montserrat', sans-serif;
     color: #3f4145;
     font-weight: normal;
-}
+}*/
 
 .email-verify-box{
   border: 1px solid #343434;
@@ -169,7 +165,7 @@ a:hover, a:focus{
 }
 
 .code{
-  font-family: "mr-eaves-modern", sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 16px;
 }
 
@@ -187,9 +183,10 @@ a:hover, a:focus{
     }
 
     .orText{
-      margin-top: -26px;
-      margin-left: 123px;
-      padding:0px 5px;
+      text-align: center;
+      margin:auto;
+      margin-bottom: -12px;
+      width: 35px;
     }
 }
 

@@ -13,6 +13,7 @@ module Authentication
 
 import Keycloak
 import Http
+import Ports as Ports exposing (saveSurveyState)
 
 
 type alias Model =
@@ -24,9 +25,9 @@ type alias Model =
 
 
 init : (Keycloak.Options -> Cmd Msg) -> (() -> Cmd Msg) -> Maybe Keycloak.LoggedInUser -> Model
-init logIn logOut initialData =
+init logIn logOut initialUser =
     { state =
-        case initialData of
+        case initialUser of
             Just user ->
                 Keycloak.LoggedIn user
 
@@ -63,7 +64,7 @@ update msg model =
             ( model, model.logIn Keycloak.defaultOpts )
 
         LogOut ->
-            ( { model | state = Keycloak.LoggedOut }, model.logOut () )
+            ( { model | state = Keycloak.LoggedOut }, Cmd.batch [ model.logOut (), Ports.saveSurveyState Nothing ] )
 
 
 handleAuthResult : Keycloak.RawAuthenticationResult -> Msg

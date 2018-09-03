@@ -108,7 +108,7 @@
       </div>
     </div>
 
-    <main class="ml-lg-5 m-lg-5 pt-3">
+    <main class="ml-lg-5 m-5 pt-3">
       <div class="container">
         <div class="row">
           <div class="col-lg-11 mx-auto">

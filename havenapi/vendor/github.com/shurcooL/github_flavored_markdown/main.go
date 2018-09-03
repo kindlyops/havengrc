@@ -22,7 +22,7 @@ import (
 	"github.com/russross/blackfriday"
 	"github.com/shurcooL/highlight_diff"
 	"github.com/shurcooL/highlight_go"
-	"github.com/shurcooL/octiconssvg"
+	"github.com/shurcooL/octicon"
 	"github.com/shurcooL/sanitized_anchor_name"
 	"github.com/sourcegraph/annotate"
 	"github.com/sourcegraph/syntaxhighlight"
@@ -58,7 +58,7 @@ func Heading(heading atom.Atom, title string) *html.Node {
 	span := &html.Node{
 		Type: html.ElementNode, Data: atom.Span.String(),
 		Attr:       []html.Attribute{{Key: atom.Class.String(), Val: "octicon-link"}}, // TODO: Factor out the CSS for just headings.
-		FirstChild: octiconssvg.Link(),
+		FirstChild: octicon.Link(),
 	}
 	a.AppendChild(span)
 	h := &html.Node{Type: html.ElementNode, Data: heading.String()}
@@ -201,7 +201,7 @@ var gfmHTMLConfig = syntaxhighlight.HTMLConfig{
 
 func highlightCode(src []byte, lang string) (highlightedCode []byte, ok bool) {
 	switch lang {
-	case "Go":
+	case "Go", "Go-unformatted":
 		var buf bytes.Buffer
 		err := highlight_go.Print(src, &buf, syntaxhighlight.HTMLPrinter(gfmHTMLConfig))
 		if err != nil {
