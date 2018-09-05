@@ -88,6 +88,27 @@ type Token struct {
 	} `json:"resource_access,omitempty"`
 }
 
+func getRole(allClaims map[string]interface{}) string {
+	// look for the role that we should assume
+	// {"resource_access":{"havendev":{"roles":["member"]}}
+	access := allClaims["resource_access"].(map[string]interface{})
+	havendev := access["havendev"].(map[string]interface{})
+	roles := havendev["roles"].([]interface{})
+	var role string
+	for _, r := range roles {
+		switch r.(string) {
+		case "member":
+			role = "member"
+		case "admin":
+			role = "admin"
+		default:
+			log.Info("Got unexpected role %s", r)
+			role = "anonymous"
+		}
+	}
+	return role
+}
+
 // JwtMiddleware validates JWT and set context compatible with PostgREST
 func JwtMiddleware(next buffalo.Handler) buffalo.Handler {
 
@@ -125,24 +146,6 @@ func JwtMiddleware(next buffalo.Handler) buffalo.Handler {
 			return c.Error(401, fmt.Errorf("invalid token: %s", err.Error()))
 		}
 
-		// look for the role that we should assume
-		// {"resource_access":{"havendev":{"roles":["member"]}}
-		access := allClaims["resource_access"].(map[string]interface{})
-		havendev := access["havendev"].(map[string]interface{})
-		roles := havendev["roles"].([]interface{})
-		var role string
-		for _, r := range roles {
-			switch r.(string) {
-			case "member":
-				role = "member"
-			case "admin":
-				role = "admin"
-			default:
-				log.Info("Got unexpected role %s", r)
-				role = "anonymous"
-			}
-		}
-
 		sub := allClaims["sub"]
 		c.Set("sub", sub)
 
@@ -152,6 +155,8 @@ func JwtMiddleware(next buffalo.Handler) buffalo.Handler {
 		org := allClaims["org"]
 		c.Set("org", org)
 		enc, _ := json.Marshal(org)
+
+		role := getRole(allClaims)
 
 		tx := c.Value("tx").(*pop.Connection)
 		err = tx.RawQuery(models.Q["setemailclaim"], email).Exec()
