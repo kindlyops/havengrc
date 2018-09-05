@@ -468,8 +468,8 @@
         <subsystem xmlns="urn:jboss:domain:undertow:4.0">
             <buffer-cache name="default"/>
             <server name="default-server">
-                <http-listener name="default" socket-binding="http" redirect-socket="https" proxy-address-forwarding="${env.PROXY_ADDRESS_FORWARDING}" enable-http2="true"/>
-                <https-listener name="https" socket-binding="https" security-realm="ApplicationRealm" enable-http2="true"/>
+                <http-listener name="default" socket-binding="http" redirect-socket="https" proxy-address-forwarding="${env.PROXY_ADDRESS_FORWARDING:false}" enable-http2="true"/>
+                <https-listener name="https" socket-binding="https" proxy-address-forwarding="${env.PROXY_ADDRESS_FORWARDING:false}" security-realm="ApplicationRealm" enable-http2="true"/>
                 <host name="default-host" alias="localhost">
                     <location name="/" handler="welcome-content"/>
                     <http-invoker security-realm="ApplicationRealm"/>
@@ -553,6 +553,16 @@
             <spi name="x509cert-lookup">
                 <default-provider>${keycloak.x509cert.lookup.provider:default}</default-provider>
                 <provider name="default" enabled="true"/>
+            </spi>
+            <spi name="hostname">
+                <default-provider>request</default-provider>
+                <provider name="fixed" enabled="true">
+                    <properties>
+                        <property name="hostname" value="localhost"/>
+                        <property name="httpPort" value="-1"/>
+                        <property name="httpsPort" value="-1"/>
+                    </properties>
+                </provider>
             </spi>
         </subsystem>
     </profile>

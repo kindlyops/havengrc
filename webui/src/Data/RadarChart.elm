@@ -1,7 +1,7 @@
-module Data.RadarChart exposing (..)
+module Data.RadarChart exposing (RadarChartConfig, generateIpsativeChart)
 
-import Color exposing (..)
-import List.Extra exposing (..)
+import Color exposing (Color, rgb, toRgb, rgba)
+import List.Extra exposing (unique, groupWhile, getAt)
 import Color.Convert exposing (colorToCssRgba)
 import Data.SurveyResponses exposing (AvailableResponse, AvailableResponseDatum)
 

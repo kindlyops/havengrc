@@ -1,6 +1,6 @@
 module Utils exposing (getHTTPErrorMessage)
 
-import Http exposing (..)
+import Http
 
 
 getHTTPErrorMessage : Http.Error -> String
