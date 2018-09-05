@@ -79,17 +79,17 @@ func App() *buffalo.App {
 	return app
 }
 
+// Token is for un marshalling {"resource_access":{"havendev":{"roles":["member"]}}
+type Token struct {
+	ResourceAccess struct {
+		Client struct {
+			Roles []string `json:"roles,omitempty"`
+		} `json:"havendev,omitempty"`
+	} `json:"resource_access,omitempty"`
+}
+
 // JwtMiddleware validates JWT and set context compatible with PostgREST
 func JwtMiddleware(next buffalo.Handler) buffalo.Handler {
-	// {"resource_access":{"havendev":{"roles":["member"]}}
-
-	type Token struct {
-		ResourceAccess struct {
-			Client struct {
-				Roles []string `json:"roles",omitempty`
-			} `json:"havendev,omitempty`
-		} `json:"resource_access,omitempty"`
-	}
 
 	return func(c buffalo.Context) error {
 		header := c.Request().Header.Get("Authorization")
