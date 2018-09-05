@@ -79,7 +79,7 @@ func App() *buffalo.App {
 	return app
 }
 
-// validate JWT and set context compatible with PostgREST
+// JwtMiddleware validates JWT and set context compatible with PostgREST
 func JwtMiddleware(next buffalo.Handler) buffalo.Handler {
 	// {"resource_access":{"havendev":{"roles":["member"]}}
 
@@ -127,13 +127,21 @@ func JwtMiddleware(next buffalo.Handler) buffalo.Handler {
 
 		// look for the role that we should assume
 		// {"resource_access":{"havendev":{"roles":["member"]}}
-		access := allClaims["resource_access"]
-		// TODO assert the type
-		// actions/app.go:132:21: invalid operation: access["havendev"] (type interface {} does not support indexing)
-		havendev := access["havendev"]
-		roles := havendev["roles"]
-
-		log.Info("The roles we got are %s", roles)
+		access := allClaims["resource_access"].(map[string]interface{})
+		havendev := access["havendev"].(map[string]interface{})
+		roles := havendev["roles"].([]interface{})
+		var role string
+		for _, r := range roles {
+			switch r.(string) {
+			case "member":
+				role = "member"
+			case "admin":
+				role = "admin"
+			default:
+				log.Info("Got unexpected role %s", r)
+				role = "anonymous"
+			}
+		}
 
 		sub := allClaims["sub"]
 		c.Set("sub", sub)
@@ -164,6 +172,11 @@ func JwtMiddleware(next buffalo.Handler) buffalo.Handler {
 		err = tx.RawQuery(models.Q["setorgclaim"], string(enc)).Exec()
 		if err != nil {
 			return c.Error(500, fmt.Errorf("error setting JWT claims org in GUC: %s", err.Error()))
+		}
+
+		err = tx.RawQuery(models.Q["setrole"], role).Exec()
+		if err != nil {
+			return c.Error(500, fmt.Errorf("error setting PostgreSQL role: %s", err.Error()))
 		}
 
 		return next(c)
