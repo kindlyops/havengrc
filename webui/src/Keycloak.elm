@@ -7,16 +7,37 @@ module Keycloak
         , Options
         , defaultOpts
         , LoggedInUser
+        , loggedInUserDecoder
         , UserProfile
         , Token
         , mapResult
         )
+
+import Json.Decode as Decode exposing (Decoder, decodeString, int, andThen, oneOf)
+import Json.Decode.Pipeline exposing (decode, required)
 
 
 type alias LoggedInUser =
     { profile : UserProfile
     , token : Token
     }
+
+
+loggedInUserDecoder : Decoder LoggedInUser
+loggedInUserDecoder =
+    decode LoggedInUser
+        |> required "profile" userProfileDecoder
+        |> required "token" Decode.string
+
+
+userProfileDecoder : Decoder UserProfile
+userProfileDecoder =
+    decode UserProfile
+        |> required "username" Decode.string
+        |> required "emailVerified" Decode.bool
+        |> required "firstName" Decode.string
+        |> required "lastName" Decode.string
+        |> required "email" Decode.string
 
 
 type AuthenticationState

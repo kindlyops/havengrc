@@ -13,14 +13,22 @@ var keycloak = Keycloak({
   realm: 'havendev',
   clientId: 'havendev'
 })
+
 var storedProfile = sessionStorage.getItem('profile')
 var storedToken = sessionStorage.getItem('token')
+var storedSurveyState = sessionStorage.getItem('storedSurvey')
 var authData =
   storedProfile && storedToken
     ? { profile: JSON.parse(storedProfile), token: storedToken }
     : null
 
-var elmApp = Main.embed(document.getElementById('root'), authData)
+var initialData = {
+  profile: authData ? authData.profile : null,
+  token: authData ? authData.token : null,
+  storedSurvey: storedSurveyState ? JSON.parse(storedSurveyState) : null
+}
+
+var elmApp = Main.embed(document.getElementById('root'), initialData)
 
 function sendElmKeycloakToken() {
   sessionStorage.setItem('profile', JSON.stringify(keycloak.profile))
@@ -48,6 +56,7 @@ keycloak.onAuthLogout = function () {
   var result = { err: null, ok: null }
   sessionStorage.removeItem('profile')
   sessionStorage.removeItem('token')
+  sessionStorage.removeItem('storedSurvey')
   elmApp.ports.keycloakAuthResult.send(result)
 }
 
@@ -81,6 +90,7 @@ elmApp.ports.keycloakLogin.subscribe(function () {
 elmApp.ports.keycloakLogout.subscribe(function () {
   sessionStorage.removeItem('profile')
   sessionStorage.removeItem('token')
+  sessionStorage.removeItem('storedSurvey')
   keycloak.logout()
 })
 
@@ -104,4 +114,9 @@ elmApp.ports.showError.subscribe(function (messageString) {
 elmApp.ports.radarChart.subscribe(chartConfig => {
   chartConfig.type = 'radar'
   window.myRadar = new Chart(document.getElementById('chart'), chartConfig)
+})
+
+
+elmApp.ports.saveSurveyState.subscribe(storedSurvey => {
+  sessionStorage.setItem('storedSurvey', JSON.stringify(storedSurvey));
 })

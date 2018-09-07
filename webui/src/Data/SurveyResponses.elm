@@ -1,4 +1,10 @@
-module Data.SurveyResponses exposing (..)
+module Data.SurveyResponses
+    exposing
+        ( GroupedIpsativeResponse
+        , groupedIpsativeResponseDecoder
+        , AvailableResponseDatum
+        , AvailableResponse
+        )
 
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (decode, required)
@@ -36,16 +42,4 @@ type alias AvailableResponseDatum =
     { group : Int
     , category : String
     , points : Int
-    }
-
-
-emptyAvailableResponse : AvailableResponse
-emptyAvailableResponse =
-    { name = "SCDS"
-    , data =
-        [ { group = 1
-          , category = "Process"
-          , points = 10
-          }
-        ]
     }

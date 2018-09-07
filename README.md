@@ -162,9 +162,13 @@ In order to be able to get a token for a user, the user must have no pending act
     http://localhost:2015/auth/realms/havendev/protocol/openid-connect/token \
     | jq -r '.access_token'`
 
+We also have a shortcut helper script you can use
+
+    export TOKEN=`./get-token`
+
 Then you can use that token by passing it in an Authorization header:
 
-    curl -v -H "Authorization: Bearer \$TOKEN" http://localhost:3001/comment
+    curl -v -H "Authorization: Bearer $TOKEN" http://localhost:3001/comment
 
 To read a file from the database:
 

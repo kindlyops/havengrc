@@ -1,11 +1,12 @@
 module Page.Home exposing (view)
 
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Html.Events exposing (..)
+import Html exposing (Html, div, img, h1, span, text, button, h3, p, footer, a)
+import Html.Attributes exposing (class, alt, attribute, id, src, height, width, href, title)
+import Html.Events exposing (onClick)
 import Authentication
 
 
+view : Html Authentication.Msg
 view =
     div [ class "" ]
         [ div [ class "" ]

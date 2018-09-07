@@ -16,3 +16,6 @@ select set_config('request.jwt.claim.sub', $1, true);
 
 -- name: setorgclaim
 select set_config('request.jwt.claim.org', $1, true);
+
+-- name: setrole
+select setrole($1);
