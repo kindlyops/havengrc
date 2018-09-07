@@ -22,8 +22,7 @@
 }
 
 body {
-  background-color:white;;
-  /*-- font should be changed to Bitter as in webui -----------------------------------*/
+  background-color:white;
   font-family: 'Bitter', serif;
   font-size: 16px !important;
 }

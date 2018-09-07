@@ -23,7 +23,7 @@ view =
                         , text "Dashboard"
                         ]
                     , button
-                        [ class "btn btn-primary btn-block mx-auto login-btn"
+                        [ class "btn btn-secondary btn-block mx-auto login-btn"
                         , onClick (Authentication.ShowLogIn)
                         ]
                         [ text "Login" ]

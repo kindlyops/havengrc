@@ -357,14 +357,14 @@ viewNavUser model user =
     ul [ class "navbar-nav" ]
         [ li [ class "nav-item dropdown" ]
             [ a [ attribute "aria-expanded" "false", attribute "aria-haspopup" "true", class "nav-link dropdown-toggle", attribute "data-toggle" "dropdown", href "#", id "navbarDropdown", attribute "role" "button" ]
-                [ text (user.firstName ++ " ")
-                , img
+                [ img
                     [ attribute "src" (getGravatar user.username)
                     , class "user-avatar"
                     ]
                     []
+                , text (user.firstName ++ " ")
                 ]
-            , div [ attribute "aria-labelledby" "navbarDropdown", class "dropdown-menu" ]
+            , div [ attribute "aria-labelledby" "navbarDropdown", class "dropdown-menu dropdown-menu-right" ]
                 [ a [ class "dropdown-item", href "/auth/realms/havendev/account/" ]
                     [ text "Profile" ]
                 , div [ class "dropdown-divider" ]
@@ -432,17 +432,18 @@ viewNavDrawerItems menuItems route =
 
 viewNavDrawerItem : MenuItem -> Route.Model -> Html Msg
 viewNavDrawerItem menuItem route =
-    a
-        [ attribute "name" (String.toLower menuItem.text)
-        , onClick <| NavigateTo <| menuItem.route
-          --, href "#"
-        , style [ ( "cursor", "pointer" ) ]
-        , classList
-            [ ( "nav-item", True )
-            , ( "nav-link", True )
-            , ( "active", (String.toLower menuItem.text) == (selectedItem route) )
-            ]
-        ]
-        [ i [ class "material-icons" ] [ text menuItem.iconName ]
-        , text menuItem.text
+    li [ class "nav-item" ]
+      [ a
+          [ attribute "name" (String.toLower menuItem.text)
+          , onClick <| NavigateTo <| menuItem.route
+            --, href "#"
+          , style [ ( "cursor", "pointer" ) ]
+          , classList
+              [ ( "nav-link", True )
+              , ( "active", (String.toLower menuItem.text) == (selectedItem route) )
+              ]
+          ]
+          [ i [ class "material-icons mx-3" ] [ text menuItem.iconName ]
+          , text menuItem.text
+          ]
         ]
