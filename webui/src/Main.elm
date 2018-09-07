@@ -284,7 +284,13 @@ viewNavigationDrawer model user =
     div [ attribute "aria-hidden" "true", class "navdrawer navdrawer-permanent-lg navdrawer-permanent-clipped", id "navdrawerDefault", attribute "tabindex" "-1" ]
         [ div [ class "navdrawer-content" ]
             [ div [ class "navdrawer-header" ]
-                [ viewNavUser model user ]
+                [ img
+                    [ attribute "src" (getGravatar user.username)
+                    , class "user-avatar"
+                    ]
+                    []
+            ,  viewNavUser model user 
+            ]
             , viewNavDrawerItems navDrawerItems model.route
             ]
         ]
@@ -339,12 +345,7 @@ viewNavUser model user =
     ul [ class "navbar-nav" ]
         [ li [ class "nav-item dropdown" ]
             [ a [ attribute "aria-expanded" "false", attribute "aria-haspopup" "true", class "nav-link dropdown-toggle", attribute "data-toggle" "dropdown", href "#", id "navbarDropdown", attribute "role" "button" ]
-                [ img
-                    [ attribute "src" (getGravatar user.username)
-                    , class "user-avatar"
-                    ]
-                    []
-                , text (user.firstName ++ " ")
+                [ text (user.firstName ++ " ")
                 ]
             , div [ attribute "aria-labelledby" "navbarDropdown", class "dropdown-menu dropdown-menu-right" ]
                 [ a [ class "dropdown-item", href "/auth/realms/havendev/account/" ]
@@ -377,11 +378,11 @@ viewNavDrawerItem menuItem route =
           , onClick <| NavigateTo <| menuItem.route
           , style [ ( "cursor", "pointer" ) ]
           , classList
-              [ ( "nav-item", True )
+              [ ( "nav-link", True )
               , ( "active", String.toLower menuItem.text == selectedItem route )
               ]
           ]
-          [ i [ class "material-icons" ] [ text menuItem.iconName ]
+          [ i [ class "material-icons mx-3" ] [ text menuItem.iconName ]
           , text menuItem.text
           ]
       ]
