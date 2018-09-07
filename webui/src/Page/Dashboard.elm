@@ -36,7 +36,7 @@ view model =
         [ Centroid.view model.data
         , br [] []
         , button
-            [ class "btn btn-primary"
+            [ class "btn btn-secondary"
             , onClick (ShowError "this is an error message")
             ]
             [ text "Show Error" ]

@@ -30,7 +30,7 @@
                     </div>
 
                 <div class="form-group">
-                    <button class="btn btn-primary btn-block" style="border-radius:25px;" name="login" id="kc-login" type="submit" value="${msg(" doLogIn")}">Log in</button>
+                    <button class="btn btn-secondary btn-block" style="border-radius:25px;" name="login" id="kc-login" type="submit" value="${msg(" doLogIn")}">Log in</button>
                     <div id="kc-form-options" class="${properties.kcFormOptionsClass!}">
                         <#if realm.rememberMe && !usernameEditDisabled??>
                             <div class="form-check">
