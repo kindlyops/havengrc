@@ -13,6 +13,11 @@ services:
     depends_on:
       - keycloak
     command: keycloak:8080
+  zap:
+    image: owasp/zap2docker-weekly
+    depends_on:
+      - webui
+    command: zap-baseline.py -t http://webui:2015
   mailhog:
     image: mailhog/mailhog:v1.0.0
     ports:
