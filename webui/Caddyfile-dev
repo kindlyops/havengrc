@@ -1,6 +1,19 @@
 0.0.0.0:2016 
 on startup npm run-script start &
 
+header / {
+  # Enable cross-site filter (XSS) and tell browser to block detected attacks
+  X-XSS-Protection "1; mode=block"
+  # Prevent some browsers from MIME-sniffing a response away from the declared Content-Type
+  X-Content-Type-Options "nosniff"
+  # Disallow the site to be rendered within a frame (clickjacking protection)
+  X-Frame-Options "DENY"
+  # CSP
+  Content-Security-Policy "'none'; script-src 'self'; connect-src 'self'; img-src 'self'; style-src 'self';"
+  Feature-Policy "autoplay 'none'; camera 'none'; microphone 'none'; midi 'none'; usb 'none'; vr 'none';"
+  Referrer-Policy "strict-origin"
+}
+
 cors /swagger http://localhost:3002
 
 proxy / localhost:2015 {
