@@ -17,7 +17,7 @@ services:
     image: owasp/zap2docker-weekly
     depends_on:
       - webui
-    command: zap-baseline.py -t http://webui:2015
+    command: zap-baseline.py -t http://webui:2016
   mailhog:
     image: mailhog/mailhog:v1.0.0
     ports:
