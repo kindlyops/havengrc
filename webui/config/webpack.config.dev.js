@@ -7,6 +7,7 @@ const DefinePlugin = require('webpack/lib/DefinePlugin');
 const NamedModulesPlugin = require('webpack/lib/NamedModulesPlugin');
 const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const HtmlWebpackExcludeAssetsPlugin = require('html-webpack-exclude-assets-plugin');
 const getClientEnvironment = require('./env');
 const paths = require('../config/paths');
 
@@ -41,7 +42,7 @@ module.exports = {
 
     paths.appIndexJs
   ],
-  
+
   output: {
 
     pathinfo: true,
@@ -67,7 +68,7 @@ module.exports = {
   },
 
   module: {
-    noParse: [ /\.elm$/ ],
+    noParse: [/\.elm$/],
 
     rules: [
       {
@@ -89,14 +90,14 @@ module.exports = {
         use: [
           {
             loader: require.resolve('elm-hot-loader')
-      },
+          },
           // string-replace-loader works as InterpolateHtmlPlugin for Elm,
           // it replaces all of the %PUBLIC_URL% with the URL of your
           // application, so you could serve static assets outside of the
           // module system.
-      {
-        loader: require.resolve('string-replace-loader'),
-        query: {
+          {
+            loader: require.resolve('string-replace-loader'),
+            query: {
               search: '%PUBLIC_URL%',
               replace: publicUrl
             }
@@ -111,10 +112,10 @@ module.exports = {
               debug: process.env.ELM_DEBUGGER === 'false' ? false : true,
               pathToMake: paths.elmMake,
               forceWatch: true
-        }
-      }
-    ]
-  },
+            }
+          }
+        ]
+      },
 
       // "postcss" loader applies autoprefixer to our CSS.
       // "css" loader resolves paths in CSS and adds assets as dependencies.
@@ -125,8 +126,8 @@ module.exports = {
         test: /\.scss$/,
         use: [
           {
-          loader: require.resolve('style-loader') // creates style nodes from JS strings
-          }, 
+            loader: require.resolve('style-loader') // creates style nodes from JS strings
+          },
           {
             loader: require.resolve('css-loader'), // translates CSS into CommonJS
             options: {
@@ -182,6 +183,14 @@ module.exports = {
       inject: true,
       template: paths.appHtml
     }),
+
+    new HtmlWebpackPlugin({
+      inject: true,
+      filename: 'login.html',
+      template: paths.loginHtml,
+      excludeAssets: [/\.js/]
+    }),
+    new HtmlWebpackExcludeAssetsPlugin(),
 
     new HotModuleReplacementPlugin(),
 

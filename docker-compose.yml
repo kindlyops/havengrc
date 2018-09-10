@@ -105,6 +105,14 @@ services:
       - "3002:8080"
     volumes:
       - ./swagger/index.html:/usr/share/nginx/html/index.html
+  unleash:
+    image: havengrc-docker.jfrog.io/kindlyops/unleash-docker:3.1.1
+    ports:
+      - "4242:4242"
+    environment:
+      - DATABASE_URL=postgres://postgres:unleash@db/mappamundi_dev
+    depends_on:
+      - db
   db:
     image: postgres:9.6.4
     ports:
