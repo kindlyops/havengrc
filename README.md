@@ -276,3 +276,11 @@ We are experimenting with the bazel build tool. Get it from https://bazel.build/
 To build the keycloak service providers jar
 
     bazel build //keycloak-service-providers:spi_deploy.jar
+
+### Security scanning with Zed Attack Proxy
+
+You can run the ZAP baseline scan with
+
+    docker-compose run zap
+
+
