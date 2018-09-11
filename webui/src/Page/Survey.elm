@@ -4,7 +4,7 @@ module Page.Survey
         , init
         , initWithSave
         , update
-        , Msg
+        , Msg (..)
         , view
         , SavedState
         , decodeSavedState

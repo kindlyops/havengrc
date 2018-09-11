@@ -1,7 +1,7 @@
 module Page.SurveyResponses
     exposing
         ( Model
-        , Msg
+        , Msg (..)
         , update
         , view
         , init

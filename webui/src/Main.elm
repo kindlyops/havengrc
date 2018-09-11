@@ -184,11 +184,27 @@ update msg model =
                 ( { model | commentsModel = commentsModel }, Cmd.map CommentsMsg cmd )
 
         SurveyMsg surveyMsg ->
-            let
-                ( surveyModel, cmd ) =
-                    Survey.update surveyMsg model.surveyModel model.authModel
-            in
-                ( { model | surveyModel = surveyModel }, Cmd.map SurveyMsg cmd )
+            case surveyMsg of
+                Survey.SaveCurrentSurvey ->
+                    let
+                        ( surveyModel, cmd ) =
+                            Survey.update surveyMsg model.surveyModel model.authModel
+                        ( surveyResponseModel, respCmd ) =
+                            SurveyResponses.update SurveyResponses.GetResponses model.surveyResponseModel model.authModel
+                        _= 
+                            Debug.log "SavedCurrentSurvey " (toString respCmd)
+                    in
+                        ( { model | surveyModel = surveyModel, surveyResponseModel = surveyResponseModel }
+                        , Cmd.batch [ Cmd.map SurveyResponseMsg respCmd, Cmd.map SurveyMsg cmd ]
+                        )
+
+                _ ->
+
+                    let
+                        ( surveyModel, cmd ) =
+                            Survey.update surveyMsg model.surveyModel model.authModel
+                    in
+                        ( { model | surveyModel = surveyModel }, Cmd.map SurveyMsg cmd )
 
         SurveyResponseMsg surveyResponseMsg ->
             let
