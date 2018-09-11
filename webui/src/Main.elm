@@ -151,6 +151,9 @@ update msg model =
                 ( commentsModel, commentsCmd ) =
                     Comments.init authModel
 
+                ( surveyResponseModel, surveyResponsesCmd ) =
+                    SurveyResponses.init authModel
+
                 ( _, surveyCmd ) =
                     Survey.init authModel
             in
@@ -162,6 +165,7 @@ update msg model =
                     [ Cmd.map AuthenticationMsg cmd
                     , Cmd.map CommentsMsg commentsCmd
                     , Cmd.map SurveyMsg surveyCmd
+                    , Cmd.map SurveyResponseMsg surveyResponsesCmd
                     ]
                 )
 

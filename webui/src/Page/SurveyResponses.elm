@@ -51,22 +51,24 @@ initialModel =
 initialCommands : Authentication.Model -> List (Cmd Msg)
 initialCommands authModel =
     if Authentication.isLoggedIn authModel then
-        [ Http.send GotServerIpsativeResponses (Request.SurveyResponses.getIpsativeResponses authModel)
-        ]
+        [ Http.send GotServerIpsativeResponses (Request.SurveyResponses.getIpsativeResponses authModel ) ]
     else
         []
 
 
 type Msg
-    = GenerateChart
+    = GetResponses
     | GotServerIpsativeResponses (Result Http.Error (List GroupedIpsativeResponse))
     | StartVisualization AvailableResponse
     | GoToHome
-
+    | GenerateChart
 
 update : Msg -> Model -> Authentication.Model -> ( Model, Cmd Msg )
 update msg model authModel =
     case msg of
+        GetResponses ->
+            model ! [ Http.send GotServerIpsativeResponses (Request.SurveyResponses.getIpsativeResponses authModel ) ]
+
         StartVisualization availableResponse ->
             { model
                 | currentPage = IpsativeResponse
@@ -196,6 +198,8 @@ viewHome model =
         [ h1 [ class "display-4" ] [ text "Survey Responses" ]
         , p [ class "lead" ] [ text "Select a response group to get started." ]
         , hr [ class "my-4" ] []
+        , div [ class "row" ]
+            [ button [ class "btn btn-secondary", onClick GetResponses ] [ text "get Ipsative Responses" ] ]
         , p [ class "" ] [ text ("There are currently " ++ toString (List.length model.availableResponses) ++ " responses to choose from.") ]
         , div [ class "row" ]
             (List.map
