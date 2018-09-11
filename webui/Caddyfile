@@ -10,7 +10,7 @@ redir 301 {
 header / {
   # Enable HTTP Strict Transport Security (HSTS) to force clients to always
   # connect via HTTPS (do not use if only testing)
-  Strict-Transport-Security: "max-age=31536000; includeSubDomains"
+  Strict-Transport-Security "max-age=31536000; includeSubDomains"
   # Enable cross-site filter (XSS) and tell browser to block detected attacks
   X-XSS-Protection "1; mode=block"
   # Prevent some browsers from MIME-sniffing a response away from the declared Content-Type
