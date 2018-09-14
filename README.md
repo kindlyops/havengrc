@@ -27,6 +27,14 @@ To check and see if you have docker available and set up
 
 If you don't have docker running, use [these instructions](https://docs.docker.com/docker-for-mac/). At the time of writing, this is working fine with docker 1.12.
 
+### Tmux
+
+We have a tmux session defined with https://github.com/tmux-python/tmuxp/
+this may make it easier to monitor logs as you work.
+
+    pip install --user tmuxp
+    tmuxp load ~/go/src/github.com/kindlyops/mappamundi
+
 ### Windows users
 
 Before you continue, you need to configure git to auto-correct line ending formats:
