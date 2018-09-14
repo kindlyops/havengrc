@@ -15,3 +15,6 @@ docs/plantuml/*.png
 .bazelrc
 /bazel-*
 .vs/
+*.swp
+*.swo
+
