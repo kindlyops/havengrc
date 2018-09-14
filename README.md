@@ -291,4 +291,16 @@ You can run the ZAP baseline scan with
 
     docker-compose run zap
 
+### Background jobs
+
+The background job worker system is Faktory. You can view the webui in
+development by opening http://localhost:7420
+
+The credentials for the faktory webui in the dev environment are
+
+    faktory / fassword
+
+You can monitor jobs as they are submitted and run. The workers run in
+a separate container, and there may be multiple containers for different
+kinds of workers (each running code for different jobs).
 
