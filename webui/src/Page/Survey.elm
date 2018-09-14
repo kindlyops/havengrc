@@ -4,7 +4,7 @@ module Page.Survey
         , init
         , initWithSave
         , update
-        , Msg (..)
+        , Msg(..)
         , view
         , SavedState
         , decodeSavedState
@@ -220,6 +220,7 @@ initialCommands authModel =
         []
 
 
+surveyRequests : Authentication.Model -> List (Cmd Msg)
 surveyRequests authModel =
     [ Http.send GotServerIpsativeSurveys (Request.Survey.getIpsativeSurveys authModel)
     , Http.send GotServerLikertSurveys (Request.Survey.getLikertSurveys authModel)
