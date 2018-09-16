@@ -11,9 +11,7 @@ module Request.Survey
 
 import Http
 import Json.Decode as Decode
-import Json.Encode as Encode
 import Authentication
-import Ports
 import Data.Survey as Survey exposing (Survey)
 
 
