@@ -1,0 +1,20 @@
+session_name: haven
+start_directory: ./ # relative to project root
+before_script: 'docker-compose up -d'
+windows:
+- window_name: main
+  focus: true
+  layout: main-vertical
+  panes:
+  - focus: true
+    shell_command:
+    - vim .
+  - pane
+  - docker-compose logs -f webui
+- window_name: logs
+  layout: tiled
+  panes:
+  - docker-compose logs -f webui
+  - docker-compose logs -f keycloak
+  - docker-compose logs -f db
+  - docker-compose logs -f havenapi

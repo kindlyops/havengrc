@@ -12,8 +12,6 @@
 module Route exposing (Route(..), Model, init, locFor, titleFor, urlFor)
 
 import String exposing (split, fromList, join)
-import String.Extra exposing (replace)
-import List.Extra exposing (getAt)
 import Navigation
 import UrlParser exposing ((</>), (<?>), s, int, string, parseHash, Parser, oneOf)
 
