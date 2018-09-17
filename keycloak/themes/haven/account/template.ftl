@@ -19,7 +19,6 @@
             <script type="text/javascript" src="${url.resourcesPath}/${script}"></script>
         </#list>
     </#if>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   </head>
   <body class="admin-console user ${bodyClass}">
     <header class="navbar navbar-expand-lg fixed-top navbar-dark bg-primary">
