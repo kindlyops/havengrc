@@ -69,7 +69,6 @@ type alias Model =
 
 --TODO: change currentSurvey to Maybe
 
---TODO: eventually allow for configuration of total groups
 totalGroups =
   1
 
