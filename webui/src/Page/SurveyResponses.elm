@@ -176,7 +176,6 @@ viewResponseTable datum =
     Html.table []
         ([ Html.tr []
             [ Html.th [] [ text "Category" ]
-            , Html.th [] [ text "Group" ]
             , Html.th [] [ text "Points" ]
             ]
          ]
@@ -184,7 +183,6 @@ viewResponseTable datum =
                 (\datum ->
                     Html.tr []
                         [ Html.td [] [ text datum.category ]
-                        , Html.td [] [ text (toString datum.group) ]
                         , Html.td [] [ text (toString datum.points) ]
                         ]
                 )
