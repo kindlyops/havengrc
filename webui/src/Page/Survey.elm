@@ -69,6 +69,9 @@ type alias Model =
 
 --TODO: change currentSurvey to Maybe
 
+--TODO: eventually allow for configuration of total groups
+totalGroups =
+  1
 
 type alias TestStructure =
     { storedSurvey : SavedState
@@ -310,7 +313,7 @@ update msg model authModel =
                     Data.Survey.groupIpsativeSurveyData data
 
                 survey =
-                    Data.Survey.createIpsativeSurvey 10 2 model.selectedSurveyMetaData questions
+                    Data.Survey.createIpsativeSurvey 10 totalGroups model.selectedSurveyMetaData questions
             in
                 { model | currentSurvey = survey, isSurveyReady = True } ! []
 
@@ -1101,7 +1104,7 @@ viewSurveyPointsGroup : IpsativeAnswer -> PointsAssigned -> Html Msg
 viewSurveyPointsGroup answer group =
     li [ class "list-group-item" ]
         [ div [ class "d-flex justify-content-between" ]
-            [ div [ class "align-self-center" ] [ p [ class "card-text" ] [ text ("Group " ++ toString group.group ++ ":") ] ]
+            [ div [ class "align-self-center" ] []
             , div [ class "" ]
                 [ button
                     [ type_ "button"
