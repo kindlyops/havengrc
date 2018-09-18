@@ -144,7 +144,7 @@ jobs:
           docker_layer_caching: true
       - run: docker build --rm=false -t kindlyops/havenworker worker
       - run: docker tag kindlyops/havenworker:latest kindlyops/havenworker:$CIRCLE_SHA1
-      - run: docker tag kindlyops/havenworkeri:latest kindlyops/havenworker:$CIRCLE_BUILD_NUM
+      - run: docker tag kindlyops/havenworker:latest kindlyops/havenworker:$CIRCLE_BUILD_NUM
       - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
       - run: docker push kindlyops/havenworker:$CIRCLE_BUILD_NUM
       - run: docker push kindlyops/havenworker:$CIRCLE_SHA1
