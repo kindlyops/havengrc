@@ -9,7 +9,6 @@ ADD . .
 RUN go get -u github.com/golang/dep/cmd/dep
 RUN dep ensure -vendor-only
 
-# TODO: set up build
 RUN go build -o app main.go
 
 FROM havengrc-docker.jfrog.io/kindlyops/reporter:latest
