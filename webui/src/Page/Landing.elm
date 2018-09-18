@@ -6,6 +6,7 @@ import Html.Events exposing (..)
 import Authentication
 
 
+view : Html Authentication.Msg
 view =
     div [ class "" ]
         [ div [ class "" ]

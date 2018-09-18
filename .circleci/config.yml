@@ -134,6 +134,25 @@ jobs:
           name: notify failed job
           command: ./notify-slack notifications "CircleCI pipeline for ${CIRCLE_PULL_REQUEST:-$CIRCLE_BRANCH} failed in $CIRCLE_JOB $CIRCLE_BUILD_URL" circleci
           when: on_fail
+  havenworker-build-job:
+    docker:
+      - image: circleci/node:7-browsers
+    steps:
+      - checkout
+      - add_ssh_keys
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run: docker build --rm=false -t kindlyops/havenworker worker
+      - run: docker tag kindlyops/havenworker:latest kindlyops/havenworker:$CIRCLE_SHA1
+      - run: docker tag kindlyops/havenworker:latest kindlyops/havenworker:$CIRCLE_BUILD_NUM
+      - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
+      - run: docker push kindlyops/havenworker:$CIRCLE_BUILD_NUM
+      - run: docker push kindlyops/havenworker:$CIRCLE_SHA1
+      - run: docker push kindlyops/havenworker:latest
+      - run:
+          name: notify failed job
+          command: ./notify-slack notifications "CircleCI pipeline for ${CIRCLE_PULL_REQUEST:-$CIRCLE_BRANCH} failed in $CIRCLE_JOB $CIRCLE_BUILD_URL" circleci
+          when: on_fail
   havenapi-testing-job:
     docker:
       - image: circleci/ruby:2.4
@@ -233,6 +252,7 @@ workflows:
       - flyway-build-job
       - keycloak-build-job
       - havenapi-build-job
+      - havenworker-build-job
       - postgrest-build-job
       - havenapi-testing-job:
           requires:
