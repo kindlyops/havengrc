@@ -135,6 +135,14 @@ services:
       - "PGADMIN_DEFAULT_PASSWORD=password"
     ports:
       - "8081:80"
+  worker:
+    working_dir: /go/src/github.com/kindlyops/mappamundi/worker
+    environment:
+      - FAKTORY_URL=tcp://:fassword@faktory:7419
+    build:
+      context: worker/
+    links:
+      - faktory
   havenapi:
     working_dir: /go/src/github.com/kindlyops/mappamundi/havenapi
     volumes:

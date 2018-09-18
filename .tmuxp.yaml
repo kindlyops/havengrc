@@ -14,7 +14,7 @@ windows:
 - window_name: logs
   layout: tiled
   panes:
-  - docker-compose logs -f webui
+  - docker-compose logs -f worker
   - docker-compose logs -f keycloak
   - docker-compose logs -f db
   - docker-compose logs -f havenapi
