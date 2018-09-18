@@ -26,7 +26,7 @@ getIpsativeSurveys authModel =
                 , body = Http.emptyBody
                 , expect = Http.expectJson (Decode.list Survey.decodeSurveyMetaData)
                 , timeout = Nothing
-                , withCredentials = True
+                , withCredentials = False
                 }
     in
         request

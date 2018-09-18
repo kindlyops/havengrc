@@ -216,10 +216,8 @@ encodeSurveyPage surveyPage =
 
 initialCommands : Authentication.Model -> List (Cmd Msg)
 initialCommands authModel =
-    if Authentication.isLoggedIn authModel then
-        surveyRequests authModel
-    else
-        []
+    surveyRequests authModel
+
 
 
 surveyRequests : Authentication.Model -> List (Cmd Msg)
