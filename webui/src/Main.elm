@@ -270,6 +270,9 @@ view model =
                     Just Route.Landing ->
                         Landing.view |> Html.map AuthenticationMsg
 
+                    Just Route.Survey ->
+                        Survey.view model.authModel model.surveyModel |> Html.map SurveyMsg
+
                     -- everything else gets the front page
                     _ ->
                         Home.view |> Html.map AuthenticationMsg
