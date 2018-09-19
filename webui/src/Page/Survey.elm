@@ -49,7 +49,6 @@ import Json.Decode.Pipeline exposing (decode, required)
 
 type SurveyPage
     = Home
-    | SurveyInstructions
     | Survey
     | IncompleteSurvey
     | Finished
@@ -70,6 +69,7 @@ type alias Model =
 --TODO: change currentSurvey to Maybe
 
 
+totalGroups : number
 totalGroups =
     1
 
@@ -112,9 +112,6 @@ decodeCurrentPage =
                 case str of
                     "Home" ->
                         Decode.succeed Home
-
-                    "SurveyInstructions" ->
-                        Decode.succeed SurveyInstructions
 
                     "Survey" ->
                         Decode.succeed Survey
@@ -203,9 +200,6 @@ encodeSurveyPage surveyPage =
         Home ->
             "Home"
 
-        SurveyInstructions ->
-            "SurveyInstructions"
-
         Survey ->
             "Survey"
 
@@ -232,9 +226,7 @@ surveyRequests authModel =
 
 
 type Msg
-    = BeginLikertSurvey
-    | BeginIpsativeSurvey
-    | StartLikertSurvey SurveyMetaData
+    = StartLikertSurvey SurveyMetaData
     | StartIpsativeSurvey SurveyMetaData
     | IncrementAnswer IpsativeAnswer Int
     | DecrementAnswer IpsativeAnswer Int
@@ -377,20 +369,6 @@ update msg model authModel =
                         { model | currentPage = Finished }
                     else
                         { model | currentPage = IncompleteSurvey }
-            in
-                newModel ! [ (storeSurvey newModel (getQuestionNumber newModel)) ]
-
-        BeginLikertSurvey ->
-            let
-                newModel =
-                    { model | currentPage = Survey }
-            in
-                newModel ! [ (storeSurvey newModel (getQuestionNumber newModel)) ]
-
-        BeginIpsativeSurvey ->
-            let
-                newModel =
-                    { model | currentPage = Survey }
             in
                 newModel ! [ (storeSurvey newModel (getQuestionNumber newModel)) ]
 
@@ -775,9 +753,6 @@ view authModel model =
         Home ->
             viewHero model
 
-        SurveyInstructions ->
-            viewSurveyInstructions model.currentSurvey model.isSurveyReady
-
         Survey ->
             viewSurvey model.currentSurvey
 
@@ -809,46 +784,6 @@ viewIncompleteButtons survey questionNumbers =
             div [ class "my-2" ] [ button [ class "btn btn-primary", onClick (GotoQuestion questionNumber) ] [ text ("Click to go back to question " ++ toString questionNumber) ] ]
         )
         questionNumbers
-
-
-viewSurveyInstructions : Survey -> Bool -> Html Msg
-viewSurveyInstructions survey isSurveyReady =
-    case survey of
-        Ipsative survey ->
-            viewIpsativeSurveyInstructions survey isSurveyReady
-
-        Likert survey ->
-            viewLikertSurveyInstructions survey isSurveyReady
-
-
-viewIpsativeSurveyInstructions : IpsativeSurvey -> Bool -> Html Msg
-viewIpsativeSurveyInstructions survey isSurveyReady =
-    div [ class "pt-3" ]
-        [ div [ class "row" ]
-            [ div
-                [ class "col" ]
-                [ h1 [ class "display-4" ] [ text survey.metaData.name ]
-                , p [ class "lead" ] [ text survey.metaData.instructions ]
-                , hr [ class "my-4" ] []
-                , button [ class "btn btn-primary", disabled (not isSurveyReady), onClick BeginIpsativeSurvey ] [ text "Begin" ]
-                ]
-            ]
-        ]
-
-
-viewLikertSurveyInstructions : LikertSurvey -> Bool -> Html Msg
-viewLikertSurveyInstructions survey isSurveyReady =
-    div [ class "pt-3" ]
-        [ div [ class "row" ]
-            [ div
-                [ class "col" ]
-                [ h1 [ class "display-4" ] [ text survey.metaData.name ]
-                , p [ class "lead" ] [ text survey.metaData.instructions ]
-                , hr [ class "my-4" ] []
-                , button [ class "btn btn-primary", disabled (not isSurveyReady), onClick BeginLikertSurvey ] [ text "Begin" ]
-                ]
-            ]
-        ]
 
 
 getTotalAvailableSurveys : Model -> Int
