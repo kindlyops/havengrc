@@ -69,8 +69,10 @@ type alias Model =
 
 --TODO: change currentSurvey to Maybe
 
+
 totalGroups =
-  1
+    1
+
 
 type alias TestStructure =
     { storedSurvey : SavedState
@@ -393,10 +395,10 @@ update msg model authModel =
                 newModel ! [ (storeSurvey newModel (getQuestionNumber newModel)) ]
 
         StartLikertSurvey metaData ->
-            { model | currentPage = SurveyInstructions, selectedSurveyMetaData = metaData } ! [ Http.send GotLikertServerData (Request.Survey.getLikertSurvey authModel metaData.uuid) ]
+            { model | currentPage = Survey, selectedSurveyMetaData = metaData } ! [ Http.send GotLikertServerData (Request.Survey.getLikertSurvey authModel metaData.uuid) ]
 
         StartIpsativeSurvey metaData ->
-            { model | currentPage = SurveyInstructions, selectedSurveyMetaData = metaData } ! [ Http.send GotIpsativeServerData (Request.Survey.getIpsativeSurvey authModel metaData.uuid) ]
+            { model | currentPage = Survey, selectedSurveyMetaData = metaData } ! [ Http.send GotIpsativeServerData (Request.Survey.getIpsativeSurvey authModel metaData.uuid) ]
 
         NextQuestion ->
             case model.currentSurvey of
@@ -921,7 +923,17 @@ viewLikertSurvey survey =
         , br [] []
         , viewLikertSurveyTable (Zipper.current survey.questions)
         , br [] []
+        , viewInlineSurveyInstructions survey.metaData.instructions
         , viewSurveyFooter
+        ]
+
+
+viewInlineSurveyInstructions : String -> Html Msg
+viewInlineSurveyInstructions instructions =
+    div [ class "row" ]
+        [ div
+            [ class "col-lg h5", style [ ( "text-align", "center" ) ] ]
+            [ text instructions ]
         ]
 
 
@@ -995,6 +1007,7 @@ viewIpsativeSurvey survey =
         , br [] []
         , viewIpsativeSurveyBoxes (Zipper.current survey.questions)
         , br [] []
+        , viewInlineSurveyInstructions survey.metaData.instructions
         , viewSurveyFooter
         ]
 
