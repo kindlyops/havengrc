@@ -1,3 +1,5 @@
+CREATE EXTENSION IF NOT EXISTS citext;
+
 -- for some columns we never let the caller control the contents
 CREATE OR REPLACE FUNCTION mappa.override_registration_funnel_columns()
 RETURNS TRIGGER AS $$
@@ -34,8 +36,8 @@ $$ language 'plpgsql';
 CREATE TABLE mappa.registration_funnel_1 (
   uuid           UUID        UNIQUE,
   created_at     TIMESTAMPTZ,
-  email          NAME,
-  ip_address     TEXT,
+  email          CITEXT,
+  ip_address     INET,
   survey_results JSONB,
   registered     BOOLEAN
 );
