@@ -215,7 +215,6 @@ initialCommands authModel =
     surveyRequests authModel
 
 
-
 surveyRequests : Authentication.Model -> List (Cmd Msg)
 surveyRequests authModel =
     [ Http.send GotServerIpsativeSurveys (Request.Survey.getIpsativeSurveys authModel)
@@ -801,27 +800,19 @@ viewHero model =
     div [ class "" ]
         [ h1 [ class "display-4" ] [ text "KindlyOps Haven Survey" ]
         , p [ class "lead" ] [ text "Welcome to the Elm Haven Survey. " ]
-        , button [ class "btn btn-secondary", onClick GetIpsativeSurveys ] [ text "get ipsative surveys (debug)" ]
-        , button [ class "btn btn-secondary", onClick GetLikertSurveys ] [ text "get likert surveys (debug)" ]
         , hr [ class "my-4" ] []
-        , p [ class "" ] [ text ("There are currently " ++ toString (getTotalAvailableSurveys model) ++ " surveys to choose from.") ]
+        , p [ class "" ] [ text "Lets get started! " ]
         , div [ class "row" ]
             (List.map
                 (\availableSurvey ->
-                    div [ class "col-6 mb-4" ]
-                        [ Views.SurveyCard.view availableSurvey "Ipsative" (StartIpsativeSurvey availableSurvey)
-                        ]
+                    if availableSurvey.name == "SCDS_1" then
+                        div [ class "col-6 mb-4" ]
+                            [ Views.SurveyCard.view availableSurvey "Ipsative" (StartIpsativeSurvey availableSurvey)
+                            ]
+                    else
+                        div [] []
                 )
                 model.availableIpsativeSurveys
-            )
-        , div [ class "row" ]
-            (List.map
-                (\availableSurvey ->
-                    div [ class "col-6 mb-4" ]
-                        [ Views.SurveyCard.view availableSurvey "Likert" (StartLikertSurvey availableSurvey)
-                        ]
-                )
-                model.availableLikertSurveys
             )
         ]
 
