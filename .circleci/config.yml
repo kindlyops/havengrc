@@ -244,6 +244,10 @@ jobs:
           name: notify failed job
           command: ./notify-slack notifications "CircleCI pipeline for ${CIRCLE_PULL_REQUEST:-$CIRCLE_BRANCH} failed in $CIRCLE_JOB $CIRCLE_BUILD_URL" circleci
           when: on_fail
+      - run:
+          name: notify deploy complete
+          command: ./notify-slack notifications "CircleCI completed deploy for ${CIRCLE_PULL_REQUEST:-$CIRCLE_BRANCH}" circleci
+          when: on_success
 workflows:
   version: 2
   builds:
