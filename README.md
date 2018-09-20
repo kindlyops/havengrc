@@ -237,7 +237,7 @@ Here is an example of running migrations in production with `oc` .
     oc project haven-production
     # check to see if the migration job is there.
     oc get jobs
-    oc delete job flywy-migrate
+    oc delete job flyway-migrate
     oc create -f k8s/flyway-migration-job.yaml
     # check the logs of the job to see if the migration ran ok
 
