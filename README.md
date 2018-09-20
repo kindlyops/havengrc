@@ -232,6 +232,15 @@ To get useful information to get oriented and find out what is happening:
     oc status -v
     oc get events
 
+Here is an example of running migrations in production with `oc` .
+
+    oc project haven-production
+    # check to see if the migration job is there.
+    oc get jobs
+    oc delete job flywy-migrate
+    oc create -f k8s/flyway-migration-job.yaml
+    # check the logs of the job to see if the migration ran ok
+
 OpenShift CLI versions vary depending on where you installed from. Installing via homebrew `brew install openshift-cli` on macOS is fresher than installing from the link in OpenShift web console. (We ran into a difference in command flags needed with different versions of `oc`).
 
 ### Using helm
