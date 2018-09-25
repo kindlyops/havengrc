@@ -139,6 +139,10 @@ services:
     working_dir: /go/src/github.com/kindlyops/mappamundi/worker
     environment:
       - FAKTORY_URL=tcp://:fassword@faktory:7419
+      - KC_ADMIN=admin
+      - KC_PW=admin
+      - KC_HOST=http://webui
+      - KC_PORT=2016
     build:
       context: worker/
     links:
