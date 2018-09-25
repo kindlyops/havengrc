@@ -32,3 +32,7 @@
 [[constraint]]
   branch = "master"
   name = "github.com/contribsys/faktory_worker_go"
+
+[[constraint]]
+  branch = "HAV-133"
+  name = "github.com/kindlyops/mappamundi"
