@@ -10,7 +10,7 @@ import (
 // CreateUser creates a new user with keycloak
 func CreateUser(ctx worker.Context, args ...interface{}) error {
 	fmt.Println("Working on job", ctx.Jid())
-	err := keycloak.KeycloakCreateUser(args[0].(string))
+	err := keycloak.CreateUser(args[0].(string))
 	if err != nil {
 		return ctx.Err()
 	}

@@ -1,6 +1,6 @@
 package keycloak
 
-func (as *ActionSuite) Test_KeycloakGetToken() {
-	err := KeycloakGetToken()
+func (as *ActionSuite) Test_GetToken() {
+	err := GetToken()
 	as.NoError(err)
 }

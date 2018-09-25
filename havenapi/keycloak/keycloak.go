@@ -41,8 +41,8 @@ var keycloakHost = os.Getenv("KC_HOST") + ":" + os.Getenv("KC_PORT")
 var getTokenURL = "/auth/realms/master/protocol/openid-connect/token"
 var getUsersURL = "/auth/admin/realms/havendev/users"
 
-// KeycloakGetToken grabs the token for the admin api.
-func KeycloakGetToken() error {
+// GetToken grabs the token for the admin api.
+func GetToken() error {
 	currentTime = time.Now()
 	fmt.Println("Expiration: ", expirationDate)
 	if currentTime.Unix() < expirationDate {
@@ -85,8 +85,8 @@ func KeycloakGetToken() error {
 	return err
 }
 
-// KeycloakGetUser checks if the user exists first.
-func KeycloakGetUser(email string) error {
+// GetUser checks if the user exists first.
+func GetUser(email string) error {
 	client := &http.Client{}
 
 	req, err := http.NewRequest("GET", keycloakHost+getUsersURL, nil)
@@ -117,15 +117,15 @@ func KeycloakGetUser(email string) error {
 
 }
 
-// KeycloakCreateUser creates a new user.
-func KeycloakCreateUser(email string) error {
-	err := KeycloakGetToken()
+// CreateUser creates a new user.
+func CreateUser(email string) error {
+	err := GetToken()
 	if err != nil {
 		return fmt.Errorf("Trouble getting the auth token: %s", err.Error())
 	}
 	client := &http.Client{}
 	log.Info("Try to create: %s", email)
-	err = KeycloakGetUser(email)
+	err = GetUser(email)
 	if err != nil {
 		return fmt.Errorf("Could not create user:%s because of: %s", email, err.Error())
 	}
