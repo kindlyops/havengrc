@@ -148,7 +148,7 @@ func CreateUser(email string) error {
 	log.Info("Added headers")
 	resp, err := client.Do(req)
 	if err != nil {
-		return fmt.Errorf("Trouble processing the response body error: %s with resp: %s", err.Error(), resp)
+		return fmt.Errorf("Trouble processing the response body error: %s", err.Error())
 	}
 
 	defer resp.Body.Close()
