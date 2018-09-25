@@ -189,9 +189,11 @@ update msg model =
                     let
                         ( surveyModel, cmd ) =
                             Survey.update surveyMsg model.surveyModel model.authModel
+
                         ( surveyResponseModel, respCmd ) =
                             SurveyResponses.update SurveyResponses.GetResponses model.surveyResponseModel model.authModel
-                        _= 
+
+                        _ =
                             Debug.log "SavedCurrentSurvey " (toString respCmd)
                     in
                         ( { model | surveyModel = surveyModel, surveyResponseModel = surveyResponseModel }
@@ -199,7 +201,6 @@ update msg model =
                         )
 
                 _ ->
-
                     let
                         ( surveyModel, cmd ) =
                             Survey.update surveyMsg model.surveyModel model.authModel
@@ -261,16 +262,16 @@ view model =
                     Debug.log "model route is: " (toString model.route)
             in
                 case model.route of
-                    Just Route.Privacy ->
+                    Just (Route.Privacy) ->
                         Privacy.view
 
-                    Just Route.Terms ->
+                    Just (Route.Terms) ->
                         Terms.view
 
-                    Just Route.Landing ->
+                    Just (Route.Landing) ->
                         Landing.view |> Html.map AuthenticationMsg
 
-                    Just Route.Survey ->
+                    Just (Route.Survey) ->
                         Survey.view model.authModel model.surveyModel |> Html.map SurveyMsg
 
                     -- everything else gets the front page
@@ -312,8 +313,8 @@ viewNavigationDrawer model user =
                     , class "user-avatar"
                     ]
                     []
-            ,  viewNavUser model user 
-            ]
+                , viewNavUser model user
+                ]
             , viewNavDrawerItems navDrawerItems model.route
             ]
         ]
@@ -326,31 +327,31 @@ viewBody model =
             Nothing ->
                 Dashboard.view model.dashboardModel |> Html.map DashboardMsg
 
-            Just Route.Home ->
+            Just (Route.Home) ->
                 Dashboard.view model.dashboardModel |> Html.map DashboardMsg
 
-            Just Route.Reports ->
+            Just (Route.Reports) ->
                 Reports.view
 
-            Just Route.Privacy ->
+            Just (Route.Privacy) ->
                 Privacy.view
 
-            Just Route.Terms ->
+            Just (Route.Terms) ->
                 Terms.view
 
-            Just Route.Dashboard ->
+            Just (Route.Dashboard) ->
                 Dashboard.view model.dashboardModel |> Html.map DashboardMsg
 
-            Just Route.Comments ->
+            Just (Route.Comments) ->
                 Comments.view model.authModel model.commentsModel |> Html.map CommentsMsg
 
-            Just Route.Activity ->
+            Just (Route.Activity) ->
                 Activity.view
 
-            Just Route.Survey ->
+            Just (Route.Survey) ->
                 Survey.view model.authModel model.surveyModel |> Html.map SurveyMsg
 
-            Just Route.SurveyResponses ->
+            Just (Route.SurveyResponses) ->
                 SurveyResponses.view model.authModel model.surveyResponseModel |> Html.map SurveyResponseMsg
 
             Just _ ->
@@ -375,7 +376,7 @@ viewNavUser model user =
                     [ text "Profile" ]
                 , div [ class "dropdown-divider" ]
                     []
-                , a [ class "dropdown-item", href "#", onClick (AuthenticationMsg Authentication.LogOut) ]
+                , a [ class "dropdown-item", href "/", onClick (AuthenticationMsg Authentication.LogOut) ]
                     [ text "Logout" ]
                 ]
             ]
@@ -396,16 +397,16 @@ viewNavDrawerItems menuItems route =
 viewNavDrawerItem : MenuItem -> Route.Model -> Html Msg
 viewNavDrawerItem menuItem route =
     li [ class "nav-item" ]
-      [ a
-          [ attribute "name" (String.toLower menuItem.text)
-          , onClick <| NavigateTo <| menuItem.route
-          , style [ ( "cursor", "pointer" ) ]
-          , classList
-              [ ( "nav-link", True )
-              , ( "active", String.toLower menuItem.text == selectedItem route )
-              ]
-          ]
-          [ i [ class "material-icons mx-3" ] [ text menuItem.iconName ]
-          , text menuItem.text
-          ]
-      ]
+        [ a
+            [ attribute "name" (String.toLower menuItem.text)
+            , onClick <| NavigateTo <| menuItem.route
+            , style [ ( "cursor", "pointer" ) ]
+            , classList
+                [ ( "nav-link", True )
+                , ( "active", String.toLower menuItem.text == selectedItem route )
+                ]
+            ]
+            [ i [ class "material-icons mx-3" ] [ text menuItem.iconName ]
+            , text menuItem.text
+            ]
+        ]
