@@ -376,7 +376,7 @@ viewNavUser model user =
                     [ text "Profile" ]
                 , div [ class "dropdown-divider" ]
                     []
-                , a [ class "dropdown-item", href "#", onClick (AuthenticationMsg Authentication.LogOut) ]
+                , a [ class "dropdown-item", href "/", onClick (AuthenticationMsg Authentication.LogOut) ]
                     [ text "Logout" ]
                 ]
             ]

@@ -13,7 +13,7 @@ module Route exposing (Route(..), Model, init, locFor, titleFor, urlFor)
 
 import String exposing (split, fromList, join)
 import Navigation
-import UrlParser exposing ((</>), (<?>), s, int, string, parseHash, Parser, oneOf)
+import UrlParser exposing ((</>), (<?>), s, int, string, parsePath, Parser, oneOf)
 
 
 type Route
@@ -49,44 +49,6 @@ route =
         , UrlParser.map EditComment (s "comments" </> int </> s "edit")
         , UrlParser.map Terms (s "terms")
         ]
-
-
-fixLocationQuery : Navigation.Location -> Navigation.Location
-fixLocationQuery location =
-    let
-        firstQuestionMarkReplacedWithAmpersand =
-            case (String.split "/" location.hash) of
-                first :: second :: third :: rest ->
-                    let
-                        dropped =
-                            third |> String.split "&" |> List.drop 1
-
-                        newString =
-                            if (List.length dropped) > 0 then
-                                "?" ++ (String.join "&" dropped)
-                            else
-                                third
-                    in
-                        first :: second :: newString :: rest
-
-                _ ->
-                    []
-
-        replacedHash =
-            join "/" firstQuestionMarkReplacedWithAmpersand
-
-        hash =
-            String.split "?" replacedHash
-                |> List.head
-                |> Maybe.withDefault ""
-
-        search =
-            String.split "?" replacedHash
-                |> List.drop 1
-                |> String.join "?"
-                |> String.append "?"
-    in
-        { location | hash = hash, search = search }
 
 
 type alias Model =
@@ -204,7 +166,7 @@ urlFor loc =
                 Terms ->
                     "/terms/"
     in
-        "#" ++ url
+        url
 
 
 locFor : Maybe Navigation.Location -> Maybe Route
@@ -215,11 +177,8 @@ locFor location =
 
         Just location ->
             let
-                fixedLocation =
-                    fixLocationQuery location
-
                 selectedRoute =
-                    parseHash route fixedLocation
+                    parsePath route location
 
                 segments =
                     location.hash
