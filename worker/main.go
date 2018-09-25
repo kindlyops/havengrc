@@ -2,19 +2,26 @@ package main
 
 import (
 	"fmt"
+
 	worker "github.com/contribsys/faktory_worker_go"
+	keycloak "github.com/kindlyops/mappamundi/havenapi/keycloak"
 )
 
-func someFunc(ctx worker.Context, args ...interface{}) error {
+// CreateUser creates a new user with keycloak
+func CreateUser(ctx worker.Context, args ...interface{}) error {
 	fmt.Println("Working on job", ctx.Jid())
-	return nil
+	err := keycloak.KeycloakCreateUser(args[0])
+	if err != nil {
+		return ctx.Error(500, err)
+	}
+	return err
 }
 
 func main() {
 	mgr := worker.NewManager()
 
 	// register job types and the function to execute them
-	mgr.Register("SomeJob", someFunc)
+	mgr.Register("CreateUser", CreateUser)
 	//mgr.Register("AnotherJob", anotherFunc)
 
 	// use up to N goroutines to execute jobs
