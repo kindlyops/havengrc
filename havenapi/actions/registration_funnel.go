@@ -2,6 +2,7 @@ package actions
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/deis/helm/log"
 	"github.com/gobuffalo/buffalo"
@@ -15,15 +16,22 @@ func RegistrationHandler(c buffalo.Context) error {
 	request := c.Request()
 	request.ParseForm()
 
+	remoteAddress := strings.Split(request.RemoteAddr, ":")[0]
+
 	err := tx.RawQuery(
 		models.Q["registeruser"],
 		request.FormValue("email"),
-		request.FormValue("ip_address"),
+		remoteAddress,
 		request.FormValue("survey_results"),
 	).Exec()
 
 	if err != nil {
-		return c.Error(500, fmt.Errorf("error inserting registration to database: %s", err.Error()))
+		return c.Error(
+			500,
+			fmt.Errorf(
+				"Error inserting registration to database: %s for remote address %s",
+				err.Error(),
+				remoteAddress))
 	}
 
 	log.Info("processed a registration")
