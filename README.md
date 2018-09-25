@@ -2,18 +2,20 @@
 
 [![CircleCI](https://circleci.com/gh/kindlyops/mappamundi.svg?style=svg)](https://circleci.com/gh/kindlyops/mappamundi) [![experimental](http://badges.github.io/stability-badges/dist/experimental.svg)](http://github.com/badges/stability-badges) [![Say Thanks!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/statik) [![Maintainability](https://api.codeclimate.com/v1/badges/d2af9dcd5ad434172a27/maintainability)](https://codeclimate.com/github/kindlyops/mappamundi/maintainability)
 
-We use [BrowserStack](http://browserstack.com) to efficiently check cross-browser compatibility while building Haven. We are using snyk.io and codeclimate.com for static scanning.
+We help organizations avoid getting bogged down in rules that no longer make sense by integrating modern tools and practices without abandoning responsible oversight and administrative controls.
+
+By prioritizing people and culture (beliefs and assumptions aka mental models) over prescriptive checklists, we build resilience and cut down on toil.
+
+By connecting controls to policies to values & customer requirements, we break the cycle of inability to improve processes "because security reasons".
+
+![screenshot of app](demo.png)
+
+## thank you to vendors that support the project
+
+We use [BrowserStack](http://browserstack.com) to efficiently check cross-browser compatibility while building Haven. We are using snyk.io and codeclimate.com for static scanning. Thank you for providing free services to open source projects!
 
 <!-- markdownlint-disable MD033 -->
 [<img height="53" src="https://p3.zdusercontent.com/attachment/1015988/xfvLD5CuyeUcq2i40RYcw494H?token=eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0..BvyIxRLJz4phFf7cbIr8_Q.Fl9BR-ARcgvq38p546lM4djFcalediYWQaXV1_U_xi_zr5stXNUKLQNkTt-2zQbXWIIffLSoG8dUSZqL-GsqaTMbBX8OZi14qIHWmBIOPoRmyhwIcQfYIa79ngad69fKDltmq2H2KKWLByI-NWE9ygYpNs2IAXOQ72NICuWLbSyXIDGFVsq5VlV5ok7iCY0WxwXzIAiHbFu_BPufmP951-dpnBIGJAl4KfGk0eSbHKDOYvVkqHU2yZvNL8itCqkThmE7WNgPCS_KL6TyQiPxUQ.0ypOzE6XBmafR82vKRcIKg">](http://browserstack.com/)
-
-## What is Haven GRC?
-
-We help organizations avoid getting bogged down in rules that no longer make sense, and empower people to update practices to use modern tools and techniques without abandoning responsible oversight and administrative controls.
-
-By connecting controls to policies to values & customer requirements, we break the cycle of inability to improve things "because security reasons".
-
-![screenshot of app](demo.png)
 
 ## setting up the dev environment
 
@@ -29,8 +31,7 @@ If you don't have docker running, use [these instructions](https://docs.docker.c
 
 ### Tmux
 
-We have a tmux session defined with https://github.com/tmux-python/tmuxp/
-this may make it easier to monitor logs as you work.
+We have a tmux session defined with https://github.com/tmux-python/tmuxp/ this may make it easier to monitor logs as you work.
 
     pip install --user tmuxp
     tmuxp load ~/go/src/github.com/kindlyops/mappamundi
@@ -50,13 +51,13 @@ You will normally run all the services using:
 
 From this point on, you just just be able to use docker-compose up/down normally. Move on to access the main webUI in the next section.
 
-## to access the main webUI
+### to access the main webUI
 
 Open [localhost:2015](http://localhost:2015/), click the login button. You can login with user1\@havengrc.com/password or user2\@havengrc.com/password. User2 will prompt you to configure 2Factor authentication.
 
 If you cannot connect to [localhost](http://localhost:2015), try getting the docker machine ip using the command `docker-machine ip default` and use that instead.
 
-## to access the swagger-ui for the postgrest API
+### to access the swagger-ui for the postgrest API
 
 Open [localhost:3002](http://localhost:3002/)
 
@@ -68,23 +69,65 @@ To refresh the swagger documentation, such as after modifying postgres to expose
     export TOKEN=`./get-token`
     curl -H "Authorization: Bearer $TOKEN" http://localhost:2015/api/ > webui/public/swagger/authenticated.json
 
-## to access keycloak
+### to access keycloak
 
-Open [localhost:8080](http://localhost:8080/), you can sign in with admin/admin
+Open [localhost:2015/auth/](http://localhost:2015/auth/), you can sign in with admin/admin
 
-## to access the GitBook documentation site
+### to access the GitBook documentation site
 
 Open [localhost:4000](http://localhost:4000/)
 
-## to see the REST API
-
-    curl -s http://localhost:3001/ | jq
-
-# to see emails sent from Haven / keycloak
+### to see emails sent from Haven / keycloak
 
 Open [localhost:8025](http://localhost:8025), you can use mailhog to see messages stored in memory
 
-## to export keycloak realm data (to refresh the dev users)
+### Background jobs
+
+The background job worker system is Faktory. You can view the webui in development by opening http://localhost:7420
+
+The credentials for the faktory webui in the dev environment are
+
+    faktory / fassword
+
+You can monitor jobs as they are submitted and run. The workers run in a separate container, and there may be multiple containers for different kinds of workers (each running code for different jobs).
+
+### Security scanning with Zed Attack Proxy
+
+You can run the ZAP baseline scan with
+
+    docker-compose run zap
+
+### Bazel
+
+We are experimenting with the bazel build tool. Get it from https://bazel.build/
+
+To build the keycloak service providers jar
+
+    bazel build //keycloak-service-providers:spi_deploy.jar
+
+## Developer tips
+
+### look around inside the database
+
+The psql client is installed in the flyway image, and can connect to the DB server running in the database container.
+
+    docker-compose run --entrypoint="psql -h db -U postgres mappamundi_dev" flyway
+    \l                          # list databases in this server
+    \dn                         # show the schemas
+    \dt mappa.*                 # show the tables in the mappa schema
+    SET ROLE member;            # assume the member role
+    SELECT * from foo LIMIT 1;  # run arbitrary queries
+    \q                          # disconnect
+
+We also have pgadmin4 running on http://localhost:8081. You can sign in using user1\@havengrc.com/password. Once inside pgadmin4, you will need to add a server, the server hostname is 'db' and the credentials are postgres/postgres.
+
+### Run Go Buffalo tasks
+
+To see the grift tasks defined in havenapi, run this buffalo command
+
+    docker-compose run havenapi buffalo task list
+
+### to export keycloak realm data (to refresh the dev users)
 
 After keycloak is running and you have made any desired config changes:
 
@@ -96,11 +139,11 @@ After keycloak is running and you have made any desired config changes:
       -Djboss.https.port=9999 \
       -Djboss.management.http.port=7777
 
-## To clear local storage in Chrome for your local site
+### To clear local storage in Chrome for your local site
 
 Sometimes messing with logins and cookies you get stuff corrupted and need to invalidate a session/drop some cookies/tokens that were in localstorage. Visit chrome://settings/cookies\#cont and search for localhost.
 
-## Testing on a real mobile device
+### Testing on a real mobile device
 
 It's often useful to test your dev code on a variety of real world phones and tablets so you can confirm UI behavior. The easiest way to do this is with a tool called [ngrok](https://ngrok.com). ngrok creates a public URL to a local webserver. If you use ngrok, it's worth signing up for the free plan at least. You will be able to inspect the traffic going over the tunnel, and use http auth credentials to protect access to your tunnel and those you share it with.
 
@@ -112,7 +155,7 @@ If you have a paid ngrok plan, something like this should work
 
     ngrok http -auth "user:password" -subdomain=$USER-haven 2015
 
-## add a database migration
+### add a database migration
 
 Add a new sql file in flyway/sql, following the naming convention for versions.
 
@@ -129,33 +172,11 @@ CREATE TABLE mappa.foo
     git add .
     git commit -m "Adding foo table"
 
-## look around inside the database
-
-The psql client is installed in the flyway image, and can connect to the DB server running in the database container.
-
-    docker-compose run --entrypoint="psql -h db -U postgres mappamundi_dev" flyway
-    \l                          # list databases in this server
-    \dn                         # show the schemas
-    \dt mappa.*                 # show the tables in the mappa schema
-    SET ROLE member;            # assume the member role
-    SELECT * from foo LIMIT 1;  # run arbitrary queries
-    \q                          # disconnect
-
-We also have pgadmin4 running on http://localhost:8081. You can sign in using user1\@havengrc.com/password. Once inside pgadmin4, you will need to add a server, the server hostname is 'db' and the credentials are postgres/postgres.
-
-## Use REST client to interact with the API
-
-[Postman](https://www.getpostman.com/) is a free GUI REST client that makes exploration easy. Run postman, and import a couple of predefined requests from the collection at postman/ComplianceOps.postman\_collection.json. Then execute the POST and GET requests to see how the API behaves.
-
-## More info on postgrest
-
-A tutorial is available [here](http://blog.jonharrington.org/postgrest-introduction/)
-
 ## Authentication with JWT and Keycloak
 
 ### roles and permissions
 
-Keycloak has very complex and sophisticated support for realms, roles, client roles, and custom mappers. For now, we use a simple scheme of a custom user attribute called role. role must be set to "member" or "admin", and a custom mapper has been configured so that a role claim will be included in the JWT access token. PostgREST will check the role claim and switch to the member or admin role defined in PostgREST. Inside the database, fields can access other parts of the JWT to store user identity.
+Keycloak has sophisticated support for realms, roles, client roles, and custom mappers. For now, we use a simple scheme of a custom user attribute called role. role must be set to "member" or "admin", and a custom mapper has been configured so that a role claim will be included in the JWT access token. PostgREST will check the role claim and switch to the member or admin role defined in PostgREST. Inside the database, fields can access other parts of the JWT to store user identity.
 
 ### multi-tenancy
 
@@ -243,25 +264,6 @@ Here is an example of running migrations in production with `oc` .
 
 OpenShift CLI versions vary depending on where you installed from. Installing via homebrew `brew install openshift-cli` on macOS is fresher than installing from the link in OpenShift web console. (We ran into a difference in command flags needed with different versions of `oc`).
 
-### Using helm
-
-To set up helm, first download and unpack the current helm release, then make sure your openshift client is authenticated to haven-production.
-
-    oc whoami
-    oc project
-    export TILLER_NAMESPACE=haven-tiller # this will be unique to your OpenShift cluster
-    helm init --client-only
-    helm version
-
-To update the deployment of helm to a new version, you must edit the tag used and then apply the update.
-
-    oc project $TILLER_NAMESPACE # switch to your tiller project
-    vim k8s/tiller-template.yaml # edit the tiller image tag to the desired version
-    oc process -f k8s/tiller-template.yaml \
-    -p TILLER_NAMESPACE="${TILLER_NAMESPACE}" | oc replace -f -
-    oc rollout status deployment tiller # watch the status of the rollout
-    helm versions # confirm the version change took effect.
-
 ### Database resource
 
 In your Kubernetes cluster there must be an ExternalName Service defined named `db`. If your administrator has already set this up, you can see the endpoint by running:
@@ -285,31 +287,3 @@ Once you complete the challenge and get the key material, edit the secret.
     oc edit secrets/secretname
 
 Replace the values for fullkey.pem and privkey.pem with base64 encoded versions of the new certificates. Save and exit.
-
-### Bazel
-
-We are experimenting with the bazel build tool. Get it from https://bazel.build/
-
-To build the keycloak service providers jar
-
-    bazel build //keycloak-service-providers:spi_deploy.jar
-
-### Security scanning with Zed Attack Proxy
-
-You can run the ZAP baseline scan with
-
-    docker-compose run zap
-
-### Background jobs
-
-The background job worker system is Faktory. You can view the webui in
-development by opening http://localhost:7420
-
-The credentials for the faktory webui in the dev environment are
-
-    faktory / fassword
-
-You can monitor jobs as they are submitted and run. The workers run in
-a separate container, and there may be multiple containers for different
-kinds of workers (each running code for different jobs).
-
