@@ -1023,9 +1023,8 @@ viewIpsativeSurveyBoxes surveyQuestion =
 viewSurveyBox : IpsativeAnswer -> Html Msg
 viewSurveyBox answer =
     div [ class "col-md-6" ]
-        [ div [ class "card mb-4 box-shadow" ]
+        [ div [ class "card mb-4 box-shadow d-flex align-content-stretch flex-wrap" ]
             [ div [ class "card-body" ]
-                [ div [ class "card-padder", style [ ( "height", "120px" ) ] ]
                     [ p [ class "card-text h5 mb-4" ] [ text answer.answer ] ]
                 , ul [ class "list-group list-group-flush" ]
                     (List.map
@@ -1034,7 +1033,6 @@ viewSurveyBox answer =
                     )
                 ]
             ]
-        ]
 
 
 viewSurveyPointsGroup : IpsativeAnswer -> PointsAssigned -> Html Msg
