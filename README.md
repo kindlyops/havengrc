@@ -1,6 +1,6 @@
 [![CircleCI](https://circleci.com/gh/kindlyops/mappamundi.svg?style=svg)](https://circleci.com/gh/kindlyops/mappamundi) [![experimental](http://badges.github.io/stability-badges/dist/experimental.svg)](http://github.com/badges/stability-badges) [![Say Thanks!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/statik) [![Maintainability](https://api.codeclimate.com/v1/badges/d2af9dcd5ad434172a27/maintainability)](https://codeclimate.com/github/kindlyops/mappamundi/maintainability)
 
-# Haven GRC is a modern risk & compliance dashboard for the cloud
+# Haven GRC is a modern risk & compliance dashboard
 
 We help organizations avoid getting bogged down in rules that no longer make sense by integrating modern tools and practices without abandoning responsible oversight and administrative controls.
 
