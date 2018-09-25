@@ -26,8 +26,8 @@ type token struct {
 
 // For example purposes
 type users struct {
-	LastName string `json:"email"`
-	ID       int    `json:"id"`
+	UserName string `json:"username"`
+	ID       string `json:"id"`
 }
 
 var adminToken = token{}
@@ -107,13 +107,8 @@ func KeycloakGetUser(email string) error {
 	defer resp.Body.Close()
 
 	data := []users{}
-
-	bodyByte, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return fmt.Errorf("Trouble processing the response body: %s", err.Error())
-	}
-
-	err = json.Unmarshal(bodyByte, &data)
+	// Look for an empty array if no users exist with that email.
+	err = json.NewDecoder(resp.Body).Decode(&data)
 	if err != nil {
 		return fmt.Errorf("Error checking for existing user: %s", err.Error())
 	}
@@ -153,18 +148,11 @@ func KeycloakCreateUser(email string) error {
 	log.Info("Added headers")
 	resp, err := client.Do(req)
 	if err != nil {
-		return fmt.Errorf("Trouble processing the response body: %s", err.Error())
+		return fmt.Errorf("Trouble processing the response body error: %s with resp: %s", err.Error(), resp)
 	}
-	bodyByte, err := ioutil.ReadAll(resp.Body)
 
-	if err != nil {
-		return fmt.Errorf("Trouble processing the response body: %s", err.Error())
-	}
 	defer resp.Body.Close()
-	err = json.Unmarshal(bodyByte, &adminToken)
-	if err != nil {
-		return fmt.Errorf("Trouble processing the response body: %s", err.Error())
-	}
+
 	if resp.StatusCode != 201 {
 		return fmt.Errorf("Trouble creating user ")
 	}
