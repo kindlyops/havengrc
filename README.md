@@ -8,7 +8,7 @@ By prioritizing people and culture (beliefs and assumptions aka mental models) o
 
 By connecting controls to policies to values & customer requirements, we break the cycle of inability to improve processes "because security reasons".
 
-![screenshot of app](demo.png)
+![screenshot of app](demo2.png)
 
 ## Table of Contents
 
