@@ -37,6 +37,9 @@ func RegistrationHandler(c buffalo.Context) error {
 
 	// Add job to the queue
 	client, err := faktory.Open()
+	if err != nil {
+		return c.Error(500, err)
+	}
 	job := faktory.NewJob("CreateUser", request.FormValue("email"))
 	err = client.Push(job)
 	if err != nil {
