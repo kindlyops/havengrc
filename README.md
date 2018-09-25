@@ -19,7 +19,7 @@ We use [BrowserStack](http://browserstack.com) to efficiently check cross-browse
 
 ## setting up the dev environment
 
-The db schema and migrations are managed using flyway. The postgresql server, the postgrest API server, and the flyway tool are all run from docker containers to reduce the need for local toolchain installation (java, haskell, postgresql)
+The db schema and migrations are managed using flyway. The PostgreSQL server, the PostgREST API server, and the flyway tool are all run from docker containers to reduce the need for local toolchain installation (java, haskell, postgresql)
 
 To check and see if you have docker available and set up
 
@@ -31,7 +31,7 @@ If you don't have docker running, use [these instructions](https://docs.docker.c
 
 ### Tmux
 
-We have a tmux session defined with https://github.com/tmux-python/tmuxp/ this may make it easier to monitor logs as you work.
+We have a tmux session defined with https://github.com/tmux-python/tmuxp/ this may make it easier to monitor logs as you work. This is also handy if you want to do development on a remote VM.
 
     pip install --user tmuxp
     tmuxp load ~/go/src/github.com/kindlyops/mappamundi
@@ -89,7 +89,11 @@ The credentials for the faktory webui in the dev environment are
 
     faktory / fassword
 
-You can monitor jobs as they are submitted and run. The workers run in a separate container, and there may be multiple containers for different kinds of workers (each running code for different jobs).
+You can monitor jobs as they are submitted and run. The workers run in separate containers.
+
+### Monitoring activity with Grafana
+
+There is a grafana dashboard that you can view at [localhost:3500](http://localhost:3500/). The username is admin and the password is foobar.
 
 ### Security scanning with Zed Attack Proxy
 
