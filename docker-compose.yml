@@ -159,11 +159,13 @@ services:
       - KC_PW=admin
       - KC_HOST=http://webui
       - KC_PORT=2016
+      - FAKTORY_URL=tcp://:fassword@faktory:7419
     build:
       context: .
       dockerfile: ./havenapi/Dockerfile-hotreload
     links:
       - db
+      - faktory
     ports:
       - "3000:3000"
   webui:
