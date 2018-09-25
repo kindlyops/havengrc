@@ -1,6 +1,12 @@
 package keycloak
 
-func (as *ActionSuite) Test_GetToken() {
+import (
+	"testing"
+)
+
+func TestGetToken(t *testing.T) {
 	err := GetToken()
-	as.NoError(err)
+	if err != nil {
+		t.Errorf("Failed test because: %s", err.Error())
+	}
 }
