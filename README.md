@@ -1,6 +1,6 @@
-# Haven GRC is a modern risk & compliance dashboard for the cloud
-
 [![CircleCI](https://circleci.com/gh/kindlyops/mappamundi.svg?style=svg)](https://circleci.com/gh/kindlyops/mappamundi) [![experimental](http://badges.github.io/stability-badges/dist/experimental.svg)](http://github.com/badges/stability-badges) [![Say Thanks!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/statik) [![Maintainability](https://api.codeclimate.com/v1/badges/d2af9dcd5ad434172a27/maintainability)](https://codeclimate.com/github/kindlyops/mappamundi/maintainability)
+
+# Haven GRC is a modern risk & compliance dashboard for the cloud
 
 We help organizations avoid getting bogged down in rules that no longer make sense by integrating modern tools and practices without abandoning responsible oversight and administrative controls.
 
@@ -10,6 +10,43 @@ By connecting controls to policies to values & customer requirements, we break t
 
 ![screenshot of app](demo.png)
 
+## Table of Contents
+
+<!--ts-->
+-   [Table of Contents](#table-of-contents)
+-   [thank you to vendors that support the project](#thank-you-to-vendors-that-support-the-project)
+-   [setting up the dev environment](#setting-up-the-dev-environment)
+    -   [Tmux](#tmux)
+    -   [Windows users](#windows-users)
+-   [running the service](#running-the-service)
+    -   [to access the main webUI](#to-access-the-main-webui)
+    -   [to access the swagger-ui for the postgrest API](#to-access-the-swagger-ui-for-the-postgrest-api)
+    -   [to access keycloak](#to-access-keycloak)
+    -   [to access the GitBook documentation site](#to-access-the-gitbook-documentation-site)
+    -   [to see emails sent from Haven / keycloak](#to-see-emails-sent-from-haven--keycloak)
+    -   [Background jobs](#background-jobs)
+    -   [Monitoring activity with Grafana](#monitoring-activity-with-grafana)
+    -   [Security scanning with Zed Attack Proxy](#security-scanning-with-zed-attack-proxy)
+    -   [Bazel](#bazel)
+-   [Developer tips](#developer-tips)
+    -   [look around inside the database](#look-around-inside-the-database)
+    -   [Run Go Buffalo tasks](#run-go-buffalo-tasks)
+    -   [to export keycloak realm data (to refresh the dev users)](#to-export-keycloak-realm-data-to-refresh-the-dev-users)
+    -   [To clear local storage in Chrome for your local site](#to-clear-local-storage-in-chrome-for-your-local-site)
+    -   [Testing on a real mobile device](#testing-on-a-real-mobile-device)
+    -   [add a database migration](#add-a-database-migration)
+-   [Authentication with JWT and Keycloak](#authentication-with-jwt-and-keycloak)
+    -   [roles and permissions](#roles-and-permissions)
+    -   [multi-tenancy](#multi-tenancy)
+    -   [Low level JWT interactions](#low-level-jwt-interactions)
+-   [Learning Elm](#learning-elm)
+    -   [Design framework and tooling](#design-framework-and-tooling)
+-   [Deploying with kubernetes / OpenShift](#deploying-with-kubernetes--openshift)
+    -   [Using OpenShift](#using-openshift)
+    -   [Database resource](#database-resource)
+    -   [TLS](#tls)
+
+<!--te-->
 ## thank you to vendors that support the project
 
 We use [BrowserStack](http://browserstack.com) to efficiently check cross-browser compatibility while building Haven. We are using snyk.io and codeclimate.com for static scanning. Thank you for providing free services to open source projects!
