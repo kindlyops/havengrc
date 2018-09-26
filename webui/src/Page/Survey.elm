@@ -1065,9 +1065,9 @@ viewSurveyPointsGroup answer group =
 
 viewSurveyFooter : Html Msg
 viewSurveyFooter =
-    div [ class "row mb-4 pb-4 " ]
-        [ div [ class "col-3" ] [ button [ class "btn btn-primary btn-lg mx-1", onClick GoToHome ] [ text "Back" ] ]
-        , div [ class "col-3" ] [ button [ class "btn btn-default btn-lg mx-1", onClick PreviousQuestion ] [ text "<" ] ]
-        , div [ class "col-3" ] [ button [ class "btn btn-default btn-lg mx-1", onClick NextQuestion ] [ text ">" ] ]
-        , div [ class "col-3" ] [ button [ class "btn btn-primary btn-lg mx-1", onClick FinishSurvey ] [ text "Finish" ] ]
+    div [ class "row mb-4 pb-4 px-3 d-flex justify-content-between" ]
+        [ button [ class "btn btn-primary btn-lg mx-1", onClick GoToHome ] [ text "Back" ] 
+        , button [ class "btn btn-default btn-lg mx-1", onClick PreviousQuestion ] [ text "<" ] 
+        , button [ class "btn btn-default btn-lg mx-1", onClick NextQuestion ] [ text ">" ] 
+        , button [ class "btn btn-primary btn-lg mx-1", onClick FinishSurvey ] [ text "Finish" ] 
         ]
