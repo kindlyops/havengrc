@@ -130,7 +130,11 @@ func CreateUser(email string) error {
 		return fmt.Errorf("Could not create user:%s because of: %s", email, err.Error())
 	}
 
-	var jsonStr = []byte(fmt.Sprintf(`{"username": "%s"}`, email))
+	var jsonStr = []byte(
+		fmt.Sprintf(`{"username": "%s", "email": "%s",}`,
+			email,
+			email,
+		))
 
 	body := bytes.NewBuffer(jsonStr)
 	req, err := http.NewRequest(
