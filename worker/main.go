@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 
@@ -20,6 +21,23 @@ type Registration struct {
 	SurveyJSON string `db:"survey_results"`
 	Registered bool   `db:"registered"`
 	CreatedAt  string `db:"created_at"`
+}
+
+// SurveyResponse is a data type for the survey
+type SurveyResponse struct {
+	ID             string `json:"uuid"`
+	UserID         string `json:"user_id"`
+	Email          string `json:"user_email"`
+	Org            string `json:"org"`
+	AnswerID       string `json:"answer_id"`
+	GroupNumber    int    `json:"group_number"`
+	PointsAssigned int    `json:"points_assigned"`
+	CreatedAt      string `json:"created_at"`
+}
+
+// SurveyRespnses is for a collection of them.
+type SurveyResponses struct {
+	Collection []SurveyResponse
 }
 
 var dbUser = envy.Get("DATABASE_USERNAME", "postgres")
@@ -56,13 +74,35 @@ func CreateUser(ctx worker.Context, args ...interface{}) error {
 	// Grab the users registration funnel info so we can use the survey data.
 	registration := []Registration{}
 	err = db.Select(&registration, "SELECT * FROM mappa.registration_funnel_1 WHERE registered=false AND email=$1 LIMIT 1", userEmail)
-	log.Printf("SQL Result found user: %s", registration)
+	log.Printf("SQL Result found user: %v", registration)
 	if err != nil {
 		log.Fatal(err)
 	}
 	// Set registered to true
 	tx := db.MustBegin()
 	tx.MustExec("UPDATE mappa.registration_funnel_1 SET registered = true WHERE email=$1", userEmail)
+	tx.MustExec("SELECT set_config('request.jwt.claim.email', $1, true)", userEmail)
+	tx.MustExec("SELECT set_config('request.jwt.claim.sub', $1, true)", registration[0].ID)
+	org, _ := json.Marshal(nil)
+	tx.MustExec("SELECT set_config('request.jwt.claim.org', $1, true)", string(org))
+	surveyString := registration[0].SurveyJSON
+	log.Printf("Survey Json found: %s", surveyString)
+	responses := make([]SurveyResponse, 0)
+	err = json.Unmarshal([]byte(surveyString), &responses)
+	log.Printf("Responses found: %v", responses)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, response := range responses {
+		tx.MustExec(
+			"INSERT INTO mappa.ipsative_responses (answer_id, group_number, points_assigned) VALUES ($1, $2, $3)",
+			response.AnswerID,
+			response.GroupNumber,
+			response.PointsAssigned,
+		)
+	}
+
 	tx.Commit()
 	err = db.Close()
 	if err != nil {
