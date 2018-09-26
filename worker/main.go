@@ -71,6 +71,7 @@ func CreateUser(ctx worker.Context, args ...interface{}) error {
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer db.Close()
 	// Grab the users registration funnel info so we can use the survey data.
 	registration := []Registration{}
 	err = db.Select(&registration, "SELECT * FROM mappa.registration_funnel_1 WHERE registered=false AND email=$1 LIMIT 1", userEmail)
@@ -103,8 +104,7 @@ func CreateUser(ctx worker.Context, args ...interface{}) error {
 		)
 	}
 
-	tx.Commit()
-	err = db.Close()
+	err = tx.Commit()
 	if err != nil {
 		log.Fatal(err)
 	}
