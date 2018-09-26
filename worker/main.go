@@ -60,32 +60,38 @@ func CreateUser(ctx worker.Context, args ...interface{}) error {
 	fmt.Println("Working on job", ctx.Jid())
 	userEmail := args[0].(string)
 	err := keycloak.CreateUser(userEmail)
-	if err != nil {
-		return ctx.Err()
-	}
+	handleError(err)
+
 	// db is for the postgres connection.
 	db, err := sqlx.Connect(
 		"postgres",
 		dbOptions,
 	)
-	if err != nil {
-		log.Fatal(err)
-	}
+	handleError(err)
+
 	defer db.Close()
+
 	// Grab the users registration funnel info so we can use the survey data.
 	registration := []Registration{}
 	err = db.Select(&registration, "SELECT * FROM mappa.registration_funnel_1 WHERE registered=false AND email=$1 LIMIT 1", userEmail)
 	log.Printf("SQL Result found user: %v", registration)
-	if err != nil {
-		log.Fatal(err)
-	}
+	handleError(err)
+
 	// Set registered to true
-	tx := db.MustBegin()
-	tx.MustExec("UPDATE mappa.registration_funnel_1 SET registered = true WHERE email=$1", userEmail)
-	tx.MustExec("SELECT set_config('request.jwt.claim.email', $1, true)", userEmail)
-	tx.MustExec("SELECT set_config('request.jwt.claim.sub', $1, true)", registration[0].ID)
+	tx, err := db.Begin()
+	handleError(err)
+
+	_, err = tx.Exec("UPDATE mappa.registration_funnel_1 SET registered = true WHERE email=$1", userEmail)
+	handleError(err)
+	_, err = tx.Exec("SELECT set_config('request.jwt.claim.email', $1, true)", userEmail)
+	handleError(err)
+	_, err = tx.Exec("SELECT set_config('request.jwt.claim.sub', $1, true)", registration[0].ID)
+	handleError(err)
 	org, _ := json.Marshal(nil)
-	tx.MustExec("SELECT set_config('request.jwt.claim.org', $1, true)", string(org))
+	_, err = tx.Exec("SELECT set_config('request.jwt.claim.org', $1, true)", string(org))
+	handleError(err)
+
+	// Collect the survey JSON
 	surveyString := registration[0].SurveyJSON
 	log.Printf("Survey Json found: %s", surveyString)
 	responses := make([]SurveyResponse, 0)
@@ -96,12 +102,13 @@ func CreateUser(ctx worker.Context, args ...interface{}) error {
 	}
 
 	for _, response := range responses {
-		tx.MustExec(
+		_, err = tx.Exec(
 			"INSERT INTO mappa.ipsative_responses (answer_id, group_number, points_assigned) VALUES ($1, $2, $3)",
 			response.AnswerID,
 			response.GroupNumber,
 			response.PointsAssigned,
 		)
+		handleError(err)
 	}
 
 	err = tx.Commit()
@@ -109,6 +116,12 @@ func CreateUser(ctx worker.Context, args ...interface{}) error {
 		log.Fatal(err)
 	}
 	return err
+}
+
+func handleError(err error) {
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func main() {
