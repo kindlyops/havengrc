@@ -263,26 +263,30 @@ view model =
             insideView model user
 
 
+outsideContainer : Html msg -> Html msg
+outsideContainer html =
+    div [ class "container p-3" ]
+        [ html ]
+
+
 outsideView : Model -> Html Msg
 outsideView model =
-    div [ class "container p-3" ]
-        [ case model.route of
-            Just (Route.Privacy) ->
-                Privacy.view
+    case model.route of
+        Just (Route.Privacy) ->
+            outsideContainer (Privacy.view)
 
-            Just (Route.Terms) ->
-                Terms.view
+        Just (Route.Terms) ->
+            outsideContainer (Terms.view)
 
-            Just (Route.Landing) ->
-                Landing.view |> Html.map AuthenticationMsg
+        Just (Route.Landing) ->
+            outsideContainer (Landing.view |> Html.map AuthenticationMsg)
 
-            Just (Route.Survey) ->
-                Survey.view model.authModel model.surveyModel |> Html.map SurveyMsg
+        Just (Route.Survey) ->
+            outsideContainer (Survey.view model.authModel model.surveyModel |> Html.map SurveyMsg)
 
-            -- everything else gets the front page
-            _ ->
-                Home.view |> Html.map AuthenticationMsg
-        ]
+        -- everything else gets the front page
+        _ ->
+            Home.view |> Html.map AuthenticationMsg
 
 
 insideView : Model -> Keycloak.UserProfile -> Html Msg
