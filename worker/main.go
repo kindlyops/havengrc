@@ -35,7 +35,7 @@ type SurveyResponse struct {
 	CreatedAt      string `json:"created_at"`
 }
 
-// SurveyRespnses is for a collection of them.
+// SurveyResponses is for a collection of SurveyResponse.
 type SurveyResponses struct {
 	Collection []SurveyResponse
 }
