@@ -265,7 +265,7 @@ view model =
 
 outsideView : Model -> Html Msg
 outsideView model =
-    div [ class "kevin" ]
+    div [ class "container p-3" ]
         [ case model.route of
             Just (Route.Privacy) ->
                 Privacy.view
