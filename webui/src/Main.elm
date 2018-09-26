@@ -257,33 +257,36 @@ view : Model -> Html Msg
 view model =
     case Authentication.tryGetUserProfile model.authModel of
         Nothing ->
-            let
-                _ =
-                    Debug.log "model route is: " (toString model.route)
-            in
-                case model.route of
-                    Just (Route.Privacy) ->
-                        Privacy.view
-
-                    Just (Route.Terms) ->
-                        Terms.view
-
-                    Just (Route.Landing) ->
-                        Landing.view |> Html.map AuthenticationMsg
-
-                    Just (Route.Survey) ->
-                        Survey.view model.authModel model.surveyModel |> Html.map SurveyMsg
-
-                    -- everything else gets the front page
-                    _ ->
-                        Home.view |> Html.map AuthenticationMsg
+            outsideView model
 
         Just user ->
-            viewMain model user
+            insideView model user
 
 
-viewMain : Model -> Keycloak.UserProfile -> Html Msg
-viewMain model user =
+outsideView : Model -> Html Msg
+outsideView model =
+    div [ class "kevin" ]
+        [ case model.route of
+            Just (Route.Privacy) ->
+                Privacy.view
+
+            Just (Route.Terms) ->
+                Terms.view
+
+            Just (Route.Landing) ->
+                Landing.view |> Html.map AuthenticationMsg
+
+            Just (Route.Survey) ->
+                Survey.view model.authModel model.surveyModel |> Html.map SurveyMsg
+
+            -- everything else gets the front page
+            _ ->
+                Home.view |> Html.map AuthenticationMsg
+        ]
+
+
+insideView : Model -> Keycloak.UserProfile -> Html Msg
+insideView model user =
     div []
         [ viewNavBar model
         , viewNavigationDrawer model user
