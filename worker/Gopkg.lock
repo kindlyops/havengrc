@@ -22,18 +22,53 @@
 [[projects]]
   name = "github.com/deis/pkg"
   packages = ["prettyprint"]
-  revision = "d8ef2e67e88941808f1bfcf28d0a91a122718459"
-  version = "v0.5.0"
+  revision = "7f41ea6de942139d5de67f4d4cb2cccced991f6f"
+
+[[projects]]
+  name = "github.com/gobuffalo/envy"
+  packages = ["."]
+  revision = "3c96536452167a705ca5a70b831d3810e1e10452"
+  version = "v1.6.4"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/jmoiron/sqlx"
+  packages = [
+    ".",
+    "reflectx"
+  ]
+  revision = "0dae4fefe7c0e190f7b5a78dac28a1c82cc8d849"
+
+[[projects]]
+  name = "github.com/joho/godotenv"
+  packages = ["."]
+  revision = "23d116af351c84513e1946b527c88823e476be13"
+  version = "v1.3.0"
 
 [[projects]]
   branch = "HAV-133"
   name = "github.com/kindlyops/mappamundi"
   packages = ["havenapi/keycloak"]
-  revision = "909aa43327c6bb99ea586be2a14d43b4f0e37c6b"
+  revision = "6e370d170ae20abdeb11945dfa54e87443add279"
+
+[[projects]]
+  name = "github.com/lib/pq"
+  packages = [
+    ".",
+    "oid"
+  ]
+  revision = "4ded0e9383f75c197b3a2aaa6d590ac52df6fd79"
+  version = "v1.0.0"
+
+[[projects]]
+  name = "github.com/nleof/goyesql"
+  packages = ["."]
+  revision = "736fe14cafb0b195a659821fb90ecfa9226441b5"
+  version = "v1.0.1"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "a71f05bd7ec64ef94b14d7ca12938ab3604c7481a74f63acbc3d372d521aa533"
+  inputs-digest = "e44ac5cddd4740b15bb8ebcd0dc4954b5bed2f27e95eb9e2cb3660da8e6db4db"
   solver-name = "gps-cdcl"
   solver-version = 1
