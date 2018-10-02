@@ -26,6 +26,7 @@ import (
 // application is being run. Default is "development".
 var ENV = envy.Get("GO_ENV", "development")
 
+// KEY gets the haven jwk path
 // TODO mappamundi/postgrest/keycloak-dev-public-key.json should be
 // the JWK and will need to be mounted into the havenapi container
 var KEY = envy.Get("HAVEN_JWK_PATH", "")
@@ -69,10 +70,13 @@ func App() *buffalo.App {
 			SSLRedirect:     ENV == "production",
 			SSLProxyHeaders: map[string]string{"X-Forwarded-Proto": "https"},
 		}))
+
 		// TODO refactor to use dependency injection instead of a package global
 		api.Use(middleware.PopTransaction(models.DB))
 		api.Use(JwtMiddleware)
+		api.Middleware.Skip(JwtMiddleware, RegistrationHandler)
 		api.POST("files", UploadHandler)
+		api.POST("registration_funnel", RegistrationHandler)
 
 	}
 

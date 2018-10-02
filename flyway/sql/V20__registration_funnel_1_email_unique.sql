@@ -1,0 +1,1 @@
+ALTER TABLE mappa.registration_funnel_1 ADD UNIQUE (email);

@@ -1,4 +1,4 @@
-package actions
+package keycloak
 
 import (
 	"bytes"
@@ -26,8 +26,8 @@ type token struct {
 
 // For example purposes
 type users struct {
-	LastName string `json:"email"`
-	ID       int    `json:"id"`
+	UserName string `json:"username"`
+	ID       string `json:"id"`
 }
 
 var adminToken = token{}
@@ -41,8 +41,8 @@ var keycloakHost = os.Getenv("KC_HOST") + ":" + os.Getenv("KC_PORT")
 var getTokenURL = "/auth/realms/master/protocol/openid-connect/token"
 var getUsersURL = "/auth/admin/realms/havendev/users"
 
-// KeycloakGetToken grabs the token for the admin api.
-func KeycloakGetToken() error {
+// GetToken grabs the token for the admin api.
+func GetToken() error {
 	currentTime = time.Now()
 	fmt.Println("Expiration: ", expirationDate)
 	if currentTime.Unix() < expirationDate {
@@ -85,8 +85,8 @@ func KeycloakGetToken() error {
 	return err
 }
 
-// KeycloakGetUser checks if the user exists first.
-func KeycloakGetUser(email string) error {
+// GetUser checks if the user exists first.
+func GetUser(email string) error {
 	client := &http.Client{}
 
 	req, err := http.NewRequest("GET", keycloakHost+getUsersURL, nil)
@@ -107,13 +107,8 @@ func KeycloakGetUser(email string) error {
 	defer resp.Body.Close()
 
 	data := []users{}
-
-	bodyByte, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return fmt.Errorf("Trouble processing the response body: %s", err.Error())
-	}
-
-	err = json.Unmarshal(bodyByte, &data)
+	// Look for an empty array if no users exist with that email.
+	err = json.NewDecoder(resp.Body).Decode(&data)
 	if err != nil {
 		return fmt.Errorf("Error checking for existing user: %s", err.Error())
 	}
@@ -122,20 +117,24 @@ func KeycloakGetUser(email string) error {
 
 }
 
-// KeycloakCreateUser creates a new user.
-func KeycloakCreateUser(email string) error {
-	err := KeycloakGetToken()
+// CreateUser creates a new user.
+func CreateUser(email string) error {
+	err := GetToken()
 	if err != nil {
 		return fmt.Errorf("Trouble getting the auth token: %s", err.Error())
 	}
 	client := &http.Client{}
 	log.Info("Try to create: %s", email)
-	err = KeycloakGetUser(email)
+	err = GetUser(email)
 	if err != nil {
 		return fmt.Errorf("Could not create user:%s because of: %s", email, err.Error())
 	}
 
-	var jsonStr = []byte(fmt.Sprintf(`{"username": "%s"}`, email))
+	var jsonStr = []byte(
+		fmt.Sprintf(`{"username": "%s", "email": "%s"}`,
+			email,
+			email,
+		))
 
 	body := bytes.NewBuffer(jsonStr)
 	req, err := http.NewRequest(
@@ -153,20 +152,13 @@ func KeycloakCreateUser(email string) error {
 	log.Info("Added headers")
 	resp, err := client.Do(req)
 	if err != nil {
-		return fmt.Errorf("Trouble processing the response body: %s", err.Error())
+		return fmt.Errorf("Trouble processing the response body error: %s", err.Error())
 	}
-	bodyByte, err := ioutil.ReadAll(resp.Body)
 
-	if err != nil {
-		return fmt.Errorf("Trouble processing the response body: %s", err.Error())
-	}
 	defer resp.Body.Close()
-	err = json.Unmarshal(bodyByte, &adminToken)
-	if err != nil {
-		return fmt.Errorf("Trouble processing the response body: %s", err.Error())
-	}
+
 	if resp.StatusCode != 201 {
-		return fmt.Errorf("Trouble creating user ")
+		return fmt.Errorf("Trouble creating user - StatusCode: %d", resp.StatusCode)
 	}
 
 	return err

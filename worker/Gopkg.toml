@@ -25,10 +25,30 @@
 #   unused-packages = true
 
 
-[prune]
-  go-tests = true
-  unused-packages = true
-
 [[constraint]]
   branch = "master"
   name = "github.com/contribsys/faktory_worker_go"
+
+[[constraint]]
+  name = "github.com/gobuffalo/envy"
+  version = "1.6.4"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/jmoiron/sqlx"
+
+[[constraint]]
+  branch = "HAV-133"
+  name = "github.com/kindlyops/mappamundi"
+
+[[constraint]]
+  name = "github.com/lib/pq"
+  version = "1.0.0"
+
+[[constraint]]
+  name = "github.com/nleof/goyesql"
+  version = "1.0.1"
+
+[prune]
+  go-tests = true
+  unused-packages = true
