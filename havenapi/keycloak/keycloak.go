@@ -158,7 +158,7 @@ func CreateUser(email string) error {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 201 {
-		return fmt.Errorf("Trouble creating user ")
+		return fmt.Errorf("Trouble creating user - StatusCode: %d", resp.StatusCode)
 	}
 
 	return err
