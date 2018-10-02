@@ -38,7 +38,7 @@
   name = "github.com/jmoiron/sqlx"
 
 [[constraint]]
-  branch = "HAV-133"
+  branch = "master"
   name = "github.com/kindlyops/mappamundi"
 
 [[constraint]]
