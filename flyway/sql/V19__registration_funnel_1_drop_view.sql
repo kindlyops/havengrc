@@ -1,1 +1,0 @@
-DROP VIEW "1".registration_funnel_1;
