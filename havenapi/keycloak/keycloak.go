@@ -131,7 +131,7 @@ func CreateUser(email string) error {
 	}
 
 	var jsonStr = []byte(
-		fmt.Sprintf(`{"username": "%s", "email": "%s",}`,
+		fmt.Sprintf(`{"username": "%s", "email": "%s"}`,
 			email,
 			email,
 		))
