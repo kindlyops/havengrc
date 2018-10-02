@@ -22,7 +22,8 @@
 [[projects]]
   name = "github.com/deis/pkg"
   packages = ["prettyprint"]
-  revision = "7f41ea6de942139d5de67f4d4cb2cccced991f6f"
+  revision = "d8ef2e67e88941808f1bfcf28d0a91a122718459"
+  version = "v0.5.0"
 
 [[projects]]
   name = "github.com/gobuffalo/envy"
@@ -46,10 +47,10 @@
   version = "v1.3.0"
 
 [[projects]]
-  branch = "HAV-133"
+  branch = "master"
   name = "github.com/kindlyops/mappamundi"
   packages = ["havenapi/keycloak"]
-  revision = "6e370d170ae20abdeb11945dfa54e87443add279"
+  revision = "27af506d4b9b29709930fd1bb3ce8c138e12c7b9"
 
 [[projects]]
   name = "github.com/lib/pq"
@@ -69,6 +70,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "e44ac5cddd4740b15bb8ebcd0dc4954b5bed2f27e95eb9e2cb3660da8e6db4db"
+  inputs-digest = "7c978c95c479ae2bf80dbc015b6a83cdbb2d96d448f9a56bda9f937de6a0fbc0"
   solver-name = "gps-cdcl"
   solver-version = 1
