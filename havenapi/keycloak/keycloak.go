@@ -24,7 +24,7 @@ type token struct {
 	TokenType      string `json:"token_type"`
 }
 
-// For example purposes
+// Users is a struct that contains useful user data.
 type Users struct {
 	UserName string `json:"username"`
 	ID       string `json:"id"`
