@@ -25,7 +25,7 @@ type token struct {
 }
 
 // For example purposes
-type users struct {
+type Users struct {
 	UserName string `json:"username"`
 	ID       string `json:"id"`
 }
@@ -86,9 +86,9 @@ func GetToken() error {
 }
 
 // GetUser checks if the user exists first.
-func GetUser(email string) ([]users, error) {
+func GetUser(email string) ([]Users, error) {
 	client := &http.Client{}
-	data := []users{}
+	data := []Users{}
 	req, err := http.NewRequest("GET", keycloakHost+getUsersURL, nil)
 	if err != nil {
 		return data, fmt.Errorf("Trouble creating an http request: %s", err.Error())
