@@ -57,10 +57,18 @@ var Q goyesql.Queries
 
 // CreateUser creates a new user with keycloak
 func CreateUser(ctx worker.Context, args ...interface{}) error {
-	fmt.Println("Working on job", ctx.Jid())
+	fmt.Println("Working on CreateUser job", ctx.Jid())
 	userEmail := args[0].(string)
 	err := keycloak.CreateUser(userEmail)
 	handleError(err)
+	fmt.Println("Created User: ", userEmail)
+	return err
+}
+
+// SaveSurvey saves the survey responses to the new user.
+func SaveSurvey(ctx worker.Context, args ...interface{}) error {
+	fmt.Println("Working on SaveSurvey job", ctx.Jid())
+	userEmail := args[0].(string)
 
 	// db is for the postgres connection.
 	db, err := sqlx.Connect(
@@ -129,7 +137,7 @@ func main() {
 
 	// register job types and the function to execute them
 	mgr.Register("CreateUser", CreateUser)
-	//mgr.Register("AnotherJob", anotherFunc)
+	mgr.Register("SaveSurvey", SaveSurvey)
 
 	// use up to N goroutines to execute jobs
 	mgr.Concurrency = 20

@@ -40,8 +40,13 @@ func RegistrationHandler(c buffalo.Context) error {
 	if err != nil {
 		return c.Error(500, err)
 	}
-	job := faktory.NewJob("CreateUser", request.FormValue("email"))
-	err = client.Push(job)
+	createUserJob := faktory.NewJob("CreateUser", request.FormValue("email"))
+	err = client.Push(createUserJob)
+	if err != nil {
+		return c.Error(500, err)
+	}
+	saveSurveyJob := faktory.NewJob("SaveSurvey", request.FormValue("email"))
+	err = client.Push(saveSurveyJob)
 	if err != nil {
 		return c.Error(500, err)
 	}
