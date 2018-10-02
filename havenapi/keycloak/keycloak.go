@@ -184,7 +184,7 @@ func ResetPassword(email string) error {
 
 	body := bytes.NewBuffer(jsonStr)
 	req, err := http.NewRequest(
-		"POST",
+		"PUT",
 		keycloakHost+getUsersURL+"/"+userList[0].ID+"/execute-actions-email",
 		body,
 	)
