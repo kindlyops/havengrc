@@ -163,6 +163,11 @@ func CreateUser(email string) error {
 		return fmt.Errorf("Trouble creating user - StatusCode: %d", resp.StatusCode)
 	}
 
+	err = ResetPassword(email)
+	if err != nil {
+		return fmt.Errorf("Trouble sending reset password email: %s", err.Error())
+	}
+
 	return err
 }
 
