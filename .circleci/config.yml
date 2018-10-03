@@ -168,51 +168,55 @@ jobs:
             - POSTGRES_DB: mappamundi_dev
             - POSTGRES_PASSWORD: ""
             - DB_DATABASE: mappamundi_dev
-            - DB_ADDR: localhost
+            - DB_ADDR: db
             - DB_USER: circleci
             - DATABASE_NAME: mappamundi_dev
             - DATABASE_USERNAME: circleci
             - DATABASE_PASSWORD: ""
-            - DATABASE_HOST: localhost
+            - DATABASE_HOST: db
             - HAVEN_JWK_PATH: /keycloak-dev-public-key.json
             - PGRST_JWT_AUD_CLAIM: havendev
-            - PGRST_SERVER_PROXY_URI: http://localhost:8180
+            - PGRST_SERVER_PROXY_URI: http://api:8180
             - KEYCLOAK_USER: admin
             - KEYCLOAK_PASSWORD: admin
             - PROXY_ADDRESS_FORWARDING: "true"
-            - FLYWAY_URL: "jdbc:postgresql://localhost/mappamundi_dev"
+            - FLYWAY_URL: "jdbc:postgresql://db/mappamundi_dev"
             - FLYWAY_USER: circleci
             - FLYWAY_IGNORE_MISSING_MIGRATIONS: "true"
             - FLYWAY_GROUP: "true"
             - FLYWAY_SCHEMAS: mappa,1
             - HAVEN_JWK_PATH: /cfg/keycloak-dev-public-key.json
-            - TEST_DATABASE_URL: postgres://circleci@localhost:5432/mappamundi_test?sslmode=disable
+            - TEST_DATABASE_URL: postgres://circleci@db:5432/mappamundi_test?sslmode=disable
           command: |
+            # create network for containers
+            docker network create -d bridge net0
             # run db
-            docker run -d -e POSTGRES_USER -e POSTGRES_DB -e POSTGRES_PASSWORD --name db circleci/postgres:9.6.4-alpine
+            docker run --network net0 -d -e POSTGRES_USER -e POSTGRES_DB -e POSTGRES_PASSWORD -h db --name db circleci/postgres:9.6.4-alpine
             # wait for DB
-            docker run --network container:db jwilder/dockerize -wait tcp://localhost:5432 -timeout 1m
+            docker run --network net0 jwilder/dockerize -wait tcp://db:5432 -timeout 1m
             sleep 2
-            docker run --network container:db circleci/postgres:9.6.4-alpine /usr/local/bin/psql -l -h localhost -U circleci || true
+            docker run --network net0 circleci/postgres:9.6.4-alpine /usr/local/bin/psql -l -h db -U circleci || true
             # create dummy DB to work around https://github.com/markbates/pop/issues/175
-            docker run --network container:db circleci/postgres:9.6.4-alpine /usr/local/bin/createdb -h localhost -U circleci circleci
+            docker run --network net0 circleci/postgres:9.6.4-alpine /usr/local/bin/createdb -h db -U circleci circleci
             # run mailhog
-            docker run -d --name mailhog -h mailhog mailhog/mailhog:v1.0.0
+            docker run --network net0 -d -h mailhog --name mailhog mailhog/mailhog:v1.0.0
+            # wait for mailhog
+            docker run --network net0 jwilder/dockerize  -wait tcp://mailhog:8025 -timeout 2m
             # creating dummy container which will hold a volume with config
             docker create -v /cfg -v /keycloak --name configs alpine:3.4 /bin/true
             docker cp postgrest/keycloak-dev-public-key.json configs:/cfg
             docker cp keycloak/data/havendev-realm.json configs:/keycloak
             # start keycloak in background container
-            docker run --volumes-from configs --network container:db --network container:mailhog -d -e DB_DATABASE -e DB_USER -e DB_ADDR -e KEYCLOAK_USER -e KEYCLOAK_PASSWORD -e PROXY_ADDRESS_FORWARDING --name keycloak kindlyops/keycloak:$CIRCLE_SHA1 start-keycloak.sh -b 0.0.0.0 -Dkeycloak.migration.file=/keycloak/havendev-realm.json -Dkeycloak.migration.strategy=IGNORE_EXISTING -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.action=import
+            docker run --volumes-from configs --network net0 -d -e DB_DATABASE -e DB_USER -e DB_ADDR -e KEYCLOAK_USER -e KEYCLOAK_PASSWORD -e PROXY_ADDRESS_FORWARDING -h keycloak --name keycloak kindlyops/keycloak:$CIRCLE_SHA1 start-keycloak.sh -b 0.0.0.0 -Dkeycloak.migration.file=/keycloak/havendev-realm.json -Dkeycloak.migration.strategy=IGNORE_EXISTING -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.action=import
             # Wait for keycloak
-            docker run --network container:db jwilder/dockerize  -wait tcp://localhost:8080 -timeout 2m
-            docker run --network container:db -e FLYWAY_URL -e FLYWAY_USER -e FLYWAY_IGNORE_MISSING_MIGRATIONS -e FLYWAY_GROUP -e FLYWAY_SCHEMAS kindlyops/havenflyway:$CIRCLE_SHA1 migrate -placeholders.databaseUser=circleci
+            docker run --network net0 jwilder/dockerize  -wait tcp://keycloak:8080 -timeout 2m
+            docker run --network net0 -e FLYWAY_URL -e FLYWAY_USER -e FLYWAY_IGNORE_MISSING_MIGRATIONS -e FLYWAY_GROUP -e FLYWAY_SCHEMAS kindlyops/havenflyway:$CIRCLE_SHA1 migrate -placeholders.databaseUser=circleci
             docker build -t kindlyops/havenapitest -f havenapi/Dockerfile-hotreload .
             docker build -t kindlyops/apitest -f apitest/Dockerfile .
-            docker run -d --volumes-from configs --network container:db --name api -e DATABASE_USERNAME -e DATABASE_PASSWORD -e DATABASE_HOST -e HAVEN_JWK_PATH -e PGRST_JWT_AUD_CLAIM -e PGRST_SERVER_PROXY_URI kindlyops/postgrest postgrest config
-            docker run --network container:db jwilder/dockerize  -wait tcp://localhost:8180 -timeout 2m
-            docker run --volumes-from configs --network container:db -e KC_ADMIN=admin -e KC_PW=admin -e KC_HOST=http://localhost -e KC_PORT=8080 -e TEST_DATABASE_URL -e HAVEN_JWK_PATH kindlyops/havenapitest /go/bin/buffalo test
-            docker run --volumes-from configs --network container:db --workdir /usr/src/app kindlyops/apitest cucumber
+            docker run -d --volumes-from configs --network net0 -h api --name api -e DATABASE_USERNAME -e DATABASE_PASSWORD -e DATABASE_HOST -e HAVEN_JWK_PATH -e PGRST_JWT_AUD_CLAIM -e PGRST_SERVER_PROXY_URI kindlyops/postgrest postgrest config
+            docker run --network net0 jwilder/dockerize  -wait tcp://api:8180 -timeout 2m
+            docker run --volumes-from configs --network net0 -e KC_ADMIN=admin -e KC_PW=admin -e KC_HOST=http://keycloak -e KC_PORT=8080 -e TEST_DATABASE_URL -e HAVEN_JWK_PATH kindlyops/havenapitest /go/bin/buffalo test
+            docker run --volumes-from configs --network net0 --workdir /usr/src/app kindlyops/apitest cucumber
       - run:
           name: notify failed job
           command: ./notify-slack notifications "CircleCI pipeline for ${CIRCLE_PULL_REQUEST:-$CIRCLE_BRANCH} failed in $CIRCLE_JOB $CIRCLE_BUILD_URL" circleci
