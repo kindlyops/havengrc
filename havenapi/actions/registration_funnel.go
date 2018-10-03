@@ -9,10 +9,15 @@ import (
 	"github.com/gobuffalo/buffalo"
 	"github.com/gobuffalo/pop"
 	"github.com/kindlyops/mappamundi/havenapi/models"
+	"go.uber.org/ratelimit"
 )
+
+// rl is the rate limited to 5 requests per second.
+var rl = ratelimit.New(5)
 
 // RegistrationHandler accepts json
 func RegistrationHandler(c buffalo.Context) error {
+	rl.Take()
 	tx := c.Value("tx").(*pop.Connection)
 	request := c.Request()
 	request.ParseForm()

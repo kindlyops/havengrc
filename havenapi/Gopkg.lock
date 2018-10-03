@@ -458,6 +458,15 @@
 
 [[projects]]
   branch = "master"
+  name = "go.uber.org/ratelimit"
+  packages = [
+    ".",
+    "internal/clock"
+  ]
+  revision = "c15da02342779cb6dc027fc95ee2277787698f36"
+
+[[projects]]
+  branch = "master"
   name = "golang.org/x/crypto"
   packages = [
     "bcrypt",
@@ -525,6 +534,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "d2422c3703a9b281be43f05f279d5ab0fa993f5dd8ebbc03f6580a90fcac595f"
+  inputs-digest = "99841bca3135ce8993955f1cc96f3a0a1b2e059c1ad204d731cfbbed71e1ddc2"
   solver-name = "gps-cdcl"
   solver-version = 1
