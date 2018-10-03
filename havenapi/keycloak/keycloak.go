@@ -204,7 +204,11 @@ func ResetPassword(email string) error {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		return fmt.Errorf("Trouble sending actions email for user - StatusCode: %d", resp.StatusCode)
+		return fmt.Errorf(
+			"Trouble sending actions email for user - StatusCode: %d - Url: %s %s",
+			resp.StatusCode,
+			req.Host,
+			req.URL.Path)
 	}
 
 	return err
