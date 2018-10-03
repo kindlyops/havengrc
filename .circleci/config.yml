@@ -187,6 +187,8 @@ jobs:
             - FLYWAY_SCHEMAS: mappa,1
             - HAVEN_JWK_PATH: /cfg/keycloak-dev-public-key.json
             - TEST_DATABASE_URL: postgres://circleci@db:5432/mappamundi_test?sslmode=disable
+            - API_SERVER: api:8180
+            - AUTH_SERVER: keycloak:8080
           command: |
             # create network for containers
             docker network create -d bridge net0
@@ -216,7 +218,7 @@ jobs:
             docker run -d --volumes-from configs --network net0 -h api --name api -e DATABASE_USERNAME -e DATABASE_PASSWORD -e DATABASE_HOST -e HAVEN_JWK_PATH -e PGRST_JWT_AUD_CLAIM -e PGRST_SERVER_PROXY_URI kindlyops/postgrest postgrest config
             docker run --network net0 jwilder/dockerize  -wait tcp://api:8180 -timeout 2m
             docker run --volumes-from configs --network net0 -e KC_ADMIN=admin -e KC_PW=admin -e KC_HOST=http://keycloak -e KC_PORT=8080 -e TEST_DATABASE_URL -e HAVEN_JWK_PATH kindlyops/havenapitest /go/bin/buffalo test
-            docker run --volumes-from configs --network net0 --workdir /usr/src/app kindlyops/apitest cucumber
+            docker run --volumes-from configs --network net0 -e API_SERVER -e AUTH_SERVER --workdir /usr/src/app kindlyops/apitest cucumber
       - run:
           name: notify failed job
           command: ./notify-slack notifications "CircleCI pipeline for ${CIRCLE_PULL_REQUEST:-$CIRCLE_BRANCH} failed in $CIRCLE_JOB $CIRCLE_BUILD_URL" circleci
