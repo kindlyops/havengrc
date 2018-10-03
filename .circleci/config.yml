@@ -188,6 +188,7 @@ jobs:
             - HAVEN_JWK_PATH: /cfg/keycloak-dev-public-key.json
             - TEST_DATABASE_URL: postgres://circleci@localhost:5432/mappamundi_test?sslmode=disable
           command: |
+            # run db
             docker run -d -e POSTGRES_USER -e POSTGRES_DB -e POSTGRES_PASSWORD --name db circleci/postgres:9.6.4-alpine
             # wait for DB
             docker run --network container:db jwilder/dockerize -wait tcp://localhost:5432 -timeout 1m
@@ -195,6 +196,8 @@ jobs:
             docker run --network container:db circleci/postgres:9.6.4-alpine /usr/local/bin/psql -l -h localhost -U circleci || true
             # create dummy DB to work around https://github.com/markbates/pop/issues/175
             docker run --network container:db circleci/postgres:9.6.4-alpine /usr/local/bin/createdb -h localhost -U circleci circleci
+            # run mailhog
+            docker run --network container:db -d --name mailhog mailhog/mailhog:v1.0.0
             # creating dummy container which will hold a volume with config
             docker create -v /cfg -v /keycloak --name configs alpine:3.4 /bin/true
             docker cp postgrest/keycloak-dev-public-key.json configs:/cfg
@@ -208,7 +211,7 @@ jobs:
             docker build -t kindlyops/apitest -f apitest/Dockerfile .
             docker run -d --volumes-from configs --network container:db --name api -e DATABASE_USERNAME -e DATABASE_PASSWORD -e DATABASE_HOST -e HAVEN_JWK_PATH -e PGRST_JWT_AUD_CLAIM -e PGRST_SERVER_PROXY_URI kindlyops/postgrest postgrest config
             docker run --network container:db jwilder/dockerize  -wait tcp://localhost:8180 -timeout 2m
-            docker run --volumes-from configs --network container:db -e KC_ADMIN=admin -e KC_PW=admin -e KC_HOST=http://localhost -e KC_PORT=8080 -e TEST_DATABASE_URL -e HAVEN_JWK_PATH kindlyops/havenapitest /go/bin/buffalo test
+            docker run --volumes-from configs --network container:db --link mailhog:mailhog -e KC_ADMIN=admin -e KC_PW=admin -e KC_HOST=http://localhost -e KC_PORT=8080 -e TEST_DATABASE_URL -e HAVEN_JWK_PATH kindlyops/havenapitest /go/bin/buffalo test
             docker run --volumes-from configs --network container:db --workdir /usr/src/app kindlyops/apitest cucumber
       - run:
           name: notify failed job
