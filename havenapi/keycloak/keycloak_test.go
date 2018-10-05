@@ -10,3 +10,20 @@ func TestGetToken(t *testing.T) {
 		t.Errorf("Failed test because: %s", err.Error())
 	}
 }
+
+func TestGetUser(t *testing.T) {
+	users, err := GetUser("user1@havengrc.com")
+	if err != nil {
+		t.Errorf("Failed test because: %s and %s", err.Error(), users)
+	}
+	if len(users) == 0 {
+		t.Errorf("Failed and found %s", users)
+	}
+}
+
+func TestResetPassword(t *testing.T) {
+	err := ResetPassword("user1@havengrc.com")
+	if err != nil {
+		t.Errorf("Failed test because: %s", err.Error())
+	}
+}

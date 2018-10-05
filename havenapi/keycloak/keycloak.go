@@ -24,8 +24,8 @@ type token struct {
 	TokenType      string `json:"token_type"`
 }
 
-// For example purposes
-type users struct {
+// Users is a struct that contains useful user data.
+type Users struct {
 	UserName string `json:"username"`
 	ID       string `json:"id"`
 }
@@ -86,12 +86,12 @@ func GetToken() error {
 }
 
 // GetUser checks if the user exists first.
-func GetUser(email string) error {
+func GetUser(email string) ([]Users, error) {
 	client := &http.Client{}
-
+	data := []Users{}
 	req, err := http.NewRequest("GET", keycloakHost+getUsersURL, nil)
 	if err != nil {
-		return fmt.Errorf("Trouble creating an http request: %s", err.Error())
+		return data, fmt.Errorf("Trouble creating an http request: %s", err.Error())
 	}
 	req.Header.Add("Authorization", "bearer "+adminToken.AccessToken)
 	q := req.URL.Query()
@@ -101,19 +101,18 @@ func GetUser(email string) error {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return fmt.Errorf("Trouble getting the list of users: %s", err.Error())
+		return data, fmt.Errorf("Trouble getting the list of users: %s", err.Error())
 	}
 
 	defer resp.Body.Close()
 
-	data := []users{}
 	// Look for an empty array if no users exist with that email.
 	err = json.NewDecoder(resp.Body).Decode(&data)
 	if err != nil {
-		return fmt.Errorf("Error checking for existing user: %s", err.Error())
+		return data, fmt.Errorf("Error checking for existing user: %s", err.Error())
 	}
 
-	return err
+	return data, err
 
 }
 
@@ -125,13 +124,16 @@ func CreateUser(email string) error {
 	}
 	client := &http.Client{}
 	log.Info("Try to create: %s", email)
-	err = GetUser(email)
+	userList, err := GetUser(email)
 	if err != nil {
 		return fmt.Errorf("Could not create user:%s because of: %s", email, err.Error())
 	}
+	if len(userList) > 0 {
+		return fmt.Errorf("Could not create user:%s because it already exists", email)
+	}
 
 	var jsonStr = []byte(
-		fmt.Sprintf(`{"username": "%s", "email": "%s"}`,
+		fmt.Sprintf(`{"username": "%s", "email": "%s", "enabled": true}`,
 			email,
 			email,
 		))
@@ -159,6 +161,59 @@ func CreateUser(email string) error {
 
 	if resp.StatusCode != 201 {
 		return fmt.Errorf("Trouble creating user - StatusCode: %d", resp.StatusCode)
+	}
+
+	err = ResetPassword(email)
+	if err != nil {
+		return fmt.Errorf("Trouble sending reset password email: %s", err.Error())
+	}
+
+	return err
+}
+
+// ResetPassword sends the reset password email to verify the email and let the user set a password.
+func ResetPassword(email string) error {
+	err := GetToken()
+	if err != nil {
+		return fmt.Errorf("Trouble getting the auth token: %s", err.Error())
+	}
+	client := &http.Client{}
+	log.Info("Try to reset password for: %s", email)
+	userList, err := GetUser(email)
+	if err != nil {
+		return fmt.Errorf("Could not find user:%s because of: %s", email, err.Error())
+	}
+
+	var jsonStr = []byte(
+		fmt.Sprintf(`["UPDATE_PASSWORD"]`))
+
+	body := bytes.NewBuffer(jsonStr)
+	req, err := http.NewRequest(
+		"PUT",
+		keycloakHost+getUsersURL+"/"+userList[0].ID+"/execute-actions-email",
+		body,
+	)
+
+	if err != nil {
+		return fmt.Errorf("Trouble executing actions email for user: %s", err.Error())
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Add("Authorization", "bearer "+adminToken.AccessToken)
+	log.Info("Added headers")
+	resp, err := client.Do(req)
+	if err != nil {
+		return fmt.Errorf("Trouble processing the response body error: %s", err.Error())
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return fmt.Errorf(
+			"Trouble sending actions email for user - StatusCode: %d - Url: %s %s",
+			resp.StatusCode,
+			req.Host,
+			req.URL.Path)
 	}
 
 	return err
