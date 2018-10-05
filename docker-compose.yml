@@ -168,7 +168,6 @@ services:
     ports:
       - "8081:80"
   worker:
-    working_dir: /go/src/github.com/kindlyops/mappamundi/worker
     environment:
       - FAKTORY_URL=tcp://:fassword@faktory:7419
       - KC_ADMIN=admin
@@ -180,6 +179,11 @@ services:
       context: .
     links:
       - faktory
+    volumes:
+      - ./worker/compilereport:/home/havenuser/compilereport
+      - ./worker/presentation.Rmd:/home/havenuser/presentation.Rmd
+      - ./worker/template.pptx:/home/havenuser/template.pptx
+      - ./worker/input.csv:/home/havenuser/input.csv
   havenapi:
     working_dir: /go/src/github.com/kindlyops/mappamundi/havenapi
     volumes:

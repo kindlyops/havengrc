@@ -1,0 +1,122 @@
+---
+title: "Security Culture Diagnostic"
+output: 
+  powerpoint_presentation:
+    reference_doc: template.pptx
+params: 
+    data: "input2.csv"
+---
+
+```{r setup, include=FALSE}
+library(extrafont)
+extrafont::font_import(pattern = 'Roboto', prompt=FALSE)
+extrafont::loadfonts(device="pdf")
+extrafont::loadfonts(device="postscript")
+#library(gridExtra)
+library(tufte)
+library(ggradar)
+library(ggplot2)
+library(ggthemes)
+library(reshape2)
+library(plyr)
+# library(cowplot)
+library(jsonlite)
+suppressPackageStartupMessages(library(dplyr))
+library(scales)
+library(tibble)
+library(stringr)
+# library(likert)
+library(RColorBrewer)
+
+knitr::opts_chunk$set(tidy = FALSE, cache.extra = packageVersion('tufte'))
+```
+
+### Security Culture Overview
+
+This is an R Markdown presentation. Markdown is a simple formatting 
+syntax for authoring HTML, PDF, and MS Word documents. For more 
+details on using R Markdown see [Lance Hayden's Work](http://rmarkdown.rstudio.com).
+
+When you click the **Knit** button a document will be generated that 
+includes both content as well as the output of any embedded R code 
+chunks within the document.
+
+### Slide with Bullets
+
+- Bullet 1
+- Bullet 2
+- Bullet 3
+
+### Slide with R Output
+
+```{r cars, echo = TRUE}
+summary(cars)
+```
+### Slide with Plot
+
+```{r fig-secculture, fig.cap = "Security Culture Survey Results", fig.fullwidth=TRUE, cache = FALSE, message=FALSE, echo=FALSE, results='hide'}
+calculate_control <- function(C) {
+  culture = as.character(C[1])
+  if (isTRUE(all.equal(culture,"Compliance"))) {
+    return ("Tight")
+  } else if (isTRUE(all.equal(culture, "Process"))) {
+    return ("Tight")
+  } else if (isTRUE(all.equal(culture, "Autonomy"))) {
+    return ("Loose")
+  } else if (isTRUE(all.equal(culture, "Trust"))) {
+    return ("Loose")
+  }
+  return ("ERROR")
+}
+
+calculate_orientation <- function(C) {
+  culture = as.character(C[1])
+  if (isTRUE(all.equal(culture, "Compliance"))) {
+    return ("External")
+  } else if (isTRUE(all.equal(culture, "Process"))) {
+    return ("Internal")
+  } else if (isTRUE(all.equal(culture,"Autonomy"))) {
+    return ("External")
+  } else if (isTRUE(all.equal(culture, "Trust"))) {
+    return ("Internal")
+  }
+  return ("ERROR")
+} 
+scds = read.csv(file=params$data)
+# reshape the data from wide to long, combining the A/B/C/D columns
+# https://clayford.github.io/dwir/dwr_05_combine_merge_rehsape_data.html
+better = melt(scds, id.vars = c("question", "respondent"), measure.vars = c("Compliance","Autonomy","Trust","Process"))
+
+
+
+# calculate the mean of the responses for each question
+# http://www.cookbook-r.com/Manipulating_data/Summarizing_data/#using-ddply
+cdata = ddply(better, 
+              c("question", "variable"), 
+              summarize, 
+              mean = mean(value), 
+              control = calculate_control(variable),
+              orientation = calculate_orientation(variable)
+              )
+
+cdata$orientation2 <- factor(cdata$orientation, levels=rev(levels(factor(cdata$orientation))))
+cdata$control2 <- factor(cdata$control, levels=rev(levels(factor(cdata$control))))
+
+p = ggplot(cdata, aes(x=factor(question, levels=c(10:1)), y=mean) ) +
+  geom_bar(stat='identity') + 
+  scale_y_continuous(limits = c(0,10), labels = c("0", "2.5", "5", "7.5", "10")) +
+  scale_x_discrete(labels=c("1" = "Org Values", "2" = "Org Behaves",
+                            "3" = "Definition", "4" = "Information",
+                            "5" = "Operations", "6" = "Technology",
+                            "7" = "People", "8" = "Risk",
+                            "9" = "Accountability", "10" = "Performance")) +
+  coord_flip() + 
+  labs(x="", y="") + 
+  theme_few() +
+  theme(text = element_text(size=5), legend.position="none", panel.grid.minor = element_line()) +
+  annotate("text", x=8.5,y=7.5,label=c("Process","Compliance","Trust","Autonomy"), size=1.75) +
+  facet_grid( control2 ~ orientation2 )
+#ggdraw(p)
+
+ggdraw(add_sub(p, "Security Culture diagnostic created by Lance Hayden, PhD (CC BY-SA 4.0)", x = 0, hjust = 0, size=4))
+```

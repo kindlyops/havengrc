@@ -3,7 +3,7 @@
 suppressPackageStartupMessages(library("optparse"))
 
 option_list <- list(
-     make_option(c("-t", "--template"), action="store", default="presentation.Rmd"
+     make_option(c("-t", "--template"), action="store", default="presentation.Rmd",
          help="The template file to use"),
      make_option(c("-d", "--data"), action="store", default="input.csv",
          help="The input data file to use when generating the presentation"),
@@ -11,6 +11,8 @@ option_list <- list(
          help="The output data file to create")
      )
 
-parse_args2(OptionParser(option_list=option_list))
+opt_parser = OptionParser(option_list=option_list)
+options <- parse_args(opt_parser)
 
-#rmarkdown::render('report.Rmd',output_file='output.pdf')
+rmarkdown::render(options$template, output_file=options$output,
+                  params = list(data = options$data))
