@@ -176,7 +176,8 @@ services:
       - KC_HOST=http://webui
       - KC_PORT=2016
     build:
-      context: worker/
+      dockerfile: ./worker/Dockerfile
+      context: .
     links:
       - faktory
   havenapi:

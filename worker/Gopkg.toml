@@ -38,10 +38,6 @@
   name = "github.com/jmoiron/sqlx"
 
 [[constraint]]
-  branch = "master"
-  name = "github.com/kindlyops/mappamundi"
-
-[[constraint]]
   name = "github.com/lib/pq"
   version = "1.0.0"
 
