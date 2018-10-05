@@ -184,6 +184,7 @@ services:
       - ./worker/presentation.Rmd:/home/havenuser/presentation.Rmd
       - ./worker/template.pptx:/home/havenuser/template.pptx
       - ./worker/input.csv:/home/havenuser/input.csv
+      - ./worker/output:/home/havenuser/output
   havenapi:
     working_dir: /go/src/github.com/kindlyops/mappamundi/havenapi
     volumes:

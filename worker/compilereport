@@ -7,7 +7,7 @@ option_list <- list(
          help="The template file to use"),
      make_option(c("-d", "--data"), action="store", default="input.csv",
          help="The input data file to use when generating the presentation"),
-     make_option(c("-o", "--output"), action="store", default="output.pptx",
+     make_option(c("-o", "--output"), action="store", default="output/output.pptx",
          help="The output data file to create")
      )
 
