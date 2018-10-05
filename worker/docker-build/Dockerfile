@@ -12,3 +12,4 @@ RUN tlmgr install roboto \
     && installGithub.r kindlyops/tufte \
     && installGithub.r --deps=TRUE kindlyops/ggradar \
     && install2.r --deps=TRUE tint \
+    && install2.r --deps=TRUE optparse \
