@@ -280,6 +280,12 @@ We are making use of the [Material Design](https://material.io/guidelines/) syst
 
 Within the app we are using [SASS](http://sass-lang.com/), and the guidance from [Inverted Triangle CSS](https://www.xfive.co/blog/itcss-scalable-maintainable-css-architecture/) and [Reasonable CSS](http://rscss.io/) to try and keep the CSS manageable.
 
+## Working with RMarkdown templates
+
+To test the Rmarkdown template, run
+
+    docker-compose run worker /home/havenuser/compilereport
+
 ## Deploying with kubernetes / OpenShift
 
 Branches merged to master will push new docker images to the OpenShift cluster.
