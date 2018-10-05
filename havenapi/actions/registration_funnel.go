@@ -1,7 +1,10 @@
 package actions
 
 import (
+	"bytes"
 	"fmt"
+	"net/http"
+	"os"
 	"strings"
 
 	faktory "github.com/contribsys/faktory/client"
@@ -55,8 +58,43 @@ func RegistrationHandler(c buffalo.Context) error {
 	if err != nil {
 		return c.Error(500, err)
 	}
+	message := fmt.Sprintf("New registration for: %s", request.FormValue("email"))
+	_ = sendSlackNotification(message)
 
-	log.Info("processed a registration")
-	message := "success"
+	log.Info(message)
+
 	return c.Render(200, r.JSON(map[string]string{"message": message}))
+}
+
+func sendSlackNotification(msg string) error {
+	slackURL, ok := getEnv("SLACK_WEBHOOK")
+	if !ok {
+		return fmt.Errorf("No Slack Webhook found")
+	}
+	client := &http.Client{}
+
+	var jsonStr = []byte(fmt.Sprintf(`{"text": "%s"}`, msg))
+	body := bytes.NewBuffer(jsonStr)
+	req, err := http.NewRequest("POST", slackURL, body)
+	if err != nil {
+		return fmt.Errorf("Error creating slack webhook: %s", err.Error())
+	}
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := client.Do(req)
+	if err != nil {
+		return fmt.Errorf("Error sending slack webhook: %s", err.Error())
+	}
+
+	defer resp.Body.Close()
+
+	return nil
+}
+
+func getEnv(key string) (string, bool) {
+	// Default returns false to signify no such env var.
+	err := false
+	if value, ok := os.LookupEnv(key); ok {
+		return value, ok
+	}
+	return "", err
 }
