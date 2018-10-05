@@ -12,4 +12,8 @@ RUN tlmgr install roboto \
     && installGithub.r kindlyops/tufte \
     && installGithub.r --deps=TRUE kindlyops/ggradar \
     && install2.r --deps=TRUE tint \
-    && install2.r --deps=TRUE optparse \
+    && install2.r --deps=TRUE optparse
+
+# overwrite embedded pandoc to be > 2.2 so that we have pptx output support
+COPY vendor/pandoc-2.3.1/bin/pandoc /usr/local/bin/pandoc
+COPY vendor/pandoc-2.3.1/bin/pandoc-citeproc /usr/local/bin/pandoc-citeproc
