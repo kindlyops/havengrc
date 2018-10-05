@@ -47,12 +47,6 @@
   version = "v1.3.0"
 
 [[projects]]
-  branch = "master"
-  name = "github.com/kindlyops/mappamundi"
-  packages = ["havenapi/keycloak"]
-  revision = "27af506d4b9b29709930fd1bb3ce8c138e12c7b9"
-
-[[projects]]
   name = "github.com/lib/pq"
   packages = [
     ".",

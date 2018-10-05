@@ -2,10 +2,11 @@
 # https://docs.docker.com/engine/userguide/eng-image/multistage-build/
 FROM golang:1.11 as builder
 
-RUN mkdir -p $GOPATH/src/github.com/kindlyops/mappamundi/worker
-WORKDIR $GOPATH/src/github.com/kindlyops/mappamundi/worker
+RUN mkdir -p $GOPATH/src/github.com/kindlyops/mappamundi
+WORKDIR $GOPATH/src/github.com/kindlyops/mappamundi
 
 ADD . .
+WORKDIR $GOPATH/src/github.com/kindlyops/mappamundi/worker
 RUN go get -u github.com/golang/dep/cmd/dep
 RUN dep ensure -vendor-only
 RUN go build -o app main.go
