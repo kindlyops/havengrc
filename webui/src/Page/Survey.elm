@@ -32,9 +32,9 @@ import Data.Survey
         , decodeSurveyMetaData
         , decodeInitialSurvey
         )
-import Html exposing (Html, div, h1, text, p, button, hr, br, table, tbody, tr, td, i, thead, th, ul, li, h3, h4)
-import Html.Attributes exposing (class, disabled, style, type_)
-import Html.Events exposing (onClick)
+import Html exposing (Html, div, h1, text, p, button, hr, br, table, tbody, tr, td, i, input, thead, th, ul, li, h3, h4)
+import Html.Attributes exposing (class, disabled, style, type_, placeholder, value)
+import Html.Events exposing (onClick, onInput)
 import List.Zipper as Zipper
 import Authentication
 import Http
@@ -62,6 +62,7 @@ type alias Model =
     , selectedSurveyMetaData : SurveyMetaData
     , isSurveyReady : Bool
     , inBoundLikertData : Maybe (List Data.Survey.LikertServerData)
+    , emailAddress : String
     }
 
 
@@ -173,6 +174,7 @@ initialModel =
     , selectedSurveyMetaData = Data.Survey.emptyIpsativeServerMetaData
     , isSurveyReady = False
     , inBoundLikertData = Nothing
+    , emailAddress = ""
     }
 
 
@@ -240,6 +242,7 @@ type Msg
     | GotServerLikertSurveys (Result Http.Error (List Data.Survey.SurveyMetaData))
     | GotLikertServerData (Result Http.Error (List Data.Survey.LikertServerData))
     | GotLikertChoices (Result Http.Error (List Data.Survey.LikertServerChoice))
+    | UpdateEmail String
     | SaveCurrentSurvey
     | IpsativeSurveySaved (Result Http.Error (List Data.Survey.IpsativeResponse))
     | LikertSurveySaved (Result Http.Error (List Data.Survey.LikertResponse))
@@ -248,6 +251,8 @@ type Msg
 update : Msg -> Model -> Authentication.Model -> ( Model, Cmd Msg )
 update msg model authModel =
     case msg of
+        UpdateEmail newEmail ->
+            { model | emailAddress = newEmail } ! []
         SaveCurrentSurvey ->
             case model.currentSurvey of
                 Ipsative survey ->
@@ -757,7 +762,11 @@ view authModel model =
             viewIncomplete model.currentSurvey
 
         Finished ->
-            viewFinished model
+            if Authentication.isLoggedIn authModel then
+                viewFinished model
+            else
+                viewRegistration model
+
 
 
 viewIncomplete : Survey -> Html Msg
@@ -827,6 +836,22 @@ viewFinished model =
                 ]
             ]
         ]
+
+
+viewRegistration : Model -> Html Msg
+viewRegistration model =
+        div [ class "container mt-3" ]
+            [ div [ class "row" ]
+                [ div [ class "jumbotron" ]
+                    [ h1 [ class "display-4" ] [ text "You finished the survey! Please enter your email address to save the survey." ]
+                    , input [ placeholder "Email Address", value model.emailAddress, onInput UpdateEmail ] []
+                    , br [] []
+                    , br [] []
+                    , button [ class "btn btn-primary", onClick SaveCurrentSurvey ] [ text "Click to save results to the server." ]
+                    ]
+                ]
+            ]
+
 
 
 viewSurvey : Survey -> Html Msg
