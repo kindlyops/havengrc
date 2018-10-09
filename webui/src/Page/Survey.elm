@@ -32,6 +32,7 @@ import Data.Survey
         , decodeSurveyMetaData
         , decodeInitialSurvey
         )
+import Data.Registration
 import Html exposing (Html, div, h1, text, p, button, hr, br, table, tbody, tr, td, i, input, thead, th, ul, li, h3, h4)
 import Html.Attributes exposing (class, disabled, style, type_, placeholder, value)
 import Html.Events exposing (onClick, onInput)
@@ -39,6 +40,7 @@ import List.Zipper as Zipper
 import Authentication
 import Http
 import Request.Survey
+import Request.Registration
 import Ports
 import Views.SurveyCard
 import Utils exposing (getHTTPErrorMessage)
@@ -243,6 +245,8 @@ type Msg
     | GotLikertServerData (Result Http.Error (List Data.Survey.LikertServerData))
     | GotLikertChoices (Result Http.Error (List Data.Survey.LikertServerChoice))
     | UpdateEmail String
+    | RegisterNewUser
+    | NewUserRegistered (Result Http.Error (List Data.Registration.Registration))
     | SaveCurrentSurvey
     | IpsativeSurveySaved (Result Http.Error (List Data.Survey.IpsativeResponse))
     | LikertSurveySaved (Result Http.Error (List Data.Survey.LikertResponse))
@@ -253,6 +257,8 @@ update msg model authModel =
     case msg of
         UpdateEmail newEmail ->
             { model | emailAddress = newEmail } ! []
+        RegisterNewUser ->
+            model ! [ Http.send NewUserRegistered (Request.Registration.post authModel) ]
         SaveCurrentSurvey ->
             case model.currentSurvey of
                 Ipsative survey ->
@@ -847,7 +853,7 @@ viewRegistration model =
                     , input [ placeholder "Email Address", value model.emailAddress, onInput UpdateEmail ] []
                     , br [] []
                     , br [] []
-                    , button [ class "btn btn-primary", onClick SaveCurrentSurvey ] [ text "Click to save results to the server." ]
+                    , button [ class "btn btn-primary", onClick RegisterNewUser ] [ text "Click to save results to the server." ]
                     ]
                 ]
             ]
