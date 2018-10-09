@@ -1,36 +1,41 @@
 module Request.Registration exposing (post)
 
-import Json.Decode as Decode
 import Data.Registration as Registration exposing (Registration)
-import Authentication
 import Http
-
+import Data.Survey exposing (Model)
+import Authentication
 
 registrationUrl : String
 registrationUrl =
     "/api/registration_funnel"
 
 
-post : Authentication.Model -> Http.Request (List Registration.Registration)
-post authModel newRegistration =
+post : Data.Survey.IpsativeSurvey -> String -> Authentication.Model -> Http.Request String
+post surveyModel emailAddress authModel =
     let
-        body =
-            Registration.encode newRegistration
+
+        responses =
+            Data.Survey.ipsativeResponseEncoder surveyModel
                 |> Http.jsonBody
+        registration = Registration emailAddress responses
+
+        body =
+            Registration.encode registration surveyModel
+                |> Http.jsonBody
+        _ =
+            Debug.log "post new registration called with " emailAddress
+
         headers =
             Authentication.tryGetAuthHeader authModel ++ Authentication.getReturnHeaders
-
-        _ =
-            Debug.log "post new registration called with " newRegistration.email
 
         request =
             Http.request
                 { method = "POST"
-                , headers = headers
                 , url = registrationUrl
+                , headers = headers
                 , body = body
                 , timeout = Nothing
-                , expect = Http.expectJson (Decode.list Registration.decode )
+                , expect = Http.expectString
                 , withCredentials = False
                 }
     in

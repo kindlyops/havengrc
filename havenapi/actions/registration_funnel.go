@@ -2,7 +2,9 @@ package actions
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"strings"
@@ -18,20 +20,45 @@ import (
 // rl is the rate limited to 5 requests per second.
 var rl = ratelimit.New(5)
 
+// ResultsStruct is a struct for the funnel
+type ResultsStruct struct {
+	ID     string `json:"answer_id"`
+	Group  int    `json:"group_number"`
+	Points int    `json:"points_assigned"`
+}
+
+// RegistrationStruct is a struct for the funnel
+type RegistrationStruct struct {
+	Email   string          `json:"email"`
+	Results []ResultsStruct `json:"survey_results"`
+}
+
 // RegistrationHandler accepts json
 func RegistrationHandler(c buffalo.Context) error {
 	rl.Take()
 	tx := c.Value("tx").(*pop.Connection)
 	request := c.Request()
-	request.ParseForm()
+	var registration RegistrationStruct
+	body, err := ioutil.ReadAll(request.Body)
 
+	err = json.Unmarshal(body, &registration)
+
+	if err != nil {
+		return c.Error(500, err)
+	}
+	log.Info(registration.Email)
+	log.Info("body: %s", body)
+	results, err := json.Marshal(registration.Results)
+	if err != nil {
+		return c.Error(500, err)
+	}
 	remoteAddress := strings.Split(request.RemoteAddr, ":")[0]
 
-	err := tx.RawQuery(
+	err = tx.RawQuery(
 		models.Q["registeruser"],
-		request.FormValue("email"),
+		registration.Email,
 		remoteAddress,
-		request.FormValue("survey_results"),
+		results,
 	).Exec()
 
 	if err != nil {
@@ -48,17 +75,17 @@ func RegistrationHandler(c buffalo.Context) error {
 	if err != nil {
 		return c.Error(500, err)
 	}
-	createUserJob := faktory.NewJob("CreateUser", request.FormValue("email"))
+	createUserJob := faktory.NewJob("CreateUser", registration.Email)
 	err = client.Push(createUserJob)
 	if err != nil {
 		return c.Error(500, err)
 	}
-	saveSurveyJob := faktory.NewJob("SaveSurvey", request.FormValue("email"))
+	saveSurveyJob := faktory.NewJob("SaveSurvey", registration.Email)
 	err = client.Push(saveSurveyJob)
 	if err != nil {
 		return c.Error(500, err)
 	}
-	message := fmt.Sprintf("New registration for: %s", request.FormValue("email"))
+	message := fmt.Sprintf("New registration for: %s", registration.Email)
 	_ = sendSlackNotification(message)
 
 	log.Info(message)

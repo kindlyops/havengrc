@@ -1,27 +1,31 @@
-module Data.Registration exposing (Registration, decode, encode)
+module Data.Registration exposing (Registration, encode)
 
-import Json.Decode as Decode exposing (Decoder)
+import Data.Survey
 import Json.Encode as Encode exposing (Value)
-import Json.Decode.Pipeline exposing (decode, required)
-
+import Http
 
 type alias Registration =
     { email : String
-    , survey_results : String
+    , survey_results : Http.Body
     }
 
 
 
-decode : Decoder Registration
-decode =
-    Json.Decode.Pipeline.decode Registration
-        |> required "email" Decode.string
-        |> required "survey_results" Decode.string
-
-
-encode : Registration -> Value
-encode record =
+encode : Registration -> Data.Survey.IpsativeSurvey -> Value
+encode record survey =
+    let
+        allResponses =
+            Data.Survey.getAllResponsesFromIpsativeSurvey survey
+        results = Encode.list
+            (List.map
+                (\x ->
+                    Data.Survey.ipsativeSingleResponseEncoder x
+                )
+                allResponses
+            )
+    in
     Encode.object
         [ ( "email", Encode.string <| record.email )
-         ,( "survey_results", Encode.string <| record.survey_results )
+         ,( "survey_results", results )
         ]
+

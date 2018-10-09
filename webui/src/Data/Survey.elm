@@ -18,6 +18,9 @@ module Data.Survey
         , IpsativeServerData
         , IpsativeSurvey
         , ipsativeSurveyDataDecoder
+        , ipsativeSingleResponseEncoder
+        , IpsativeSingleResponse
+        , getAllResponsesFromIpsativeSurvey
         , LikertAnswer
         , LikertQuestion
         , LikertResponse
@@ -35,6 +38,8 @@ module Data.Survey
         , encodeSurveyMetaData
         , upgradeSurvey
         , decodeInitialSurvey
+        , Model
+        , SurveyPage(..)
         )
 
 import Json.Decode as Decode exposing (Decoder, decodeString, int, andThen, oneOf)
@@ -42,6 +47,24 @@ import Json.Decode.Pipeline exposing (decode, required)
 import Json.Encode as Encode
 import List.Zipper as Zipper
 import List.Extra
+
+
+type SurveyPage
+    = Home
+    | Survey
+    | IncompleteSurvey
+    | Finished
+
+type alias Model =
+    { currentSurvey : Survey
+    , currentPage : SurveyPage
+    , availableIpsativeSurveys : List SurveyMetaData
+    , availableLikertSurveys : List SurveyMetaData
+    , selectedSurveyMetaData : SurveyMetaData
+    , isSurveyReady : Bool
+    , inBoundLikertData : Maybe (List LikertServerData)
+    , emailAddress : String
+    }
 
 
 type Survey

@@ -1,7 +1,6 @@
 module Page.Survey
     exposing
-        ( Model
-        , init
+        ( init
         , initWithSave
         , update
         , Msg(..)
@@ -15,6 +14,8 @@ module Page.Survey
 import Data.Survey
     exposing
         ( Survey(..)
+        , Model
+        , SurveyPage(..)
         , IpsativeSurvey
         , LikertSurvey
         , LikertQuestion
@@ -47,26 +48,6 @@ import Utils exposing (getHTTPErrorMessage)
 import Json.Encode as Encode
 import Json.Decode as Decode exposing (Decoder, decodeString, int, andThen, oneOf)
 import Json.Decode.Pipeline exposing (decode, required)
-
-
-type SurveyPage
-    = Home
-    | Survey
-    | IncompleteSurvey
-    | Finished
-
-
-type alias Model =
-    { currentSurvey : Survey
-    , currentPage : SurveyPage
-    , availableIpsativeSurveys : List SurveyMetaData
-    , availableLikertSurveys : List SurveyMetaData
-    , selectedSurveyMetaData : SurveyMetaData
-    , isSurveyReady : Bool
-    , inBoundLikertData : Maybe (List Data.Survey.LikertServerData)
-    , emailAddress : String
-    }
-
 
 
 --TODO: change currentSurvey to Maybe
@@ -246,7 +227,7 @@ type Msg
     | GotLikertChoices (Result Http.Error (List Data.Survey.LikertServerChoice))
     | UpdateEmail String
     | RegisterNewUser
-    | NewUserRegistered (Result Http.Error (List Data.Registration.Registration))
+    | NewUserRegistered (Result Http.Error (String))
     | SaveCurrentSurvey
     | IpsativeSurveySaved (Result Http.Error (List Data.Survey.IpsativeResponse))
     | LikertSurveySaved (Result Http.Error (List Data.Survey.LikertResponse))
@@ -258,7 +239,12 @@ update msg model authModel =
         UpdateEmail newEmail ->
             { model | emailAddress = newEmail } ! []
         RegisterNewUser ->
-            model ! [ Http.send NewUserRegistered (Request.Registration.post authModel) ]
+            case model.currentSurvey of
+                Ipsative survey ->
+                    model ! [ Http.send NewUserRegistered (Request.Registration.post survey model.emailAddress authModel) ]
+                Likert survey ->
+                    initialModel ! []
+
         SaveCurrentSurvey ->
             case model.currentSurvey of
                 Ipsative survey ->
@@ -266,6 +252,19 @@ update msg model authModel =
 
                 Likert survey ->
                     model ! [ Http.send LikertSurveySaved (Request.Survey.postLikertResponses authModel survey) ]
+        
+        NewUserRegistered (Err error) ->
+            let
+                _ =
+                    Debug.log "New User error" error
+            in
+                initialModel ! []
+        NewUserRegistered (Ok responses) ->
+            let
+                _ =
+                    Debug.log "New User response" responses
+            in
+                initialModel ! []
 
         IpsativeSurveySaved (Err error) ->
             model ! [ Ports.showError (getHTTPErrorMessage error) ]

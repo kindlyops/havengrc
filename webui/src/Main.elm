@@ -17,6 +17,7 @@ import Page.Privacy as Privacy
 import Page.Landing as Landing
 import Page.Reports as Reports
 import Page.Survey as Survey
+import Data.Survey as SurveyData
 import Page.SurveyResponses as SurveyResponses
 import Page.Terms as Terms
 import Json.Decode as Decode
@@ -27,7 +28,7 @@ type alias Model =
     , authModel : Authentication.Model
     , dashboardModel : Dashboard.Model
     , commentsModel : Comments.Model
-    , surveyModel : Survey.Model
+    , surveyModel : SurveyData.Model
     , surveyResponseModel : SurveyResponses.Model
     }
 
