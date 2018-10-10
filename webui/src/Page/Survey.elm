@@ -33,7 +33,7 @@ import Data.Survey
         , decodeSurveyMetaData
         , decodeInitialSurvey
         )
-import Data.Registration
+
 import Html exposing (Html, div, h1, text, p, button, hr, br, table, tbody, tr, td, i, input, thead, th, ul, li, h3, h4)
 import Html.Attributes exposing (class, disabled, style, type_, placeholder, value)
 import Html.Events exposing (onClick, onInput)
@@ -194,6 +194,8 @@ encodeSurveyPage surveyPage =
         Finished ->
             "Finished"
 
+        Registered ->
+            "Registered"
 
 initialCommands : Authentication.Model -> List (Cmd Msg)
 initialCommands authModel =
@@ -244,7 +246,6 @@ update msg model authModel =
                     model ! [ Http.send NewUserRegistered (Request.Registration.post survey model.emailAddress authModel) ]
                 Likert survey ->
                     initialModel ! []
-
         SaveCurrentSurvey ->
             case model.currentSurvey of
                 Ipsative survey ->
@@ -261,10 +262,10 @@ update msg model authModel =
                 initialModel ! []
         NewUserRegistered (Ok responses) ->
             let
-                _ =
-                    Debug.log "New User response" responses
+                newModel =
+                    { model | currentPage = Registered }
             in
-                initialModel ! []
+                newModel ! []
 
         IpsativeSurveySaved (Err error) ->
             model ! [ Ports.showError (getHTTPErrorMessage error) ]
@@ -772,6 +773,9 @@ view authModel model =
             else
                 viewRegistration model
 
+        Registered ->
+            viewRegistered model
+
 
 
 viewIncomplete : Survey -> Html Msg
@@ -857,7 +861,17 @@ viewRegistration model =
                 ]
             ]
 
-
+viewRegistered : Model -> Html Msg
+viewRegistered model =
+        div [ class "container mt-3" ]
+            [ div [ class "row" ]
+                [ div [ class "jumbotron" ]
+                    [ h1 [ class "display-4" ] [ text "Thank you for signing up! Please check your email for login information." ]
+                    , br [] []
+                    , br [] []
+                    ]
+                ]
+            ]
 
 viewSurvey : Survey -> Html Msg
 viewSurvey survey =

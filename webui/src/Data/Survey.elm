@@ -54,6 +54,7 @@ type SurveyPage
     | Survey
     | IncompleteSurvey
     | Finished
+    | Registered
 
 type alias Model =
     { currentSurvey : Survey
