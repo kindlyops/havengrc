@@ -1,7 +1,6 @@
 module Page.Survey
     exposing
-        ( Model
-        , init
+        ( init
         , initWithSave
         , update
         , Msg(..)
@@ -15,6 +14,8 @@ module Page.Survey
 import Data.Survey
     exposing
         ( Survey(..)
+        , Model
+        , SurveyPage(..)
         , IpsativeSurvey
         , LikertSurvey
         , LikertQuestion
@@ -32,38 +33,21 @@ import Data.Survey
         , decodeSurveyMetaData
         , decodeInitialSurvey
         )
-import Html exposing (Html, div, h1, text, p, button, hr, br, table, tbody, tr, td, i, thead, th, ul, li, h3, h4)
-import Html.Attributes exposing (class, disabled, style, type_)
-import Html.Events exposing (onClick)
+
+import Html exposing (Html, div, h1, text, p, button, hr, br, table, tbody, tr, td, i, input, thead, th, ul, li, h3, h4)
+import Html.Attributes exposing (class, disabled, style, type_, placeholder, value)
+import Html.Events exposing (onClick, onInput)
 import List.Zipper as Zipper
 import Authentication
 import Http
 import Request.Survey
+import Request.Registration
 import Ports
 import Views.SurveyCard
 import Utils exposing (getHTTPErrorMessage)
 import Json.Encode as Encode
 import Json.Decode as Decode exposing (Decoder, decodeString, int, andThen, oneOf)
 import Json.Decode.Pipeline exposing (decode, required)
-
-
-type SurveyPage
-    = Home
-    | Survey
-    | IncompleteSurvey
-    | Finished
-
-
-type alias Model =
-    { currentSurvey : Survey
-    , currentPage : SurveyPage
-    , availableIpsativeSurveys : List SurveyMetaData
-    , availableLikertSurveys : List SurveyMetaData
-    , selectedSurveyMetaData : SurveyMetaData
-    , isSurveyReady : Bool
-    , inBoundLikertData : Maybe (List Data.Survey.LikertServerData)
-    }
-
 
 
 --TODO: change currentSurvey to Maybe
@@ -173,6 +157,7 @@ initialModel =
     , selectedSurveyMetaData = Data.Survey.emptyIpsativeServerMetaData
     , isSurveyReady = False
     , inBoundLikertData = Nothing
+    , emailAddress = ""
     }
 
 
@@ -209,6 +194,8 @@ encodeSurveyPage surveyPage =
         Finished ->
             "Finished"
 
+        Registered ->
+            "Registered"
 
 initialCommands : Authentication.Model -> List (Cmd Msg)
 initialCommands authModel =
@@ -240,6 +227,9 @@ type Msg
     | GotServerLikertSurveys (Result Http.Error (List Data.Survey.SurveyMetaData))
     | GotLikertServerData (Result Http.Error (List Data.Survey.LikertServerData))
     | GotLikertChoices (Result Http.Error (List Data.Survey.LikertServerChoice))
+    | UpdateEmail String
+    | RegisterNewUser
+    | NewUserRegistered (Result Http.Error (String))
     | SaveCurrentSurvey
     | IpsativeSurveySaved (Result Http.Error (List Data.Survey.IpsativeResponse))
     | LikertSurveySaved (Result Http.Error (List Data.Survey.LikertResponse))
@@ -248,6 +238,14 @@ type Msg
 update : Msg -> Model -> Authentication.Model -> ( Model, Cmd Msg )
 update msg model authModel =
     case msg of
+        UpdateEmail newEmail ->
+            { model | emailAddress = newEmail } ! []
+        RegisterNewUser ->
+            case model.currentSurvey of
+                Ipsative survey ->
+                    model ! [ Http.send NewUserRegistered (Request.Registration.post survey model.emailAddress authModel) ]
+                Likert survey ->
+                    initialModel ! []
         SaveCurrentSurvey ->
             case model.currentSurvey of
                 Ipsative survey ->
@@ -255,6 +253,19 @@ update msg model authModel =
 
                 Likert survey ->
                     model ! [ Http.send LikertSurveySaved (Request.Survey.postLikertResponses authModel survey) ]
+        
+        NewUserRegistered (Err error) ->
+            let
+                _ =
+                    Debug.log "New User error" error
+            in
+                initialModel ! []
+        NewUserRegistered (Ok responses) ->
+            let
+                newModel =
+                    { model | currentPage = Registered }
+            in
+                newModel ! []
 
         IpsativeSurveySaved (Err error) ->
             model ! [ Ports.showError (getHTTPErrorMessage error) ]
@@ -757,7 +768,14 @@ view authModel model =
             viewIncomplete model.currentSurvey
 
         Finished ->
-            viewFinished model
+            if Authentication.isLoggedIn authModel then
+                viewFinished model
+            else
+                viewRegistration model
+
+        Registered ->
+            viewRegistered model
+
 
 
 viewIncomplete : Survey -> Html Msg
@@ -828,6 +846,32 @@ viewFinished model =
             ]
         ]
 
+
+viewRegistration : Model -> Html Msg
+viewRegistration model =
+        div [ class "container mt-3" ]
+            [ div [ class "row" ]
+                [ div [ class "jumbotron" ]
+                    [ h1 [ class "display-4" ] [ text "You finished the survey! Please enter your email address to save the survey." ]
+                    , input [ placeholder "Email Address", value model.emailAddress, onInput UpdateEmail ] []
+                    , br [] []
+                    , br [] []
+                    , button [ class "btn btn-primary", onClick RegisterNewUser ] [ text "Click to save results to the server." ]
+                    ]
+                ]
+            ]
+
+viewRegistered : Model -> Html Msg
+viewRegistered model =
+        div [ class "container mt-3" ]
+            [ div [ class "row" ]
+                [ div [ class "jumbotron" ]
+                    [ h1 [ class "display-4" ] [ text "Thank you for signing up! Please check your email for login information." ]
+                    , br [] []
+                    , br [] []
+                    ]
+                ]
+            ]
 
 viewSurvey : Survey -> Html Msg
 viewSurvey survey =
