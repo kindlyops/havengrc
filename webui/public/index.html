@@ -40,7 +40,6 @@
     <script src="%PUBLIC_URL%/js/vega.min.js"></script>
     <script src="%PUBLIC_URL%/js/vega-lite.min.js"></script>
     <script src="%PUBLIC_URL%/js/vega-embed.js"></script>
-    <script src="%PUBLIC_URL%/js/helloWorld.js"></script>
 
 </head>
 <body>
@@ -49,19 +48,6 @@
     <div id="snackbar" class="snackbar">
         <div id="snackbar-body" class="snackbar-body"></div>
     </div>
-
-    <script>
-        // This function grabs the specification from Elm (here called specs).
-        // Replace 'HelloWorld' in line below with name of your Elm module when you write your own.
-        setTimeout(function(){
-            if (document.getElementById("vis")){
-                Elm.HelloWorld.worker().ports.elmToJS.subscribe(function(specs) {
-                // Change actions to true to display links to source, editor and image.
-                    vegaEmbed("#vis", specs, {actions: false}).catch(console.warn);
-                });
-            }
-        }, 200)
-    </script>
 
 </body>
 </html>
