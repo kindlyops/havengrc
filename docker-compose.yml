@@ -253,3 +253,10 @@ services:
       context: .
       dockerfile: ./docs/plantuml/Dockerfile
     command: [-v, /docs/plantuml/*.puml]
+  mjml:
+    build:
+      context: mjml/
+    volumes:
+      - ./mjml/templates:/home/mjml/templates
+      - ./mjml/dist:/home/mjml/dist
+    command: ["templates/*.mjml", "-o", "dist/"]
