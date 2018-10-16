@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: faktory
+spec:
+  selector:
+    service: faktory
+  ports:
+  - nodePort: 0
+    port: 7420
+    protocol: TCP
+    targetPort: 7420

@@ -1,0 +1,50 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: faktory
+spec:
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+        alpha.image.policy.openshift.io/resolve-names: '*'
+      labels:
+        service: faktory
+    spec:
+      containers:
+        - name: faktory
+          image: contribsys/faktory:0.9.0-beta1
+          args:
+          - /faktory
+          - -b
+          - 0.0.0.0:7419 
+          - -w
+          - 0.0.0.0:7420
+          env:
+            - name: production
+              value: "true"
+            - name: FAKTORY_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: haven-faktory-credentials
+                  key: password
+          volumeMounts:
+            - name: secret-volume
+              mountPath: /etc/haven-credentials/
+              readOnly: true
+          ports:
+            - containerPort: 7420
+              protocol: TCP
+              targetPort: 7420
+      volumes:
+        - name: secret-volume
+          secret:
+            secretName: haven-faktory-credentials
+      restartPolicy: Always
+  strategy:
+    type: "Recreate"
+  paused: false
+  revisionHistoryLimit: 2
+  minReadySeconds: 0
+status: {}
