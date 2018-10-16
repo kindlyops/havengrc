@@ -35,7 +35,7 @@ import Data.Survey
         )
 
 import Html exposing (Html, div, h1, text, p, button, hr, br, table, tbody, tr, td, i, input, thead, th, ul, li, h3, h4)
-import Html.Attributes exposing (class, disabled, style, type_, placeholder, value)
+import Html.Attributes exposing (class, disabled, style, type_, placeholder, value, id)
 import Html.Events exposing (onClick, onInput)
 import List.Zipper as Zipper
 import Authentication
@@ -819,6 +819,7 @@ viewHero model =
         [ h1 [ class "display-4" ] [ text "KindlyOps Haven Survey" ]
         , p [ class "lead" ] [ text "Welcome to the Elm Haven Survey. " ]
         , hr [ class "my-4" ] []
+        , div [ id "vis" ] []
         , p [ class "" ] [ text "Lets get started! " ]
         , div [ class "row" ]
             (List.map
