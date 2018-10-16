@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: faktory
-          image: contribsys/faktory:0.9.0
+          image: kindlyops/faktory
           command:
           - "/faktory"
           - "-l"
@@ -35,6 +35,9 @@ spec:
             - containerPort: 7420
               protocol: TCP
               targetPort: 7420
+            - containerPort: 7419
+              protocol: TCP
+              targetPort: 7419
       volumes:
         - name: secret-volume
           secret:

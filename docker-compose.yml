@@ -63,7 +63,8 @@ services:
     volumes:
       - ./mailhog/maildir:/maildir
   faktory:
-    image: contribsys/faktory:0.9.0
+    build:
+      context: ./faktory
     ports:
       - "7420:7420"
     environment:
