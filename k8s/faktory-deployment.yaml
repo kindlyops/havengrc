@@ -14,25 +14,23 @@ spec:
     spec:
       containers:
         - name: faktory
-          image: contribsys/faktory:0.9.0-beta1
-          args:
-          - /faktory
-          - -b
-          - 0.0.0.0:7419 
-          - -w
-          - 0.0.0.0:7420
+          image: contribsys/faktory:0.9.0
+          command:
+          - "/faktory"
+          - "-l"
+          - "debug"
+          - "-b"
+          - "0.0.0.0:7419"
+          - "-w"
+          - "0.0.0.0:7420"
+          - "-e"
+          - "production"
           env:
-            - name: production
-              value: "true"
             - name: FAKTORY_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: haven-faktory-credentials
                   key: password
-          volumeMounts:
-            - name: secret-volume
-              mountPath: /etc/haven-credentials/
-              readOnly: true
           ports:
             - containerPort: 7420
               protocol: TCP
@@ -41,6 +39,8 @@ spec:
         - name: secret-volume
           secret:
             secretName: haven-faktory-credentials
+      # TODO: need to set up persistent volume claim so we don't lose state
+      # on restart.
       restartPolicy: Always
   strategy:
     type: "Recreate"
