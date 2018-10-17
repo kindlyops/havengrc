@@ -16,6 +16,11 @@ spec:
         - name: havenapi
           image: havengrc-docker.jfrog.io/kindlyops/havenapi:latest
           env:
+            - name: FAKTORY_URL
+              valueFrom:
+                secretKeyRef:
+                  name: haven-faktory-credentials
+                  key: url
             - name: GO_ENV
               value: "production"
             - name: DATABASE_NAME

@@ -16,6 +16,20 @@ spec:
         - name: worker
           image: kindlyops/havenworker
           env:
+            - name: DATABASE_NAME
+              value: "havenstage"
+            - name: DATABASE_HOST
+              value: "db"
+            - name: DATABASE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: haven-database-credentials
+                  key: username
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: haven-database-credentials
+                  key: password
             - name: FAKTORY_URL
               valueFrom:
                 secretKeyRef:
