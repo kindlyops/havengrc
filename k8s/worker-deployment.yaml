@@ -1,0 +1,45 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: worker
+spec:
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+        alpha.image.policy.openshift.io/resolve-names: '*'
+      labels:
+        service: worker
+    spec:
+      containers:
+        - name: worker
+          image: kindlyops/havenworker
+          env:
+            - name: FAKTORY_URL
+              valueFrom:
+                secretKeyRef:
+                  name: haven-faktory-credentials
+                  key: url
+            - name: KC_ADMIN
+              value: "admin"
+            - name: KC_PW
+              valueFrom:
+                secretKeyRef:
+                  name: haven-database-credentials
+                  key: password
+            - name: KC_HOST
+              value: http://keycloak
+            - name: KC_PORT
+              value: "8080"
+      volumes:
+        - name: secret-volume
+          secret:
+            secretName: haven-faktory-credentials
+      restartPolicy: Always
+  strategy:
+    type: "Recreate"
+  paused: false
+  revisionHistoryLimit: 2
+  minReadySeconds: 0
+status: {}

@@ -9,7 +9,7 @@ params:
 
 ```{r setup, include=FALSE}
 library(extrafont)
-extrafont::font_import(pattern = 'Roboto', prompt=FALSE)
+#extrafont::font_import(pattern = 'Roboto', prompt=FALSE)
 extrafont::loadfonts(device="pdf")
 extrafont::loadfonts(device="postscript")
 library(gridExtra)
