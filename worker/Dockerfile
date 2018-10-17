@@ -20,5 +20,5 @@ COPY --from=builder /go/src/github.com/kindlyops/mappamundi/worker/app .
 COPY --from=builder /go/src/github.com/kindlyops/mappamundi/worker/compilereport .
 RUN chown -R havenuser:havenuser /home/havenuser
 RUN chgrp -R 0 /home/havenuser &&chmod -R g=u /home/havenuser
-
+USER havenuser
 CMD exec /home/havenuser/app
