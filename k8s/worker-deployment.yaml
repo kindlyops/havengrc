@@ -32,6 +32,13 @@ spec:
               value: http://keycloak
             - name: KC_PORT
               value: "8080"
+          volumeMounts:
+            - mountPath: "/home/rstudio/kitematic"
+              name: worker-vol
+      volumes:
+        - name: worker-vol
+          persistentVolumeClaim:
+          claimName: worker-volume
       restartPolicy: Always
   strategy:
     type: "Recreate"
