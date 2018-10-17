@@ -1,10 +1,10 @@
 FROM  havengrc-docker.jfrog.io/rocker/rstudio:3.4.3
 LABEL maintainer="Kindly Ops, LLC <support@kindlyops.com>"
 
-RUN apt-get update \
-    && apt-get install -y zlib1g-dev libproj-dev texlive-full fonts-roboto texlive-fonts-extra xzdec gnupg \
-    && tlmgr init-usertree
-RUN tlmgr install roboto
+# RUN apt-get update \
+#     && apt-get install -y zlib1g-dev libproj-dev texlive-full fonts-roboto texlive-fonts-extra xzdec gnupg \
+#     && tlmgr init-usertree
+# RUN tlmgr install roboto
 RUN install2.r --deps=TRUE remotes
 RUN install2.r --deps=TRUE tinytex
 RUN install2.r --deps=TRUE formatR
