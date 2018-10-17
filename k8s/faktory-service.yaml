@@ -7,6 +7,12 @@ spec:
     service: faktory
   ports:
   - nodePort: 0
+    name: web
     port: 7420
     protocol: TCP
     targetPort: 7420
+  - nodePort: 0
+    name: worker
+    port: 7419
+    protocol: TCP
+    targetPort: 7419

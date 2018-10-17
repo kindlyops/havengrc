@@ -38,12 +38,17 @@ spec:
             - containerPort: 7419
               protocol: TCP
               targetPort: 7419
+          volumeMounts:
+            - mountPath: "/var/lib/faktory/db"
+              name: faktory-db
       volumes:
         - name: secret-volume
           secret:
             secretName: haven-faktory-credentials
-      # TODO: need to set up persistent volume claim so we don't lose state
-      # on restart.
+        - name: faktory-db
+          persistentVolumeClaim:
+            claimName: faktory-volume-claim
+
       restartPolicy: Always
   strategy:
     type: "Recreate"
