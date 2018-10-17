@@ -144,7 +144,7 @@ func main() {
 
 	// pull jobs from these queues, in this order of precedence
 	mgr.Queues = []string{"critical", "default", "bulk"}
-
+	fmt.Printf("Haven worker started, processing jobs\n")
 	// Start processing jobs, this method does not return
 	mgr.Run()
 }
