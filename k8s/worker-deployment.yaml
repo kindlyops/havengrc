@@ -32,10 +32,6 @@ spec:
               value: http://keycloak
             - name: KC_PORT
               value: "8080"
-      volumes:
-        - name: secret-volume
-          secret:
-            secretName: haven-faktory-credentials
       restartPolicy: Always
   strategy:
     type: "Recreate"
