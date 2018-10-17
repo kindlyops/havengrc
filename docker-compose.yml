@@ -172,8 +172,8 @@ services:
       - FAKTORY_URL=tcp://:fassword@faktory:7419
       - KC_ADMIN=admin
       - KC_PW=admin
-      - KC_HOST=http://webui
-      - KC_PORT=2016
+      - KC_HOST=http://keycloak
+      - KC_PORT=8080
     build:
       dockerfile: ./worker/Dockerfile
       context: .
@@ -195,8 +195,8 @@ services:
       - HAVEN_JWK_PATH=/keycloak-dev-public-key.json
       - KC_ADMIN=admin
       - KC_PW=admin
-      - KC_HOST=http://webui
-      - KC_PORT=2016
+      - KC_HOST=http://keycloak
+      - KC_PORT=8080
       - FAKTORY_URL=tcp://:fassword@faktory:7419
     build:
       context: .
@@ -204,6 +204,7 @@ services:
     links:
       - db
       - faktory
+      - keycloak
     ports:
       - "3000:3000"
   grafana:
