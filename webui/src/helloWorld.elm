@@ -6,12 +6,27 @@ import VegaLite exposing (..)
 
 myVis : Spec
 myVis =
-    toVegaLite
-        [ title "Hello, World!"
-        , dataFromColumns [] <| dataColumn "x" (nums [ 10, 20, 30 ]) []
-        , circle []
-        , encoding <| position X [ pName "x", pMType Quantitative ] []
-        ]
+    let
+        des =
+            description "SCDS Assessment"
+
+        data =
+            dataFromColumns []
+                << dataColumn "a" (strs [ "A", "B", "C" ])
+                << dataColumn "b" (nums [ 28, 55, 43 ])
+        enc =
+            encoding
+                << position X [ pName "b", pMType Quantitative ]
+                << position Y [ pName "a", pMType Ordinal ]
+        specBar =
+            asSpec [ bar [] ]
+        specText =
+            asSpec [ textMark [ maStyle [ "label" ] ], encoding (text [ tName "b", tMType Quantitative ] []) ]
+        config =
+            configure << configuration (coNamedStyle "label" [ maAlign AlignLeft, maBaseline AlignMiddle, maDx 3 ])
+    in
+    toVegaLite [ des, data [], enc [], layer [ specBar, specText ], config [] ]
+
 
 
 
