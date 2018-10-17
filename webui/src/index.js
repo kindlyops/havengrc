@@ -14,7 +14,6 @@ var keycloak = Keycloak({
   realm: 'havendev',
   clientId: 'havendev'
 })
-
 var storedProfile = sessionStorage.getItem('profile')
 var storedToken = sessionStorage.getItem('token')
 var storedSurveyState = sessionStorage.getItem('storedSurvey')
@@ -122,9 +121,11 @@ elmApp.ports.saveSurveyState.subscribe(storedSurvey => {
   sessionStorage.setItem('storedSurvey', JSON.stringify(storedSurvey));
 })
 
-HelloWorld.worker().ports.elmToJS.subscribe(function(specs) {
-  // Change actions to true to display links to source, editor and image.
-  if ( document.getElementById('vis') ){
-    vegaEmbed("#vis", specs, {actions: false}).catch(console.warn);
-  }
-})
+
+let updateChart = function(spec){
+  vegaEmbed("#vis", spec, {actions: false}).catch(console.warn);
+}
+
+document.arrive(".vis", function(){
+    HelloWorld.worker().ports.elmToJS.subscribe(updateChart);
+});

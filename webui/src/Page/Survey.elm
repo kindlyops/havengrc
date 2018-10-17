@@ -819,7 +819,6 @@ viewHero model =
         [ h1 [ class "display-4" ] [ text "KindlyOps Haven Survey" ]
         , p [ class "lead" ] [ text "Welcome to the Elm Haven Survey. " ]
         , hr [ class "my-4" ] []
-        , div [ id "vis" ] []
         , p [ class "" ] [ text "Lets get started! " ]
         , div [ class "row" ]
             (List.map
@@ -855,6 +854,9 @@ viewRegistration model =
                 [ div [ class "jumbotron" ]
                     [ h1 [ class "display-4" ] [ text "You finished the survey! Please enter your email address to save the survey." ]
                     , input [ placeholder "Email Address", value model.emailAddress, onInput UpdateEmail ] []
+                    , br [] []
+                    , br [] []
+                    , div [ class "vis", id "vis" ] []
                     , br [] []
                     , br [] []
                     , button [ class "btn btn-primary", onClick RegisterNewUser ] [ text "Click to save results to the server." ]
