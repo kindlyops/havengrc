@@ -255,7 +255,7 @@ jobs:
             oc set image deployment/havenapi havenapi=havengrc-docker.jfrog.io/kindlyops/havenapi:$CIRCLE_SHA1
             oc set image deployment/havenweb havenweb=havengrc-docker.jfrog.io/kindlyops/havenweb:$CIRCLE_SHA1
             oc set image deployment/keycloak keycloak=havengrc-docker.jfrog.io/kindlyops/keycloak:$CIRCLE_SHA1
-            oc set image deployment/worker   worker=havengrc-docker.jfrog.io/kindlyops/havenworker:$CIRCLE_SHA1
+            oc set image deployment/worker   worker=kindlyops/havenworker:$CIRCLE_SHA1
       - run:
           name: notify failed job
           command: ./notify-slack notifications "CircleCI pipeline for ${CIRCLE_PULL_REQUEST:-$CIRCLE_BRANCH} failed in $CIRCLE_JOB $CIRCLE_BUILD_URL" circleci
