@@ -933,7 +933,7 @@ viewLikertSurvey survey =
         , viewLikertSurveyTable (Zipper.current survey.questions)
         , br [] []
         , viewInlineSurveyInstructions survey.metaData.instructions
-        , viewSurveyFooter
+        , viewSurveyFooter True
         ]
 
 
@@ -1013,13 +1013,37 @@ viewLikertSurveyTableHeader surveyQuestion =
 
 viewIpsativeSurvey : IpsativeSurvey -> Html Msg
 viewIpsativeSurvey survey =
+    let
+        currentQuestion =
+            Zipper.current survey.questions
+
+        groupPointsLeft =
+            List.head currentQuestion.pointsLeft
+
+        pointsLeft =
+            case groupPointsLeft of
+                Just points ->
+                    points.pointsLeft
+
+                Nothing ->
+                    0
+
+        ready =
+            pointsLeft == 0
+
+        _ =
+            Debug.log "Points left is " pointsLeft
+
+        _ =
+            Debug.log "Ready is " ready
+    in
     div [ class "" ]
         [ viewIpsativeSurveyTitle survey
         , br [] []
         , viewIpsativeSurveyBoxes (Zipper.current survey.questions)
         , br [] []
         , viewInlineSurveyInstructions survey.metaData.instructions
-        , viewSurveyFooter
+        , viewSurveyFooter ready
         ]
 
 
@@ -1150,9 +1174,9 @@ viewSurveyPointsGroup answer group =
         ]
 
 
-viewSurveyFooter : Html Msg
-viewSurveyFooter =
+viewSurveyFooter : Bool -> Html Msg
+viewSurveyFooter ready =
     div [ class "row mb-4 pb-4 px-3 d-flex justify-content-between" ]
         [ button [ class "btn btn-default btn-lg mx-1", onClick GoToHome ] [ text "Quit Survey" ]
-        , button [ class "btn btn-primary btn-lg mx-1", onClick NextQuestion ] [ text "Next" ]
+        , button [ class "btn btn-primary btn-lg mx-1", onClick NextQuestion, disabled (not ready) ] [ text "Next" ]
         ]
