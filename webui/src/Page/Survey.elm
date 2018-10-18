@@ -218,7 +218,6 @@ type Msg
     | NextQuestion
     | PreviousQuestion
     | GoToHome
-    | FinishSurvey
     | SelectLikertAnswer String String
     | GotoQuestion Int
     | GetIpsativeSurveys
@@ -375,17 +374,6 @@ update msg model authModel =
             in
             newModel ! (storeSurvey newModel (getQuestionNumber newModel) :: surveyRequests authModel)
 
-        FinishSurvey ->
-            let
-                ( newModel, cmd ) =
-                    if validateSurvey model.currentSurvey then
-                        ( { model | currentPage = Finished }, Ports.renderVega myVis )
-
-                    else
-                        ( { model | currentPage = IncompleteSurvey }, Cmd.none )
-            in
-            newModel ! [ storeSurvey newModel (getQuestionNumber newModel), cmd ]
-
         StartLikertSurvey metaData ->
             { model | currentPage = Survey, selectedSurveyMetaData = metaData } ! [ Http.send GotLikertServerData (Request.Survey.getLikertSurvey authModel metaData.uuid) ]
 
@@ -393,6 +381,14 @@ update msg model authModel =
             { model | currentPage = Survey, selectedSurveyMetaData = metaData } ! [ Http.send GotIpsativeServerData (Request.Survey.getIpsativeSurvey authModel metaData.uuid) ]
 
         NextQuestion ->
+            --   let
+            --         ( newModel, cmd ) =
+            --             if validateSurvey model.currentSurvey then
+            --                 ( { model | currentPage = Finished }, Ports.renderVega myVis )
+            --             else
+            --                 ( { model | currentPage = IncompleteSurvey }, Cmd.none )
+            --     in
+            --     newModel ! [ storeSurvey newModel (getQuestionNumber newModel), cmd ]
             case model.currentSurvey of
                 Ipsative survey ->
                     case Zipper.next survey.questions of
@@ -404,7 +400,14 @@ update msg model authModel =
                             newModel ! [ storeSurvey newModel (getQuestionNumber newModel) ]
 
                         _ ->
-                            model ! []
+                            let
+                                newModel =
+                                    { model | currentPage = Finished }
+
+                                cmd =
+                                    Ports.renderVega myVis
+                            in
+                            newModel ! [ storeSurvey newModel (getQuestionNumber newModel), cmd ]
 
                 Likert survey ->
                     case Zipper.next survey.questions of
@@ -416,7 +419,14 @@ update msg model authModel =
                             newModel ! [ storeSurvey newModel (getQuestionNumber newModel) ]
 
                         _ ->
-                            model ! []
+                            let
+                                newModel =
+                                    { model | currentPage = Finished }
+
+                                cmd =
+                                    Ports.renderVega myVis
+                            in
+                            newModel ! [ storeSurvey newModel (getQuestionNumber newModel), cmd ]
 
         PreviousQuestion ->
             case model.currentSurvey of
@@ -1143,8 +1153,6 @@ viewSurveyPointsGroup answer group =
 viewSurveyFooter : Html Msg
 viewSurveyFooter =
     div [ class "row mb-4 pb-4 px-3 d-flex justify-content-between" ]
-        [ button [ class "btn btn-primary btn-lg mx-1", onClick GoToHome ] [ text "Back" ]
-        , button [ class "btn btn-default btn-lg mx-1", onClick PreviousQuestion ] [ text "<" ]
-        , button [ class "btn btn-default btn-lg mx-1", onClick NextQuestion ] [ text ">" ]
-        , button [ class "btn btn-primary btn-lg mx-1", onClick FinishSurvey ] [ text "Finish" ]
+        [ button [ class "btn btn-default btn-lg mx-1", onClick GoToHome ] [ text "Quit Survey" ]
+        , button [ class "btn btn-primary btn-lg mx-1", onClick NextQuestion ] [ text "Next" ]
         ]
