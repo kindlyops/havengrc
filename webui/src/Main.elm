@@ -21,6 +21,7 @@ import Data.Survey as SurveyData
 import Page.SurveyResponses as SurveyResponses
 import Page.Terms as Terms
 import Json.Decode as Decode
+import Visualization exposing (myVis)
 
 
 type alias Model =
@@ -94,6 +95,7 @@ init sessionStorage location =
             , Cmd.map CommentsMsg commentsCmd
             , Cmd.map SurveyMsg surveyCmd
             , Cmd.map SurveyResponseMsg surveyResponsesCmd
+            , Ports.renderVega myVis
             ]
         )
 

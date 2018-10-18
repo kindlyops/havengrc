@@ -1,7 +1,6 @@
 import "./main.scss";
 
 import { Main } from './Main.elm'
-import { HelloWorld } from './helloWorld.elm'
 
 if (process.env.NODE_ENV === 'development') {
   var CLIENT_ID = process.env.ELM_APP_KEYCLOAK_CLIENT_ID
@@ -116,16 +115,15 @@ elmApp.ports.radarChart.subscribe(chartConfig => {
   window.myRadar = new Chart(document.getElementById('chart'), chartConfig)
 })
 
-
 elmApp.ports.saveSurveyState.subscribe(storedSurvey => {
   sessionStorage.setItem('storedSurvey', JSON.stringify(storedSurvey));
 })
 
-
-let updateChart = function(spec){
-  vegaEmbed("#vis", spec, {actions: false}).catch(console.warn);
+let updateChart = function (spec) {
+  //console.log("updateChart was called");
+  window.requestAnimationFrame(() => {
+    vegaEmbed("#vis", spec, { actions: false }).catch(console.warn);
+  });
 }
 
-document.arrive(".vis", function(){
-    HelloWorld.worker().ports.elmToJS.subscribe(updateChart);
-});
+elmApp.ports.renderVega.subscribe(updateChart);

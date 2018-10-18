@@ -33,7 +33,6 @@ import Data.Survey
         , decodeSurveyMetaData
         , decodeInitialSurvey
         )
-
 import Html exposing (Html, div, h1, text, p, button, hr, br, table, tbody, tr, td, i, input, thead, th, ul, li, h3, h4)
 import Html.Attributes exposing (class, disabled, style, type_, placeholder, value, id)
 import Html.Events exposing (onClick, onInput)
@@ -48,6 +47,7 @@ import Utils exposing (getHTTPErrorMessage)
 import Json.Encode as Encode
 import Json.Decode as Decode exposing (Decoder, decodeString, int, andThen, oneOf)
 import Json.Decode.Pipeline exposing (decode, required)
+import Visualization exposing (myVis)
 
 
 --TODO: change currentSurvey to Maybe
@@ -197,6 +197,7 @@ encodeSurveyPage surveyPage =
         Registered ->
             "Registered"
 
+
 initialCommands : Authentication.Model -> List (Cmd Msg)
 initialCommands authModel =
     surveyRequests authModel
@@ -229,7 +230,7 @@ type Msg
     | GotLikertChoices (Result Http.Error (List Data.Survey.LikertServerChoice))
     | UpdateEmail String
     | RegisterNewUser
-    | NewUserRegistered (Result Http.Error (String))
+    | NewUserRegistered (Result Http.Error String)
     | SaveCurrentSurvey
     | IpsativeSurveySaved (Result Http.Error (List Data.Survey.IpsativeResponse))
     | LikertSurveySaved (Result Http.Error (List Data.Survey.LikertResponse))
@@ -240,12 +241,15 @@ update msg model authModel =
     case msg of
         UpdateEmail newEmail ->
             { model | emailAddress = newEmail } ! []
+
         RegisterNewUser ->
             case model.currentSurvey of
                 Ipsative survey ->
                     model ! [ Http.send NewUserRegistered (Request.Registration.post survey model.emailAddress authModel) ]
+
                 Likert survey ->
                     initialModel ! []
+
         SaveCurrentSurvey ->
             case model.currentSurvey of
                 Ipsative survey ->
@@ -253,13 +257,14 @@ update msg model authModel =
 
                 Likert survey ->
                     model ! [ Http.send LikertSurveySaved (Request.Survey.postLikertResponses authModel survey) ]
-        
+
         NewUserRegistered (Err error) ->
             let
                 _ =
                     Debug.log "New User error" error
             in
                 initialModel ! []
+
         NewUserRegistered (Ok responses) ->
             let
                 newModel =
@@ -372,13 +377,13 @@ update msg model authModel =
 
         FinishSurvey ->
             let
-                newModel =
+                (newModel, cmd) =
                     if validateSurvey model.currentSurvey then
-                        { model | currentPage = Finished }
+                        ( { model | currentPage = Finished }, Ports.renderVega myVis)
                     else
-                        { model | currentPage = IncompleteSurvey }
+                        ({ model | currentPage = IncompleteSurvey }, Cmd.none)
             in
-                newModel ! [ (storeSurvey newModel (getQuestionNumber newModel)) ]
+                newModel ! [ (storeSurvey newModel (getQuestionNumber newModel)), cmd ]
 
         StartLikertSurvey metaData ->
             { model | currentPage = Survey, selectedSurveyMetaData = metaData } ! [ Http.send GotLikertServerData (Request.Survey.getLikertSurvey authModel metaData.uuid) ]
@@ -777,7 +782,6 @@ view authModel model =
             viewRegistered model
 
 
-
 viewIncomplete : Survey -> Html Msg
 viewIncomplete survey =
     div [ class "row justify-content-center pt-3" ]
@@ -849,32 +853,34 @@ viewFinished model =
 
 viewRegistration : Model -> Html Msg
 viewRegistration model =
-        div [ class "container mt-3" ]
-            [ div [ class "row" ]
-                [ div [ class "jumbotron" ]
-                    [ h1 [ class "display-4" ] [ text "You finished the survey! Please enter your email address to save the survey." ]
-                    , input [ placeholder "Email Address", value model.emailAddress, onInput UpdateEmail ] []
-                    , br [] []
-                    , br [] []
-                    , div [ class "vis", id "vis" ] []
-                    , br [] []
-                    , br [] []
-                    , button [ class "btn btn-primary", onClick RegisterNewUser ] [ text "Click to save results to the server." ]
-                    ]
+    div [ class "container mt-3" ]
+        [ div [ class "row" ]
+            [ div [ class "jumbotron" ]
+                [ h1 [ class "display-4" ] [ text "You finished the survey! Please enter your email address to save the survey." ]
+                , input [ placeholder "Email Address", value model.emailAddress, onInput UpdateEmail ] []
+                , br [] []
+                , br [] []
+                , div [ class "vis", id "vis" ] []
+                , br [] []
+                , br [] []
+                , button [ class "btn btn-primary", onClick RegisterNewUser ] [ text "Click to save results to the server." ]
                 ]
             ]
+        ]
+
 
 viewRegistered : Model -> Html Msg
 viewRegistered model =
-        div [ class "container mt-3" ]
-            [ div [ class "row" ]
-                [ div [ class "jumbotron" ]
-                    [ h1 [ class "display-4" ] [ text "Thank you for signing up! Please check your email for login information." ]
-                    , br [] []
-                    , br [] []
-                    ]
+    div [ class "container mt-3" ]
+        [ div [ class "row" ]
+            [ div [ class "jumbotron" ]
+                [ h1 [ class "display-4" ] [ text "Thank you for signing up! Please check your email for login information." ]
+                , br [] []
+                , br [] []
                 ]
             ]
+        ]
+
 
 viewSurvey : Survey -> Html Msg
 viewSurvey survey =
@@ -1113,8 +1119,8 @@ viewSurveyPointsGroup answer group =
 viewSurveyFooter : Html Msg
 viewSurveyFooter =
     div [ class "row mb-4 pb-4 px-3 d-flex justify-content-between" ]
-        [ button [ class "btn btn-primary btn-lg mx-1", onClick GoToHome ] [ text "Back" ] 
-        , button [ class "btn btn-default btn-lg mx-1", onClick PreviousQuestion ] [ text "<" ] 
-        , button [ class "btn btn-default btn-lg mx-1", onClick NextQuestion ] [ text ">" ] 
-        , button [ class "btn btn-primary btn-lg mx-1", onClick FinishSurvey ] [ text "Finish" ] 
+        [ button [ class "btn btn-primary btn-lg mx-1", onClick GoToHome ] [ text "Back" ]
+        , button [ class "btn btn-default btn-lg mx-1", onClick PreviousQuestion ] [ text "<" ]
+        , button [ class "btn btn-default btn-lg mx-1", onClick NextQuestion ] [ text ">" ]
+        , button [ class "btn btn-primary btn-lg mx-1", onClick FinishSurvey ] [ text "Finish" ]
         ]
