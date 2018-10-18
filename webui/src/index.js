@@ -13,7 +13,6 @@ var keycloak = Keycloak({
   realm: 'havendev',
   clientId: 'havendev'
 })
-
 var storedProfile = sessionStorage.getItem('profile')
 var storedToken = sessionStorage.getItem('token')
 var storedSurveyState = sessionStorage.getItem('storedSurvey')
@@ -116,7 +115,15 @@ elmApp.ports.radarChart.subscribe(chartConfig => {
   window.myRadar = new Chart(document.getElementById('chart'), chartConfig)
 })
 
-
 elmApp.ports.saveSurveyState.subscribe(storedSurvey => {
   sessionStorage.setItem('storedSurvey', JSON.stringify(storedSurvey));
 })
+
+let updateChart = function (spec) {
+  //console.log("updateChart was called");
+  window.requestAnimationFrame(() => {
+    vegaEmbed("#vis", spec, { actions: false }).catch(console.warn);
+  });
+}
+
+elmApp.ports.renderVega.subscribe(updateChart);
