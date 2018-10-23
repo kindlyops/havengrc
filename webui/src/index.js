@@ -127,3 +127,17 @@ let updateChart = function (spec) {
 }
 
 elmApp.ports.renderVega.subscribe(updateChart);
+
+let renderAnimation = function () {
+  window.requestAnimationFrame(() => {
+    lottie.loadAnimation({
+      container: document.getElementById('lottie'), // Required
+      path: '/animations/drone-animation.json', // Required
+      renderer: 'svg', // Required
+      loop: true, // Optional
+      autoplay: true, // Optional
+    })
+  });
+}
+
+elmApp.ports.renderVega.subscribe(renderAnimation);
