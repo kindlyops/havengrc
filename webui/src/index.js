@@ -133,7 +133,7 @@ let renderAnimation = function () {
     element = document.getElementById('lottie');
     if (element) {
       lottie.loadAnimation({
-        container: , // Required
+        container: element, // Required
         path: '/animations/drone-animation.json', // Required
         renderer: 'svg', // Required
         loop: true, // Optional
