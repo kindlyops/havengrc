@@ -130,11 +130,11 @@ elmApp.ports.renderVega.subscribe(updateChart);
 
 let renderAnimation = function () {
   window.requestAnimationFrame(() => {
-    element = document.getElementById('lottie');
+    var element = document.getElementById('lottie');
     if (element) {
       lottie.loadAnimation({
         container: element, // Required
-        path: '/animations/drone-animation.json', // Required
+        path: process.env.PUBLIC_URL + '/animations/drone-animation.json', // Required
         renderer: 'svg', // Required
         loop: true, // Optional
         autoplay: true, // Optional
