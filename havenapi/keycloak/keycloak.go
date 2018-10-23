@@ -190,7 +190,7 @@ func SendVerificationEmail(email string) error {
 	body := bytes.NewBuffer(jsonStr)
 	req, err := http.NewRequest(
 		"PUT",
-		keycloakHost+getUsersURL+"/"+userList[0].ID+"/send-verify-email",
+		keycloakHost+getUsersURL+"/"+userList[0].ID+"/send-verify-email?client_id=havendev",
 		body,
 	)
 
