@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 
+	faktory "github.com/contribsys/faktory/client"
 	"github.com/deis/helm/log"
 	"github.com/gobuffalo/buffalo"
 	"github.com/gobuffalo/pop"
@@ -34,4 +35,21 @@ func UploadHandler(c buffalo.Context) error {
 	log.Info("processed a file")
 	message := "success"
 	return c.Render(200, r.JSON(map[string]string{"message": message}))
+}
+
+// CreateSlide triggers a worker job to create a report with R
+func CreateSlide(c buffalo.Context, email string) error {
+	// Add job to the queue
+	client, err := faktory.Open()
+	if err != nil {
+		return c.Error(500, err)
+	}
+
+	createSlideJob := faktory.NewJob("CreateSlide", email)
+	err = client.Push(createSlideJob)
+	if err != nil {
+		return c.Error(500, err)
+	}
+
+	return err
 }
