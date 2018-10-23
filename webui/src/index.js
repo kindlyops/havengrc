@@ -130,13 +130,16 @@ elmApp.ports.renderVega.subscribe(updateChart);
 
 let renderAnimation = function () {
   window.requestAnimationFrame(() => {
-    lottie.loadAnimation({
-      container: document.getElementById('lottie'), // Required
-      path: '/animations/drone-animation.json', // Required
-      renderer: 'svg', // Required
-      loop: true, // Optional
-      autoplay: true, // Optional
-    })
+    element = document.getElementById('lottie');
+    if (element) {
+      lottie.loadAnimation({
+        container: , // Required
+        path: '/animations/drone-animation.json', // Required
+        renderer: 'svg', // Required
+        loop: true, // Optional
+        autoplay: true, // Optional
+      })
+    }
   });
 }
 
