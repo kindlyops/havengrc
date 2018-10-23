@@ -11,6 +11,8 @@
   "ssoSessionIdleTimeout" : 1800,
   "ssoSessionMaxLifespan" : 36000,
   "offlineSessionIdleTimeout" : 2592000,
+  "offlineSessionMaxLifespanEnabled" : false,
+  "offlineSessionMaxLifespan" : 5184000,
   "accessCodeLifespan" : 60,
   "accessCodeLifespanUserAction" : 300,
   "accessCodeLifespanLogin" : 1800,
@@ -1833,6 +1835,7 @@
     "providerId" : "CONFIGURE_TOTP",
     "enabled" : true,
     "defaultAction" : false,
+    "priority" : 0,
     "config" : { }
   }, {
     "alias" : "UPDATE_PASSWORD",
@@ -1840,6 +1843,7 @@
     "providerId" : "UPDATE_PASSWORD",
     "enabled" : true,
     "defaultAction" : false,
+    "priority" : 0,
     "config" : { }
   }, {
     "alias" : "UPDATE_PROFILE",
@@ -1847,6 +1851,7 @@
     "providerId" : "UPDATE_PROFILE",
     "enabled" : true,
     "defaultAction" : false,
+    "priority" : 0,
     "config" : { }
   }, {
     "alias" : "VERIFY_EMAIL",
@@ -1854,6 +1859,7 @@
     "providerId" : "VERIFY_EMAIL",
     "enabled" : true,
     "defaultAction" : false,
+    "priority" : 0,
     "config" : { }
   }, {
     "alias" : "terms_and_conditions",
@@ -1861,6 +1867,7 @@
     "providerId" : "terms_and_conditions",
     "enabled" : false,
     "defaultAction" : false,
+    "priority" : 0,
     "config" : { }
   } ],
   "browserFlow" : "browser",
@@ -1885,11 +1892,13 @@
     "maxDeltaTimeSeconds" : "43200",
     "_browser_header.xContentTypeOptions" : "nosniff",
     "actionTokenGeneratedByAdminLifespan" : "43200",
+    "offlineSessionMaxLifespan" : "5184000",
     "bruteForceProtected" : "false",
     "_browser_header.contentSecurityPolicy" : "frame-src 'self'; frame-ancestors 'self'; object-src 'none';",
+    "offlineSessionMaxLifespanEnabled" : "false",
     "waitIncrementSeconds" : "60"
   },
-  "keycloakVersion" : "4.0.0.Final",
+  "keycloakVersion" : "4.3.0.Final",
   "userManagedAccessAllowed" : false
 }, {
   "id" : "havendev",
@@ -1904,6 +1913,8 @@
   "ssoSessionIdleTimeout" : 1800,
   "ssoSessionMaxLifespan" : 36000,
   "offlineSessionIdleTimeout" : 2592000,
+  "offlineSessionMaxLifespanEnabled" : false,
+  "offlineSessionMaxLifespan" : 5184000,
   "accessCodeLifespan" : 60,
   "accessCodeLifespanUserAction" : 300,
   "accessCodeLifespanLogin" : 1800,
@@ -3326,7 +3337,7 @@
   "loginTheme" : "haven",
   "accountTheme" : "haven",
   "adminTheme" : "haven",
-  "emailTheme" : "keycloak",
+  "emailTheme" : "haven",
   "eventsEnabled" : false,
   "eventsListeners" : [ "jboss-logging" ],
   "enabledEventTypes" : [ ],
@@ -3778,6 +3789,7 @@
     "providerId" : "CONFIGURE_TOTP",
     "enabled" : true,
     "defaultAction" : false,
+    "priority" : 0,
     "config" : { }
   }, {
     "alias" : "UPDATE_PASSWORD",
@@ -3785,6 +3797,7 @@
     "providerId" : "UPDATE_PASSWORD",
     "enabled" : true,
     "defaultAction" : false,
+    "priority" : 0,
     "config" : { }
   }, {
     "alias" : "UPDATE_PROFILE",
@@ -3792,6 +3805,7 @@
     "providerId" : "UPDATE_PROFILE",
     "enabled" : true,
     "defaultAction" : false,
+    "priority" : 0,
     "config" : { }
   }, {
     "alias" : "VERIFY_EMAIL",
@@ -3799,6 +3813,7 @@
     "providerId" : "VERIFY_EMAIL",
     "enabled" : true,
     "defaultAction" : false,
+    "priority" : 0,
     "config" : { }
   }, {
     "alias" : "terms_and_conditions",
@@ -3806,6 +3821,7 @@
     "providerId" : "terms_and_conditions",
     "enabled" : true,
     "defaultAction" : true,
+    "priority" : 0,
     "config" : { }
   } ],
   "browserFlow" : "browser",
@@ -3830,10 +3846,12 @@
     "maxDeltaTimeSeconds" : "43200",
     "_browser_header.xContentTypeOptions" : "nosniff",
     "actionTokenGeneratedByAdminLifespan" : "43200",
+    "offlineSessionMaxLifespan" : "5184000",
     "bruteForceProtected" : "false",
     "_browser_header.contentSecurityPolicy" : "frame-src 'self'; frame-ancestors 'self'; object-src 'none';",
+    "offlineSessionMaxLifespanEnabled" : "false",
     "waitIncrementSeconds" : "60"
   },
-  "keycloakVersion" : "4.0.0.Final",
+  "keycloakVersion" : "4.3.0.Final",
   "userManagedAccessAllowed" : false
 } ]
