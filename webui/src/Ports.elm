@@ -3,7 +3,6 @@ port module Ports exposing
     , keycloakLogin
     , keycloakLogout
     , radarChart
-    , renderAnimation
     , renderVega
     , saveSurveyState
     , setTitle
@@ -38,6 +37,3 @@ port saveSurveyState : Maybe Value -> Cmd msg
 
 
 port renderVega : Spec -> Cmd msg
-
-
-port renderAnimation : () -> Cmd msg
