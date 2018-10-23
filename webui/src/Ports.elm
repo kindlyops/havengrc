@@ -1,18 +1,18 @@
-port module Ports
-    exposing
-        ( radarChart
-        , showError
-        , setTitle
-        , keycloakAuthResult
-        , keycloakLogout
-        , keycloakLogin
-        , saveSurveyState
-        , renderVega
-        )
+port module Ports exposing
+    ( keycloakAuthResult
+    , keycloakLogin
+    , keycloakLogout
+    , radarChart
+    , renderAnimation
+    , renderVega
+    , saveSurveyState
+    , setTitle
+    , showError
+    )
 
-import Keycloak exposing (Options, RawAuthenticationResult)
 import Data.RadarChart exposing (RadarChartConfig)
 import Json.Encode exposing (Value)
+import Keycloak exposing (Options, RawAuthenticationResult)
 import VegaLite exposing (Spec)
 
 
@@ -38,3 +38,6 @@ port saveSurveyState : Maybe Value -> Cmd msg
 
 
 port renderVega : Spec -> Cmd msg
+
+
+port renderAnimation : () -> Cmd msg

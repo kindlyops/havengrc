@@ -320,7 +320,7 @@ update msg model authModel =
                 survey =
                     Data.Survey.createIpsativeSurvey 10 totalGroups model.selectedSurveyMetaData questions
             in
-            { model | currentSurvey = survey, isSurveyReady = True } ! []
+            { model | currentSurvey = survey, isSurveyReady = True } ! [ Ports.renderAnimation () ]
 
         GotLikertServerData (Err error) ->
             model ! [ Ports.showError (getHTTPErrorMessage error) ]
