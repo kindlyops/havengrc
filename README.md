@@ -291,7 +291,7 @@ Elm is also a language that compiles to javascript. Here are some resources for 
 -   [Free elm course](http://courses.knowthen.com/p/elm-for-beginners)
 -   Daily Drip has an [excellent elm course](https://www.dailydrip.com/topics/elm) that sends you a little bit of code each day to work on
 -   [Pragmatic Programmers course](https://pragmaticstudio.com/elm)
--   [Frontend Masters 2-day elm workshop](https://frontendmasters.com/workshops/elm/)
+-   [Frontend Masters elm workshop](https://frontendmasters.com/courses/intro-elm/)
 
 ### Design framework and tooling
 
