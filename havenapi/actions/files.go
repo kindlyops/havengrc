@@ -38,18 +38,13 @@ func UploadHandler(c buffalo.Context) error {
 }
 
 // CreateSlide triggers a worker job to create a report with R
-func CreateSlide(c buffalo.Context, email string) error {
+func CreateSlide(email string) error {
 	// Add job to the queue
 	client, err := faktory.Open()
 	if err != nil {
-		return c.Error(500, err)
+		return err
 	}
-
 	createSlideJob := faktory.NewJob("CreateSlide", email)
 	err = client.Push(createSlideJob)
-	if err != nil {
-		return c.Error(500, err)
-	}
-
 	return err
 }
