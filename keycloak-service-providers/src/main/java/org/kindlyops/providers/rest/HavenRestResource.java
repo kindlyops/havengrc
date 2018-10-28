@@ -49,6 +49,7 @@ public class HavenRestResource {
     @Path("funnel/verify-email")
     @POST
     public Response verifyEmail() {
+        // TODO this should check keycloak admin rather than realmAdmin
         checkRealmAdmin();
         RealmModel realm = session.getContext().getRealm();
         FreeMarkerUtil util = new FreeMarkerUtil();

@@ -49,6 +49,14 @@ To interact with the custom organizations API via HTTP
 -   ADMIN modify user orgnization role assignment (from one role to another)
 -   ADMIN add a role? or hard-code in SQL?
 
+## Custom funnel verify email
+
+To send the verify email for a user created as part of the gradual registration funnel
+
+    # TODO: figure out how to pass the user we are verifying
+    export TOKEN=`./get-token`
+    curl -v -H "Authorization: Bearer \$TOKEN" -X POST http://localhost:2015/auth/realms/havendev/haven/funnel/verify-email
+
 ## Development
 
 For local development here is a handy to deploy updated code for the SPI
