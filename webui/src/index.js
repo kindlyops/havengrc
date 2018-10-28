@@ -15,12 +15,19 @@ var keycloak = Keycloak({
 })
 var storedProfile = sessionStorage.getItem('profile')
 var storedToken = sessionStorage.getItem('token')
+var storedSurveyState = sessionStorage.getItem('storedSurvey')
 var authData =
   storedProfile && storedToken
     ? { profile: JSON.parse(storedProfile), token: storedToken }
     : null
 
-var elmApp = Main.embed(document.getElementById('root'), authData)
+var initialData = {
+  profile: authData ? authData.profile : null,
+  token: authData ? authData.token : null,
+  storedSurvey: storedSurveyState ? JSON.parse(storedSurveyState) : null
+}
+
+var elmApp = Main.embed(document.getElementById('root'), initialData)
 
 function sendElmKeycloakToken() {
   sessionStorage.setItem('profile', JSON.stringify(keycloak.profile))
@@ -48,6 +55,7 @@ keycloak.onAuthLogout = function () {
   var result = { err: null, ok: null }
   sessionStorage.removeItem('profile')
   sessionStorage.removeItem('token')
+  sessionStorage.removeItem('storedSurvey')
   elmApp.ports.keycloakAuthResult.send(result)
 }
 
@@ -81,6 +89,7 @@ elmApp.ports.keycloakLogin.subscribe(function () {
 elmApp.ports.keycloakLogout.subscribe(function () {
   sessionStorage.removeItem('profile')
   sessionStorage.removeItem('token')
+  sessionStorage.removeItem('storedSurvey')
   keycloak.logout()
 })
 
@@ -105,3 +114,34 @@ elmApp.ports.radarChart.subscribe(chartConfig => {
   chartConfig.type = 'radar'
   window.myRadar = new Chart(document.getElementById('chart'), chartConfig)
 })
+
+elmApp.ports.saveSurveyState.subscribe(storedSurvey => {
+  sessionStorage.setItem('storedSurvey', JSON.stringify(storedSurvey));
+})
+
+let updateChart = function (spec) {
+  //console.log("updateChart was called");
+  window.requestAnimationFrame(() => {
+    var element = $('#vis');
+    if (element) {
+      vegaEmbed("#vis", spec, { actions: false }).catch(console.warn);
+    }
+  });
+}
+
+elmApp.ports.renderVega.subscribe(updateChart);
+
+document.arrive("#lottie", () => {
+  var element = document.getElementById('lottie');
+  var animationPath = process.env.PUBLIC_URL + '/animations/drone-animation.json'
+  if (element) {
+    console.log("got lottie element");
+    lottie.loadAnimation({
+      container: element, // Required
+      path: animationPath, // Required
+      renderer: 'svg', // Required
+      loop: true, // Optional
+      autoplay: true, // Optional
+    });
+  }
+});

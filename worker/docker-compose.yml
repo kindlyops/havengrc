@@ -1,0 +1,8 @@
+version: '2'
+services:
+  report:
+    image: havengrc-docker.jfrog.io/kindlyops/reporter:latest
+    working_dir: /docs
+    volumes:
+      - .:/docs
+    command: [./compilereport.sh]

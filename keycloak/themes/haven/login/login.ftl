@@ -30,7 +30,7 @@
                     </div>
 
                 <div class="form-group">
-                    <button class="btn btn-primary btn-block" style="border-radius:25px;" name="login" id="kc-login" type="submit" value="${msg(" doLogIn")}">Log in</button>
+                    <button class="btn btn-secondary btn-block" style="border-radius:25px;" name="login" id="kc-login" type="submit" value="${msg(" doLogIn")}">Log in</button>
                     <div id="kc-form-options" class="${properties.kcFormOptionsClass!}">
                         <#if realm.rememberMe && !usernameEditDisabled??>
                             <div class="form-check">
@@ -47,10 +47,10 @@
                 </div>
             </form>
         </#if>
+        <div class="orText">OR</div>
     </div>
     <#elseif section="info">
         <div class="col-sm-6 d-sm-flex flex-column align-items-sm-start pl-sm-5 py-sm-4">
-        <div class="orText">OR</div>
             <#if realm.password && social.providers??>
                 <div id="kc-social-providers" class="mb-auto text-center">
                     <h5>Log In With:</h5>

@@ -2,7 +2,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: flywy-migrate
+  name: flyway-migrate
 spec:
   parallelism: 1
   completions: 1

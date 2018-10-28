@@ -1,7 +1,7 @@
 $primary: (
-  color: #5AB4AC,
-  dark:  darken(#5AB4AC, 30%),
-  light: lighten(#5AB4AC, 30%)
+  color: #2fa09d,
+  dark:  darken(#2fa09d, 30%),
+  light: lighten(#2fa09d, 30%)
 );
 
 $secondary: (
@@ -10,6 +10,7 @@ $secondary: (
   light: lighten(#E86953, 30%)
 );
 $yiq-contrasted-threshold:  160;
+
 
 /* Material Icons fonts */
 @import "public/fonts/material-icons";
@@ -24,11 +25,12 @@ $yiq-contrasted-threshold:  160;
     margin-left: $navdrawer-width;
   }
 }
+
 body p {
   font-family: 'Bitter';
 }
 
-h1,h2,h2,h4,p.lead, a.nav-item, .navbar-brand, .navbar-nav {
+h1,h2,h2,h4,p.lead, .nav-item, .navbar-brand, .navbar-nav {
   font-family: 'Montserrat';
 }
 
@@ -36,22 +38,72 @@ h1,h2,h2,h4,p.lead, a.nav-item, .navbar-brand, .navbar-nav {
     margin-top: 4rem;
 }
 
+.navdrawer-header{
+  background-color: var(--dark-dark);
+  padding-top:30px;
+}
+
+li.nav-item.dropdown{
+  width:100%;
+}
+
+#navbarDropdown{
+  color: #fff;
+  opacity:1;
+}
+
+#navbarDropdown::after{
+  float:right;
+}
+
 .user-avatar {
-    margin-top: -10px;
-    border-radius: 10px;
-    max-height: 37px;
+    margin-top: -15px;
+    border-radius: 50px;
+    max-height: 55px;
+    float:left;
+}
+
+.nav-link{
+  font-size: 16px !important;
+}
+
+nav.navdrawer-nav li.nav-item{
+  height:58px; //matches KC theme, which is rendering height differently
+}
+
+nav.navdrawer-nav i.material-icons{
+  color: var(--dark-light);
+}
+
+nav.navdrawer-nav a.active i
+, nav.navdrawer-nav a.active:hover{
+  color: var(--primary);
+}
+
+.jumbotron{
+  padding-bottom: 150px;
 }
 
 .login-header {
     text-transform: uppercase;
-    font-family: 'Montserrat';
-    font-weight: bold;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size:60px;
 }
 
 .login-btn{
   margin-top:25px;
   border-radius: 25px;
   max-width:255px;
+}
+
+img#Wireframe{
+  margin-top: -150px;
+}
+
+h3{
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
 }
 
 #footer-image {
@@ -74,4 +126,16 @@ h1,h2,h2,h4,p.lead, a.nav-item, .navbar-brand, .navbar-nav {
 
 .homeparagraph {
   line-height: 1.6875;
+}
+
+@media screen and (max-width:768px){
+  .login-header{
+    font-size: 36px;
+  }
+}
+
+@media screen and (max-width:320px){
+  .login-header{
+    font-size: 30px;
+  }
 }

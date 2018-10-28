@@ -1,11 +1,12 @@
 module Page.Home exposing (view)
 
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Html.Events exposing (..)
+import Html exposing (Html, div, img, h1, span, text, button, h3, p, footer, a)
+import Html.Attributes exposing (class, alt, attribute, id, src, height, width, href, title)
+import Html.Events exposing (onClick)
 import Authentication
 
 
+view : Html Authentication.Msg
 view =
     div [ class "" ]
         [ div [ class "" ]
@@ -23,7 +24,7 @@ view =
                         , text "Dashboard"
                         ]
                     , button
-                        [ class "btn btn-primary btn-block mx-auto login-btn"
+                        [ class "btn btn-secondary btn-block mx-auto login-btn"
                         , onClick (Authentication.ShowLogIn)
                         ]
                         [ text "Login" ]
@@ -33,11 +34,13 @@ view =
         , div [ class "py-5 bg-light text-center " ]
             [ div [ class "" ]
                 [ div [ class "pb-5" ]
-                    [ img [ class "img-lg", width 552, height 375, alt "Wireframe graphic of compliance and risk dashboard Haven GRC", src "/img/wireframe-large.png" ]
+                    [ img [ class "img-lg d-none d-md-inline", id "Wireframe", width 552, height 375, alt "Wireframe graphic of compliance and risk dashboard Haven GRC", src "/img/wireframe-large.png" ]
+                        []
+                    , img [ class "img-sm d-md-none", id "Wireframe", width 329, height 229, alt "Wireframe graphic of compliance and risk dashboard Haven GRC", src "/img/wireframe@2x.png" ]
                         []
                     ]
-                , div [ class "row px-5" ]
-                    [ div [ class "col-4 px-4" ]
+                , div [ class "row mx-5" ]
+                    [ div [ class "col-sm-12 col-lg-4 px-4" ]
                         [ img [ alt "Clipboard check list", class "img-responsive center-block", attribute "data-rjs" "2", src "/img/record_assets.png" ]
                             []
                         , h3 [ class "py-3" ]
@@ -45,7 +48,7 @@ view =
                         , p [ class "homeparagraph" ]
                             [ text "You already have well-defined controls, but it’s nearly impossible to keep up with the speed at which applications and services are purchased and provisioned in the cloud.  Reduce the Shadow IT burden by allowing teams to identify and report new cloud services regularly. Everyone can easily see which cloud services are approved, which ones need review, which ones are being retired, as well as what type of data is stored and processed." ]
                         ]
-                    , div [ class "col-4 px-4" ]
+                    , div [ class "col-sm-12 col-lg-4 px-4" ]
                         [ img [ alt "icon with exclaimation point warning symbol alert", class "img-responsive center-block", attribute "data-rjs" "2", src "/img/track_risk.png" ]
                             []
                         , h3 [ class "py-3" ]
@@ -53,7 +56,7 @@ view =
                         , p [ class "homeparagraph" ]
                             [ text "When reviewing applications, services, and vendors for regulatory compliance, you inevitably find issues that need to be addressed. We help you quantify the relative importance and risk of each issue to the overall business so that everyone can see what needs priority attention. You can then easily track those issues through all stages of remediation and provide at-a-glance status for your overall risk profile to all stakeholders." ]
                         ]
-                    , div [ class "col-4 px-4" ]
+                    , div [ class "col-sm-12 col-lg-4 px-4" ]
                         [ img [ alt "Award badge ribbon", class "img-responsive center-block", attribute "data-rjs" "2", src "/img/give_credit.png" ]
                             []
                         , h3 [ class "py-3" ]

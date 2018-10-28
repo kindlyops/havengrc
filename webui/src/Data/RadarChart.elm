@@ -1,8 +1,7 @@
-module Data.RadarChart exposing (..)
+module Data.RadarChart exposing (RadarChartConfig, generateIpsativeChart)
 
-import Color exposing (..)
-import List.Extra exposing (..)
-import Color.Convert exposing (colorToCssRgba)
+import Color exposing (Color, rgb, toRgb, rgba)
+import List.Extra exposing (unique, groupWhile, getAt)
 import Data.SurveyResponses exposing (AvailableResponse, AvailableResponseDatum)
 
 
@@ -66,6 +65,29 @@ type alias RadarChartConfig =
     , data : RadarChartData
     , options : RadarChartOptions
     }
+
+
+{-|
+Converts a color to an css rgba string.
+    colorToCssRgba (rgba 255 0 0 0.5) -- "rgba(255, 0, 0, 0.5)"
+-}
+colorToCssRgba : Color -> String
+colorToCssRgba cl =
+    let
+        { red, green, blue, alpha } =
+            toRgb cl
+    in
+        cssColorString "rgba"
+            [ toString red
+            , toString green
+            , toString blue
+            , toString alpha
+            ]
+
+
+cssColorString : String -> List String -> String
+cssColorString kind values =
+    kind ++ "(" ++ String.join ", " values ++ ")"
 
 
 generateIpsativeChart : AvailableResponse -> RadarChartConfig

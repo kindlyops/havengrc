@@ -13,6 +13,7 @@ module Authentication
 
 import Keycloak
 import Http
+import Ports as Ports exposing (saveSurveyState)
 
 
 type alias Model =
@@ -24,9 +25,9 @@ type alias Model =
 
 
 init : (Keycloak.Options -> Cmd Msg) -> (() -> Cmd Msg) -> Maybe Keycloak.LoggedInUser -> Model
-init logIn logOut initialData =
+init logIn logOut initialUser =
     { state =
-        case initialData of
+        case initialUser of
             Just user ->
                 Keycloak.LoggedIn user
 
@@ -63,7 +64,7 @@ update msg model =
             ( model, model.logIn Keycloak.defaultOpts )
 
         LogOut ->
-            ( { model | state = Keycloak.LoggedOut }, model.logOut () )
+            ( { model | state = Keycloak.LoggedOut }, Cmd.batch [ model.logOut (), Ports.saveSurveyState Nothing ] )
 
 
 handleAuthResult : Keycloak.RawAuthenticationResult -> Msg
@@ -95,7 +96,7 @@ tryGetAuthHeader : Model -> List Http.Header
 tryGetAuthHeader authModel =
     case authModel.state of
         Keycloak.LoggedIn user ->
-            [ (Http.header "Authorization" ("Bearer " ++ user.token)) ]
+            [ Http.header "Authorization" ("Bearer " ++ user.token) ]
 
         Keycloak.LoggedOut ->
             let
@@ -107,4 +108,4 @@ tryGetAuthHeader authModel =
 
 getReturnHeaders : List Http.Header
 getReturnHeaders =
-    [ (Http.header "Prefer" "return=representation") ]
+    [ Http.header "Prefer" "return=representation" ]

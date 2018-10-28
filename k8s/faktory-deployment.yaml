@@ -1,0 +1,58 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: faktory
+spec:
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+        alpha.image.policy.openshift.io/resolve-names: '*'
+      labels:
+        service: faktory
+    spec:
+      containers:
+        - name: faktory
+          image: kindlyops/faktory
+          command:
+          - "/faktory"
+          - "-l"
+          - "debug"
+          - "-b"
+          - "0.0.0.0:7419"
+          - "-w"
+          - "0.0.0.0:7420"
+          - "-e"
+          - "production"
+          env:
+            - name: FAKTORY_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: haven-faktory-credentials
+                  key: password
+          ports:
+            - containerPort: 7420
+              protocol: TCP
+              targetPort: 7420
+            - containerPort: 7419
+              protocol: TCP
+              targetPort: 7419
+          volumeMounts:
+            - mountPath: "/var/lib/faktory/db"
+              name: faktory-db
+      volumes:
+        - name: secret-volume
+          secret:
+            secretName: haven-faktory-credentials
+        - name: faktory-db
+          persistentVolumeClaim:
+            claimName: faktory-volume-claim
+
+      restartPolicy: Always
+  strategy:
+    type: "Recreate"
+  paused: false
+  revisionHistoryLimit: 2
+  minReadySeconds: 0
+status: {}

@@ -1,9 +1,16 @@
-module Page.SurveyResponses exposing (..)
+module Page.SurveyResponses
+    exposing
+        ( Model
+        , Msg (..)
+        , update
+        , view
+        , init
+        )
 
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Html.Events exposing (..)
-import List.Extra exposing (..)
+import Html exposing (Html, div, text, h2, button, canvas, h1, p, hr, h5)
+import Html.Attributes exposing (class, id)
+import Html.Events exposing (onClick)
+import List.Extra exposing (groupWhile)
 import Authentication
 import Http
 import Request.SurveyResponses
@@ -16,7 +23,6 @@ import Data.SurveyResponses exposing (GroupedIpsativeResponse, AvailableResponse
 type ResponsePage
     = Home
     | IpsativeResponse
-    | LikertResponse
 
 
 type alias Model =
@@ -45,25 +51,23 @@ initialModel =
 initialCommands : Authentication.Model -> List (Cmd Msg)
 initialCommands authModel =
     if Authentication.isLoggedIn authModel then
-        [ Http.send GotServerIpsativeResponses (Request.SurveyResponses.getIpsativeResponses authModel)
-        ]
+        [ Http.send GotServerIpsativeResponses (Request.SurveyResponses.getIpsativeResponses authModel ) ]
     else
         []
 
 
 type Msg
-    = NoOp
-    | GenerateChart
+    = GetResponses
     | GotServerIpsativeResponses (Result Http.Error (List GroupedIpsativeResponse))
     | StartVisualization AvailableResponse
     | GoToHome
-
+    | GenerateChart
 
 update : Msg -> Model -> Authentication.Model -> ( Model, Cmd Msg )
 update msg model authModel =
     case msg of
-        NoOp ->
-            model ! []
+        GetResponses ->
+            model ! [ Http.send GotServerIpsativeResponses (Request.SurveyResponses.getIpsativeResponses authModel ) ]
 
         StartVisualization availableResponse ->
             { model
@@ -155,9 +159,6 @@ view authModel model =
                 Just x ->
                     viewIpsativeResponse x
 
-        LikertResponse ->
-            div [] [ text "not done" ]
-
 
 viewIpsativeResponse : AvailableResponse -> Html Msg
 viewIpsativeResponse response =
@@ -175,20 +176,17 @@ viewResponseTable datum =
     Html.table []
         ([ Html.tr []
             [ Html.th [] [ text "Category" ]
-            , Html.th [] [ text "Group" ]
             , Html.th [] [ text "Points" ]
             ]
          ]
-            ++ (List.map
-                    (\datum ->
-                        Html.tr []
-                            [ Html.td [] [ text datum.category ]
-                            , Html.td [] [ text (toString datum.group) ]
-                            , Html.td [] [ text (toString datum.points) ]
-                            ]
-                    )
-                    datum
-               )
+            ++ List.map
+                (\datum ->
+                    Html.tr []
+                        [ Html.td [] [ text datum.category ]
+                        , Html.td [] [ text (toString datum.points) ]
+                        ]
+                )
+                datum
         )
 
 
@@ -198,7 +196,9 @@ viewHome model =
         [ h1 [ class "display-4" ] [ text "Survey Responses" ]
         , p [ class "lead" ] [ text "Select a response group to get started." ]
         , hr [ class "my-4" ] []
-        , p [ class "" ] [ text ("There are currently " ++ (toString (List.length model.availableResponses)) ++ " responses to choose from.") ]
+        , div [ class "row" ]
+            [ button [ class "btn btn-secondary", onClick GetResponses ] [ text "get Ipsative Responses" ] ]
+        , p [ class "" ] [ text ("There are currently " ++ toString (List.length model.availableResponses) ++ " responses to choose from.") ]
         , div [ class "row" ]
             (List.map
                 (\availableResponse ->

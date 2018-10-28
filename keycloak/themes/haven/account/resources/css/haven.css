@@ -1,4 +1,3 @@
-
 :root{
   --primary:#2FA09D;
   --primary-dark:darken(#2FA09D, 30%)
@@ -17,6 +16,16 @@
   background-color: var(--secondary) !important;
 }
 
+.navdrawer-nav .nav-link.active
+, .navdrawer-nav .nav-link:active
+, nav.navdrawer-nav a.active i {
+  color: var(--primary);
+}
+
+nav.navdrawer-nav i.material-icons{
+  color: var(--dark-light);
+}
+
 .btn-flat-secondary, .btn-flat-secondary:active, .btn-flat-secondary:focus, .btn-flat-secondary:hover,
 .btn-outline-secondary, .btn-outline-secondary:active, .btn-outline-secondary:focus, .btn-outline-secondary:hover{
   color: var(--secondary);
@@ -24,45 +33,41 @@
 
 body {
   background-color:var(--body-bg) !important;
-  /*-- font should be changed to Bitter as in webui -----------------------------------*/
-  font-family: Arial, sans-serif;
-  font-size: 16px !important;
+  font-family: 'Bitter', serif;
 }
 
 header{
   height:64px;
+  font-family: 'Montserrat', sans-serif;
 }
 
 header.navbar ul.navbar-nav a.nav-link{
   font-size:14px !important;
 }
 
+nav.navdrawer-nav{
+  display: initial !important;
+  flex-grow: 2;
+  font-family: 'Montserrat', sans-serif;
+}
+
 nav.navdrawer-nav a{
-    font-family:"ff-tisa-web-pro",serif !important;
-    font-size: 20px !important;
+    font-size: 16px !important;
 }
 
-.navdrawer-nav .nav-link i{
-  color: lightgray;
-}
 
-.navdrawer-nav .nav-link.active, .navdrawer-nav .nav-link:active {
-  background-color:#888 ;
-  color: #3F4145;
-}
-
-a.nav-link:focus, a.nav-link:active{
-    -webkit-tap-highlight-color:transparent;
+a.nav-link:active{
+    -webkit-tap-highlight-color:transparent !important;
 }
 
 div.navdrawer-content{
-  display: inline-grid;
+  display: flex;
+  flex-direction: column;
 }
 
 .drawer-logo{
-    text-align: center;
     padding-bottom: 15px;
-    align-self: flex-end;
+    align-self: center;
 }
 
 /*Keep this for when keycloak has a build process*/
@@ -81,11 +86,11 @@ div.navdrawer-content{
 } /*This overwrites the form lines being black*/
 
 button{
-  font-family: "mr-eaves-modern", sans-serif;
+  font-family: 'Montserrat', sans-serif;
 }
 
 h2{
-    font-family: "ff-tisa-web-pro", serif;
+    font-family: 'Bitter', serif;
     font-size: 28px;
 }
 
@@ -96,11 +101,11 @@ h2{
 
 .subtitle{
     align-self: center;
-    font-family: "mr-eaves-modern", sans-serif;
+    font-family: 'Montserrat', sans-serif;
 }
 
 label {
-    font-family:"ff-tisa-web-pro",serif ;
+    font-family:"Bitter",serif ;
 }
 
 .required {
@@ -138,18 +143,18 @@ label {
 
 /* Authenticator Page */
 ol#AccountForm{
-  font-family:"ff-tisa-web-pro",serif ;
+  font-family:'Bitter',serif ;
 }
 
 #TotpTable thead tr th{
-  font-weight: 700;
-  font-family: "mr-eaves-modern", sans-serif;
-  font-size: 18px;
+  font-weight: 600;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
   color:#3F4145;
 }
 
 .code{
-    font-family: "mr-eaves-modern", sans-serif;
+    font-family: 'Montserrat', sans-serif;
 }
 
 @media screen and (min-width:992px){

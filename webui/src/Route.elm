@@ -9,13 +9,14 @@
 -- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-module Route exposing (..)
+module Route exposing (Route(..), Model, init, locFor, titleFor, urlFor)
 
-import String exposing (split)
+import String exposing (split, fromList, join)
 import Navigation
+import UrlParser exposing ((</>), (<?>), s, int, string, parsePath, Parser, oneOf)
 
 
-type Location
+type Route
     = Login
     | Activity
     | Comments
@@ -31,8 +32,27 @@ type Location
     | Terms
 
 
+route : Parser (Route -> a) a
+route =
+    oneOf
+        [ UrlParser.map Activity (s "activity")
+        , UrlParser.map Comments (s "comments")
+        , UrlParser.map Dashboard (s "dashboard")
+        , UrlParser.map Home (s "")
+        , UrlParser.map Login (s "login")
+        , UrlParser.map Privacy (s "privacy")
+        , UrlParser.map Landing (s "l")
+        , UrlParser.map Reports (s "reports")
+        , UrlParser.map Survey (s "survey")
+        , UrlParser.map SurveyResponses (s "surveyResponses")
+        , UrlParser.map ShowComment (s "comments" </> int)
+        , UrlParser.map EditComment (s "comments" </> int </> s "edit")
+        , UrlParser.map Terms (s "terms")
+        ]
+
+
 type alias Model =
-    Maybe Location
+    Maybe Route
 
 
 init : Maybe Navigation.Location -> ( Model, Cmd msg )
@@ -54,11 +74,11 @@ init location =
             Nothing ->
                 ( route, Navigation.newUrl (urlFor Home) )
 
-            Just location ->
+            Just _ ->
                 ( route, Cmd.none )
 
 
-titleFor : Location -> String
+titleFor : Route -> String
 titleFor route =
     "Haven GRC - "
         ++ case route of
@@ -84,7 +104,7 @@ titleFor route =
                 "Privacy Policy"
 
             Landing ->
-                "Landing Page"
+                "Welcome"
 
             Reports ->
                 "Reports"
@@ -102,119 +122,76 @@ titleFor route =
                 "Terms of Service"
 
 
-urlFor : Location -> String
+urlFor : Route -> String
 urlFor loc =
     let
         url =
             case loc of
                 Activity ->
-                    "/activity"
+                    "/activity/"
 
                 Comments ->
-                    "/comments"
+                    "/comments/"
 
                 Dashboard ->
-                    "/dashboard"
+                    "/dashboard/"
 
                 EditComment id ->
-                    "/comments/" ++ (toString id) ++ "/edit"
+                    "/comments/" ++ toString id ++ "/edit"
 
                 Home ->
                     "/"
 
+                Landing ->
+                    "/l/"
+
                 Login ->
-                    "/login"
+                    "/login/"
 
                 Privacy ->
-                    "/privacy"
-
-                Landing ->
-                    "/l"
+                    "/privacy/"
 
                 Reports ->
-                    "/reports"
+                    "/reports/"
 
                 ShowComment id ->
-                    "/comments/" ++ (toString id)
+                    "/comments/" ++ toString id
 
                 Survey ->
-                    "/survey"
+                    "/survey/"
 
                 SurveyResponses ->
-                    "/surveyResponses"
+                    "/surveyResponses/"
 
                 Terms ->
-                    "/terms"
+                    "/terms/"
     in
-        "#" ++ url
+        url
 
 
-locFor : Maybe Navigation.Location -> Maybe Location
-locFor path =
-    case path of
+locFor : Maybe Navigation.Location -> Maybe Route
+locFor location =
+    case location of
         Nothing ->
             Nothing
 
-        Just path ->
+        Just location ->
             let
+                selectedRoute =
+                    parsePath route location
+
                 segments =
-                    path.hash
+                    location.hash
                         |> split "/"
                         |> List.filter (\seg -> seg /= "" && seg /= "#")
 
-                _ =
-                    Debug.log "Route.locFor " (toString segments)
+                -- _ =
+                --     Debug.log "Route.locFor segments" (toString segments)
+                -- _ =
+                --     Debug.log "Route.locFor selectedRoute" (toString selectedRoute)
+                -- _ =
+                --     Debug.log "Route.locFor normal hash" (toString location.hash)
+                -- _ =
+                --     Debug.log "Route.locFor fixed hash" (toString fixedLocation.hash)
             in
-                case segments of
-                    [] ->
-                        Just Home
-
-                    [ "activity" ] ->
-                        Just Activity
-
-                    [ "comments" ] ->
-                        Just Comments
-
-                    [ "comments", stringId ] ->
-                        case String.toInt stringId of
-                            Ok id ->
-                                Just (ShowComment id)
-
-                            Err _ ->
-                                Nothing
-
-                    [ "comments", stringId, "edit" ] ->
-                        String.toInt stringId
-                            |> Result.toMaybe
-                            |> Maybe.map EditComment
-
-                    [ "dashboard" ] ->
-                        Just Dashboard
-
-                    [ "login" ] ->
-                        Just Login
-
-                    [ "privacy" ] ->
-                        Just Privacy
-
-                    [ "l" ] ->
-                        Just Landing
-
-                    [ "reports" ] ->
-                        Just Reports
-
-                    [ "survey" ] ->
-                        Just Survey
-
-                    [ "surveyResponses" ] ->
-                        Just SurveyResponses
-
-                    [ "terms" ] ->
-                        Just Terms
-
-                    _ ->
-                        let
-                            _ =
-                                Debug.log "Route.locFor resolved wildcard, location Nothing" ""
-                        in
-                            Nothing
+                selectedRoute

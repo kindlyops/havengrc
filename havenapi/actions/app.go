@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/deis/helm/log"
 	"github.com/gobuffalo/buffalo"
 	"github.com/gobuffalo/buffalo/middleware"
 	"github.com/gobuffalo/buffalo/middleware/ssl"
@@ -25,6 +26,7 @@ import (
 // application is being run. Default is "development".
 var ENV = envy.Get("GO_ENV", "development")
 
+// KEY gets the haven jwk path
 // TODO mappamundi/postgrest/keycloak-dev-public-key.json should be
 // the JWK and will need to be mounted into the havenapi container
 var KEY = envy.Get("HAVEN_JWK_PATH", "")
@@ -68,18 +70,52 @@ func App() *buffalo.App {
 			SSLRedirect:     ENV == "production",
 			SSLProxyHeaders: map[string]string{"X-Forwarded-Proto": "https"},
 		}))
+
 		// TODO refactor to use dependency injection instead of a package global
 		api.Use(middleware.PopTransaction(models.DB))
 		api.Use(JwtMiddleware)
+		api.Middleware.Skip(JwtMiddleware, RegistrationHandler)
 		api.POST("files", UploadHandler)
+		api.POST("registration_funnel", RegistrationHandler)
 
 	}
 
 	return app
 }
 
-// validate JWT and set context compatible with PostgREST
+// Token is for un marshalling {"resource_access":{"havendev":{"roles":["member"]}}
+type Token struct {
+	ResourceAccess struct {
+		Client struct {
+			Roles []string `json:"roles,omitempty"`
+		} `json:"havendev,omitempty"`
+	} `json:"resource_access,omitempty"`
+}
+
+func getRole(allClaims map[string]interface{}) string {
+	// look for the role that we should assume
+	// {"resource_access":{"havendev":{"roles":["member"]}}
+	access := allClaims["resource_access"].(map[string]interface{})
+	havendev := access["havendev"].(map[string]interface{})
+	roles := havendev["roles"].([]interface{})
+	var role string
+	for _, r := range roles {
+		switch r.(string) {
+		case "member":
+			role = "member"
+		case "admin":
+			role = "admin"
+		default:
+			log.Info("Got unexpected role %s", r)
+			role = "anonymous"
+		}
+	}
+	return role
+}
+
+// JwtMiddleware validates JWT and set context compatible with PostgREST
 func JwtMiddleware(next buffalo.Handler) buffalo.Handler {
+
 	return func(c buffalo.Context) error {
 		header := c.Request().Header.Get("Authorization")
 		parts := strings.Split(header, "Bearer ")
@@ -124,6 +160,8 @@ func JwtMiddleware(next buffalo.Handler) buffalo.Handler {
 		c.Set("org", org)
 		enc, _ := json.Marshal(org)
 
+		role := getRole(allClaims)
+
 		tx := c.Value("tx").(*pop.Connection)
 		err = tx.RawQuery(models.Q["setemailclaim"], email).Exec()
 		if err != nil {
@@ -143,6 +181,11 @@ func JwtMiddleware(next buffalo.Handler) buffalo.Handler {
 		err = tx.RawQuery(models.Q["setorgclaim"], string(enc)).Exec()
 		if err != nil {
 			return c.Error(500, fmt.Errorf("error setting JWT claims org in GUC: %s", err.Error()))
+		}
+
+		err = tx.RawQuery(models.Q["setrole"], role).Exec()
+		if err != nil {
+			return c.Error(500, fmt.Errorf("error setting PostgreSQL role: %s", err.Error()))
 		}
 
 		return next(c)
