@@ -21,8 +21,8 @@ func TestGetUser(t *testing.T) {
 	}
 }
 
-func TestResetPassword(t *testing.T) {
-	err := ResetPassword("user1@havengrc.com")
+func TestVerifyEmail(t *testing.T) {
+	err := SendVerificationEmail("user1@havengrc.com")
 	if err != nil {
 		t.Errorf("Failed test because: %s", err.Error())
 	}

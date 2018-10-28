@@ -1,26 +1,26 @@
 module Main exposing (main)
 
+import Authentication
+import Data.Survey as SurveyData
+import Gravatar
+import Html exposing (Html, a, button, div, i, img, li, nav, span, text, ul)
+import Html.Attributes exposing (attribute, class, classList, href, id, style)
+import Html.Events exposing (onClick)
+import Json.Decode as Decode
 import Keycloak
 import Navigation
-import Gravatar
-import Authentication
-import Ports
-import Html exposing (Html, div, nav, button, span, text, ul, li, a, img, i)
-import Html.Attributes exposing (class, attribute, id, href, style, classList)
-import Html.Events exposing (onClick)
-import Route
 import Page.Activity as Activity
 import Page.Comments as Comments
 import Page.Dashboard as Dashboard
 import Page.Home as Home
-import Page.Privacy as Privacy
 import Page.Landing as Landing
+import Page.Privacy as Privacy
 import Page.Reports as Reports
 import Page.Survey as Survey
-import Data.Survey as SurveyData
 import Page.SurveyResponses as SurveyResponses
 import Page.Terms as Terms
-import Json.Decode as Decode
+import Ports
+import Route
 import Visualization exposing (myVis)
 
 
@@ -89,15 +89,15 @@ init sessionStorage location =
             , surveyResponseModel = surveyResponseModel
             }
     in
-        ( model
-        , Cmd.batch
-            [ routeCmd
-            , Cmd.map CommentsMsg commentsCmd
-            , Cmd.map SurveyMsg surveyCmd
-            , Cmd.map SurveyResponseMsg surveyResponsesCmd
-            , Ports.renderVega myVis
-            ]
-        )
+    ( model
+    , Cmd.batch
+        [ routeCmd
+        , Cmd.map CommentsMsg commentsCmd
+        , Cmd.map SurveyMsg surveyCmd
+        , Cmd.map SurveyResponseMsg surveyResponsesCmd
+        , Ports.renderVega myVis
+        ]
+    )
 
 
 subscriptions : a -> Sub Msg
@@ -144,7 +144,7 @@ update msg model =
                 _ =
                     Debug.log "UrlChange: " location.hash
             in
-                { model | route = Route.locFor (Just location) } ! []
+            { model | route = Route.locFor (Just location) } ! []
 
         AuthenticationMsg authMsg ->
             let
@@ -160,31 +160,31 @@ update msg model =
                 ( _, surveyCmd ) =
                     Survey.init authModel
             in
-                ( { model
-                    | authModel = authModel
-                    , commentsModel = commentsModel
-                  }
-                , Cmd.batch
-                    [ Cmd.map AuthenticationMsg cmd
-                    , Cmd.map CommentsMsg commentsCmd
-                    , Cmd.map SurveyMsg surveyCmd
-                    , Cmd.map SurveyResponseMsg surveyResponsesCmd
-                    ]
-                )
+            ( { model
+                | authModel = authModel
+                , commentsModel = commentsModel
+              }
+            , Cmd.batch
+                [ Cmd.map AuthenticationMsg cmd
+                , Cmd.map CommentsMsg commentsCmd
+                , Cmd.map SurveyMsg surveyCmd
+                , Cmd.map SurveyResponseMsg surveyResponsesCmd
+                ]
+            )
 
         DashboardMsg dashboardMsg ->
             let
                 ( dashboardModel, cmd ) =
                     Dashboard.update dashboardMsg model.dashboardModel
             in
-                ( { model | dashboardModel = dashboardModel }, Cmd.map DashboardMsg cmd )
+            ( { model | dashboardModel = dashboardModel }, Cmd.map DashboardMsg cmd )
 
         CommentsMsg commentMsg ->
             let
                 ( commentsModel, cmd ) =
                     Comments.update commentMsg model.commentsModel model.authModel
             in
-                ( { model | commentsModel = commentsModel }, Cmd.map CommentsMsg cmd )
+            ( { model | commentsModel = commentsModel }, Cmd.map CommentsMsg cmd )
 
         SurveyMsg surveyMsg ->
             case surveyMsg of
@@ -199,23 +199,23 @@ update msg model =
                         _ =
                             Debug.log "SavedCurrentSurvey " (toString respCmd)
                     in
-                        ( { model | surveyModel = surveyModel, surveyResponseModel = surveyResponseModel }
-                        , Cmd.batch [ Cmd.map SurveyResponseMsg respCmd, Cmd.map SurveyMsg cmd ]
-                        )
+                    ( { model | surveyModel = surveyModel, surveyResponseModel = surveyResponseModel }
+                    , Cmd.batch [ Cmd.map SurveyResponseMsg respCmd, Cmd.map SurveyMsg cmd ]
+                    )
 
                 _ ->
                     let
                         ( surveyModel, cmd ) =
                             Survey.update surveyMsg model.surveyModel model.authModel
                     in
-                        ( { model | surveyModel = surveyModel }, Cmd.map SurveyMsg cmd )
+                    ( { model | surveyModel = surveyModel }, Cmd.map SurveyMsg cmd )
 
         SurveyResponseMsg surveyResponseMsg ->
             let
                 ( surveyResponseModel, cmd ) =
                     SurveyResponses.update surveyResponseMsg model.surveyResponseModel model.authModel
             in
-                ( { model | surveyResponseModel = surveyResponseModel }, Cmd.map SurveyResponseMsg cmd )
+            ( { model | surveyResponseModel = surveyResponseModel }, Cmd.map SurveyResponseMsg cmd )
 
 
 selectedItem : Route.Model -> String
@@ -224,12 +224,12 @@ selectedItem route =
         item =
             List.head (List.filter (\m -> m.route == route) navDrawerItems)
     in
-        case item of
-            Nothing ->
-                "dashboard"
+    case item of
+        Nothing ->
+            "dashboard"
 
-            Just item ->
-                String.toLower item.text
+        Just item ->
+            String.toLower item.text
 
 
 getGravatar : String -> String
@@ -242,7 +242,7 @@ getGravatar email =
         url =
             Gravatar.url options email
     in
-        "https:" ++ url
+    "https:" ++ url
 
 
 navDrawerItems : List MenuItem
@@ -275,16 +275,16 @@ outsideContainer html =
 outsideView : Model -> Html Msg
 outsideView model =
     case model.route of
-        Just (Route.Privacy) ->
-            outsideContainer (Privacy.view)
+        Just Route.Privacy ->
+            outsideContainer Privacy.view
 
-        Just (Route.Terms) ->
-            outsideContainer (Terms.view)
+        Just Route.Terms ->
+            outsideContainer Terms.view
 
-        Just (Route.Landing) ->
+        Just Route.Landing ->
             outsideContainer (Landing.view |> Html.map AuthenticationMsg)
 
-        Just (Route.Survey) ->
+        Just Route.Survey ->
             outsideContainer (Survey.view model.authModel model.surveyModel |> Html.map SurveyMsg)
 
         -- everything else gets the front page
@@ -337,31 +337,31 @@ viewBody model =
             Nothing ->
                 Dashboard.view model.dashboardModel |> Html.map DashboardMsg
 
-            Just (Route.Home) ->
+            Just Route.Home ->
                 Dashboard.view model.dashboardModel |> Html.map DashboardMsg
 
-            Just (Route.Reports) ->
+            Just Route.Reports ->
                 Reports.view
 
-            Just (Route.Privacy) ->
+            Just Route.Privacy ->
                 Privacy.view
 
-            Just (Route.Terms) ->
+            Just Route.Terms ->
                 Terms.view
 
-            Just (Route.Dashboard) ->
+            Just Route.Dashboard ->
                 Dashboard.view model.dashboardModel |> Html.map DashboardMsg
 
-            Just (Route.Comments) ->
+            Just Route.Comments ->
                 Comments.view model.authModel model.commentsModel |> Html.map CommentsMsg
 
-            Just (Route.Activity) ->
+            Just Route.Activity ->
                 Activity.view
 
-            Just (Route.Survey) ->
+            Just Route.Survey ->
                 Survey.view model.authModel model.surveyModel |> Html.map SurveyMsg
 
-            Just (Route.SurveyResponses) ->
+            Just Route.SurveyResponses ->
                 SurveyResponses.view model.authModel model.surveyResponseModel |> Html.map SurveyResponseMsg
 
             Just _ ->

@@ -122,8 +122,26 @@ elmApp.ports.saveSurveyState.subscribe(storedSurvey => {
 let updateChart = function (spec) {
   //console.log("updateChart was called");
   window.requestAnimationFrame(() => {
-    vegaEmbed("#vis", spec, { actions: false }).catch(console.warn);
+    var element = $('#vis');
+    if (element) {
+      vegaEmbed("#vis", spec, { actions: false }).catch(console.warn);
+    }
   });
 }
 
 elmApp.ports.renderVega.subscribe(updateChart);
+
+document.arrive("#lottie", () => {
+  var element = document.getElementById('lottie');
+  var animationPath = process.env.PUBLIC_URL + '/animations/drone-animation.json'
+  if (element) {
+    console.log("got lottie element");
+    lottie.loadAnimation({
+      container: element, // Required
+      path: animationPath, // Required
+      renderer: 'svg', // Required
+      loop: true, // Optional
+      autoplay: true, // Optional
+    });
+  }
+});

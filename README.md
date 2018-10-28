@@ -6,10 +6,29 @@ We help organizations avoid getting bogged down in rules that no longer make sen
 
 By prioritizing people and culture (beliefs and assumptions aka mental models) over prescriptive checklists, we build resilience and cut down on toil.
 
-By connecting controls to policies to values & customer requirements, we break the cycle of inability to improve processes "because security reasons".
+### But what does Haven GRC do?
 
-![screenshot of app](demo2.png)
----
+-   Measures and reports on key security metrics. such as SCDS and FORCE.
+-   Guided tool for performing scenario-based risk analysis as required by NIST CSF. Risk analysis modules is based on FAIR topology for quantitative risk estimation.
+-   Calibration exercises for subject matter experts. Subject matter experts provide estimates based on their expert judgement, calibration training improves accuracy of estimates.
+-   Tamper proof evidence store for compliance artifacts. Examples include risk acceptance documents, attestations that management oversight tasks have been completed, and third-party security assessment reports. Make your audits much easier!
+
+### Future roadmap
+
+-   Custom risk analysis models to support domains where subject matter experts have specific insights into the probability distribution of threats or losses
+-   Guided tool for performing controls assessments
+-   Features for Vendor Risk Management
+
+### Complementary tools
+
+Applications and frameworks that are complementary to Haven. We would prefer to integrate with rather than compete against these tools. They are great!
+
+-   IT asset management with [SnipeIT](https://snipeitapp.com)
+-   FISMA, NIST 800-53, NIST RMF, DFARS 800-171 documentation preparation for Authority To Operate [GovReady](https://govready.com)
+-   SOC2 documentation and workflow assistance with [Comply](https://github.com/strongdm/comply)
+-   Controls frameworks such as CIS Top 20 and NIST CSF
+
+## ![screenshot of app](demo2.png)
 
 ## Table of Contents
 
@@ -272,7 +291,7 @@ Elm is also a language that compiles to javascript. Here are some resources for 
 -   [Free elm course](http://courses.knowthen.com/p/elm-for-beginners)
 -   Daily Drip has an [excellent elm course](https://www.dailydrip.com/topics/elm) that sends you a little bit of code each day to work on
 -   [Pragmatic Programmers course](https://pragmaticstudio.com/elm)
--   [Frontend Masters 2-day elm workshop](https://frontendmasters.com/workshops/elm/)
+-   [Frontend Masters elm workshop](https://frontendmasters.com/courses/intro-elm/)
 
 ### Design framework and tooling
 

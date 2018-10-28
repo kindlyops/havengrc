@@ -163,22 +163,22 @@ func CreateUser(email string) error {
 		return fmt.Errorf("Trouble creating user - StatusCode: %d", resp.StatusCode)
 	}
 
-	err = ResetPassword(email)
+	err = SendVerificationEmail(email)
 	if err != nil {
-		return fmt.Errorf("Trouble sending reset password email: %s", err.Error())
+		return fmt.Errorf("Trouble sending verification email: %s", err.Error())
 	}
 
 	return err
 }
 
-// ResetPassword sends the reset password email to verify the email and let the user set a password.
-func ResetPassword(email string) error {
+// SendVerificationEmail verifies the email and let the user set a password.
+func SendVerificationEmail(email string) error {
 	err := GetToken()
 	if err != nil {
 		return fmt.Errorf("Trouble getting the auth token: %s", err.Error())
 	}
 	client := &http.Client{}
-	log.Info("Try to reset password for: %s", email)
+	log.Info("Try to verify email for: %s", email)
 	userList, err := GetUser(email)
 	if err != nil {
 		return fmt.Errorf("Could not find user:%s because of: %s", email, err.Error())
@@ -190,12 +190,12 @@ func ResetPassword(email string) error {
 	body := bytes.NewBuffer(jsonStr)
 	req, err := http.NewRequest(
 		"PUT",
-		keycloakHost+getUsersURL+"/"+userList[0].ID+"/execute-actions-email",
+		keycloakHost+getUsersURL+"/"+userList[0].ID+"/send-verify-email?client_id=havendev",
 		body,
 	)
 
 	if err != nil {
-		return fmt.Errorf("Trouble executing actions email for user: %s", err.Error())
+		return fmt.Errorf("Trouble executing verify email for user: %s", err.Error())
 	}
 
 	req.Header.Set("Content-Type", "application/json")
@@ -210,7 +210,7 @@ func ResetPassword(email string) error {
 
 	if resp.StatusCode != 200 {
 		return fmt.Errorf(
-			"Trouble sending actions email for user - StatusCode: %d - Url: %s %s",
+			"Trouble sending verify email for user - StatusCode: %d - Url: %s %s",
 			resp.StatusCode,
 			req.Host,
 			req.URL.Path)
