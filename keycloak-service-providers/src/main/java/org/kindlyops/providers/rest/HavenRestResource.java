@@ -55,6 +55,7 @@ public class HavenRestResource {
         checkRealmAdmin();
         RealmModel realm = session.getContext().getRealm();
         // TODO get email from API call
+        // https://github.com/keycloak/keycloak/blob/c41bcddd8db64eda84086ca370ecc2276b7f3d49/services/src/main/java/org/keycloak/services/resources/admin/UserResource.java#L656
         String email = "user1@havengrc.com";
         UserModel user = session.users().getUserByEmail(email, realm);
         FreeMarkerUtil util = new FreeMarkerUtil();
@@ -65,30 +66,13 @@ public class HavenRestResource {
         try {
             provider.setUser(user);
             provider.setRealm(realm);
+            // TODO: build up proper link and required actions
+            // https://github.com/keycloak/keycloak/blob/c41bcddd8db64eda84086ca370ecc2276b7f3d49/services/src/main/java/org/keycloak/services/resources/admin/UserResource.java#L701
             provider.sendFunnelVerifyEmail("http://link", expiration);
         } catch (EmailException e) {
             return Response.serverError().build();
         }
-        // UserModel existingUser = // TODO get user that we need to verify from API
-        // TODO figure out brokerContext and set up linkk.
 
-        // try {
-        // context.getSession().getProvider(EmailTemplateProvider.class).setRealm(realm)
-        // .setAuthenticationSession(authSession).setUser(existingUser)
-        // .setAttribute(EmailTemplateProvider.IDENTITY_PROVIDER_BROKER_CONTEXT,
-        // brokerContext)
-        // .sendConfirmIdentityBrokerLink(link, expirationInMinutes);
-
-        // event.success();
-        // } catch (EmailException e) {
-        // event.error(Errors.EMAIL_SEND_FAILED);
-
-        // ServicesLogger.LOGGER.confirmBrokerEmailFailed(e);
-        // Response challenge = context.form().setError(Messages.EMAIL_SENT_ERROR)
-        // .createErrorPage(Response.Status.INTERNAL_SERVER_ERROR);
-        // context.failure(AuthenticationFlowError.INTERNAL_ERROR, challenge);
-        // return;
-        // }
         return Response.ok().build();
     }
 
