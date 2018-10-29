@@ -9,7 +9,7 @@ RUN mvn -f /keycloak-service-providers/pom.xml dependency:resolve
 COPY keycloak-service-providers /keycloak-service-providers
 RUN mvn -f /keycloak-service-providers/pom.xml clean package
 
-FROM                havengrc-docker.jfrog.io/jboss/keycloak-openshift:4.3.0.Final
+FROM                havengrc-docker.jfrog.io/jboss/keycloak:4.5.0.Final
 MAINTAINER          Kindly Ops, LLC <support@kindlyops.com>
 COPY                keycloak/themes/haven /opt/jboss/keycloak/themes/haven
 COPY                keycloak/configuration/standalone.xml /opt/jboss/keycloak/standalone/configuration/standalone.xml
@@ -27,4 +27,4 @@ ENV         PROXY_ADDRESS_FORWARDING true
 ENV         KEYCLOAK_LOGLEVEL DEBUG
 EXPOSE 8443
 EXPOSE 8080
-CMD         ["start-keycloak.sh", "-b", "0.0.0.0"]
+CMD         ["-b", "0.0.0.0"]
