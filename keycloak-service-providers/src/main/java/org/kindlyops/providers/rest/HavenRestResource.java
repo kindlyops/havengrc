@@ -17,6 +17,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import java.util.concurrent.TimeUnit;
+import java.net.URI;
 
 import org.kindlyops.providers.email.HavenEmailProvider;
 import org.keycloak.theme.FreeMarkerUtil;
@@ -54,10 +55,12 @@ public class HavenRestResource {
     public Response verifyEmail() {
         checkRealmAdmin();
         RealmModel realm = session.getContext().getRealm();
+
         // TODO get email from API call
         // https://github.com/keycloak/keycloak/blob/c41bcddd8db64eda84086ca370ecc2276b7f3d49/services/src/main/java/org/keycloak/services/resources/admin/UserResource.java#L656
         String email = "user1@havengrc.com";
         UserModel user = session.users().getUserByEmail(email, realm);
+        URI uri = session.getContext().getAuthServerUrl();
         FreeMarkerUtil util = new FreeMarkerUtil();
 
         HavenEmailProvider provider = new HavenEmailProvider(session, util);
@@ -68,7 +71,7 @@ public class HavenRestResource {
             provider.setRealm(realm);
             // TODO: build up proper link and required actions
             // https://github.com/keycloak/keycloak/blob/c41bcddd8db64eda84086ca370ecc2276b7f3d49/services/src/main/java/org/keycloak/services/resources/admin/UserResource.java#L701
-            provider.sendFunnelVerifyEmail("http://link", expiration);
+            provider.sendFunnelVerifyEmail(uri.toString(), expiration);
         } catch (EmailException e) {
             return Response.serverError().build();
         }
