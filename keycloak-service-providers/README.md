@@ -55,7 +55,7 @@ To send the verify email for a user created as part of the gradual registration 
 
     # TODO: figure out how to pass the user we are verifying
     export TOKEN=`./get-token`
-    curl -v -H "Authorization: Bearer \$TOKEN" -X POST http://localhost:2015/auth/realms/havendev/haven/funnel/verify-email
+    curl -v -H "Authorization: Bearer $TOKEN" -X POST http://localhost:2015/auth/realms/havendev/haven/funnel/verify-email
 
 ## Development
 

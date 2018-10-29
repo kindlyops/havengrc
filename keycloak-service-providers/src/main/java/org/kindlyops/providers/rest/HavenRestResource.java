@@ -63,7 +63,8 @@ public class HavenRestResource {
         int seconds = realm.getActionTokenGeneratedByUserLifespan(IdpVerifyAccountLinkActionToken.TOKEN_TYPE);
         long expiration = TimeUnit.SECONDS.toMinutes(seconds);
         try {
-
+            provider.setUser(user);
+            provider.setRealm(realm);
             provider.sendFunnelVerifyEmail("http://link", expiration);
         } catch (EmailException e) {
             return Response.serverError().build();
@@ -97,6 +98,8 @@ public class HavenRestResource {
     }
 
     private void checkRealmAdmin() {
+        // TODO: figure out if this is the right permission check. We want the
+        // permission check used for the admin api
         if (auth == null) {
             throw new NotAuthorizedException("Bearer");
         } else if (auth.getToken().getRealmAccess() == null
