@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 import org.keycloak.email.EmailException;
 import org.keycloak.email.freemarker.beans.ProfileBean;
+import org.keycloak.events.Errors;
+import org.keycloak.events.EventBuilder;
+import org.keycloak.events.EventType;
 
 import org.keycloak.email.freemarker.FreeMarkerEmailTemplateProvider;
 import org.keycloak.models.KeycloakSession;

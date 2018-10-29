@@ -2,10 +2,12 @@ package org.kindlyops.providers.rest;
 
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
-import org.keycloak.services.resource.RealmResourceProvider;
 
 import org.keycloak.services.managers.AppAuthManager;
 import org.keycloak.services.managers.AuthenticationManager;
+import org.keycloak.authentication.actiontoken.idpverifyemail.IdpVerifyAccountLinkActionToken;
+import org.keycloak.models.UserModel;
+import org.keycloak.email.EmailException;
 
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.NotAuthorizedException;
@@ -14,6 +16,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.GET;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
+import java.util.concurrent.TimeUnit;
 
 import org.kindlyops.providers.email.HavenEmailProvider;
 import org.keycloak.theme.FreeMarkerUtil;
@@ -49,12 +52,22 @@ public class HavenRestResource {
     @Path("funnel/verify-email")
     @POST
     public Response verifyEmail() {
-        // TODO this should check keycloak admin rather than realmAdmin
         checkRealmAdmin();
         RealmModel realm = session.getContext().getRealm();
+        // TODO get email from API call
+        String email = "user1@havengrc.com";
+        UserModel user = session.users().getUserByEmail(email, realm);
         FreeMarkerUtil util = new FreeMarkerUtil();
 
         HavenEmailProvider provider = new HavenEmailProvider(session, util);
+        int seconds = realm.getActionTokenGeneratedByUserLifespan(IdpVerifyAccountLinkActionToken.TOKEN_TYPE);
+        long expiration = TimeUnit.SECONDS.toMinutes(seconds);
+        try {
+
+            provider.sendFunnelVerifyEmail("http://link", expiration);
+        } catch (EmailException e) {
+            return Response.serverError().build();
+        }
         // UserModel existingUser = // TODO get user that we need to verify from API
         // TODO figure out brokerContext and set up linkk.
 
@@ -75,11 +88,6 @@ public class HavenRestResource {
         // context.failure(AuthenticationFlowError.INTERNAL_ERROR, challenge);
         // return;
         // }
-
-        // get the Haven email template provider class that derives from
-        // https://github.com/keycloak/keycloak/blob/b478472b3578b8980d7b5f1642e91e75d1e78d16/services/src/main/java/org/keycloak/email/freemarker/FreeMarkerEmailTemplateProvider.java
-        // see example use at
-        // https://github.com/keycloak/keycloak/blob/d04791243cd2ce3ec9203e098f96591b58019deb/services/src/main/java/org/keycloak/authentication/authenticators/broker/IdpEmailVerificationAuthenticator.java
         return Response.ok().build();
     }
 
