@@ -8,7 +8,7 @@
     <version>0.1.0</version>
     <packaging>jar</packaging>
     <properties>
-        <keycloak.version>4.0.0.Final</keycloak.version>
+        <keycloak.version>4.5.0.Final</keycloak.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <dependencies>
@@ -33,6 +33,11 @@
             <version>${keycloak.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-model-jpa</artifactId>
+            <version>${keycloak.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.jboss.logging</groupId>
             <artifactId>jboss-logging</artifactId>
             <version>3.3.1.Final</version>
@@ -43,9 +48,19 @@
             <version>2.4.7</version>
         </dependency>
         <dependency>
+            <groupId>org.jboss.spec.javax.ws.rs</groupId>
+            <artifactId>jboss-jaxrs-api_2.0_spec</artifactId>
+            <version>1.0.1.Final</version>
+        </dependency>
+        <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-services</artifactId>
             <version>${keycloak.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+            <version>5.3.7.Final</version>
         </dependency>
     </dependencies>
     <build>
@@ -73,6 +88,7 @@
                     <artifactSet>
                         <excludes>
                             <exclude>org.keycloak:*</exclude>
+                            <exclude>com.h2database:h2</exclude>
                         </excludes>
                     </artifactSet>
                     <filters>

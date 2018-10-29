@@ -16,6 +16,7 @@ import org.keycloak.models.UserModel;
 import org.keycloak.provider.ProviderConfigProperty;
 import org.keycloak.models.AuthenticatorConfigModel;
 import org.keycloak.provider.ConfiguredProvider;
+import org.keycloak.provider.ServerInfoAwareProviderFactory;
 import org.keycloak.models.utils.FormMessage;
 
 import com.chargebee.*;
@@ -25,10 +26,12 @@ import com.chargebee.models.HostedPage;
 import javax.ws.rs.core.MultivaluedMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.LinkedHashMap;
 
 import org.jboss.logging.Logger;
 
-public class ChargeBeeRegistration implements FormAction, FormActionFactory, ConfiguredProvider {
+public class ChargeBeeRegistration implements FormAction, FormActionFactory, ConfiguredProvider, ServerInfoAwareProviderFactory {
     private static String FIELD_ORGANIZATION = "user.attributes.organization";
     private static String ATTRIBUTE_ORGANIZATION = "organization";
     public static final String API_KEY = "api.key";
@@ -174,6 +177,13 @@ public class ChargeBeeRegistration implements FormAction, FormActionFactory, Con
     @Override
     public List<ProviderConfigProperty> getConfigProperties() {
         return configProperties;
+    }
+
+    @Override
+    public Map<String, String> getOperationalInfo() {
+        Map<String, String> ret = new LinkedHashMap<>();
+        ret.put("ChargebeeProviderInfo", "HELLO");
+        return ret;
     }
 
 }

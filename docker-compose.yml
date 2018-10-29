@@ -78,6 +78,10 @@ services:
     build:
       context: .
       dockerfile: ./keycloak/Dockerfile
+    # to use the image line, you must first build & load the image
+    # bazel run //keycloak:keycloak
+    # image: bazel/keycloak:keycloak
+    # TODO: trouble with neverlink, need to figure out how to neverlink antlr and dom4j
     environment:
       - DB_DATABASE=mappamundi_dev
       - DB_USER=postgres
@@ -92,7 +96,7 @@ services:
     volumes:
       - ./keycloak/themes/haven:/opt/jboss/keycloak/themes/haven
       - ./keycloak/data:/keycloak
-    command: ["start-keycloak.sh", "-b", "0.0.0.0", "-Dkeycloak.migration.file=/keycloak/havendev-realm.json", "-Dkeycloak.migration.strategy=IGNORE_EXISTING", "-Dkeycloak.migration.provider=singleFile", "-Dkeycloak.migration.action=import"]
+    command: ["-b", "0.0.0.0", "-Dkeycloak.migration.file=/keycloak/havendev-realm.json", "-Dkeycloak.migration.strategy=IGNORE_EXISTING", "-Dkeycloak.migration.provider=singleFile", "-Dkeycloak.migration.action=import"]
   flyway:
     build:
       context: flyway/
