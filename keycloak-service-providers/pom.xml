@@ -57,6 +57,11 @@
             <artifactId>keycloak-services</artifactId>
             <version>${keycloak.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+            <version>5.3.7.Final</version>
+        </dependency>
     </dependencies>
     <build>
         <finalName>kindlyops-chargebee-form-action</finalName>
@@ -83,8 +88,7 @@
                     <artifactSet>
                         <excludes>
                             <exclude>org.keycloak:*</exclude>
-                            <exclude>dom4j:*</exclude>
-                            <exclude>antlr:*</exclude>
+                            <exclude>com.h2database:h2</exclude>
                         </excludes>
                     </artifactSet>
                     <filters>
