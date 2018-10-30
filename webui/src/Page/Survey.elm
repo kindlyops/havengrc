@@ -859,7 +859,7 @@ viewHero model =
             (List.map
                 (\availableSurvey ->
                     if availableSurvey.name == "SCDS_1" then
-                        div [ class "col-6 mb-4" ]
+                        div []
                             [ Views.SurveyCard.view availableSurvey "Ipsative" (StartIpsativeSurvey availableSurvey)
                             ]
 
