@@ -133,7 +133,7 @@ elmApp.ports.renderVega.subscribe(updateChart);
 
 document.arrive("#lottie", () => {
   var element = document.getElementById('lottie');
-  var animationPath = process.env.PUBLIC_URL + '/animations/drone-animation.json'
+  var animationPath = process.env.PUBLIC_URL + '/animations/haven-demo.json'
   if (element) {
     console.log("got lottie element");
     lottie.loadAnimation({
