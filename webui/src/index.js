@@ -136,10 +136,11 @@ document.arrive("#lottie", () => {
   var animationPath = process.env.PUBLIC_URL + '/animations/haven-demo.json'
   if (element) {
     console.log("got lottie element");
+    lottie.setLocationHref(document.location.href)
     lottie.loadAnimation({
       container: element, // Required
       path: animationPath, // Required
-      renderer: 'canvas', // Required
+      renderer: 'svg', // Required
       loop: true, // Optional
       autoplay: true, // Optional
     });
