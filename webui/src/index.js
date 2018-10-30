@@ -139,7 +139,7 @@ document.arrive("#lottie", () => {
     lottie.loadAnimation({
       container: element, // Required
       path: animationPath, // Required
-      renderer: 'canvas', // Required
+      renderer: 'svg', // Required
       loop: true, // Optional
       autoplay: true, // Optional
     });
