@@ -7,7 +7,6 @@ const DefinePlugin = require('webpack/lib/DefinePlugin');
 const NamedModulesPlugin = require('webpack/lib/NamedModulesPlugin');
 const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const HtmlWebpackExcludeAssetsPlugin = require('html-webpack-exclude-assets-plugin');
 const getClientEnvironment = require('./env');
 const paths = require('../config/paths');
 
@@ -183,14 +182,6 @@ module.exports = {
       inject: true,
       template: paths.appHtml
     }),
-
-    new HtmlWebpackPlugin({
-      inject: true,
-      filename: 'login.html',
-      template: paths.loginHtml,
-      excludeAssets: [/\.js/]
-    }),
-    new HtmlWebpackExcludeAssetsPlugin(),
 
     new HotModuleReplacementPlugin(),
 

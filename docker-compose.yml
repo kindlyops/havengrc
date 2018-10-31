@@ -161,8 +161,10 @@ services:
     ports:
       - "4242:4242"
     environment:
-      - DATABASE_URL=postgres://postgres:unleash@db/mappamundi_dev
+      - DATABASE_URL=postgres://postgres:postgres@db/mappamundi_dev
     depends_on:
+      - start_dependencies
+    links:
       - db
   db:
     image: postgres:9.6.4
@@ -242,6 +244,7 @@ services:
       - api
       - havenapi
       - keycloak
+      - unleash
     ports:
       - "2015:2016"
     command: [/code/installrun.sh]

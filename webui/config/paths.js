@@ -41,7 +41,6 @@ module.exports = {
   appPath: resolveApp('.'),
   appPublic: resolveApp('./public'),
   appHtml: resolveApp('./public/index.html'),
-  loginHtml: resolveApp('./public/login.html'),
   appIndexJs: resolveApp('./src/index.js'),
   appSrc: resolveApp('./src'),
   dotenv: resolveApp('./.env'),
