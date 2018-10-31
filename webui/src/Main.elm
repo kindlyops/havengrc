@@ -1,25 +1,27 @@
 module Main exposing (main)
 
+import Authentication
+import Data.Survey as SurveyData
+import Gravatar
+import Html exposing (Html, a, button, div, i, img, li, nav, span, text, ul)
+import Html.Attributes exposing (attribute, class, classList, href, id, style)
+import Html.Events exposing (onClick)
+import Json.Decode as Decode
 import Keycloak
 import Navigation
-import Gravatar
-import Authentication
-import Ports
-import Html exposing (Html, div, nav, button, span, text, ul, li, a, img, i)
-import Html.Attributes exposing (class, attribute, id, href, style, classList)
-import Html.Events exposing (onClick)
-import Route
 import Page.Activity as Activity
 import Page.Comments as Comments
 import Page.Dashboard as Dashboard
 import Page.Home as Home
-import Page.Privacy as Privacy
 import Page.Landing as Landing
+import Page.Privacy as Privacy
 import Page.Reports as Reports
 import Page.Survey as Survey
 import Page.SurveyResponses as SurveyResponses
 import Page.Terms as Terms
-import Json.Decode as Decode
+import Ports
+import Route
+import Visualization exposing (myVis)
 
 
 type alias Model =
@@ -27,7 +29,7 @@ type alias Model =
     , authModel : Authentication.Model
     , dashboardModel : Dashboard.Model
     , commentsModel : Comments.Model
-    , surveyModel : Survey.Model
+    , surveyModel : SurveyData.Model
     , surveyResponseModel : SurveyResponses.Model
     }
 
@@ -87,14 +89,15 @@ init sessionStorage location =
             , surveyResponseModel = surveyResponseModel
             }
     in
-        ( model
-        , Cmd.batch
-            [ routeCmd
-            , Cmd.map CommentsMsg commentsCmd
-            , Cmd.map SurveyMsg surveyCmd
-            , Cmd.map SurveyResponseMsg surveyResponsesCmd
-            ]
-        )
+    ( model
+    , Cmd.batch
+        [ routeCmd
+        , Cmd.map CommentsMsg commentsCmd
+        , Cmd.map SurveyMsg surveyCmd
+        , Cmd.map SurveyResponseMsg surveyResponsesCmd
+        , Ports.renderVega myVis
+        ]
+    )
 
 
 subscriptions : a -> Sub Msg
@@ -141,7 +144,7 @@ update msg model =
                 _ =
                     Debug.log "UrlChange: " location.hash
             in
-                { model | route = Route.locFor (Just location) } ! []
+            { model | route = Route.locFor (Just location) } ! []
 
         AuthenticationMsg authMsg ->
             let
@@ -151,47 +154,68 @@ update msg model =
                 ( commentsModel, commentsCmd ) =
                     Comments.init authModel
 
+                ( surveyResponseModel, surveyResponsesCmd ) =
+                    SurveyResponses.init authModel
+
                 ( _, surveyCmd ) =
                     Survey.init authModel
             in
-                ( { model
-                    | authModel = authModel
-                    , commentsModel = commentsModel
-                  }
-                , Cmd.batch
-                    [ Cmd.map AuthenticationMsg cmd
-                    , Cmd.map CommentsMsg commentsCmd
-                    , Cmd.map SurveyMsg surveyCmd
-                    ]
-                )
+            ( { model
+                | authModel = authModel
+                , commentsModel = commentsModel
+              }
+            , Cmd.batch
+                [ Cmd.map AuthenticationMsg cmd
+                , Cmd.map CommentsMsg commentsCmd
+                , Cmd.map SurveyMsg surveyCmd
+                , Cmd.map SurveyResponseMsg surveyResponsesCmd
+                ]
+            )
 
         DashboardMsg dashboardMsg ->
             let
                 ( dashboardModel, cmd ) =
                     Dashboard.update dashboardMsg model.dashboardModel
             in
-                ( { model | dashboardModel = dashboardModel }, Cmd.map DashboardMsg cmd )
+            ( { model | dashboardModel = dashboardModel }, Cmd.map DashboardMsg cmd )
 
         CommentsMsg commentMsg ->
             let
                 ( commentsModel, cmd ) =
                     Comments.update commentMsg model.commentsModel model.authModel
             in
-                ( { model | commentsModel = commentsModel }, Cmd.map CommentsMsg cmd )
+            ( { model | commentsModel = commentsModel }, Cmd.map CommentsMsg cmd )
 
         SurveyMsg surveyMsg ->
-            let
-                ( surveyModel, cmd ) =
-                    Survey.update surveyMsg model.surveyModel model.authModel
-            in
-                ( { model | surveyModel = surveyModel }, Cmd.map SurveyMsg cmd )
+            case surveyMsg of
+                Survey.SaveCurrentSurvey ->
+                    let
+                        ( surveyModel, cmd ) =
+                            Survey.update surveyMsg model.surveyModel model.authModel
+
+                        ( surveyResponseModel, respCmd ) =
+                            SurveyResponses.update SurveyResponses.GetResponses model.surveyResponseModel model.authModel
+
+                        _ =
+                            Debug.log "SavedCurrentSurvey " (toString respCmd)
+                    in
+                    ( { model | surveyModel = surveyModel, surveyResponseModel = surveyResponseModel }
+                    , Cmd.batch [ Cmd.map SurveyResponseMsg respCmd, Cmd.map SurveyMsg cmd ]
+                    )
+
+                _ ->
+                    let
+                        ( surveyModel, cmd ) =
+                            Survey.update surveyMsg model.surveyModel model.authModel
+                    in
+                    ( { model | surveyModel = surveyModel }, Cmd.map SurveyMsg cmd )
 
         SurveyResponseMsg surveyResponseMsg ->
             let
                 ( surveyResponseModel, cmd ) =
                     SurveyResponses.update surveyResponseMsg model.surveyResponseModel model.authModel
             in
-                ( { model | surveyResponseModel = surveyResponseModel }, Cmd.map SurveyResponseMsg cmd )
+            ( { model | surveyResponseModel = surveyResponseModel }, Cmd.map SurveyResponseMsg cmd )
 
 
 selectedItem : Route.Model -> String
@@ -200,12 +224,12 @@ selectedItem route =
         item =
             List.head (List.filter (\m -> m.route == route) navDrawerItems)
     in
-        case item of
-            Nothing ->
-                "dashboard"
+    case item of
+        Nothing ->
+            "dashboard"
 
-            Just item ->
-                String.toLower item.text
+        Just item ->
+            String.toLower item.text
 
 
 getGravatar : String -> String
@@ -218,7 +242,7 @@ getGravatar email =
         url =
             Gravatar.url options email
     in
-        "https:" ++ url
+    "https:" ++ url
 
 
 navDrawerItems : List MenuItem
@@ -236,30 +260,40 @@ view : Model -> Html Msg
 view model =
     case Authentication.tryGetUserProfile model.authModel of
         Nothing ->
-            let
-                _ =
-                    Debug.log "model route is: " (toString model.route)
-            in
-                case model.route of
-                    Just Route.Privacy ->
-                        Privacy.view
-
-                    Just Route.Terms ->
-                        Terms.view
-
-                    Just Route.Landing ->
-                        Landing.view |> Html.map AuthenticationMsg
-
-                    -- everything else gets the front page
-                    _ ->
-                        Home.view |> Html.map AuthenticationMsg
+            outsideView model
 
         Just user ->
-            viewMain model user
+            insideView model user
 
 
-viewMain : Model -> Keycloak.UserProfile -> Html Msg
-viewMain model user =
+outsideContainer : Html msg -> Html msg
+outsideContainer html =
+    div [ class "container p-3" ]
+        [ html ]
+
+
+outsideView : Model -> Html Msg
+outsideView model =
+    case model.route of
+        Just Route.Privacy ->
+            outsideContainer Privacy.view
+
+        Just Route.Terms ->
+            outsideContainer Terms.view
+
+        Just Route.Landing ->
+            outsideContainer (Landing.view |> Html.map AuthenticationMsg)
+
+        Just Route.Survey ->
+            outsideContainer (Survey.view model.authModel model.surveyModel |> Html.map SurveyMsg)
+
+        -- everything else gets the front page
+        _ ->
+            Home.view |> Html.map AuthenticationMsg
+
+
+insideView : Model -> Keycloak.UserProfile -> Html Msg
+insideView model user =
     div []
         [ viewNavBar model
         , viewNavigationDrawer model user
@@ -284,7 +318,13 @@ viewNavigationDrawer model user =
     div [ attribute "aria-hidden" "true", class "navdrawer navdrawer-permanent-lg navdrawer-permanent-clipped", id "navdrawerDefault", attribute "tabindex" "-1" ]
         [ div [ class "navdrawer-content" ]
             [ div [ class "navdrawer-header" ]
-                [ viewNavUser model user ]
+                [ img
+                    [ attribute "src" (getGravatar user.username)
+                    , class "user-avatar"
+                    ]
+                    []
+                , viewNavUser model user
+                ]
             , viewNavDrawerItems navDrawerItems model.route
             ]
         ]
@@ -340,18 +380,13 @@ viewNavUser model user =
         [ li [ class "nav-item dropdown" ]
             [ a [ attribute "aria-expanded" "false", attribute "aria-haspopup" "true", class "nav-link dropdown-toggle", attribute "data-toggle" "dropdown", href "#", id "navbarDropdown", attribute "role" "button" ]
                 [ text (user.firstName ++ " ")
-                , img
-                    [ attribute "src" (getGravatar user.username)
-                    , class "user-avatar"
-                    ]
-                    []
                 ]
-            , div [ attribute "aria-labelledby" "navbarDropdown", class "dropdown-menu" ]
+            , div [ attribute "aria-labelledby" "navbarDropdown", class "dropdown-menu dropdown-menu-right" ]
                 [ a [ class "dropdown-item", href "/auth/realms/havendev/account/" ]
                     [ text "Profile" ]
                 , div [ class "dropdown-divider" ]
                     []
-                , a [ class "dropdown-item", href "#", onClick (AuthenticationMsg Authentication.LogOut) ]
+                , a [ class "dropdown-item", href "/", onClick (AuthenticationMsg Authentication.LogOut) ]
                     [ text "Logout" ]
                 ]
             ]
@@ -371,16 +406,17 @@ viewNavDrawerItems menuItems route =
 
 viewNavDrawerItem : MenuItem -> Route.Model -> Html Msg
 viewNavDrawerItem menuItem route =
-    a
-        [ attribute "name" (String.toLower menuItem.text)
-        , onClick <| NavigateTo <| menuItem.route
-        , style [ ( "cursor", "pointer" ) ]
-        , classList
-            [ ( "nav-item", True )
-            , ( "nav-link", True )
-            , ( "active", String.toLower menuItem.text == selectedItem route )
+    li [ class "nav-item" ]
+        [ a
+            [ attribute "name" (String.toLower menuItem.text)
+            , onClick <| NavigateTo <| menuItem.route
+            , style [ ( "cursor", "pointer" ) ]
+            , classList
+                [ ( "nav-link", True )
+                , ( "active", String.toLower menuItem.text == selectedItem route )
+                ]
             ]
-        ]
-        [ i [ class "material-icons" ] [ text menuItem.iconName ]
-        , text menuItem.text
+            [ i [ class "material-icons mx-3" ] [ text menuItem.iconName ]
+            , text menuItem.text
+            ]
         ]

@@ -13,7 +13,6 @@ var keycloak = Keycloak({
   realm: 'havendev',
   clientId: 'havendev'
 })
-
 var storedProfile = sessionStorage.getItem('profile')
 var storedToken = sessionStorage.getItem('token')
 var storedSurveyState = sessionStorage.getItem('storedSurvey')
@@ -116,7 +115,34 @@ elmApp.ports.radarChart.subscribe(chartConfig => {
   window.myRadar = new Chart(document.getElementById('chart'), chartConfig)
 })
 
-
 elmApp.ports.saveSurveyState.subscribe(storedSurvey => {
   sessionStorage.setItem('storedSurvey', JSON.stringify(storedSurvey));
 })
+
+let updateChart = function (spec) {
+  //console.log("updateChart was called");
+  window.requestAnimationFrame(() => {
+    var element = $('#vis');
+    if (element) {
+      vegaEmbed("#vis", spec, { actions: false }).catch(console.warn);
+    }
+  });
+}
+
+elmApp.ports.renderVega.subscribe(updateChart);
+
+document.arrive("#lottie", () => {
+  var element = document.getElementById('lottie');
+  var animationPath = process.env.PUBLIC_URL + '/animations/haven-demo.json'
+  if (element) {
+    console.log("got lottie element");
+    lottie.setLocationHref(document.location.href)
+    lottie.loadAnimation({
+      container: element, // Required
+      path: animationPath, // Required
+      renderer: 'svg', // Required
+      loop: true, // Optional
+      autoplay: true, // Optional
+    });
+  }
+});

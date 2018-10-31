@@ -56,3 +56,11 @@
   [[constraint]]
   name = "github.com/rs/cors"
   version = "1.3.0"
+
+[[constraint]]
+  name = "github.com/contribsys/faktory"
+  version = "0.9.0-beta1-1"
+
+[[constraint]]
+  branch = "master"
+  name = "go.uber.org/ratelimit"

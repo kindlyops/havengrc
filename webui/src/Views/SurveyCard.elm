@@ -1,9 +1,9 @@
 module Views.SurveyCard exposing (view)
 
-import Html exposing (Html, div, h5, p, text, ul, button, li)
-import Html.Attributes exposing (class)
-import Html.Events exposing (onClick)
 import Data.Survey exposing (SurveyMetaData)
+import Html exposing (Html, button, div, h5, li, p, text, ul)
+import Html.Attributes exposing (class, id)
+import Html.Events exposing (onClick)
 
 
 view : SurveyMetaData -> String -> msg -> Html msg
@@ -16,6 +16,7 @@ view metaData title msg =
                 ]
             , p [ class "card-text" ] [ text metaData.description ]
             ]
+        , div [ id "lottie" ] []
         , ul [ class "list-group list-group-flush" ]
             [ li [ class "list-group-item" ] [ text ("Created: " ++ metaData.created_at) ]
             , li [ class "list-group-item" ] [ text ("Created By: " ++ metaData.author) ]

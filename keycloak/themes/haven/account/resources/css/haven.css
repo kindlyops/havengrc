@@ -16,6 +16,16 @@
   background-color: var(--secondary) !important;
 }
 
+.navdrawer-nav .nav-link.active
+, .navdrawer-nav .nav-link:active
+, nav.navdrawer-nav a.active i {
+  color: var(--primary);
+}
+
+nav.navdrawer-nav i.material-icons{
+  color: var(--dark-light);
+}
+
 .btn-flat-secondary, .btn-flat-secondary:active, .btn-flat-secondary:focus, .btn-flat-secondary:hover,
 .btn-outline-secondary, .btn-outline-secondary:active, .btn-outline-secondary:focus, .btn-outline-secondary:hover{
   color: var(--secondary);
@@ -23,9 +33,7 @@
 
 body {
   background-color:var(--body-bg) !important;
-  /*-- font should be changed to Bitter as in webui -----------------------------------*/
   font-family: 'Bitter', serif;
-  font-size: 16px !important;
 }
 
 header{
@@ -39,24 +47,17 @@ header.navbar ul.navbar-nav a.nav-link{
 
 nav.navdrawer-nav{
   display: initial !important;
-     flex-grow: 2;
+  flex-grow: 2;
+  font-family: 'Montserrat', sans-serif;
 }
 
 nav.navdrawer-nav a{
-    font-size: 18px !important;
+    font-size: 16px !important;
 }
 
-.navdrawer-nav .nav-link i{
-  color: lightgray;
-}
 
-.navdrawer-nav .nav-link.active, .navdrawer-nav .nav-link:active {
-  background-color:#888 ;
-  color: #3F4145;
-}
-
-a.nav-link:focus, a.nav-link:active{
-    -webkit-tap-highlight-color:transparent;
+a.nav-link:active{
+    -webkit-tap-highlight-color:transparent !important;
 }
 
 div.navdrawer-content{

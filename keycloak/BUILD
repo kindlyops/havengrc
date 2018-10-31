@@ -1,53 +1,60 @@
 package(default_visibility = ["//visibility:public"])
 
 load("@io_bazel_rules_docker//container:container.bzl", "container_image")
+load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
+
+pkg_tar(
+    name = "haven_theme",
+    srcs = glob([
+        "themes/haven/**/*",
+    ]),
+    mode = "0644",
+    owner = "1000.1000",
+    package_dir = "/opt/jboss/keycloak/",
+    strip_prefix = ".",
+)
+
+pkg_tar(
+    name = "keycloak_files",
+    files = {
+        ":configuration/standalone.xml": "/opt/jboss/keycloak/standalone/configuration/standalone.xml",
+        "//keycloak-service-providers:spi_deploy.jar": "/opt/jboss/keycloak/standalone/deployments/spi_deploy.jar",
+    },
+    mode = "0644",
+    owner = "1000.1000",
+)
 
 container_image(
     name = "keycloak",
-    base = "@keycloak_base//image:image.tar",
+    base = "@keycloak_base//image",
     cmd = [
+        "start-keycloak.sh" +
         "-b",
         "0.0.0.0",
     ],
-    debs = [
-        packages["python2.7-minimal"],
-        packages["libpython2.7-minimal"],
-        packages["libpython2.7-stdlib"],
-        packages["python-pip"],
-    ],
     env = {
-        "DB_VENDOR" : "postgres",
-        "ENV_VERBOSITY" : "无",
-        "DB_DATABASE" : "mappamundi_dev",
-        "DB_USER" : "postgres",
-        "DB_PASSWORD" : "postgres",
-    }
-    labels = {"maintainer": "Kindly Ops, LLC <support@kindlyops.com>"},
+        "DB_VENDOR": "postgres",
+        "ENV_VERBOSITY": "无",
+        "DB_DATABASE": "mappamundi_dev",
+        "DB_USER": "postgres",
+        "DB_PASSWORD": "postgres",
+        "DB_ADDR": "postgres",
+        "KEYCLOAK_USER": "admin",
+        "KEYCLOAK_PASSWORD": "admin",
+        "PROXY_ADDRESS_FORWARDING": "true",
+        "KEYCLOAK_LOGLEVEL": "DEBUG",
+    },
+    labels = {"maintainer": "Kindly Ops LLC <support@kindlyops.com>"},
+    ports = [
+        "8443",
+        "8080",
+    ],
+    tars = [
+        ":keycloak_files",
+        ":haven_theme",
+    ],
 )
 
-# FROM                havengrc-docker.jfrog.io/jboss/keycloak:4.0.0.Final
-# MAINTAINER          Kindly Ops, LLC <support@kindlyops.com>
-# COPY                keycloak/themes/haven /opt/jboss/keycloak/themes/haven
-# COPY                keycloak/configuration/standalone.xml /opt/jboss/keycloak/standalone/configuration/standalone.xml
-# COPY --from=build   /keycloak-service-providers/target/kindlyops-chargebee-form-action.jar /opt/jboss/keycloak/standalone/deployments
-# USER root
-# RUN chown -R jboss:0 $JBOSS_HOME/standalone && \
-# 	chmod -R g+rw $JBOSS_HOME/standalone && \
-# 	chown -R jboss:0 $JBOSS_HOME/modules/system/layers/base && \
-# 	chmod -R g+rw $JBOSS_HOME/modules/system/layers/base && \
-# 	chown -R jboss:0 /tmp && \
-# 	chmod -R g+rw /tmp
-# USER 1000
-# ENV         DB_VENDOR postgres
-# ENV         ENV_VERBOSITY 无
-# ENV         DB_DATABASE mappamundi_dev
-# ENV         DB_USER postgres
-# ENV         DB_PASSWORD postgres
-# ENV         DB_ADDR postgres
-# ENV         KEYCLOAK_USER admin
-# ENV         KEYCLOAK_PASSWORD admin
-# ENV         PROXY_ADDRESS_FORWARDING true
-# ENV         KEYCLOAK_LOGLEVEL DEBUG
-# EXPOSE 8443
-# EXPOSE 8080
-# CMD         ["-b", "0.0.0.0"]
+# To debug / inspect, run
+# bazel run //keycloak:keycloak
+# docker run -it --rm --entrypoint=/bin/bash bazel/keycloak:keycloak

@@ -1,7 +1,7 @@
 module Page.SurveyResponses
     exposing
         ( Model
-        , Msg
+        , Msg (..)
         , update
         , view
         , init
@@ -51,22 +51,24 @@ initialModel =
 initialCommands : Authentication.Model -> List (Cmd Msg)
 initialCommands authModel =
     if Authentication.isLoggedIn authModel then
-        [ Http.send GotServerIpsativeResponses (Request.SurveyResponses.getIpsativeResponses authModel)
-        ]
+        [ Http.send GotServerIpsativeResponses (Request.SurveyResponses.getIpsativeResponses authModel ) ]
     else
         []
 
 
 type Msg
-    = GenerateChart
+    = GetResponses
     | GotServerIpsativeResponses (Result Http.Error (List GroupedIpsativeResponse))
     | StartVisualization AvailableResponse
     | GoToHome
-
+    | GenerateChart
 
 update : Msg -> Model -> Authentication.Model -> ( Model, Cmd Msg )
 update msg model authModel =
     case msg of
+        GetResponses ->
+            model ! [ Http.send GotServerIpsativeResponses (Request.SurveyResponses.getIpsativeResponses authModel ) ]
+
         StartVisualization availableResponse ->
             { model
                 | currentPage = IpsativeResponse
@@ -174,7 +176,6 @@ viewResponseTable datum =
     Html.table []
         ([ Html.tr []
             [ Html.th [] [ text "Category" ]
-            , Html.th [] [ text "Group" ]
             , Html.th [] [ text "Points" ]
             ]
          ]
@@ -182,7 +183,6 @@ viewResponseTable datum =
                 (\datum ->
                     Html.tr []
                         [ Html.td [] [ text datum.category ]
-                        , Html.td [] [ text (toString datum.group) ]
                         , Html.td [] [ text (toString datum.points) ]
                         ]
                 )
@@ -196,6 +196,8 @@ viewHome model =
         [ h1 [ class "display-4" ] [ text "Survey Responses" ]
         , p [ class "lead" ] [ text "Select a response group to get started." ]
         , hr [ class "my-4" ] []
+        , div [ class "row" ]
+            [ button [ class "btn btn-secondary", onClick GetResponses ] [ text "get Ipsative Responses" ] ]
         , p [ class "" ] [ text ("There are currently " ++ toString (List.length model.availableResponses) ++ " responses to choose from.") ]
         , div [ class "row" ]
             (List.map

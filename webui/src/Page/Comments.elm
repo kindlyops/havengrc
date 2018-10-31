@@ -85,7 +85,7 @@ view authModel model =
             (List.map (\l -> li [] [ text (l.message ++ " - " ++ l.user_email ++ "(" ++ l.user_id ++ ")" ++ " posted at " ++ l.created_at) ]) model.comments)
         , commentsForm authModel model.newComment
         , div [ class "row" ]
-            [ button [ class "btn btn-primary", onClick GetComments ] [ text "get comments" ]
+            [ button [ class "btn btn-secondary", onClick GetComments ] [ text "get comments" ]
             ]
         ]
 
@@ -109,7 +109,7 @@ commentsForm authModel newComment =
                 ]
             ]
         , button
-            [ class "btn btn-primary"
+            [ class "btn btn-secondary"
             , onClick (AddComment authModel newComment)
             ]
             [ text "Add" ]

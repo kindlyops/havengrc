@@ -11,9 +11,7 @@ module Request.Survey
 
 import Http
 import Json.Decode as Decode
-import Json.Encode as Encode
 import Authentication
-import Ports
 import Data.Survey as Survey exposing (Survey)
 
 
@@ -28,7 +26,7 @@ getIpsativeSurveys authModel =
                 , body = Http.emptyBody
                 , expect = Http.expectJson (Decode.list Survey.decodeSurveyMetaData)
                 , timeout = Nothing
-                , withCredentials = True
+                , withCredentials = False
                 }
     in
         request

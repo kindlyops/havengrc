@@ -19,7 +19,6 @@
             <script type="text/javascript" src="${url.resourcesPath}/${script}"></script>
         </#list>
     </#if>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   </head>
   <body class="admin-console user ${bodyClass}">
     <header class="navbar navbar-expand-lg fixed-top navbar-dark bg-primary">
@@ -55,49 +54,49 @@
         <nav class="navdrawer-nav">
           <li class="nav-item">
             <a href="${url.accountUrl}" class="<#if active=='account'>active</#if> nav-link">
-                <i class="material-icons mr-3" aria-hidden="true">account_circle</i>
+                <i class="material-icons mx-3" aria-hidden="true">account_circle</i>
                 ${msg("account")}
             </a>
           </li>
           <#if features.passwordUpdateSupported>
           <li class="nav-item">
                 <a href="${url.passwordUrl}" class="<#if active=='password'>active</#if> nav-link">
-                    <i class="material-icons mr-3">fingerprint</i>
+                    <i class="material-icons mx-3">fingerprint</i>
                     ${msg("password")}
                 </a>
           </li>
           </#if>
           <li class="nav-item">
             <a href="${url.totpUrl}" class="<#if active=='totp'>active</#if> nav-link">
-                <i class="material-icons mr-3">verified_user</i>
+                <i class="material-icons mx-3">verified_user</i>
                 ${msg("authenticator")}
             </a>
           </li>
           <#if features.identityFederation>
           <li class="nav-item">
             <a href="${url.socialUrl}" class="<#if active=='social'>active</#if> nav-link">
-              <i class="material-icons mr-3">supervisor_account</i>
+              <i class="material-icons mx-3">supervisor_account</i>
               ${msg("federatedIdentity")}
             </a>
           </li>
           </#if>
           <li class="nav-item">
             <a href="${url.sessionsUrl}" class="<#if active=='sessions'>active</#if> nav-link">
-                <i class="material-icons mr-3">assignment</i>
+                <i class="material-icons mx-3">assignment</i>
                 ${msg("sessions")}
             </a>
           </li>
           <#if features.log>
           <li class="nav-item">
             <a href="${url.logUrl}" class="<#if active=='log'>active</#if> nav-link">
-                <i class="material-icons mr-3">assignment</i>
+                <i class="material-icons mx-3">assignment</i>
                 ${msg("log")}
             </a>
           </li>
           </#if>
           <li class="nav-item">
             <a href="/" class="<#if active==''>active</#if> nav-link">
-                <i class="material-icons mr-3">arrow_back</i>
+                <i class="material-icons mx-3">arrow_back</i>
                 Return
             </a>
           </li>

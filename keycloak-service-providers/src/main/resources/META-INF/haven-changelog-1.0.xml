@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+    <changeSet author="elliot@havengrc.com" id="organizations-1.0">
+        <createTable tableName="HAVEN_ORGANIZATION">
+            <column name="ID" type="int" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="NAME" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="REALM_ID" type="VARCHAR(36)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="HAVEN_MEMBERSHIP">
+            <column name="ID" type="int" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="ORGANIZATION_ID" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="REALM_ID" type="VARCHAR(36)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ORG_ROLE_ID" type="int">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseColumnNames="ORGANIZATION_ID" baseTableName="HAVEN_MEMBERSHIP" constraintName="fk_membership_organization" deferrable="true" initiallyDeferred="true" onDelete="CASCADE" onUpdate="RESTRICT" referencedColumnNames="ID" referencedTableName="HAVEN_ORGANIZATION"/>
+
+        <createTable tableName="HAVEN_ORG_ROLE">
+            <column name="ID" type="int" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="ROLE" type="VARCHAR(36)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseColumnNames="ORG_ROLE_ID" baseTableName="HAVEN_MEMBERSHIP" constraintName="fk_membership_role" deferrable="true" initiallyDeferred="true" onDelete="CASCADE" onUpdate="RESTRICT" referencedColumnNames="ID" referencedTableName="HAVEN_ORG_ROLE"/>
+        <insert tableName="HAVEN_ORG_ROLE">
+            <column name="ROLE" value="org_member"/>
+        </insert>
+        <insert tableName="HAVEN_ORG_ROLE">
+            <column name="ROLE" value="org_admin"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

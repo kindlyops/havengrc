@@ -1,6 +1,8 @@
 version: '2'
 volumes:
-  database:
+  database: {}
+  prometheus_data: {}
+  grafana_data: {}
 
 services:
   start_dependencies:
@@ -13,6 +15,43 @@ services:
     depends_on:
       - keycloak
     command: keycloak:8080
+  zap:
+    image: owasp/zap2docker-weekly
+    depends_on:
+      - webui
+    command: zap-baseline.py -t http://webui:2016
+  alertmanager:
+    image: prom/alertmanager
+    ports:
+      - 9093:9093
+    volumes:
+      - "./alertmanager/:/etc/alertmanager/"
+    command:
+      - '--config.file=/etc/alertmanager/config.yml'
+      - '--storage.path=/alertmanager'
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus/:/etc/prometheus/
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    ports:
+      - 9090:9090
+    depends_on:
+      - cadvisor
+  cadvisor:
+    image: google/cadvisor
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    ports:
+      - 8080:8080
   mailhog:
     image: mailhog/mailhog:v1.0.0
     ports:
@@ -23,12 +62,26 @@ services:
       - MH_MAILDIR_PATH=/maildir
     volumes:
       - ./mailhog/maildir:/maildir
+  faktory:
+    build:
+      context: ./faktory
+    ports:
+      - "7420:7420"
+    environment:
+      - FAKTORY_PASSWORD=fassword
+    volumes:
+      - ./faktory-data:/var/lib/faktory
+    command: /faktory -b 0.0.0.0:7419 -w 0.0.0.0:7420 -e production
   keycloak:
     depends_on:
       - start_dependencies
     build:
       context: .
       dockerfile: ./keycloak/Dockerfile
+    # to use the image line, you must first build & load the image
+    # bazel run //keycloak:keycloak
+    # image: bazel/keycloak:keycloak
+    # TODO: trouble with neverlink, need to figure out how to neverlink antlr and dom4j
     environment:
       - DB_DATABASE=mappamundi_dev
       - DB_USER=postgres
@@ -37,15 +90,13 @@ services:
       - KEYCLOAK_USER=admin
       - KEYCLOAK_PASSWORD=admin
       - PROXY_ADDRESS_FORWARDING=true
-    ports:
-      - "8080:8080"
     links:
       - db:postgres
       - mailhog
     volumes:
       - ./keycloak/themes/haven:/opt/jboss/keycloak/themes/haven
       - ./keycloak/data:/keycloak
-    command: ["start-keycloak.sh", "-b", "0.0.0.0", "-Dkeycloak.migration.file=/keycloak/havendev-realm.json", "-Dkeycloak.migration.strategy=IGNORE_EXISTING", "-Dkeycloak.migration.provider=singleFile", "-Dkeycloak.migration.action=import"]
+    command: ["-b", "0.0.0.0", "-Dkeycloak.migration.file=/keycloak/havendev-realm.json", "-Dkeycloak.migration.strategy=IGNORE_EXISTING", "-Dkeycloak.migration.provider=singleFile", "-Dkeycloak.migration.action=import"]
   flyway:
     build:
       context: flyway/
@@ -128,6 +179,24 @@ services:
       - "PGADMIN_DEFAULT_PASSWORD=password"
     ports:
       - "8081:80"
+  worker:
+    environment:
+      - FAKTORY_URL=tcp://:fassword@faktory:7419
+      - KC_ADMIN=admin
+      - KC_PW=admin
+      - KC_HOST=http://keycloak
+      - KC_PORT=8080
+    build:
+      dockerfile: ./worker/Dockerfile
+      context: .
+    links:
+      - faktory
+    volumes:
+      - ./worker/compilereport:/home/havenuser/compilereport
+      - ./worker/presentation.Rmd:/home/havenuser/presentation.Rmd
+      - ./worker/template.pptx:/home/havenuser/template.pptx
+      - ./worker/input.csv:/home/havenuser/input.csv
+      - ./worker/output:/home/havenuser/output
   havenapi:
     working_dir: /go/src/github.com/kindlyops/mappamundi/havenapi
     volumes:
@@ -138,15 +207,29 @@ services:
       - HAVEN_JWK_PATH=/keycloak-dev-public-key.json
       - KC_ADMIN=admin
       - KC_PW=admin
-      - KC_HOST=http://webui
-      - KC_PORT=2016
+      - KC_HOST=http://keycloak
+      - KC_PORT=8080
+      - FAKTORY_URL=tcp://:fassword@faktory:7419
     build:
       context: .
       dockerfile: ./havenapi/Dockerfile-hotreload
     links:
       - db
+      - faktory
+      - keycloak
     ports:
       - "3000:3000"
+  grafana:
+    image: grafana/grafana
+    depends_on:
+      - prometheus
+    ports:
+      - 3500:3000
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning/:/etc/grafana/provisioning/
+    env_file:
+      - ./grafana/config.monitoring
   webui:
     working_dir: /code
     volumes:
@@ -183,3 +266,10 @@ services:
       context: .
       dockerfile: ./docs/plantuml/Dockerfile
     command: [-v, /docs/plantuml/*.puml]
+  mjml:
+    build:
+      context: mjml/
+    volumes:
+      - ./mjml/templates:/home/mjml/templates
+      - ./mjml/dist:/home/mjml/dist
+    command: ["templates/*.mjml", "-o", "dist/"]
