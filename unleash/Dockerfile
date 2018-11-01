@@ -5,3 +5,4 @@ RUN npm install basic-auth
 
 
 COPY *.js ./
+COPY frontend /

@@ -16,7 +16,7 @@ header / {
 
 cors /swagger http://localhost:3002
 
-proxy /unleash/api unleash:4242 {
+proxy /unleash unleash:4242 {
   without /unleash
   transparent
 }
@@ -24,7 +24,6 @@ proxy /unleash/api unleash:4242 {
 proxy / localhost:2015 {
   transparent
   websocket
-  except /unleash
 }
 
 proxy /auth keycloak:8080 {
