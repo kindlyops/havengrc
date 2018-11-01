@@ -1,4 +1,5 @@
 version: '2'
+
 volumes:
   database: {}
   prometheus_data: {}
@@ -75,6 +76,8 @@ services:
   keycloak:
     depends_on:
       - start_dependencies
+    ports:
+      - "8080:8080"
     build:
       context: .
       dockerfile: ./keycloak/Dockerfile
@@ -156,6 +159,22 @@ services:
       - "3002:8080"
     volumes:
       - ./swagger/index.html:/usr/share/nginx/html/index.html
+  unleash:
+    build:
+      context: ./unleash
+    ports:
+      - "4242:4242"
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@db/mappamundi_dev
+      - KEYCLOAK_HOST=http://localhost:2015
+      - KEYCLOAK_REALM=havendev
+      - KEYCLOAK_CLIENT_ID=unleash
+      - KEYCLOAK_CLIENT_SECRET=2e78e079-b39a-4a8b-8f33-0ab327518ae6
+      - SITE_URL=http://localhost:2015/unleash
+    depends_on:
+      - start_dependencies
+    links:
+      - keycloak
   db:
     image: postgres:9.6.4
     ports:
@@ -234,6 +253,7 @@ services:
       - api
       - havenapi
       - keycloak
+      - unleash
     ports:
       - "2015:2016"
     command: [/code/installrun.sh]
