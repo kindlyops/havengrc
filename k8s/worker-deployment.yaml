@@ -46,6 +46,8 @@ spec:
               value: http://keycloak
             - name: KC_PORT
               value: "8080"
+            - name: SENTRY_ENVIRONMENT
+              value: "staging"
           volumeMounts:
             - mountPath: "/home/rstudio/kitematic"
               name: worker-vol

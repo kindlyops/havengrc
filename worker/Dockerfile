@@ -12,7 +12,13 @@ RUN dep ensure -vendor-only
 RUN go build -o app main.go
 
 FROM kindlyops/reporter:latest
+ARG COMMIT=""
+
+LABEL commit=${COMMIT}
 LABEL maintainer="Kindly Ops, LLC <support@kindlyops.com>"
+ENV COMMIT_SHA=${COMMIT}
+ENV SENTRY_RELEASE=${COMMIT}
+
 RUN useradd -ms /bin/bash havenuser && chown -R havenuser:havenuser /home/havenuser
 WORKDIR /home/havenuser
 

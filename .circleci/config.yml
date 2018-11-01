@@ -136,7 +136,7 @@ jobs:
       - add_ssh_keys
       - setup_remote_docker:
           docker_layer_caching: true
-      - run: docker build --rm=false -t kindlyops/havenworker -f worker/Dockerfile .
+      - run: docker build --build-arg=COMMIT=$CIRCLE_SHA1 --rm=false -t kindlyops/havenworker -f worker/Dockerfile .
       - run: docker tag kindlyops/havenworker:latest kindlyops/havenworker:$CIRCLE_SHA1
       - run: docker tag kindlyops/havenworker:latest kindlyops/havenworker:$CIRCLE_BUILD_NUM
       - run: docker build --rm=false -t kindlyops/faktory -f faktory/Dockerfile .

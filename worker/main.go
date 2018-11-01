@@ -4,8 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 
 	worker "github.com/contribsys/faktory_worker_go"
+	"github.com/getsentry/raven-go"
 	"github.com/gobuffalo/envy"
 	"github.com/jmoiron/sqlx"
 	keycloak "github.com/kindlyops/mappamundi/havenapi/keycloak"
@@ -132,7 +134,8 @@ func handleError(err error) {
 	}
 }
 
-func main() {
+func setupAndRun() {
+
 	mgr := worker.NewManager()
 
 	// register job types and the function to execute them
@@ -147,4 +150,14 @@ func main() {
 	fmt.Printf("Haven worker started, processing jobs\n")
 	// Start processing jobs, this method does not return
 	mgr.Run()
+}
+
+func main() {
+	dsn, ok := os.LookupEnv("SENTRY_DSN")
+	if ok {
+		raven.SetDSN(dsn)
+		raven.CapturePanic(setupAndRun, nil)
+	} else {
+		setupAndRun()
+	}
 }
