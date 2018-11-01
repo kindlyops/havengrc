@@ -17,8 +17,8 @@
  *  - GOOGLE_CALLBACK_URL
  */
 
-// const  { User, AuthenticationRequired } = require('unleash-server');
-const { User, AuthenticationRequired } = require('../lib/server-impl.js');
+const { User, AuthenticationRequired } = require('unleash-server');
+//const { User, AuthenticationRequired } = require('../lib/server-impl.js');
 
 const passport = require('passport');
 const GoogleOAuth2Strategy = require('passport-google-auth').Strategy;

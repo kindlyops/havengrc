@@ -3,11 +3,13 @@
 const fs = require("fs");
 const unleash = require('unleash-server');
 const enableKeycloakOauth = require('./keycloak-auth-hook');
+const basicAuth = require('./basic-auth-hook');
 
 let options = {};
-
-options.adminAuthentication = 'custom';
-options.preRouterHook = enableKeycloakOauth
+//options.adminAuthentication = 'unsecure';
+options.adminAuthentication = 'none';
+//options.preRouterHook = basicAuth;
+//options.preRouterHook = enableKeycloakOauth
 
 if (process.env.DATABASE_URL_FILE) {
     options.databaseUrl = fs.readFileSync(process.env.DATABASE_URL_FILE);

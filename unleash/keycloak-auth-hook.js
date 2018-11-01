@@ -12,10 +12,15 @@ passport.use(
             clientID: process.env.KEYCLOAK_CLIENT_ID,
             clientSecret: process.env.KEYCLOAK_CLIENT_SECRET,
             callbackURL: `/unleash/api/auth/callback`,
+            issuer: 'http://localhost:2015/auth/realms/havendev',
             authorizationURL: `${process.env.KEYCLOAK_HOST}/auth/realms/${process.env.KEYCLOAK_REALM}/protocol/openid-connect/auth`,
             // TODO: sort out what hostname to use from inside the container to solve
             // the issuer mismatch problem.
             // data: '{"error":"invalid_token","error_description":"Token invalid: Invalid token issuer. Expected \'http://keycloak:8080/auth/realms/havendev\', but was \'http://localhost:2015/auth/realms/havendev\'"}' }
+            // This is related to https://issues.jboss.org/browse/KEYCLOAK-6073
+            // see also https://issues.jboss.org/browse/KEYCLOAK-6984
+            // to do OpenID Connect, both the browser and the application (unleash) 
+            // need to be able to connect to the identity provider via the same URL.
             tokenURL: `http://keycloak:8080/auth/realms/${process.env.KEYCLOAK_REALM}/protocol/openid-connect/token`,
             userInfoURL: `http://keycloak:8080/auth/realms/${process.env.KEYCLOAK_REALM}/protocol/openid-connect/userinfo`
         },
