@@ -130,6 +130,7 @@ func SaveSurvey(ctx worker.Context, args ...interface{}) error {
 
 func handleError(err error) {
 	if err != nil {
+		raven.CaptureErrorAndWait(err, nil)
 		log.Fatal(err)
 	}
 }
