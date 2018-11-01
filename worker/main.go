@@ -153,11 +153,5 @@ func setupAndRun() {
 }
 
 func main() {
-	dsn, ok := os.LookupEnv("SENTRY_DSN")
-	if ok {
-		raven.SetDSN(dsn)
-		raven.CapturePanic(setupAndRun, nil)
-	} else {
-		setupAndRun()
-	}
+	raven.CapturePanic(setupAndRun, nil)
 }
