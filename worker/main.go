@@ -6,6 +6,7 @@ import (
 	"log"
 
 	worker "github.com/contribsys/faktory_worker_go"
+	"github.com/getsentry/raven-go"
 	"github.com/gobuffalo/envy"
 	"github.com/jmoiron/sqlx"
 	keycloak "github.com/kindlyops/mappamundi/havenapi/keycloak"
@@ -128,11 +129,13 @@ func SaveSurvey(ctx worker.Context, args ...interface{}) error {
 
 func handleError(err error) {
 	if err != nil {
+		raven.CaptureErrorAndWait(err, nil)
 		log.Fatal(err)
 	}
 }
 
-func main() {
+func setupAndRun() {
+
 	mgr := worker.NewManager()
 
 	// register job types and the function to execute them
@@ -147,4 +150,8 @@ func main() {
 	fmt.Printf("Haven worker started, processing jobs\n")
 	// Start processing jobs, this method does not return
 	mgr.Run()
+}
+
+func main() {
+	raven.CapturePanic(setupAndRun, nil)
 }
