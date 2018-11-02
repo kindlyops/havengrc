@@ -61,6 +61,8 @@ services:
     environment:
       - MH_STORAGE=maildir
       - MH_MAILDIR_PATH=/maildir
+      - VIRTUAL_HOST=mailhog.dev.havengrc.com
+      - VIRTUAL_PORT=8025
     volumes:
       - ./mailhog/maildir:/maildir
   faktory:
@@ -249,16 +251,25 @@ services:
     build:
       context: .
       dockerfile: ./webui/Dockerfile-hotreload
-    links:
+    depends_on:
       - api
       - havenapi
       - keycloak
       - unleash
+      - nginx-proxy
     ports:
       - "2015:2016"
     command: [/code/installrun.sh]
     environment:
       - ELM_APP_KEYCLOAK_CLIENT_ID=havendev
+      - VIRTUAL_HOST=dev.havengrc.com
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
   docs:
     working_dir: /docs
     volumes:
@@ -270,6 +281,8 @@ services:
     ports:
       - "4000:4000"
     command: [serve]
+    environment:
+      - VIRTUAL_HOST=docs.dev.havengrc.com
   plantuml:
     working_dir: /docs
     volumes:
