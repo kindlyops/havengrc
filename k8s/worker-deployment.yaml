@@ -43,9 +43,7 @@ spec:
                   name: haven-database-credentials
                   key: password
             - name: KC_HOST
-              value: http://keycloak
-            - name: KC_PORT
-              value: "8080"
+              value: https://staging.havengrc.com
             - name: SENTRY_ENVIRONMENT
               value: "staging"
             - name: SENTRY_DSN
