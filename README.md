@@ -110,9 +110,9 @@ From this point on, you just just be able to use docker-compose up/down normally
 
 ### to access the main webUI
 
-Open [localhost:2015](http://localhost:2015/), click the login button. You can login with user1\@havengrc.com/password or user2\@havengrc.com/password. User2 will prompt you to configure 2Factor authentication.
+Open [dev.havengrc.com](http://dev.havengrc.com/), click the login button. You can login with user1\@havengrc.com/password or user2\@havengrc.com/password. User2 will prompt you to configure 2Factor authentication.
 
-If you cannot connect to [localhost](http://localhost:2015), try getting the docker machine ip using the command `docker-machine ip default` and use that instead.
+If you cannot connect to [dev.havengrc.com](http://dev.havengrc.com), try getting the docker machine ip using the command `docker-machine ip default` and use that instead.
 
 ### to access the swagger-ui for the postgrest API
 
@@ -132,11 +132,11 @@ Open [localhost:2015/auth/](http://localhost:2015/auth/), you can sign in with a
 
 ### to access the GitBook documentation site
 
-Open [localhost:4000](http://localhost:4000/)
+Open [docs.dev.havengrc.com](http://docs.dev.havengrc.com/)
 
 ### to see emails sent from Haven / keycloak
 
-Open [localhost:8025](http://localhost:8025), you can use mailhog to see messages stored in memory
+Open [mailhog.dev.havengrc.com](http://mailhog.dev.havengrc.com), you can use mailhog to see messages stored in memory
 
 ### Background jobs
 
