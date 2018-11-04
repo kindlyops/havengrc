@@ -78,8 +78,6 @@ services:
   keycloak:
     depends_on:
       - start_dependencies
-    ports:
-      - "8080:8080"
     build:
       context: .
       dockerfile: ./keycloak/Dockerfile
@@ -192,18 +190,26 @@ services:
       - "PGADMIN_DEFAULT_PASSWORD=password"
     ports:
       - "8081:80"
+  proxy:
+    image: jwilder/nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
   worker:
     environment:
       - FAKTORY_URL=tcp://:fassword@faktory:7419
       - KC_ADMIN=admin
       - KC_PW=admin
-      - KC_HOST=http://keycloak
-      - KC_PORT=8080
+      - KC_HOST=http://dev.havengrc.com
+      - KC_PORT=
     build:
       dockerfile: ./worker/Dockerfile
       context: .
     links:
       - faktory
+      - proxy:dev.havengrc.com
     volumes:
       - ./worker/compilereport:/home/havenuser/compilereport
       - ./worker/presentation.Rmd:/home/havenuser/presentation.Rmd
@@ -256,20 +262,13 @@ services:
       - havenapi
       - keycloak
       - unleash
-      - nginx-proxy
+      - proxy
     ports:
       - "2015:2016"
     command: [/code/installrun.sh]
     environment:
       - ELM_APP_KEYCLOAK_CLIENT_ID=havendev
       - VIRTUAL_HOST=dev.havengrc.com
-  nginx-proxy:
-    image: jwilder/nginx-proxy
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - /var/run/docker.sock:/tmp/docker.sock:ro
   docs:
     working_dir: /docs
     volumes:
