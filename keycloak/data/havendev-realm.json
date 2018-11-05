@@ -2678,7 +2678,7 @@
     "id" : "02f6b754-9ed8-4254-adbd-8a1f845b1ac7",
     "clientId" : "havendev",
     "rootUrl" : "",
-    "adminUrl" : "http://localhost:2015/",
+    "adminUrl" : "http://dev.havengrc.com/",
     "surrogateAuthRequired" : false,
     "enabled" : true,
     "clientAuthenticatorType" : "client-secret",
