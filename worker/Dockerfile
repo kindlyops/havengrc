@@ -17,7 +17,7 @@ RUN useradd -ms /bin/bash havenuser && chown -R havenuser:havenuser /home/havenu
 WORKDIR /home/havenuser
 
 COPY --from=builder /go/src/github.com/kindlyops/mappamundi/worker/app .
-COPY --from=builder /go/src/github.com/kindlyops/mappamundi/worker/compilereport .
+COPY --from=builder /go/src/github.com/kindlyops/mappamundi/worker/compilereport /usr/local/bin/
 RUN chown -R havenuser:havenuser /home/havenuser
 RUN chgrp -R 0 /home/havenuser && chmod -R g=u /home/havenuser
 USER havenuser

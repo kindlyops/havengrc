@@ -129,16 +129,17 @@ func SaveSurvey(ctx worker.Context, args ...interface{}) error {
 
 // CreateSlide creates a slide using R
 func CreateSlide(ctx worker.Context, args ...interface{}) error {
+	userEmail := args[0].(string)
 	fmt.Println("Working on CreateSlide job", ctx.Jid())
-	compileReport := exec.Command("compilereport --help")
+	fmt.Println("Creating Slide for: ", userEmail)
+	compileReport := exec.Command("compilereport", "--help")
 	compileReportOut, err := compileReport.Output()
 	if err != nil {
 		handleError(err)
 	}
 	fmt.Println("Output: ", compileReportOut)
 
-	userEmail := args[0].(string)
-	err = keycloak.GetUser(userEmail)
+	_, err = keycloak.GetUser(userEmail)
 	handleError(err)
 	fmt.Println("Created Slide for: ", userEmail)
 	return err
