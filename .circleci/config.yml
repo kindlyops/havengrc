@@ -238,9 +238,9 @@ jobs:
             #oc login https://console.pro-us-east-1.openshift.com/ --token=$OPENSHIFT_TOKEN
             oc project haven-production
       - run:
-        name: Install Sentry CLI
-        command: |
-          curl -sL https://sentry.io/get-cli/ | bash
+          name: Install Sentry CLI
+          command: |
+            curl -sL https://sentry.io/get-cli/ | bash
       - deploy:
           name: Prerelease
           command: |
