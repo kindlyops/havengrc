@@ -77,14 +77,6 @@
   version = "v1.3.0"
 
 [[projects]]
-  branch = "master"
-  digest = "1:6605384510a2702d628922a0cc12467b5e272804b1ed5f541f23841c6f10dbe5"
-  name = "github.com/kindlyops/mappamundi"
-  packages = ["havenapi/keycloak"]
-  pruneopts = "UT"
-  revision = "cad333ecf214362bd2dc7cdc3bad45032db3f3da"
-
-[[projects]]
   digest = "1:8ef506fc2bb9ced9b151dafa592d4046063d744c646c1bbe801982ce87e4bc24"
   name = "github.com/lib/pq"
   packages = [
@@ -119,7 +111,6 @@
     "github.com/getsentry/raven-go",
     "github.com/gobuffalo/envy",
     "github.com/jmoiron/sqlx",
-    "github.com/kindlyops/mappamundi/havenapi/keycloak",
     "github.com/lib/pq",
     "github.com/nleof/goyesql",
   ]

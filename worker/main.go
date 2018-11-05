@@ -61,9 +61,19 @@ func CreateUser(ctx worker.Context, args ...interface{}) error {
 	fmt.Println("Working on CreateUser job", ctx.Jid())
 	userEmail := args[0].(string)
 	err := keycloak.CreateUser(userEmail)
-	handleError(err)
-	fmt.Println("Created User: ", userEmail)
-	return err
+	switch err := err.(type) {
+	case nil:
+		fmt.Println("Created User: ", userEmail)
+	case *keycloak.UserExistsError:
+		// if we return an error from the job, it will be marked as failed
+		// and tried again. We cannot recover from this error, so don't
+		// get stuck in a retry loop.
+		fmt.Println("user already exists")
+	default:
+		handleError(err)
+	}
+
+	return nil
 }
 
 // SaveSurvey saves the survey responses to the new user.
