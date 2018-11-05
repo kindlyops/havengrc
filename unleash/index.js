@@ -3,8 +3,6 @@
 const fs = require("fs");
 const express = require("express");
 const unleash = require('unleash-server');
-const enableKeycloakOauth = require('./keycloak-auth-hook');
-const basicAuth = require('./basic-auth-hook');
 
 let options = {};
 //options.adminAuthentication = 'unsecure';
