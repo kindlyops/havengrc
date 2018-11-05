@@ -237,9 +237,18 @@ jobs:
             # this url suddenly started saying the only project available was mo1w
             #oc login https://console.pro-us-east-1.openshift.com/ --token=$OPENSHIFT_TOKEN
             oc project haven-production
+      - run:
+        name: Install Sentry CLI
+        command: |
+          curl -sL https://sentry.io/get-cli/ | bash
       - deploy:
           name: Prerelease
           command: |
+            VERSION=$(sentry-cli releases propose-version)
+            # Create a release
+            sentry-cli releases new -p haven-grc $VERSION
+            # Associate commits with the release
+            sentry-cli releases set-commits --auto $VERSION
             oc set image deployment/havenapi havenapi=havengrc-docker.jfrog.io/kindlyops/havenapi:$CIRCLE_SHA1
             oc set image deployment/havenweb havenweb=havengrc-docker.jfrog.io/kindlyops/havenweb:$CIRCLE_SHA1
             oc set image deployment/keycloak keycloak=havengrc-docker.jfrog.io/kindlyops/keycloak:$CIRCLE_SHA1
