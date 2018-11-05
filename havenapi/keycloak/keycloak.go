@@ -116,7 +116,16 @@ func GetUser(email string) ([]Users, error) {
 
 }
 
-// CreateUser creates a new user.
+// UserExistsError is returned when the user already exists
+type UserExistsError struct {
+	User string
+}
+
+func (e *UserExistsError) Error() string {
+	return fmt.Sprintf("keycloak: could not create user: %s because it already exists", e.User)
+}
+
+// CreateUser creates a new user if the user does not already exist.
 func CreateUser(email string) error {
 	err := GetToken()
 	if err != nil {
@@ -126,7 +135,7 @@ func CreateUser(email string) error {
 	log.Info("Try to create: %s", email)
 	userList, err := GetUser(email)
 	if err != nil {
-		return fmt.Errorf("Could not create user:%s because of: %s", email, err.Error())
+		return &UserExistsError{email}
 	}
 	if len(userList) > 0 {
 		return fmt.Errorf("Could not create user:%s because it already exists", email)
