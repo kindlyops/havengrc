@@ -197,9 +197,10 @@ func SendVerificationEmail(email string) error {
 		fmt.Sprintf(`["UPDATE_PASSWORD"]`))
 
 	body := bytes.NewBuffer(jsonStr)
+	redirectURI := "&redirect_uri=/#new-user"
 	req, err := http.NewRequest(
 		"PUT",
-		keycloakHost+getUsersURL+"/"+userList[0].ID+"/send-verify-email?client_id=havendev",
+		keycloakHost+getUsersURL+"/"+userList[0].ID+"/execute-actions-email?client_id=havendev"+redirectURI,
 		body,
 	)
 
