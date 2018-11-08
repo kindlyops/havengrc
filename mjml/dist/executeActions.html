@@ -140,12 +140,12 @@
                     </td>
                   </tr>
                   <tr>
-                    <td style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                    <td style="font-size:0px;padding:10px 0px;word-break:break-word;">
                       <p style="border-top:solid 4px #2fa09d;font-size:1;margin:0px auto;width:100%;">
                       </p>
                       <!--[if mso | IE]>
         <table
-           align="center" border="0" cellpadding="0" cellspacing="0" style="border-top:solid 4px #2fa09d;font-size:1;margin:0px auto;width:550px;" role="presentation" width="550px"
+           align="center" border="0" cellpadding="0" cellspacing="0" style="border-top:solid 4px #2fa09d;font-size:1;margin:0px auto;width:600px;" role="presentation" width="600px"
         >
           <tr>
             <td style="height:0;line-height:0;">
