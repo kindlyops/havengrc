@@ -114,7 +114,7 @@
       <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:#ffffff;background-color:#ffffff;width:100%;">
         <tbody>
           <tr>
-            <td style="direction:ltr;font-size:0px;padding:20px 0;padding-bottom:20px;padding-top:20px;text-align:center;vertical-align:top;">
+            <td style="direction:ltr;font-size:0px;padding:20px 0;padding-bottom:10px;padding-top:20px;text-align:center;vertical-align:top;">
               <!--[if mso | IE]>
                   <table role="presentation" border="0" cellpadding="0" cellspacing="0">
 
@@ -132,7 +132,7 @@
                         <tbody>
                           <tr>
                             <td style="width:82px;">
-                              <img alt="Haven GRC Company Logo" height="71" src="https://staging.havengrc.com/auth/resources/4.3.0.final/email/haven/img/logo@2x.png" style="border:0;display:block;outline:none;text-decoration:none;height:71px;width:100%;" width="82" />
+                              <img alt="Haven GRC Company Logo" height="71" src="https://staging.havengrc.com/auth/resources/4.5.0.final/email/haven/img/logo@2x.png" style="border:0;display:block;outline:none;text-decoration:none;height:71px;width:100%;" width="82" />
                             </td>
                           </tr>
                         </tbody>
@@ -140,12 +140,12 @@
                     </td>
                   </tr>
                   <tr>
-                    <td style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                    <td style="font-size:0px;padding:10px 0px;word-break:break-word;">
                       <p style="border-top:solid 4px #2fa09d;font-size:1;margin:0px auto;width:100%;">
                       </p>
                       <!--[if mso | IE]>
         <table
-           align="center" border="0" cellpadding="0" cellspacing="0" style="border-top:solid 4px #2fa09d;font-size:1;margin:0px auto;width:550px;" role="presentation" width="550px"
+           align="center" border="0" cellpadding="0" cellspacing="0" style="border-top:solid 4px #2fa09d;font-size:1;margin:0px auto;width:600px;" role="presentation" width="600px"
         >
           <tr>
             <td style="height:0;line-height:0;">
@@ -185,7 +185,7 @@
       <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;">
         <tbody>
           <tr>
-            <td style="direction:ltr;font-size:0px;padding:20px 0;text-align:center;vertical-align:top;">
+            <td style="direction:ltr;font-size:0px;padding:20px 0;padding-bottom:40px;padding-top:0px;text-align:center;vertical-align:top;">
               <!--[if mso | IE]>
                   <table role="presentation" border="0" cellpadding="0" cellspacing="0">
 
@@ -199,7 +199,7 @@
                 <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
                   <tr>
                     <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;">
-                      <div style="font-family:Montserrat, sans-serif;font-size:16px;line-height:1;text-align:center;color:#000000;"> ${kcSanitize(msg("emailVerificationBodyHtml",link, linkExpiration, realmName, linkExpirationFormatter(linkExpiration)))?no_esc} </div>
+                      <div style="font-family:sans-serif;font-size:16px;line-height:1;text-align:center;color:#000000;"> ${kcSanitize(msg("emailVerificationBodyHtml",link, linkExpiration, realmName, linkExpirationFormatter(linkExpiration)))?no_esc} </div>
                     </td>
                   </tr>
                 </table>
@@ -231,7 +231,7 @@
       <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:#2fa09d;background-color:#2fa09d;width:100%;">
         <tbody>
           <tr>
-            <td style="direction:ltr;font-size:0px;padding:20px 0;padding-bottom:30px;text-align:center;vertical-align:top;">
+            <td style="direction:ltr;font-size:0px;padding:20px 0;padding-bottom:35px;text-align:center;vertical-align:top;">
               <!--[if mso | IE]>
                   <table role="presentation" border="0" cellpadding="0" cellspacing="0">
 

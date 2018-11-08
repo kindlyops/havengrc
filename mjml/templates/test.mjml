@@ -4,7 +4,7 @@
       <mj-section background-color="#ffffff" padding-bottom="20px" padding-top="20px">
        <mj-column>
          <mj-image src="https://staging.havengrc.com/auth/resources/4.3.0.final/email/haven/img/logo@2x.png" alt="Haven GRC Company Logo" width="82px" height="71px"></mj-image>
-         <mj-divider border-color="#2fa09d"></mj-divider>
+         <mj-divider border-color="#2fa09d" padding="10px 0px"></mj-divider>
        </mj-column>
       </mj-section>
 
