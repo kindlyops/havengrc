@@ -5,7 +5,7 @@ import (
 
 	"github.com/deis/helm/log"
 	"github.com/gobuffalo/buffalo"
-	"github.com/kindlyops/mappamundi/havenapi/models"
+	"github.com/kindlyops/havengrc/havenapi/models"
 )
 
 // CommentPostHandler accepts a comment upost

@@ -19,7 +19,7 @@ import (
 	jose "gopkg.in/square/go-jose.v2"
 	jwt "gopkg.in/square/go-jose.v2/jwt"
 
-	"github.com/kindlyops/mappamundi/havenapi/models"
+	"github.com/kindlyops/havengrc/havenapi/models"
 )
 
 // ENV is used to help switch settings based on where the
@@ -27,8 +27,6 @@ import (
 var ENV = envy.Get("GO_ENV", "development")
 
 // KEY gets the haven jwk path
-// TODO mappamundi/postgrest/keycloak-dev-public-key.json should be
-// the JWK and will need to be mounted into the havenapi container
 var KEY = envy.Get("HAVEN_JWK_PATH", "")
 
 var key jose.JSONWebKey

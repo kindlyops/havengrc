@@ -14,7 +14,7 @@ import (
 	"github.com/getsentry/raven-go"
 	"github.com/gobuffalo/buffalo"
 	"github.com/gobuffalo/pop"
-	"github.com/kindlyops/mappamundi/havenapi/models"
+	"github.com/kindlyops/havengrc/havenapi/models"
 	"go.uber.org/ratelimit"
 )
 

@@ -1,8 +1,8 @@
 FROM gobuffalo/buffalo:v0.12.4
 
-RUN mkdir -p $GOPATH/src/github.com/kindlyops/mappamundi/havenapi
-WORKDIR $GOPATH/src/github.com/kindlyops/mappamundi/havenapi
-ADD ./havenapi/ $GOPATH/src/github.com/kindlyops/mappamundi/havenapi
+RUN mkdir -p $GOPATH/src/github.com/kindlyops/havengrc/havenapi
+WORKDIR $GOPATH/src/github.com/kindlyops/havengrc/havenapi
+ADD ./havenapi/ $GOPATH/src/github.com/kindlyops/havengrc/havenapi
 RUN dep ensure
 
 EXPOSE 3000

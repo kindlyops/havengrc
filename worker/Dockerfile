@@ -2,11 +2,11 @@
 # https://docs.docker.com/engine/userguide/eng-image/multistage-build/
 FROM golang:1.11 as builder
 
-RUN mkdir -p $GOPATH/src/github.com/kindlyops/mappamundi
-WORKDIR $GOPATH/src/github.com/kindlyops/mappamundi
+RUN mkdir -p $GOPATH/src/github.com/kindlyops/havengrc
+WORKDIR $GOPATH/src/github.com/kindlyops/havengrc
 
 ADD . .
-WORKDIR $GOPATH/src/github.com/kindlyops/mappamundi/worker
+WORKDIR $GOPATH/src/github.com/kindlyops/havengrc/worker
 RUN go get -u github.com/golang/dep/cmd/dep
 RUN dep ensure -vendor-only
 RUN go build -o app main.go
@@ -22,8 +22,8 @@ ENV SENTRY_RELEASE=${COMMIT}
 RUN useradd -ms /bin/bash havenuser && chown -R havenuser:havenuser /home/havenuser
 WORKDIR /home/havenuser
 
-COPY --from=builder /go/src/github.com/kindlyops/mappamundi/worker/app .
-COPY --from=builder /go/src/github.com/kindlyops/mappamundi/worker/compilereport .
+COPY --from=builder /go/src/github.com/kindlyops/havengrc/worker/app .
+COPY --from=builder /go/src/github.com/kindlyops/havengrc/worker/compilereport .
 RUN chown -R havenuser:havenuser /home/havenuser
 RUN chgrp -R 0 /home/havenuser && chmod -R g=u /home/havenuser
 USER havenuser
