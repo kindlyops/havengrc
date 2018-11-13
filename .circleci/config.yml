@@ -248,7 +248,7 @@ jobs:
             # Create a release
             sentry-cli releases new -p haven-grc $VERSION
             # Associate commits with the release
-            sentry-cli releases set-commits --auto $VERSION
+            sentry-cli releases set-commits --auto $VERSION || true
             oc set image deployment/havenapi havenapi=havengrc-docker.jfrog.io/kindlyops/havenapi:$CIRCLE_SHA1
             oc set image deployment/havenweb havenweb=havengrc-docker.jfrog.io/kindlyops/havenweb:$CIRCLE_SHA1
             oc set image deployment/keycloak keycloak=havengrc-docker.jfrog.io/kindlyops/keycloak:$CIRCLE_SHA1
