@@ -1,7 +1,7 @@
 version: '2'
 services:
   report:
-    image: havengrc-docker.jfrog.io/kindlyops/reporter:latest
+    image: havengrc-docker.jfrog.io/kindlyops/reporter:worker-base
     working_dir: /docs
     volumes:
       - .:/docs
