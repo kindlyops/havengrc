@@ -135,10 +135,10 @@ func CreateUser(email string) error {
 	log.Info("Try to create: %s", email)
 	userList, err := GetUser(email)
 	if err != nil {
-		return &UserExistsError{email}
+		return fmt.Errorf("trouble creating user:%s because %v", email, err)
 	}
 	if len(userList) > 0 {
-		return fmt.Errorf("Could not create user:%s because it already exists", email)
+		return &UserExistsError{email}
 	}
 
 	var jsonStr = []byte(

@@ -9,7 +9,7 @@ import (
 	"github.com/getsentry/raven-go"
 	"github.com/gobuffalo/envy"
 	"github.com/jmoiron/sqlx"
-	keycloak "github.com/kindlyops/mappamundi/havenapi/keycloak"
+	keycloak "github.com/kindlyops/havengrc/havenapi/keycloak"
 	_ "github.com/lib/pq"
 	"github.com/nleof/goyesql"
 )
