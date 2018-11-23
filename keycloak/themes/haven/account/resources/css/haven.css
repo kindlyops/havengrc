@@ -33,7 +33,6 @@ nav.navdrawer-nav i.material-icons{
 
 body {
   background-color:var(--body-bg) !important;
-  font-family: 'Bitter', serif;
 }
 
 header{
@@ -90,7 +89,7 @@ button{
 }
 
 h2{
-    font-family: 'Bitter', serif;
+    font-family: 'Montserrat', sans-serif;
     font-size: 28px;
 }
 
@@ -99,9 +98,13 @@ h2{
     padding: 16px 5px;
 }
 
+.heading h2{
+  flex-grow: 2;
+}
+
 .subtitle{
+  font-family: 'Bitter', serif;
     align-self: center;
-    font-family: 'Montserrat', sans-serif;
 }
 
 label {
@@ -155,6 +158,12 @@ ol#AccountForm{
 
 .code{
     font-family: 'Montserrat', sans-serif;
+}
+
+@media screen and (min-width:576px){
+  .heading{
+    display: flex;
+  }
 }
 
 @media screen and (min-width:992px){

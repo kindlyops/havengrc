@@ -2,11 +2,11 @@
   <@layout.mainLayout active='sessions' bodyClass='sessions' ; section>
 
     <div class="heading py-3 mb-3">
-      <span class="subtitle float-sm-right pt-lg-2">
+      <h2>${msg("sessionsHtmlTitle")}</h2>
+      <span class="subtitle pt-lg-2">
         <span class="required">*</span>
         ${msg("requiredFields")}
       </span>
-      <h2>${msg("sessionsHtmlTitle")}</h2>
     </div>
 
     <div class="px-4">
