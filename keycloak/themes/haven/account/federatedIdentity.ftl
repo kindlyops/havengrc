@@ -11,14 +11,14 @@
                 <#if federatedIdentity.removeLinkPossible>
                     <form action="${url.socialUrl}" method="post" class="px-4">
                       <div class="form-row pb-3">
-                        <div class="col-10">
+                        <div class="col-sm-10">
                           <label for="${identity.providerId!}" class="">${identity.displayName!}</label>
                           <input disabled="true" class="form-control" value="${identity.userName!}">
                           <input type="hidden" id="stateChecker" name="stateChecker" value="${stateChecker}">
                           <input type="hidden" id="action" name="action" value="remove">
                           <input type="hidden" id="providerId" name="providerId" value="${identity.providerId!}">
                         </div>
-                        <div class="col-2 d-flex align-items-end">
+                        <div class="col-sm-2 pt-2 d-flex align-items-end justify-content-end">
                           <button id="remove-link-${identity.providerId!}" class="btn btn-secondary">${msg("doRemove")}</button>
                         </div>
                       </div>
@@ -27,14 +27,14 @@
             <#else>
             <form action="${url.socialUrl}" method="post" class="px-4">
                   <div class="form-row pb-3">
-                    <div class="col-10">
+                    <div class="col-sm-10">
                       <label for="${identity.providerId!}" class="">${identity.displayName!}</label>
                       <input disabled="true" class="form-control" value="${identity.userName!}">
                       <input type="hidden" id="stateChecker" name="stateChecker" value="${stateChecker}">
                       <input type="hidden" id="action" name="action" value="add">
                       <input type="hidden" id="providerId" name="providerId" value="${identity.providerId!}">
                     </div>
-                    <div class="col-2 d-flex align-items-end">
+                    <div class="col-sm-2 pt-2 d-flex align-items-end justify-content-end">
                       <button id="add-link-${identity.providerId!}" class="btn btn-secondary">${msg("doAdd")}</button>
                     </div>
                   </div>

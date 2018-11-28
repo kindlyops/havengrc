@@ -34,7 +34,7 @@
 
 <body class="body-other-pages">
     <header class="navbar navbar-dark bg-primary">
-        <div class="navbar-brand">
+        <div class="navbar-brand primary-font">
             Haven GRC
         </div>
         <ul class="navbar-nav">

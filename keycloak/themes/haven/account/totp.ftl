@@ -3,11 +3,11 @@
 
   <#if totp.enabled>
     <div class="heading py-3 mb-3">
-        <span class="subtitle float-sm-right pt-lg-2">
+        <h2>${msg("authenticatorTitle")}</h2>
+        <span class="subtitle">
             <span class="required">*</span>
             ${msg("requiredFields")}
         </span>
-        <h2>${msg("authenticatorTitle")}</h2>
     </div>
 
     <div class="px-4">
@@ -34,16 +34,15 @@
 
   <#else>
     <div class="heading py-3 mb-3">
-        <span class="subtitle float-sm-right pt-lg-2">
+        <h2>${msg("authenticatorTitle")}</h2>
+        <span class="subtitle">
             <span class="required">*</span>
             ${msg("requiredFields")}
         </span>
-        <h2>${msg("authenticatorTitle")}</h2>
     </div>
 
-    <div class="row">
-        <div class="col-lg-6">
-            <ol id="AccountForm" class="px-4 ml-3">
+    <div class="col-lg-6 px-4">
+            <ol id="AccountForm">
                 <li>
                     <p>${msg("totpStep1")}</p>
                 </li>
@@ -59,7 +58,7 @@
 
             <form action="${url.totpUrl}" id="TotpForm" method="post">
                 <input type="hidden" id="stateChecker" name="stateChecker" value="${stateChecker}" />
-                <div class="form-group ml-3 pl-4">
+                <div class="form-group pl-3">
                     <label for="totp">${msg("authenticatorCode")}</label><span class="required">*</span>
                     <input type="text" class="form-control" id="totp" name="totp" autocomplete="off" required />
                     <input type="hidden" id="totpSecret" name="totpSecret" value="${totp.totpSecret}" />
@@ -72,7 +71,6 @@
             </form>
 
         </div>
-    </div>
   </#if>
 
 </@layout.mainLayout>
