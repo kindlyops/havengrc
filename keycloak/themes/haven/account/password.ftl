@@ -3,7 +3,7 @@
 
     <div class="heading py-3 mb-3">
       <h2>${msg("changePasswordHtmlTitle")}</h2>
-      <span class="subtitle pt-lg-2">
+      <span class="subtitle">
           <span class="required">*</span>
           ${msg("requiredFields")}
       </span>

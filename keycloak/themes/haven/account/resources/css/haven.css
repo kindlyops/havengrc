@@ -88,6 +88,13 @@ button{
   font-family: 'Montserrat', sans-serif;
 }
 
+button[type=submit], button[id^="add-link-"], button[id^="remove-link-"], button#logout-all-sessions{
+  min-width:92px !important;
+  text-align: center !important;
+  white-space: normal;
+  line-height: inherit;
+}
+
 h2{
     font-family: 'Montserrat', sans-serif;
     font-size: 28px;
@@ -147,6 +154,7 @@ label {
 /* Authenticator Page */
 ol#AccountForm{
   font-family:'Bitter',serif ;
+  padding-inline-start:14px;
 }
 
 #TotpTable thead tr th{
@@ -172,8 +180,15 @@ ol#AccountForm{
   }
 }
 
-@media screen and (max-width:330px){
+@media screen and (max-width:372px){
+    button[type=submit], button[id^="add-link"], button[id^="remove-link"]{
+      width:100% !important;
+      margin-bottom: 5px;
+    }
     .totp-img{
-        margin-left:-8px;
+        margin-left:-40px;
+    }
+    #TotpForm div.form-group{
+      padding-left: 0px !important;
     }
 }
