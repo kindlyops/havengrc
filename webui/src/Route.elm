@@ -9,11 +9,11 @@
 -- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-module Route exposing (Route(..), Model, init, locFor, titleFor, urlFor)
+module Route exposing (Model, Route(..), init, locFor, titleFor, urlFor)
 
-import String exposing (split, fromList, join)
 import Navigation
-import UrlParser exposing ((</>), (<?>), s, int, string, parsePath, Parser, oneOf)
+import String exposing (fromList, join, split)
+import UrlParser exposing ((</>), (<?>), Parser, int, oneOf, parsePath, s, string)
 
 
 type Route
@@ -64,62 +64,63 @@ init location =
         _ =
             Debug.log "Route.init : " (toString route)
     in
-        -- TODO when we are loaded with an invalid URL, the wildcard case
-        -- in locFor is giving us a route of Nothing, but the browser location
-        -- is invalid. In this case the address needs to be updated to the
-        -- URL that matches the route or we need to introduce a 404 route.
-        -- revisit routing when Elm 0.19 comes out to see if there are better
-        -- patterns we should be using
-        case route of
-            Nothing ->
-                ( route, Navigation.newUrl (urlFor Home) )
+    -- TODO when we are loaded with an invalid URL, the wildcard case
+    -- in locFor is giving us a route of Nothing, but the browser location
+    -- is invalid. In this case the address needs to be updated to the
+    -- URL that matches the route or we need to introduce a 404 route.
+    -- revisit routing when Elm 0.19 comes out to see if there are better
+    -- patterns we should be using
+    case route of
+        Nothing ->
+            ( route, Navigation.newUrl (urlFor Home) )
 
-            Just _ ->
-                ( route, Cmd.none )
+        Just _ ->
+            ( route, Cmd.none )
 
 
 titleFor : Route -> String
 titleFor route =
     "Haven GRC - "
-        ++ case route of
-            Activity ->
-                "Activity"
+        ++ (case route of
+                Activity ->
+                    "Activity"
 
-            Comments ->
-                "Comments"
+                Comments ->
+                    "Comments"
 
-            Dashboard ->
-                "Dashboard"
+                Dashboard ->
+                    "Dashboard"
 
-            EditComment _ ->
-                "Thread"
+                EditComment _ ->
+                    "Thread"
 
-            Home ->
-                "Home"
+                Home ->
+                    "Home"
 
-            Login ->
-                "Login"
+                Login ->
+                    "Login"
 
-            Privacy ->
-                "Privacy Policy"
+                Privacy ->
+                    "Privacy Policy"
 
-            Landing ->
-                "Welcome"
+                Landing ->
+                    "Welcome"
 
-            Reports ->
-                "Reports"
+                Reports ->
+                    "Reports"
 
-            ShowComment _ ->
-                "Comment"
+                ShowComment _ ->
+                    "Comment"
 
-            Survey ->
-                "Survey"
+                Survey ->
+                    "Survey"
 
-            SurveyResponses ->
-                "Survey Responses"
+                SurveyResponses ->
+                    "Survey Responses"
 
-            Terms ->
-                "Terms of Service"
+                Terms ->
+                    "Terms of Service"
+           )
 
 
 urlFor : Route -> String
@@ -166,7 +167,7 @@ urlFor loc =
                 Terms ->
                     "/terms/"
     in
-        url
+    url
 
 
 locFor : Maybe Navigation.Location -> Maybe Route
@@ -194,4 +195,4 @@ locFor location =
                 -- _ =
                 --     Debug.log "Route.locFor fixed hash" (toString fixedLocation.hash)
             in
-                selectedRoute
+            selectedRoute

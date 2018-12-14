@@ -1,23 +1,22 @@
-module Page.SurveyResponses
-    exposing
-        ( Model
-        , Msg (..)
-        , update
-        , view
-        , init
-        )
+module Page.SurveyResponses exposing
+    ( Model
+    , Msg(..)
+    , init
+    , update
+    , view
+    )
 
-import Html exposing (Html, div, text, h2, button, canvas, h1, p, hr, h5)
+import Authentication
+import Data.RadarChart
+import Data.SurveyResponses exposing (AvailableResponse, AvailableResponseDatum, GroupedIpsativeResponse)
+import Html exposing (Html, button, canvas, div, h1, h2, h5, hr, p, text)
 import Html.Attributes exposing (class, id)
 import Html.Events exposing (onClick)
-import List.Extra exposing (groupWhile)
-import Authentication
 import Http
-import Request.SurveyResponses
+import List.Extra exposing (groupWhile)
 import Ports
+import Request.SurveyResponses
 import Utils exposing (getHTTPErrorMessage)
-import Data.RadarChart
-import Data.SurveyResponses exposing (GroupedIpsativeResponse, AvailableResponse, AvailableResponseDatum)
 
 
 type ResponsePage
@@ -35,8 +34,9 @@ type alias Model =
 
 init : Authentication.Model -> ( Model, Cmd Msg )
 init authModel =
-    initialModel
-        ! initialCommands authModel
+    ( initialModel
+    , Cmd.batch (initialCommands authModel)
+    )
 
 
 initialModel : Model
@@ -51,7 +51,8 @@ initialModel =
 initialCommands : Authentication.Model -> List (Cmd Msg)
 initialCommands authModel =
     if Authentication.isLoggedIn authModel then
-        [ Http.send GotServerIpsativeResponses (Request.SurveyResponses.getIpsativeResponses authModel ) ]
+        [ Http.send GotServerIpsativeResponses (Request.SurveyResponses.getIpsativeResponses authModel) ]
+
     else
         []
 
@@ -63,28 +64,36 @@ type Msg
     | GoToHome
     | GenerateChart
 
+
 update : Msg -> Model -> Authentication.Model -> ( Model, Cmd Msg )
 update msg model authModel =
     case msg of
         GetResponses ->
-            model ! [ Http.send GotServerIpsativeResponses (Request.SurveyResponses.getIpsativeResponses authModel ) ]
+            ( model
+            , Http.send GotServerIpsativeResponses (Request.SurveyResponses.getIpsativeResponses authModel)
+            )
 
         StartVisualization availableResponse ->
-            { model
+            ( { model
                 | currentPage = IpsativeResponse
                 , selectedResponse = Just availableResponse
-            }
-                ! []
+              }
+            , Cmd.none
+            )
 
         GotServerIpsativeResponses (Err error) ->
-            model ! [ Ports.showError (getHTTPErrorMessage error) ]
+            ( model
+            , Ports.showError (getHTTPErrorMessage error)
+            )
 
         GotServerIpsativeResponses (Ok groupedResponses) ->
             let
                 availableResponses =
                     createAvailableResponses groupedResponses
             in
-                { model | groupedIpsativeResponses = groupedResponses, availableResponses = availableResponses } ! []
+            ( { model | groupedIpsativeResponses = groupedResponses, availableResponses = availableResponses }
+            , Cmd.none
+            )
 
         GenerateChart ->
             case model.selectedResponse of
@@ -98,7 +107,9 @@ update msg model authModel =
                     )
 
         GoToHome ->
-            { model | currentPage = Home } ! []
+            ( { model | currentPage = Home }
+            , Cmd.none
+            )
 
 
 createAvailableResponses : List GroupedIpsativeResponse -> List AvailableResponse
@@ -126,11 +137,11 @@ createAvailableResponses groupedResponses =
                                 _ ->
                                     "Grouping error"
                     in
-                        { name = name, data = createAvailableResponseDatum surveyGroup }
+                    { name = name, data = createAvailableResponseDatum surveyGroup }
                 )
                 groupedBySurvey
     in
-        availableResponses
+    availableResponses
 
 
 createAvailableResponseDatum : List GroupedIpsativeResponse -> List AvailableResponseDatum

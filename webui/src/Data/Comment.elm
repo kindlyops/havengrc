@@ -1,8 +1,8 @@
-module Data.Comment exposing (Comment, emptyNewComment, decode, encode)
+module Data.Comment exposing (Comment, decode, emptyNewComment, encode)
 
 import Json.Decode as Decode exposing (Decoder)
-import Json.Encode as Encode exposing (Value)
 import Json.Decode.Pipeline exposing (decode, required)
+import Json.Encode as Encode exposing (Value)
 
 
 type alias Comment =

@@ -1,7 +1,7 @@
 module Page.Reports exposing (view)
 
-import Html exposing (Html, div, text, ol, li, a)
-import Html.Attributes exposing (target, href)
+import Html exposing (Html, a, div, li, ol, text)
+import Html.Attributes exposing (href, target)
 
 
 view : Html msg

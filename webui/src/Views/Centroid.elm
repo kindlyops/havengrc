@@ -1,10 +1,10 @@
 module Views.Centroid exposing (view)
 
-import Visualization.Shape as Shape exposing (defaultPieConfig, Arc)
-import Visualization.Path as Path
 import List.Extra exposing (getAt)
-import Svg exposing (Svg, svg, g, path)
-import Svg.Attributes exposing (transform, d, style, width, height)
+import Svg exposing (Svg, g, path, svg)
+import Svg.Attributes exposing (d, height, style, transform, width)
+import Visualization.Path as Path
+import Visualization.Shape as Shape exposing (Arc, defaultPieConfig)
 
 
 screenWidth : Float
@@ -51,10 +51,10 @@ annular arcs =
         makeDot datum =
             path [ d dot, transform ("translate" ++ toString (Shape.centroid { datum | innerRadius = radius - 60 })) ] []
     in
-        g [ transform ("translate(" ++ toString (radius + 20) ++ "," ++ toString radius ++ ")") ]
-            [ g [] <| List.indexedMap makeSlice arcs
-            , g [] <| List.map makeDot arcs
-            ]
+    g [ transform ("translate(" ++ toString (radius + 20) ++ "," ++ toString radius ++ ")") ]
+        [ g [] <| List.indexedMap makeSlice arcs
+        , g [] <| List.map makeDot arcs
+        ]
 
 
 view : List Float -> Svg msg
@@ -63,5 +63,5 @@ view data =
         pieData =
             data |> Shape.pie { defaultPieConfig | outerRadius = radius }
     in
-        svg [ width (toString screenWidth ++ "px"), height (toString screenHeight ++ "px") ]
-            [ annular pieData ]
+    svg [ width (toString screenWidth ++ "px"), height (toString screenHeight ++ "px") ]
+        [ annular pieData ]

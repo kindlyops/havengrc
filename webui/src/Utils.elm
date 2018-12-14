@@ -10,10 +10,10 @@ getHTTPErrorMessage error =
             "Is the server running?"
 
         Http.BadStatus response ->
-            (toString response.status)
+            toString response.status
 
         Http.BadPayload message _ ->
             "Decoding Failed: " ++ message
 
         _ ->
-            (toString error)
+            toString error

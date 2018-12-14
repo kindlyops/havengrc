@@ -1,8 +1,8 @@
 module Data.RadarChart exposing (RadarChartConfig, generateIpsativeChart)
 
-import Color exposing (Color, rgb, toRgb, rgba)
-import List.Extra exposing (unique, groupWhile, getAt)
+import Color exposing (Color, rgb, rgba, toRgb)
 import Data.SurveyResponses exposing (AvailableResponse, AvailableResponseDatum)
+import List.Extra exposing (getAt, groupWhile, unique)
 
 
 colors : List Color
@@ -67,9 +67,8 @@ type alias RadarChartConfig =
     }
 
 
-{-|
-Converts a color to an css rgba string.
-    colorToCssRgba (rgba 255 0 0 0.5) -- "rgba(255, 0, 0, 0.5)"
+{-| Converts a color to an css rgba string.
+colorToCssRgba (rgba 255 0 0 0.5) -- "rgba(255, 0, 0, 0.5)"
 -}
 colorToCssRgba : Color -> String
 colorToCssRgba cl =
@@ -77,12 +76,12 @@ colorToCssRgba cl =
         { red, green, blue, alpha } =
             toRgb cl
     in
-        cssColorString "rgba"
-            [ toString red
-            , toString green
-            , toString blue
-            , toString alpha
-            ]
+    cssColorString "rgba"
+        [ toString red
+        , toString green
+        , toString blue
+        , toString alpha
+        ]
 
 
 cssColorString : String -> List String -> String
@@ -107,10 +106,10 @@ generateIpsativeChart availableResponse =
             , scale = { ticks = { beginAtZero = True } }
             }
     in
-        { type_ = "radar"
-        , data = radarChartData
-        , options = radarChartOptions
-        }
+    { type_ = "radar"
+    , data = radarChartData
+    , options = radarChartOptions
+    }
 
 
 getLabels : List AvailableResponseDatum -> List String
@@ -131,28 +130,28 @@ getDataSets points =
                 )
                 sortedByGroup
     in
-        List.map
-            (\group ->
-                let
-                    first =
-                        List.head group
+    List.map
+        (\group ->
+            let
+                first =
+                    List.head group
 
-                    groupNumber =
-                        case first of
-                            Just x ->
-                                x.group
+                groupNumber =
+                    case first of
+                        Just x ->
+                            x.group
 
-                            _ ->
-                                0
-                in
-                    { label = "Group " ++ toString groupNumber
-                    , backgroundColor = colorToCssRgba (makeTransparent (getAt (groupNumber - 1) colors |> Maybe.withDefault (rgb 0 0 0)))
-                    , borderColor = colorToCssRgba (getAt (groupNumber - 1) colors |> Maybe.withDefault (rgb 0 0 0))
-                    , pointBackgroundColor = colorToCssRgba (getAt (groupNumber - 1) colors |> Maybe.withDefault (rgb 0 0 0))
-                    , data = group |> List.sortBy .category |> List.map .points
-                    }
-            )
-            groupedByGroup
+                        _ ->
+                            0
+            in
+            { label = "Group " ++ toString groupNumber
+            , backgroundColor = colorToCssRgba (makeTransparent (getAt (groupNumber - 1) colors |> Maybe.withDefault (rgb 0 0 0)))
+            , borderColor = colorToCssRgba (getAt (groupNumber - 1) colors |> Maybe.withDefault (rgb 0 0 0))
+            , pointBackgroundColor = colorToCssRgba (getAt (groupNumber - 1) colors |> Maybe.withDefault (rgb 0 0 0))
+            , data = group |> List.sortBy .category |> List.map .points
+            }
+        )
+        groupedByGroup
 
 
 makeTransparent : Color -> Color
@@ -161,4 +160,4 @@ makeTransparent color =
         colorObject =
             toRgb color
     in
-        rgba colorObject.red colorObject.green colorObject.blue 0.2
+    rgba colorObject.red colorObject.green colorObject.blue 0.2

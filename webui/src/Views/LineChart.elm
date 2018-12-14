@@ -1,11 +1,11 @@
 module Views.LineChart exposing (view)
 
-import Visualization.Scale as Scale exposing (ContinuousScale, ContinuousTimeScale)
-import Visualization.Axis as Axis
-import Visualization.Shape as Shape
 import Date exposing (Date)
-import Svg exposing (Svg, svg, g)
-import Svg.Attributes exposing (width, height, transform, class, d, stroke, strokeWidth, fill)
+import Svg exposing (Svg, g, svg)
+import Svg.Attributes exposing (class, d, fill, height, stroke, strokeWidth, transform, width)
+import Visualization.Axis as Axis
+import Visualization.Scale as Scale exposing (ContinuousScale, ContinuousTimeScale)
+import Visualization.Shape as Shape
 
 
 w : Float
@@ -64,13 +64,13 @@ view model =
             List.map lineGenerator model
                 |> Shape.line Shape.monotoneInXCurve
     in
-        svg [ width (toString w ++ "px"), height (toString h ++ "px") ]
-            [ g [ transform ("translate(" ++ toString (padding - 1) ++ ", " ++ toString (h - padding) ++ ")") ]
-                [ xAxis ]
-            , g [ transform ("translate(" ++ toString (padding - 1) ++ ", " ++ toString padding ++ ")") ]
-                [ yAxis ]
-            , g [ transform ("translate(" ++ toString padding ++ ", " ++ toString padding ++ ")"), class "series" ]
-                [ Svg.path [ d area, stroke "none", strokeWidth "3px", fill "rgba(255, 0, 0, 0.54)" ] []
-                , Svg.path [ d line, stroke "red", strokeWidth "3px", fill "none" ] []
-                ]
+    svg [ width (toString w ++ "px"), height (toString h ++ "px") ]
+        [ g [ transform ("translate(" ++ toString (padding - 1) ++ ", " ++ toString (h - padding) ++ ")") ]
+            [ xAxis ]
+        , g [ transform ("translate(" ++ toString (padding - 1) ++ ", " ++ toString padding ++ ")") ]
+            [ yAxis ]
+        , g [ transform ("translate(" ++ toString padding ++ ", " ++ toString padding ++ ")"), class "series" ]
+            [ Svg.path [ d area, stroke "none", strokeWidth "3px", fill "rgba(255, 0, 0, 0.54)" ] []
+            , Svg.path [ d line, stroke "red", strokeWidth "3px", fill "none" ] []
             ]
+        ]

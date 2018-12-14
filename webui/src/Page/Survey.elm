@@ -113,8 +113,9 @@ decodeCurrentPage =
 
 init : Authentication.Model -> ( Model, Cmd Msg )
 init authModel =
-    initialModel
-        ! initialCommands authModel
+    ( initialModel
+    , Cmd.batch (initialCommands authModel)
+    )
 
 
 initWithSave : Authentication.Model -> TestStructure -> ( Model, Cmd Msg )
@@ -144,8 +145,9 @@ initWithSave authModel testStructure =
                         , isSurveyReady = savedState.isSurveyReady
                     }
     in
-    upgradedModel
-        ! initialCommands authModel
+    ( upgradedModel
+    , Cmd.batch (initialCommands authModel)
+    )
 
 
 initialModel : Model
@@ -239,78 +241,114 @@ update : Msg -> Model -> Authentication.Model -> ( Model, Cmd Msg )
 update msg model authModel =
     case msg of
         UpdateEmail newEmail ->
-            { model | emailAddress = newEmail } ! []
+            ( { model | emailAddress = newEmail }
+            , Cmd.none
+            )
 
         RegisterNewUser ->
             case model.currentSurvey of
                 Ipsative survey ->
-                    model ! [ Http.send NewUserRegistered (Request.Registration.post survey model.emailAddress authModel) ]
+                    ( model
+                    , Http.send NewUserRegistered (Request.Registration.post survey model.emailAddress authModel)
+                    )
 
                 Likert survey ->
-                    initialModel ! []
+                    ( initialModel
+                    , Cmd.none
+                    )
 
         SaveCurrentSurvey ->
             case model.currentSurvey of
                 Ipsative survey ->
-                    model ! [ Http.send IpsativeSurveySaved (Request.Survey.postIpsativeResponse authModel survey) ]
+                    ( model
+                    , Http.send IpsativeSurveySaved (Request.Survey.postIpsativeResponse authModel survey)
+                    )
 
                 Likert survey ->
-                    model ! [ Http.send LikertSurveySaved (Request.Survey.postLikertResponses authModel survey) ]
+                    ( model
+                    , Http.send LikertSurveySaved (Request.Survey.postLikertResponses authModel survey)
+                    )
 
         NewUserRegistered (Err error) ->
             let
                 _ =
                     Debug.log "New User error" error
             in
-            initialModel ! []
+            ( initialModel
+            , Cmd.none
+            )
 
         NewUserRegistered (Ok responses) ->
             let
                 newModel =
                     { model | currentPage = Registered }
             in
-            newModel ! []
+            ( newModel
+            , Cmd.none
+            )
 
         IpsativeSurveySaved (Err error) ->
-            model ! [ Ports.showError (getHTTPErrorMessage error) ]
+            ( model
+            , Ports.showError (getHTTPErrorMessage error)
+            )
 
         IpsativeSurveySaved (Ok responses) ->
             let
                 _ =
                     Debug.log "saved response" responses
             in
-            initialModel ! []
+            ( initialModel
+            , Cmd.none
+            )
 
         LikertSurveySaved (Err error) ->
-            model ! [ Ports.showError (getHTTPErrorMessage error) ]
+            ( model
+            , Ports.showError (getHTTPErrorMessage error)
+            )
 
         LikertSurveySaved (Ok responses) ->
             let
                 _ =
                     Debug.log "saved response" responses
             in
-            initialModel ! []
+            ( initialModel
+            , Cmd.none
+            )
 
         GetIpsativeSurveys ->
-            model ! [ Http.send GotServerIpsativeSurveys (Request.Survey.getIpsativeSurveys authModel) ]
+            ( model
+            , Http.send GotServerIpsativeSurveys (Request.Survey.getIpsativeSurveys authModel)
+            )
 
         GetLikertSurveys ->
-            model ! [ Http.send GotServerLikertSurveys (Request.Survey.getLikertSurveys authModel) ]
+            ( model
+            , Http.send GotServerLikertSurveys (Request.Survey.getLikertSurveys authModel)
+            )
 
         GotServerIpsativeSurveys (Err error) ->
-            model ! [ Ports.showError (getHTTPErrorMessage error) ]
+            ( model
+            , Ports.showError (getHTTPErrorMessage error)
+            )
 
         GotServerIpsativeSurveys (Ok surveys) ->
-            { model | availableIpsativeSurveys = surveys } ! []
+            ( { model | availableIpsativeSurveys = surveys }
+            , Cmd.none
+            )
 
         GotServerLikertSurveys (Err error) ->
-            model ! [ Ports.showError (getHTTPErrorMessage error) ]
+            ( model
+            , Ports.showError (getHTTPErrorMessage error)
+            )
 
         GotServerLikertSurveys (Ok surveys) ->
-            { model | availableLikertSurveys = surveys } ! []
+            ( { model | availableLikertSurveys = surveys }
+            , Cmd.none
+            )
 
         GotIpsativeServerData (Err error) ->
-            model ! [ Ports.showError (getHTTPErrorMessage error) ]
+            ( model
+            , Ports.showError (getHTTPErrorMessage error)
+            )
 
         GotIpsativeServerData (Ok data) ->
             let
@@ -320,18 +358,24 @@ update msg model authModel =
                 survey =
                     Data.Survey.createIpsativeSurvey 10 totalGroups model.selectedSurveyMetaData questions
             in
-            { model | currentSurvey = survey, isSurveyReady = True } ! []
+            ( { model | currentSurvey = survey, isSurveyReady = True }
+            , Cmd.none
+            )
 
         GotLikertServerData (Err error) ->
-            model ! [ Ports.showError (getHTTPErrorMessage error) ]
+            ( model
+            , Ports.showError (getHTTPErrorMessage error)
+            )
 
         GotLikertServerData (Ok data) ->
-            { model | inBoundLikertData = Just data }
-                ! [ Http.send GotLikertChoices (Request.Survey.getLikertChoices authModel model.selectedSurveyMetaData.uuid)
-                  ]
+            ( { model | inBoundLikertData = Just data }
+            , Http.send GotLikertChoices (Request.Survey.getLikertChoices authModel model.selectedSurveyMetaData.uuid)
+            )
 
         GotLikertChoices (Err error) ->
-            model ! [ Ports.showError (getHTTPErrorMessage error) ]
+            ( model
+            , Ports.showError (getHTTPErrorMessage error)
+            )
 
         GotLikertChoices (Ok serverChoices) ->
             let
@@ -349,8 +393,9 @@ update msg model authModel =
                 isSurveyReady =
                     True
             in
-            { model | currentSurvey = survey, isSurveyReady = isSurveyReady }
-                ! []
+            ( { model | currentSurvey = survey, isSurveyReady = isSurveyReady }
+            , Cmd.none
+            )
 
         SelectLikertAnswer answerNumber choice ->
             let
@@ -365,20 +410,28 @@ update msg model authModel =
                 newModel =
                     { model | currentSurvey = newSurvey }
             in
-            newModel ! [ storeSurvey newModel (getQuestionNumber newModel) ]
+            ( newModel
+            , storeSurvey newModel (getQuestionNumber newModel)
+            )
 
         GoToHome ->
             let
                 newModel =
                     { model | currentPage = Home }
             in
-            newModel ! (storeSurvey newModel (getQuestionNumber newModel) :: surveyRequests authModel)
+            ( newModel
+            , Cmd.batch (storeSurvey newModel (getQuestionNumber newModel) :: surveyRequests authModel)
+            )
 
         StartLikertSurvey metaData ->
-            { model | currentPage = Survey, selectedSurveyMetaData = metaData } ! [ Http.send GotLikertServerData (Request.Survey.getLikertSurvey authModel metaData.uuid) ]
+            ( { model | currentPage = Survey, selectedSurveyMetaData = metaData }
+            , Http.send GotLikertServerData (Request.Survey.getLikertSurvey authModel metaData.uuid)
+            )
 
         StartIpsativeSurvey metaData ->
-            { model | currentPage = Survey, selectedSurveyMetaData = metaData } ! [ Http.send GotIpsativeServerData (Request.Survey.getIpsativeSurvey authModel metaData.uuid) ]
+            ( { model | currentPage = Survey, selectedSurveyMetaData = metaData }
+            , Http.send GotIpsativeServerData (Request.Survey.getIpsativeSurvey authModel metaData.uuid)
+            )
 
         NextQuestion ->
             --   let
@@ -397,7 +450,9 @@ update msg model authModel =
                                 newModel =
                                     { model | currentSurvey = Ipsative { survey | questions = x } }
                             in
-                            newModel ! [ storeSurvey newModel (getQuestionNumber newModel) ]
+                            ( newModel
+                            , storeSurvey newModel (getQuestionNumber newModel)
+                            )
 
                         _ ->
                             let
@@ -407,7 +462,9 @@ update msg model authModel =
                                 cmd =
                                     Ports.renderVega myVis
                             in
-                            newModel ! [ storeSurvey newModel (getQuestionNumber newModel), cmd ]
+                            ( newModel
+                            , Cmd.batch [ storeSurvey newModel (getQuestionNumber newModel), cmd ]
+                            )
 
                 Likert survey ->
                     case Zipper.next survey.questions of
@@ -416,7 +473,9 @@ update msg model authModel =
                                 newModel =
                                     { model | currentSurvey = Likert { survey | questions = x } }
                             in
-                            newModel ! [ storeSurvey newModel (getQuestionNumber newModel) ]
+                            ( newModel
+                            , storeSurvey newModel (getQuestionNumber newModel)
+                            )
 
                         _ ->
                             let
@@ -426,7 +485,9 @@ update msg model authModel =
                                 cmd =
                                     Ports.renderVega myVis
                             in
-                            newModel ! [ storeSurvey newModel (getQuestionNumber newModel), cmd ]
+                            ( newModel
+                            , Cmd.batch [ storeSurvey newModel (getQuestionNumber newModel), cmd ]
+                            )
 
         PreviousQuestion ->
             case model.currentSurvey of
@@ -437,10 +498,14 @@ update msg model authModel =
                                 newModel =
                                     { model | currentSurvey = Ipsative { survey | questions = x } }
                             in
-                            newModel ! [ storeSurvey newModel (getQuestionNumber newModel) ]
+                            ( newModel
+                            , storeSurvey newModel (getQuestionNumber newModel)
+                            )
 
                         _ ->
-                            model ! []
+                            ( model
+                            , Cmd.none
+                            )
 
                 Likert survey ->
                     case Zipper.previous survey.questions of
@@ -449,10 +514,14 @@ update msg model authModel =
                                 newModel =
                                     { model | currentSurvey = Likert { survey | questions = x } }
                             in
-                            newModel ! [ storeSurvey newModel (getQuestionNumber newModel) ]
+                            ( newModel
+                            , storeSurvey newModel (getQuestionNumber newModel)
+                            )
 
                         _ ->
-                            model ! []
+                            ( model
+                            , Cmd.none
+                            )
 
         DecrementAnswer answer groupNumber ->
             --if points for this answer is > 0,
@@ -470,7 +539,9 @@ update msg model authModel =
                 newModel =
                     { model | currentSurvey = newSurvey }
             in
-            newModel ! [ storeSurvey newModel (getQuestionNumber newModel) ]
+            ( newModel
+            , storeSurvey newModel (getQuestionNumber newModel)
+            )
 
         IncrementAnswer answer groupNumber ->
             --    --if points left in group > 0,
@@ -488,7 +559,9 @@ update msg model authModel =
                 newModel =
                     { model | currentSurvey = newSurvey }
             in
-            newModel ! [ storeSurvey newModel (getQuestionNumber newModel) ]
+            ( newModel
+            , storeSurvey newModel (getQuestionNumber newModel)
+            )
 
         GotoQuestion questionNumber ->
             case model.currentSurvey of
@@ -499,10 +572,14 @@ update msg model authModel =
                                 newModel =
                                     { model | currentSurvey = Ipsative { survey | questions = x }, currentPage = Survey }
                             in
-                            newModel ! [ storeSurvey newModel (getQuestionNumber newModel) ]
+                            ( newModel
+                            , storeSurvey newModel (getQuestionNumber newModel)
+                            )
 
                         _ ->
-                            model ! []
+                            ( model
+                            , Cmd.none
+                            )
 
                 Likert survey ->
                     case Zipper.find (\x -> x.orderNumber == questionNumber) (Zipper.first survey.questions) of
@@ -511,10 +588,14 @@ update msg model authModel =
                                 newModel =
                                     { model | currentSurvey = Likert { survey | questions = x }, currentPage = Survey }
                             in
-                            newModel ! [ storeSurvey newModel (getQuestionNumber newModel) ]
+                            ( newModel
+                            , storeSurvey newModel (getQuestionNumber newModel)
+                            )
 
                         _ ->
-                            model ! []
+                            ( model
+                            , Cmd.none
+                            )
 
 
 getQuestionNumber : Model -> Int
@@ -941,7 +1022,7 @@ viewInlineSurveyInstructions : String -> Html Msg
 viewInlineSurveyInstructions instructions =
     div [ class "row" ]
         [ div
-            [ class "col-lg h5", style [ ( "text-align", "center" ) ] ]
+            [ class "col-lg h5", style "text-align" "center" ]
             [ text instructions ]
         ]
 
@@ -1063,7 +1144,7 @@ viewLikertSurveyTitle survey =
             currentQuestion.title
     in
     div [ class "row" ]
-        [ div [ class "col-lg ", style [ ( "text-align", "center" ) ] ]
+        [ div [ class "col-lg ", style "text-align" "center" ]
             [ h3 [ class "" ] [ text ("Question " ++ questionNumber ++ " of " ++ toString totalQuestions) ]
             , h4 [] [ text questionTitle ]
             ]
@@ -1086,7 +1167,7 @@ viewIpsativeSurveyTitle survey =
             currentQuestion.title
     in
     div [ class "row" ]
-        [ div [ class "col-lg ", style [ ( "text-align", "center" ) ] ]
+        [ div [ class "col-lg ", style "text-align" "center" ]
             [ h3 [ class "" ] [ text ("Question " ++ toString questionNumber ++ " of " ++ toString totalQuestions) ]
             , h4 [] [ text questionTitle ]
             , div [ class "row" ] (viewPointsLeft currentQuestion.pointsLeft survey.pointsPerQuestion)
@@ -1101,7 +1182,7 @@ viewPointsLeft pointsLeft pointsPerQuestion =
             div [ class "col-md" ]
                 [ p [] [ text ("Group " ++ toString x.group ++ ": " ++ toString x.pointsLeft ++ "/" ++ toString pointsPerQuestion) ]
                 , div [ class "progress" ]
-                    [ div [ class "progress-bar bg-primary", style [ calculateProgressBarPercent x.pointsLeft pointsPerQuestion ] ] []
+                    [ div [ class "progress-bar bg-primary", (\( a, b ) -> style a b) (calculateProgressBarPercent x.pointsLeft pointsPerQuestion) ] []
                     ]
                 ]
         )
@@ -1136,7 +1217,7 @@ viewSurveyBox answer =
     div [ class "col-md-6" ]
         [ div [ class "card mb-4 box-shadow" ]
             [ div [ class "card-body" ]
-                [ div [ class "card-padder", style [ ( "height", "120px" ) ] ]
+                [ div [ class "card-padder", style "height" "120px" ]
                     [ p [ class "card-text h5 mb-4" ] [ text answer.answer ] ]
                 , ul [ class "list-group list-group-flush" ]
                     (List.map

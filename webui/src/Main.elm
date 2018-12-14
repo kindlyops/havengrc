@@ -131,20 +131,26 @@ update msg model =
         NavigateTo maybeLocation ->
             case maybeLocation of
                 Nothing ->
-                    model ! []
+                    ( model
+                    , Cmd.none
+                    )
 
                 Just location ->
-                    model
-                        ! [ Navigation.newUrl (Route.urlFor location)
-                          , Ports.setTitle (Route.titleFor location)
-                          ]
+                    ( model
+                    , Cmd.batch
+                        [ Navigation.newUrl (Route.urlFor location)
+                        , Ports.setTitle (Route.titleFor location)
+                        ]
+                    )
 
         UrlChange location ->
             let
                 _ =
                     Debug.log "UrlChange: " location.hash
             in
-            { model | route = Route.locFor (Just location) } ! []
+            ( { model | route = Route.locFor (Just location) }
+            , Cmd.none
+            )
 
         AuthenticationMsg authMsg ->
             let
@@ -410,7 +416,7 @@ viewNavDrawerItem menuItem route =
         [ a
             [ attribute "name" (String.toLower menuItem.text)
             , onClick <| NavigateTo <| menuItem.route
-            , style [ ( "cursor", "pointer" ) ]
+            , style "cursor" "pointer"
             , classList
                 [ ( "nav-link", True )
                 , ( "active", String.toLower menuItem.text == selectedItem route )

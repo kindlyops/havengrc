@@ -1,19 +1,18 @@
-module Keycloak
-    exposing
-        ( AuthenticationState(..)
-        , AuthenticationError
-        , AuthenticationResult
-        , RawAuthenticationResult
-        , Options
-        , defaultOpts
-        , LoggedInUser
-        , loggedInUserDecoder
-        , UserProfile
-        , Token
-        , mapResult
-        )
+module Keycloak exposing
+    ( AuthenticationError
+    , AuthenticationResult
+    , AuthenticationState(..)
+    , LoggedInUser
+    , Options
+    , RawAuthenticationResult
+    , Token
+    , UserProfile
+    , defaultOpts
+    , loggedInUserDecoder
+    , mapResult
+    )
 
-import Json.Decode as Decode exposing (Decoder, decodeString, int, andThen, oneOf)
+import Json.Decode as Decode exposing (Decoder, andThen, decodeString, int, oneOf)
 import Json.Decode.Pipeline exposing (decode, required)
 
 

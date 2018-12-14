@@ -1,7 +1,7 @@
 module Page.Activity exposing (view)
 
-import Html exposing (Html, div, text)
 import Date
+import Html exposing (Html, div, text)
 import Views.LineChart as LineChart
 
 
@@ -15,8 +15,8 @@ view =
             , ( Date.fromTime 1456790400000, 1 )
             ]
     in
-        div []
-            [ div []
-                [ text "What is Risk Management?" ]
-            , LineChart.view data
-            ]
+    div []
+        [ div []
+            [ text "What is Risk Management?" ]
+        , LineChart.view data
+        ]

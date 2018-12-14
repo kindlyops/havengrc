@@ -1,9 +1,9 @@
 module Request.SurveyResponses exposing (getIpsativeResponses)
 
-import Http
-import Json.Decode as Decode
 import Authentication
 import Data.SurveyResponses exposing (GroupedIpsativeResponse, groupedIpsativeResponseDecoder)
+import Http
+import Json.Decode as Decode
 
 
 getIpsativeResponses : Authentication.Model -> Http.Request (List GroupedIpsativeResponse)

@@ -1,9 +1,9 @@
 module Request.Comments exposing (get, post)
 
-import Json.Decode as Decode
 import Authentication
-import Http
 import Data.Comment
+import Http
+import Json.Decode as Decode
 
 
 commentsUrl : String
@@ -48,4 +48,4 @@ post authModel newComment =
                 , withCredentials = True
                 }
     in
-        request
+    request

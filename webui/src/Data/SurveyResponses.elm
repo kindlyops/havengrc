@@ -1,13 +1,13 @@
-module Data.SurveyResponses
-    exposing
-        ( GroupedIpsativeResponse
-        , groupedIpsativeResponseDecoder
-        , AvailableResponseDatum
-        , AvailableResponse
-        )
+module Data.SurveyResponses exposing
+    ( AvailableResponse
+    , AvailableResponseDatum
+    , GroupedIpsativeResponse
+    , groupedIpsativeResponseDecoder
+    )
 
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (decode, required)
+
 
 
 --TODO: rename this to server ipsative response

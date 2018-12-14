@@ -1,18 +1,17 @@
-module Authentication
-    exposing
-        ( Msg(..)
-        , Model
-        , init
-        , update
-        , handleAuthResult
-        , tryGetUserProfile
-        , tryGetAuthHeader
-        , getReturnHeaders
-        , isLoggedIn
-        )
+module Authentication exposing
+    ( Model
+    , Msg(..)
+    , getReturnHeaders
+    , handleAuthResult
+    , init
+    , isLoggedIn
+    , tryGetAuthHeader
+    , tryGetUserProfile
+    , update
+    )
 
-import Keycloak
 import Http
+import Keycloak
 import Ports as Ports exposing (saveSurveyState)
 
 
@@ -58,7 +57,7 @@ update msg model =
                         Err err ->
                             ( Keycloak.LoggedOut, Just err )
             in
-                ( { model | state = newState, lastError = error }, Cmd.none )
+            ( { model | state = newState, lastError = error }, Cmd.none )
 
         ShowLogIn ->
             ( model, model.logIn Keycloak.defaultOpts )
@@ -103,7 +102,7 @@ tryGetAuthHeader authModel =
                 _ =
                     Debug.log "didn't get a user token" ""
             in
-                []
+            []
 
 
 getReturnHeaders : List Http.Header
