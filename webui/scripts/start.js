@@ -38,7 +38,7 @@ const createDevServerConfig = require('../config/webpackDevServer.config');
 const highlightElmCompilerErrors = require('./utils/highlightElmCompilerErrors');
 const paths = require('../config/paths');
 
-if (fs.existsSync('elm-package.json') === false) {
+if (fs.existsSync('elm.json') === false) {
   console.log('Please, run the build script from project root directory');
   process.exit(0);
 }
@@ -89,10 +89,10 @@ function createCompiler(webpack, config, appName, urls) {
   // "invalid" is short for "bundle invalidated", it doesn't imply any errors.
   compiler.plugin('invalid', () => {
     if (isInteractive) {
-  clearConsole();
+      clearConsole();
     }
-  console.log('Compiling...');
-});
+    console.log('Compiling...');
+  });
 
   let isFirstCompile = true;
 
@@ -116,7 +116,7 @@ function createCompiler(webpack, config, appName, urls) {
     }
     if (isSuccessful && (isInteractive || isFirstCompile)) {
       printInstructions(appName, urls);
-  }
+    }
     isFirstCompile = false;
 
     // If errors exist, only show errors.
@@ -134,16 +134,16 @@ function createCompiler(webpack, config, appName, urls) {
       // Teach some ESLint tricks.
       console.log(
         '\nSearch for the ' +
-          chalk.underline(chalk.yellow('keywords')) +
-          ' to learn more about each warning.'
+        chalk.underline(chalk.yellow('keywords')) +
+        ' to learn more about each warning.'
       );
       console.log(
         'To ignore, add ' +
-          chalk.cyan('// eslint-disable-next-line') +
-          ' to the line before.\n'
+        chalk.cyan('// eslint-disable-next-line') +
+        ' to the line before.\n'
       );
-  }
-});
+    }
+  });
   return compiler;
 }
 
@@ -173,17 +173,17 @@ choosePort(HOST, DEFAULT_PORT)
       urls.lanUrlForConfig
     );
     const devServer = new WebpackDevServer(compiler, serverConfig);
-// Launch WebpackDevServer.
+    // Launch WebpackDevServer.
     devServer.listen(port, HOST, err => {
-  if (err) {
-    return console.log(err);
-  }
+      if (err) {
+        return console.log(err);
+      }
       if (isInteractive) {
         clearConsole();
       }
       console.log(chalk.cyan('Starting the development server...\n'));
       openBrowser(urls.localUrlForBrowser);
-});
+    });
 
     ['SIGINT', 'SIGTERM'].forEach(sig => {
       process.on(sig, () => {

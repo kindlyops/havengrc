@@ -12,8 +12,8 @@ module Keycloak exposing
     , mapResult
     )
 
-import Json.Decode as Decode exposing (Decoder, andThen, decodeString, int, oneOf)
-import Json.Decode.Pipeline exposing (decode, required)
+import Json.Decode as Decode exposing (Decoder, andThen, decodeString, int, oneOf, succeed)
+import Json.Decode.Pipeline exposing (required)
 
 
 type alias LoggedInUser =
@@ -24,7 +24,7 @@ type alias LoggedInUser =
 
 loggedInUserDecoder : Decoder LoggedInUser
 loggedInUserDecoder =
-    decode LoggedInUser
+    succeed LoggedInUser
         |> required "profile" userProfileDecoder
         |> required "token" Decode.string
 
