@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/kindlyops/mappamundi.svg?style=svg)](https://circleci.com/gh/kindlyops/mappamundi) [![experimental](http://badges.github.io/stability-badges/dist/experimental.svg)](http://github.com/badges/stability-badges) [![Say Thanks!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/statik) [![Maintainability](https://api.codeclimate.com/v1/badges/d2af9dcd5ad434172a27/maintainability)](https://codeclimate.com/github/kindlyops/mappamundi/maintainability)
+[![CircleCI](https://circleci.com/gh/kindlyops/havengrc.svg?style=svg)](https://circleci.com/gh/kindlyops/havengrc) [![experimental](http://badges.github.io/stability-badges/dist/experimental.svg)](http://github.com/badges/stability-badges) [![Say Thanks!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/statik) [![Maintainability](https://api.codeclimate.com/v1/badges/d2af9dcd5ad434172a27/maintainability)](https://codeclimate.com/github/kindlyops/havengrc/maintainability)
 
 # Haven GRC is a modern risk & compliance dashboard
 
@@ -34,43 +34,43 @@ Applications and frameworks that are complementary to Haven. We would prefer to 
 
 <!--ts-->
 - [Haven GRC is a modern risk & compliance dashboard](#haven-grc-is-a-modern-risk--compliance-dashboard)
-        - [But what does Haven GRC do?](#but-what-does-haven-grc-do)
-        - [Future roadmap](#future-roadmap)
-        - [Complementary tools](#complementary-tools)
-    - [!screenshot of app](#screenshot-of-app)
-    - [Table of Contents](#table-of-contents)
-    - [thank you to vendors that support the project](#thank-you-to-vendors-that-support-the-project)
-    - [setting up the dev environment](#setting-up-the-dev-environment)
-        - [Tmux](#tmux)
-        - [Windows users](#windows-users)
-    - [running the service](#running-the-service)
-        - [to access the main webUI](#to-access-the-main-webui)
-        - [to access the swagger-ui for the postgrest API](#to-access-the-swagger-ui-for-the-postgrest-api)
-        - [to access keycloak](#to-access-keycloak)
-        - [to access the GitBook documentation site](#to-access-the-gitbook-documentation-site)
-        - [to see emails sent from Haven / keycloak](#to-see-emails-sent-from-haven--keycloak)
-        - [Background jobs](#background-jobs)
-        - [Monitoring activity with Grafana](#monitoring-activity-with-grafana)
-        - [Security scanning with Zed Attack Proxy](#security-scanning-with-zed-attack-proxy)
-        - [Bazel](#bazel)
-    - [Developer tips](#developer-tips)
-        - [look around inside the database](#look-around-inside-the-database)
-        - [Run Go Buffalo tasks](#run-go-buffalo-tasks)
-        - [to export keycloak realm data (to refresh the dev users)](#to-export-keycloak-realm-data-to-refresh-the-dev-users)
-        - [To clear local storage in Chrome for your local site](#to-clear-local-storage-in-chrome-for-your-local-site)
-        - [Testing on a real mobile device](#testing-on-a-real-mobile-device)
-        - [add a database migration](#add-a-database-migration)
-    - [Authentication with JWT and Keycloak](#authentication-with-jwt-and-keycloak)
-        - [roles and permissions](#roles-and-permissions)
-        - [multi-tenancy](#multi-tenancy)
-        - [Low level JWT interactions](#low-level-jwt-interactions)
-    - [Learning Elm](#learning-elm)
-        - [Design framework and tooling](#design-framework-and-tooling)
-    - [Working with RMarkdown templates](#working-with-rmarkdown-templates)
-    - [Deploying with kubernetes / OpenShift](#deploying-with-kubernetes--openshift)
-        - [Using OpenShift](#using-openshift)
-        - [Database resource](#database-resource)
-        - [TLS](#tls)
+    - [But what does Haven GRC do?](#but-what-does-haven-grc-do)
+    - [Future roadmap](#future-roadmap)
+    - [Complementary tools](#complementary-tools)
+  - [!screenshot of app](#screenshot-of-app)
+  - [Table of Contents](#table-of-contents)
+  - [thank you to vendors that support the project](#thank-you-to-vendors-that-support-the-project)
+  - [setting up the dev environment](#setting-up-the-dev-environment)
+    - [Tmux](#tmux)
+    - [Windows users](#windows-users)
+  - [running the service](#running-the-service)
+    - [to access the main webUI](#to-access-the-main-webui)
+    - [to access the swagger-ui for the postgrest API](#to-access-the-swagger-ui-for-the-postgrest-api)
+    - [to access keycloak](#to-access-keycloak)
+    - [to access the GitBook documentation site](#to-access-the-gitbook-documentation-site)
+    - [to see emails sent from Haven / keycloak](#to-see-emails-sent-from-haven--keycloak)
+    - [Background jobs](#background-jobs)
+    - [Monitoring activity with Grafana](#monitoring-activity-with-grafana)
+    - [Security scanning with Zed Attack Proxy](#security-scanning-with-zed-attack-proxy)
+    - [Bazel](#bazel)
+  - [Developer tips](#developer-tips)
+    - [look around inside the database](#look-around-inside-the-database)
+    - [Run Go Buffalo tasks](#run-go-buffalo-tasks)
+    - [to export keycloak realm data (to refresh the dev users)](#to-export-keycloak-realm-data-to-refresh-the-dev-users)
+    - [To clear local storage in Chrome for your local site](#to-clear-local-storage-in-chrome-for-your-local-site)
+    - [Testing on a real mobile device](#testing-on-a-real-mobile-device)
+    - [add a database migration](#add-a-database-migration)
+  - [Authentication with JWT and Keycloak](#authentication-with-jwt-and-keycloak)
+    - [roles and permissions](#roles-and-permissions)
+    - [multi-tenancy](#multi-tenancy)
+    - [Low level JWT interactions](#low-level-jwt-interactions)
+  - [Learning Elm](#learning-elm)
+    - [Design framework and tooling](#design-framework-and-tooling)
+  - [Working with RMarkdown templates](#working-with-rmarkdown-templates)
+  - [Deploying with kubernetes / OpenShift](#deploying-with-kubernetes--openshift)
+    - [Using OpenShift](#using-openshift)
+    - [Database resource](#database-resource)
+    - [TLS](#tls)
 
 <!--te-->
 ## thank you to vendors that support the project
@@ -97,7 +97,7 @@ If you don't have docker running, use [these instructions](https://docs.docker.c
 We have a tmux session defined with https://github.com/tmux-python/tmuxp/ this may make it easier to monitor logs as you work. This is also handy if you want to do development on a remote VM.
 
     pip install --user tmuxp
-    tmuxp load ~/go/src/github.com/kindlyops/mappamundi
+    tmuxp load ~/go/src/github.com/kindlyops/havengrc
 
 ### Windows users
 
