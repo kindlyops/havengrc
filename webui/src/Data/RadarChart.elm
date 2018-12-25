@@ -3,6 +3,7 @@ module Data.RadarChart exposing (RadarChartConfig, generateIpsativeChart)
 import Color exposing (Color, rgb, rgba, toRgba)
 import Data.SurveyResponses exposing (AvailableResponse, AvailableResponseDatum)
 import List.Extra exposing (getAt, groupWhile, unique)
+import Utils exposing (smashList)
 
 
 colors : List Color
@@ -123,12 +124,15 @@ getDataSets points =
         sortedByGroup =
             List.sortBy .group points
 
-        groupedByGroup =
+        nonEmptyListGroupedByGroup =
             groupWhile
                 (\x y ->
                     x.group == y.group
                 )
                 sortedByGroup
+
+        groupedByGroup =
+            smashList nonEmptyListGroupedByGroup
     in
     List.map
         (\group ->

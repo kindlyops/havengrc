@@ -1,4 +1,4 @@
-module Utils exposing (getHTTPErrorMessage)
+module Utils exposing (getHTTPErrorMessage, smashList)
 
 import Http
 
@@ -17,3 +17,18 @@ getHTTPErrorMessage error =
 
         _ ->
             "Unhandled HTTP error type"
+
+
+smashList list =
+    -- in the change from version 7 to 8 groupWhile changed to use a tuple
+    -- representing a non-empty list. Convert back to something compatible
+    -- with List.map.
+    List.map
+        (\item ->
+            let
+                ( a, b ) =
+                    item
+            in
+            [ a ] ++ b
+        )
+        list

@@ -19,12 +19,10 @@ encode record survey =
 
         results =
             Encode.list
-                (List.map
                     (\x ->
                         Data.Survey.ipsativeSingleResponseEncoder x
                     )
                     allResponses
-                )
     in
     Encode.object
         [ ( "email", Encode.string <| record.email )

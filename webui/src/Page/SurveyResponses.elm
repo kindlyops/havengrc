@@ -194,7 +194,7 @@ viewResponseTable datum =
                 (\datum ->
                     Html.tr []
                         [ Html.td [] [ text datum.category ]
-                        , Html.td [] [ text (toString datum.points) ]
+                        , Html.td [] [ text (String.fromInt datum.points) ]
                         ]
                 )
                 datum
@@ -209,7 +209,7 @@ viewHome model =
         , hr [ class "my-4" ] []
         , div [ class "row" ]
             [ button [ class "btn btn-secondary", onClick GetResponses ] [ text "get Ipsative Responses" ] ]
-        , p [ class "" ] [ text ("There are currently " ++ toString (List.length model.availableResponses) ++ " responses to choose from.") ]
+        , p [ class "" ] [ text ("There are currently " ++ String.fromInt (List.length model.availableResponses) ++ " responses to choose from.") ]
         , div [ class "row" ]
             (List.map
                 (\availableResponse ->

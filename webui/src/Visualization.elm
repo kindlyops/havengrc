@@ -18,7 +18,7 @@ getData model =
         _ =
             Debug.log "Test Get Data"
                 Debug.log
-                (toString allResponses)
+                (Debug.toString allResponses)
     in
     allResponses
 

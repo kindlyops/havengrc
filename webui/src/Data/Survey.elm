@@ -45,6 +45,7 @@ import Json.Decode as Decode exposing (Decoder, andThen, field, int, map2, map3,
 import Json.Encode as Encode
 import List.Extra
 import List.Zipper as Zipper
+import Utils exposing (smashList)
 
 
 type SurveyPage
@@ -419,16 +420,14 @@ ipsativeResponseDecoder =
         (field "points_assigned" int)
 
 
-ipsativeResponseEncoder : IpsativeSurvey -> List Encode.Value
+ipsativeResponseEncoder : IpsativeSurvey -> Encode.Value
 ipsativeResponseEncoder survey =
     let
         allResponses =
             getAllResponsesFromIpsativeSurvey survey
     in
-    List.map
-        (\x ->
-            ipsativeSingleResponseEncoder x
-        )
+    Encode.list
+        ipsativeSingleResponseEncoder
         allResponses
 
 
@@ -489,16 +488,14 @@ likertResponseDecoder =
         (field "choice" string)
 
 
-likertResponseEncoder : LikertSurvey -> List Encode.Value
+likertResponseEncoder : LikertSurvey -> Encode.Value
 likertResponseEncoder survey =
     let
         allResponses =
             getAllResponsesFromLikertSurvey survey
     in
-    List.map
-        (\x ->
-            likertSingleResponseEncoder x
-        )
+    Encode.list
+        likertSingleResponseEncoder
         allResponses
 
 
@@ -614,11 +611,13 @@ groupIpsativeSurveyData : List IpsativeServerData -> List IpsativeServerQuestion
 groupIpsativeSurveyData data =
     let
         grouped =
-            List.Extra.groupWhile
-                (\x y ->
-                    x.question_id == y.question_id
+            smashList
+                (List.Extra.groupWhile
+                    (\x y ->
+                        x.question_id == y.question_id
+                    )
+                    data
                 )
-                data
 
         mapped =
             List.map
@@ -661,11 +660,13 @@ groupLikertSurveyData : List LikertServerData -> List LikertServerQuestion
 groupLikertSurveyData data =
     let
         grouped =
-            List.Extra.groupWhile
-                (\x y ->
-                    x.question_id == y.question_id
+            smashList
+                (List.Extra.groupWhile
+                    (\x y ->
+                        x.question_id == y.question_id
+                    )
+                    data
                 )
-                data
 
         mapped =
             List.map

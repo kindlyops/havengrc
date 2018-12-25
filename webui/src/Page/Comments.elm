@@ -135,4 +135,4 @@ commentsForm authModel newComment =
 
 showDebugData : record -> Html Msg
 showDebugData record =
-    div [ class "debug" ] [ text ("DEBUG: " ++ toString record) ]
+    div [ class "debug" ] [ text ("DEBUG: " ++ Debug.toString record) ]
