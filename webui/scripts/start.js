@@ -35,7 +35,7 @@ const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
 const clearConsole = require('react-dev-utils/clearConsole');
 const openBrowser = require('react-dev-utils/openBrowser');
 const createDevServerConfig = require('../config/webpackDevServer.config');
-const highlightElmCompilerErrors = require('./utils/formatElmCompilerErrors');
+const formatElmCompilerErrors = require('./utils/formatElmCompilerErrors');
 const paths = require('../config/paths');
 const warn = require('./utils/warn');
 
