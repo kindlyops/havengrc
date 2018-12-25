@@ -5,8 +5,7 @@ module Data.SurveyResponses exposing
     , groupedIpsativeResponseDecoder
     )
 
-import Json.Decode as Decode exposing (Decoder)
-import Json.Decode.Pipeline exposing (decode, required)
+import Json.Decode as Decode exposing (Decoder, field, int, map5, string)
 
 
 
@@ -24,12 +23,12 @@ type alias GroupedIpsativeResponse =
 
 groupedIpsativeResponseDecoder : Decoder GroupedIpsativeResponse
 groupedIpsativeResponseDecoder =
-    decode GroupedIpsativeResponse
-        |> required "survey_id" Decode.string
-        |> required "name" Decode.string
-        |> required "group_number" Decode.int
-        |> required "category" Decode.string
-        |> required "sum" Decode.int
+    map5 GroupedIpsativeResponse
+        (field "survey_id" string)
+        (field "name" string)
+        (field "group_number" int)
+        (field "category" string)
+        (field "sum" int)
 
 
 type alias AvailableResponse =

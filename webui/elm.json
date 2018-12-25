@@ -8,6 +8,7 @@
     "dependencies": {
         "direct": {
             "NoRedInk/elm-json-decode-pipeline": "1.0.0",
+            "avh4/elm-color": "1.0.0",
             "elm/browser": "1.0.1",
             "elm/core": "1.0.0",
             "elm/html": "1.0.0",
@@ -20,16 +21,17 @@
             "elm-community/json-extra": "4.0.0",
             "elm-community/list-extra": "8.1.0",
             "elm-community/string-extra": "4.0.0",
+            "elm-community/typed-svg": "5.0.1",
             "elm-explorations/markdown": "1.0.0",
             "gampleman/elm-visualization": "2.0.0",
             "gicentre/elm-vega": "4.1.0",
+            "gicentre/elm-vegalite": "1.0.5",
             "kuzzmi/elm-gravatar": "2.0.2",
             "rtfeldman/elm-css": "16.0.0",
             "wernerdegroot/listzipper": "3.1.1"
         },
         "indirect": {
             "Skinney/murmur3": "2.0.8",
-            "avh4/elm-color": "1.0.0",
             "elm/parser": "1.1.0",
             "elm/virtual-dom": "1.0.2",
             "folkertdev/elm-deque": "3.0.0",

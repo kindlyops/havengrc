@@ -11,9 +11,10 @@
 
 module Route exposing (Model, Route(..), init, locFor, titleFor, urlFor)
 
-import Navigation
 import String exposing (fromList, join, split)
-import UrlParser exposing ((</>), (<?>), Parser, int, oneOf, parsePath, s, string)
+import Url
+import Url.Builder
+import Url.Parser exposing ((</>), (<?>), Parser, int, oneOf, s, string)
 
 
 type Route
@@ -35,19 +36,19 @@ type Route
 route : Parser (Route -> a) a
 route =
     oneOf
-        [ UrlParser.map Activity (s "activity")
-        , UrlParser.map Comments (s "comments")
-        , UrlParser.map Dashboard (s "dashboard")
-        , UrlParser.map Home (s "")
-        , UrlParser.map Login (s "login")
-        , UrlParser.map Privacy (s "privacy")
-        , UrlParser.map Landing (s "l")
-        , UrlParser.map Reports (s "reports")
-        , UrlParser.map Survey (s "survey")
-        , UrlParser.map SurveyResponses (s "surveyResponses")
-        , UrlParser.map ShowComment (s "comments" </> int)
-        , UrlParser.map EditComment (s "comments" </> int </> s "edit")
-        , UrlParser.map Terms (s "terms")
+        [ Url.Parser.map Activity (s "activity")
+        , Url.Parser.map Comments (s "comments")
+        , Url.Parser.map Dashboard (s "dashboard")
+        , Url.Parser.map Home (s "")
+        , Url.Parser.map Login (s "login")
+        , Url.Parser.map Privacy (s "privacy")
+        , Url.Parser.map Landing (s "l")
+        , Url.Parser.map Reports (s "reports")
+        , Url.Parser.map Survey (s "survey")
+        , Url.Parser.map SurveyResponses (s "surveyResponses")
+        , Url.Parser.map ShowComment (s "comments" </> int)
+        , Url.Parser.map EditComment (s "comments" </> int </> s "edit")
+        , Url.Parser.map Terms (s "terms")
         ]
 
 
@@ -55,14 +56,11 @@ type alias Model =
     Maybe Route
 
 
-init : Maybe Navigation.Location -> ( Model, Cmd msg )
+init : Maybe Url.Url -> ( Model, Cmd msg )
 init location =
     let
-        route =
+        initialRoute =
             locFor location
-
-        _ =
-            Debug.log "Route.init : " (toString route)
     in
     -- TODO when we are loaded with an invalid URL, the wildcard case
     -- in locFor is giving us a route of Nothing, but the browser location
@@ -70,18 +68,14 @@ init location =
     -- URL that matches the route or we need to introduce a 404 route.
     -- revisit routing when Elm 0.19 comes out to see if there are better
     -- patterns we should be using
-    case route of
-        Nothing ->
-            ( route, Navigation.newUrl (urlFor Home) )
 
-        Just _ ->
-            ( route, Cmd.none )
+    ( initialRoute, Cmd.none )
 
 
 titleFor : Route -> String
-titleFor route =
+titleFor r =
     "Haven GRC - "
-        ++ (case route of
+        ++ (case r of
                 Activity ->
                     "Activity"
 
@@ -138,7 +132,7 @@ urlFor loc =
                     "/dashboard/"
 
                 EditComment id ->
-                    "/comments/" ++ toString id ++ "/edit"
+                    "/comments/" ++ String.fromInt id ++ "/edit"
 
                 Home ->
                     "/"
@@ -156,7 +150,7 @@ urlFor loc =
                     "/reports/"
 
                 ShowComment id ->
-                    "/comments/" ++ toString id
+                    "/comments/" ++ String.fromInt id
 
                 Survey ->
                     "/survey/"
@@ -170,19 +164,19 @@ urlFor loc =
     url
 
 
-locFor : Maybe Navigation.Location -> Maybe Route
+locFor : Maybe Url.Url -> Maybe Route
 locFor location =
     case location of
         Nothing ->
             Nothing
 
-        Just location ->
+        Just loc ->
             let
                 selectedRoute =
-                    parsePath route location
+                    route loc
 
                 segments =
-                    location.hash
+                    loc.path
                         |> split "/"
                         |> List.filter (\seg -> seg /= "" && seg /= "#")
 

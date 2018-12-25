@@ -1,6 +1,7 @@
 module Main exposing (main)
 
 import Authentication
+import Browser
 import Data.Survey as SurveyData
 import Gravatar
 import Html exposing (Html, a, button, div, i, img, li, nav, span, text, ul)
@@ -8,7 +9,6 @@ import Html.Attributes exposing (attribute, class, classList, href, id, style)
 import Html.Events exposing (onClick)
 import Json.Decode as Decode
 import Keycloak
-import Navigation
 import Page.Activity as Activity
 import Page.Comments as Comments
 import Page.Dashboard as Dashboard
@@ -107,7 +107,7 @@ subscriptions model =
 
 main : Program Decode.Value Model Msg
 main =
-    Navigation.programWithFlags UrlChange
+    Browser.application UrlChange
         { init = init
         , update = update
         , subscriptions = subscriptions

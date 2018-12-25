@@ -4,7 +4,6 @@ import Html exposing (Html, br, button, div, text)
 import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
 import Ports
-import Views.Centroid as Centroid
 
 
 type Msg
@@ -35,7 +34,7 @@ view : Model -> Html Msg
 view model =
     div
         []
-        [ Centroid.view model.data
+        [ div [] [ text "This used to be the Centroid" ]
         , br [] []
         , button
             [ class "btn btn-secondary"

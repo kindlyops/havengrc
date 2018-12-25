@@ -1,7 +1,6 @@
 module Data.Comment exposing (Comment, decode, emptyNewComment, encode)
 
-import Json.Decode as Decode exposing (Decoder)
-import Json.Decode.Pipeline exposing (decode, required)
+import Json.Decode as Decode exposing (Decoder, field, int, map5, string)
 import Json.Encode as Encode exposing (Value)
 
 
@@ -21,12 +20,12 @@ emptyNewComment =
 
 decode : Decoder Comment
 decode =
-    Json.Decode.Pipeline.decode Comment
-        |> required "uuid" Decode.string
-        |> required "created_at" Decode.string
-        |> required "user_email" Decode.string
-        |> required "user_id" Decode.string
-        |> required "message" Decode.string
+    map5 Comment
+        (field "uuid" string)
+        (field "created_at" string)
+        (field "user_email" string)
+        (field "user_id" string)
+        (field "message" string)
 
 
 encode : Comment -> Value

@@ -1,6 +1,6 @@
 module Data.RadarChart exposing (RadarChartConfig, generateIpsativeChart)
 
-import Color exposing (Color, rgb, rgba, toRgb)
+import Color exposing (Color, rgb, rgba, toRgba)
 import Data.SurveyResponses exposing (AvailableResponse, AvailableResponseDatum)
 import List.Extra exposing (getAt, groupWhile, unique)
 
@@ -74,13 +74,13 @@ colorToCssRgba : Color -> String
 colorToCssRgba cl =
     let
         { red, green, blue, alpha } =
-            toRgb cl
+            toRgba cl
     in
     cssColorString "rgba"
-        [ toString red
-        , toString green
-        , toString blue
-        , toString alpha
+        [ String.fromFloat red
+        , String.fromFloat green
+        , String.fromFloat blue
+        , String.fromFloat alpha
         ]
 
 
@@ -144,7 +144,7 @@ getDataSets points =
                         _ ->
                             0
             in
-            { label = "Group " ++ toString groupNumber
+            { label = "Group " ++ String.fromInt groupNumber
             , backgroundColor = colorToCssRgba (makeTransparent (getAt (groupNumber - 1) colors |> Maybe.withDefault (rgb 0 0 0)))
             , borderColor = colorToCssRgba (getAt (groupNumber - 1) colors |> Maybe.withDefault (rgb 0 0 0))
             , pointBackgroundColor = colorToCssRgba (getAt (groupNumber - 1) colors |> Maybe.withDefault (rgb 0 0 0))
@@ -158,6 +158,6 @@ makeTransparent : Color -> Color
 makeTransparent color =
     let
         colorObject =
-            toRgb color
+            toRgba color
     in
     rgba colorObject.red colorObject.green colorObject.blue 0.2
