@@ -14,7 +14,7 @@ module Route exposing (Model, Route(..), init, locFor, titleFor, urlFor)
 import String exposing (fromList, join, split)
 import Url
 import Url.Builder
-import Url.Parser exposing ((</>), (<?>), Parser, int, oneOf, s, string)
+import Url.Parser exposing ((</>), (<?>), Parser, int, map, oneOf, s, string)
 
 
 type Route
@@ -36,19 +36,19 @@ type Route
 route : Parser (Route -> a) a
 route =
     oneOf
-        [ Url.Parser.map Activity (s "activity")
-        , Url.Parser.map Comments (s "comments")
-        , Url.Parser.map Dashboard (s "dashboard")
-        , Url.Parser.map Home (s "")
-        , Url.Parser.map Login (s "login")
-        , Url.Parser.map Privacy (s "privacy")
-        , Url.Parser.map Landing (s "l")
-        , Url.Parser.map Reports (s "reports")
-        , Url.Parser.map Survey (s "survey")
-        , Url.Parser.map SurveyResponses (s "surveyResponses")
-        , Url.Parser.map ShowComment (s "comments" </> int)
-        , Url.Parser.map EditComment (s "comments" </> int </> s "edit")
-        , Url.Parser.map Terms (s "terms")
+        [ map Activity (s "activity")
+        , map Comments (s "comments")
+        , map Dashboard (s "dashboard")
+        , map Home (s "")
+        , map Login (s "login")
+        , map Privacy (s "privacy")
+        , map Landing (s "l")
+        , map Reports (s "reports")
+        , map Survey (s "survey")
+        , map SurveyResponses (s "surveyResponses")
+        , map ShowComment (s "comments" </> int)
+        , map EditComment (s "comments" </> int </> s "edit")
+        , map Terms (s "terms")
         ]
 
 
@@ -68,7 +68,6 @@ init location =
     -- URL that matches the route or we need to introduce a 404 route.
     -- revisit routing when Elm 0.19 comes out to see if there are better
     -- patterns we should be using
-
     ( initialRoute, Cmd.none )
 
 

@@ -230,15 +230,15 @@ encodeipsativeSurveyWithoutZipper surveyWithoutZipper =
         [ ( "metaData", encodeSurveyMetaData <| surveyWithoutZipper.metaData )
         , ( "pointsPerQuestion", Encode.int <| surveyWithoutZipper.pointsPerQuestion )
         , ( "numGroups", Encode.int <| surveyWithoutZipper.numGroups )
-        , ( "questions", Encode.list <| List.map encodeIpsativeQuestion <| surveyWithoutZipper.questions )
+        , ( "questions", surveyWithoutZipper.questions |> Encode.list encodeIpsativeQuestion )
         ]
 
 
 encodeLikertSurveyWithoutZipper : LikertSurveyWithoutZipper -> Encode.Value
 encodeLikertSurveyWithoutZipper surveyWithoutZipper =
     Encode.object
-        [ ( "metaData", encodeSurveyMetaData <| surveyWithoutZipper.metaData )
-        , ( "questions", Encode.list <| List.map encodeLikertQuestion <| surveyWithoutZipper.questions )
+        [ ( "metaData", surveyWithoutZipper.metaData |> encodeSurveyMetaData )
+        , ( "questions", surveyWithoutZipper.questions |> Encode.list encodeLikertQuestion )
         ]
 
 
@@ -260,8 +260,8 @@ encodeIpsativeQuestion ipsativeQuestion =
         [ ( "id", Encode.string <| ipsativeQuestion.id )
         , ( "title", Encode.string <| ipsativeQuestion.title )
         , ( "orderNumber", Encode.int <| ipsativeQuestion.orderNumber )
-        , ( "pointsLeft", Encode.list <| List.map encodePointsLeft <| ipsativeQuestion.pointsLeft )
-        , ( "answers", Encode.list <| List.map encodeIpsativeAnswer <| ipsativeQuestion.answers )
+        , ( "pointsLeft", ipsativeQuestion.pointsLeft |> Encode.list encodePointsLeft )
+        , ( "answers", ipsativeQuestion.answers |> Encode.list encodeIpsativeAnswer )
         ]
 
 
@@ -271,8 +271,8 @@ encodeLikertQuestion likertQuestion =
         [ ( "id", Encode.string <| likertQuestion.id )
         , ( "title", Encode.string <| likertQuestion.title )
         , ( "orderNumber", Encode.int <| likertQuestion.orderNumber )
-        , ( "choices", Encode.list <| List.map Encode.string <| likertQuestion.choices )
-        , ( "answers", Encode.list <| List.map encodeLikertAnswer <| likertQuestion.answers )
+        , ( "choices", likertQuestion.choices |> Encode.list Encode.string )
+        , ( "answers", likertQuestion.answers |> Encode.list encodeLikertAnswer )
         ]
 
 
@@ -290,7 +290,7 @@ encodeIpsativeAnswer ipsativeAnswer =
         [ ( "id", Encode.string <| ipsativeAnswer.id )
         , ( "answer", Encode.string <| ipsativeAnswer.answer )
         , ( "orderNumber", Encode.int <| ipsativeAnswer.orderNumber )
-        , ( "pointsAssigned", Encode.list <| List.map encodePointsAssigned <| ipsativeAnswer.pointsAssigned )
+        , ( "pointsAssigned", ipsativeAnswer.pointsAssigned |> Encode.list encodePointsAssigned )
         ]
 
 
