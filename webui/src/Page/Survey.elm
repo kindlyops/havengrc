@@ -37,8 +37,7 @@ import Html exposing (Html, br, button, div, h1, h3, h4, hr, i, input, li, p, ta
 import Html.Attributes exposing (class, disabled, id, placeholder, style, type_, value)
 import Html.Events exposing (onClick, onInput)
 import Http
-import Json.Decode as Decode exposing (Decoder, andThen, decodeString, int, oneOf)
-import Json.Decode.Pipeline exposing (decode, required)
+import Json.Decode as Decode exposing (Decoder, andThen, decodeString, field, int, map, map5, oneOf)
 import Json.Encode as Encode
 import List.Zipper as Zipper
 import Ports
@@ -65,8 +64,8 @@ type alias TestStructure =
 
 testDecoder : Decoder TestStructure
 testDecoder =
-    decode TestStructure
-        |> required "storedSurvey" decodeSavedState
+    map TestStructure
+        (field "storedSurvey" decodeSavedState)
 
 
 type alias SavedState =
@@ -80,12 +79,12 @@ type alias SavedState =
 
 decodeSavedState : Decoder SavedState
 decodeSavedState =
-    decode SavedState
-        |> required "currentPage" decodeCurrentPage
-        |> required "surveyData" decodeInitialSurvey
-        |> required "selectedSurveyMetaData" decodeSurveyMetaData
-        |> required "isSurveyReady" Decode.bool
-        |> required "currentQuestionNumber" Decode.int
+    map5 SavedState
+        (field "currentPage" decodeCurrentPage)
+        (field "surveyData" decodeInitialSurvey)
+        (field "selectedSurveyMetaData" decodeSurveyMetaData)
+        (field "isSurveyReady" Decode.bool)
+        (field "currentQuestionNumber" Decode.int)
 
 
 decodeCurrentPage : Decoder SurveyPage
@@ -620,7 +619,7 @@ validateSurvey survey =
 getIncompleteQuestions : Survey -> List Int
 getIncompleteQuestions survey =
     case survey of
-        Ipsative survey ->
+        Ipsative s ->
             --Survey question is good if all the points for all the groups for all the answers is zero
             List.foldr
                 (\question incompleteQuestions ->
@@ -631,9 +630,9 @@ getIncompleteQuestions survey =
                         question.orderNumber :: incompleteQuestions
                 )
                 []
-                (Zipper.toList survey.questions)
+                (Zipper.toList s.questions)
 
-        Likert survey ->
+        Likert s ->
             --Survey question is good if all the answers have a selectedChoice
             List.foldr
                 (\question incompleteQuestions ->
@@ -644,7 +643,7 @@ getIncompleteQuestions survey =
                         question.orderNumber :: incompleteQuestions
                 )
                 []
-                (Zipper.toList survey.questions)
+                (Zipper.toList s.questions)
 
 
 validateLikertQuestion : LikertQuestion -> Bool
@@ -912,7 +911,7 @@ viewIncompleteButtons : Survey -> List Int -> List (Html Msg)
 viewIncompleteButtons survey questionNumbers =
     List.map
         (\questionNumber ->
-            div [ class "my-2" ] [ button [ class "btn btn-primary", onClick (GotoQuestion questionNumber) ] [ text ("Click to go back to question " ++ toString questionNumber) ] ]
+            div [ class "my-2" ] [ button [ class "btn btn-primary", onClick (GotoQuestion questionNumber) ] [ text ("Click to go back to question " ++ String.fromInt questionNumber) ] ]
         )
         questionNumbers
 
@@ -998,11 +997,11 @@ viewRegistered model =
 viewSurvey : Survey -> Html Msg
 viewSurvey survey =
     case survey of
-        Ipsative survey ->
-            viewIpsativeSurvey survey
+        Ipsative s ->
+            viewIpsativeSurvey s
 
-        Likert survey ->
-            viewLikertSurvey survey
+        Likert s ->
+            viewLikertSurvey s
 
 
 viewLikertSurvey : LikertSurvey -> Html Msg
@@ -1135,7 +1134,7 @@ viewLikertSurveyTitle survey =
             Zipper.current survey.questions
 
         questionNumber =
-            toString currentQuestion.orderNumber
+            String.fromInt currentQuestion.orderNumber
 
         totalQuestions =
             List.length (Zipper.toList survey.questions)
@@ -1145,7 +1144,7 @@ viewLikertSurveyTitle survey =
     in
     div [ class "row" ]
         [ div [ class "col-lg ", style "text-align" "center" ]
-            [ h3 [ class "" ] [ text ("Question " ++ questionNumber ++ " of " ++ toString totalQuestions) ]
+            [ h3 [ class "" ] [ text ("Question " ++ questionNumber ++ " of " ++ String.fromInt totalQuestions) ]
             , h4 [] [ text questionTitle ]
             ]
         ]
@@ -1168,7 +1167,7 @@ viewIpsativeSurveyTitle survey =
     in
     div [ class "row" ]
         [ div [ class "col-lg ", style "text-align" "center" ]
-            [ h3 [ class "" ] [ text ("Question " ++ toString questionNumber ++ " of " ++ toString totalQuestions) ]
+            [ h3 [ class "" ] [ text ("Question " ++ String.fromInt questionNumber ++ " of " ++ String.fromInt totalQuestions) ]
             , h4 [] [ text questionTitle ]
             , div [ class "row" ] (viewPointsLeft currentQuestion.pointsLeft survey.pointsPerQuestion)
             ]
@@ -1180,7 +1179,7 @@ viewPointsLeft pointsLeft pointsPerQuestion =
     List.map
         (\x ->
             div [ class "col-md" ]
-                [ p [] [ text ("Group " ++ toString x.group ++ ": " ++ toString x.pointsLeft ++ "/" ++ toString pointsPerQuestion) ]
+                [ p [] [ text ("Group " ++ String.fromInt x.group ++ ": " ++ String.fromInt x.pointsLeft ++ "/" ++ String.fromInt pointsPerQuestion) ]
                 , div [ class "progress" ]
                     [ div [ class "progress-bar bg-primary", (\( a, b ) -> style a b) (calculateProgressBarPercent x.pointsLeft pointsPerQuestion) ] []
                     ]
@@ -1196,7 +1195,7 @@ calculateProgressBarPercent current max =
             100 * (toFloat current / toFloat max)
 
         percentString =
-            toString percent ++ "%"
+            String.fromFloat percent ++ "%"
     in
     ( "width", percentString )
 
@@ -1242,7 +1241,7 @@ viewSurveyPointsGroup answer group =
                     ]
                     [ i [ class "material-icons" ] [ text "remove" ] ]
                 ]
-            , div [ class "align-self-center" ] [ p [ class "card-text   " ] [ text (toString group.points) ] ]
+            , div [ class "align-self-center" ] [ p [ class "card-text   " ] [ text (String.fromInt group.points) ] ]
             , div [ class "" ]
                 [ button
                     [ type_ "button"

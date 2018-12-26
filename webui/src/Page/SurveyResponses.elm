@@ -16,7 +16,7 @@ import Http
 import List.Extra exposing (groupWhile)
 import Ports
 import Request.SurveyResponses
-import Utils exposing (getHTTPErrorMessage)
+import Utils exposing (getHTTPErrorMessage, smashList)
 
 
 type ResponsePage
@@ -119,11 +119,13 @@ createAvailableResponses groupedResponses =
             List.sortBy .survey_id groupedResponses
 
         groupedBySurvey =
-            groupWhile
-                (\x y ->
-                    x.survey_id == y.survey_id
+            smashList
+                (groupWhile
+                    (\x y ->
+                        x.survey_id == y.survey_id
+                    )
+                    sorted
                 )
-                sorted
 
         availableResponses =
             List.map
@@ -191,10 +193,10 @@ viewResponseTable datum =
             ]
          ]
             ++ List.map
-                (\datum ->
+                (\d ->
                     Html.tr []
-                        [ Html.td [] [ text datum.category ]
-                        , Html.td [] [ text (String.fromInt datum.points) ]
+                        [ Html.td [] [ text d.category ]
+                        , Html.td [] [ text (String.fromInt d.points) ]
                         ]
                 )
                 datum

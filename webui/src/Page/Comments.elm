@@ -51,9 +51,9 @@ update msg model authModel =
             , Http.send GotComments (Request.Comments.get authModel)
             )
 
-        AddComment authModel comment ->
+        AddComment aM comment ->
             ( model
-            , Http.send NewComment (Request.Comments.post authModel comment)
+            , Http.send NewComment (Request.Comments.post aM comment)
             )
 
         GotComments (Ok comments) ->
