@@ -2,6 +2,7 @@ module Main exposing (main)
 
 import Authentication
 import Browser
+import Browser.Navigation as Nav
 import Data.Survey as SurveyData
 import Gravatar
 import Html exposing (Html, a, button, div, i, img, li, nav, span, text, ul)
@@ -21,6 +22,7 @@ import Page.SurveyResponses as SurveyResponses
 import Page.Terms as Terms
 import Ports
 import Route
+import Url
 import Visualization exposing (myVis)
 
 
@@ -31,13 +33,15 @@ type alias Model =
     , commentsModel : Comments.Model
     , surveyModel : SurveyData.Model
     , surveyResponseModel : SurveyResponses.Model
+    , key : Nav.Key
+    , url : Url.Url
     }
 
 
 type alias MenuItem =
     { text : String
     , iconName : String
-    , route : Maybe Route.Route
+    , url : String
     }
 
 
@@ -57,8 +61,8 @@ decodeSavedState json =
         |> Maybe.andThen (Decode.decodeString Survey.testDecoder >> Result.toMaybe)
 
 
-init : Decode.Value -> Navigation.Location -> ( Model, Cmd Msg )
-init sessionStorage location =
+init : Decode.Value -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
+init sessionStorage location key =
     let
         initialAuthModel =
             Authentication.init Ports.keycloakLogin Ports.keycloakLogout (decodeKeyCloak sessionStorage)
@@ -87,6 +91,8 @@ init sessionStorage location =
             , commentsModel = commentsModel
             , surveyModel = surveyModel
             , surveyResponseModel = surveyResponseModel
+            , key = key
+            , url = location
             }
     in
     ( model
@@ -107,17 +113,19 @@ subscriptions model =
 
 main : Program Decode.Value Model Msg
 main =
-    Browser.application UrlChange
+    Browser.application
         { init = init
         , update = update
         , subscriptions = subscriptions
         , view = view
+        , onUrlChange = UrlChange
+        , onUrlRequest = LinkClicked
         }
 
 
 type Msg
-    = NavigateTo (Maybe Route.Route)
-    | UrlChange Navigation.Location
+    = LinkClicked Browser.UrlRequest
+    | UrlChange Url.Url
     | AuthenticationMsg Authentication.Msg
     | DashboardMsg Dashboard.Msg
     | CommentsMsg Comments.Msg
@@ -128,114 +136,107 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        NavigateTo maybeLocation ->
-            case maybeLocation of
-                Nothing ->
-                    ( model
+        LinkClicked urlRequest ->
+            case urlRequest of
+                Browser.Internal url ->
+                    ( model, Nav.pushUrl model.key (Url.toString url) )
+
+                Browser.External href ->
+                    ( model, Nav.load href )
+
+                UrlChange location ->
+                    let
+                        _ =
+                            Debug.log "UrlChange: " location.hash
+                    in
+                    ( { model | route = Route.locFor (Just location) }
                     , Cmd.none
                     )
 
-                Just location ->
-                    ( model
+                AuthenticationMsg authMsg ->
+                    let
+                        ( authModel, cmd ) =
+                            Authentication.update authMsg model.authModel
+
+                        ( commentsModel, commentsCmd ) =
+                            Comments.init authModel
+
+                        ( surveyResponseModel, surveyResponsesCmd ) =
+                            SurveyResponses.init authModel
+
+                        ( _, surveyCmd ) =
+                            Survey.init authModel
+                    in
+                    ( { model
+                        | authModel = authModel
+                        , commentsModel = commentsModel
+                      }
                     , Cmd.batch
-                        [ Navigation.newUrl (Route.urlFor location)
-                        , Ports.setTitle (Route.titleFor location)
+                        [ Cmd.map AuthenticationMsg cmd
+                        , Cmd.map CommentsMsg commentsCmd
+                        , Cmd.map SurveyMsg surveyCmd
+                        , Cmd.map SurveyResponseMsg surveyResponsesCmd
                         ]
                     )
 
-        UrlChange location ->
-            let
-                _ =
-                    Debug.log "UrlChange: " location.hash
-            in
-            ( { model | route = Route.locFor (Just location) }
-            , Cmd.none
-            )
-
-        AuthenticationMsg authMsg ->
-            let
-                ( authModel, cmd ) =
-                    Authentication.update authMsg model.authModel
-
-                ( commentsModel, commentsCmd ) =
-                    Comments.init authModel
-
-                ( surveyResponseModel, surveyResponsesCmd ) =
-                    SurveyResponses.init authModel
-
-                ( _, surveyCmd ) =
-                    Survey.init authModel
-            in
-            ( { model
-                | authModel = authModel
-                , commentsModel = commentsModel
-              }
-            , Cmd.batch
-                [ Cmd.map AuthenticationMsg cmd
-                , Cmd.map CommentsMsg commentsCmd
-                , Cmd.map SurveyMsg surveyCmd
-                , Cmd.map SurveyResponseMsg surveyResponsesCmd
-                ]
-            )
-
-        DashboardMsg dashboardMsg ->
-            let
-                ( dashboardModel, cmd ) =
-                    Dashboard.update dashboardMsg model.dashboardModel
-            in
-            ( { model | dashboardModel = dashboardModel }, Cmd.map DashboardMsg cmd )
-
-        CommentsMsg commentMsg ->
-            let
-                ( commentsModel, cmd ) =
-                    Comments.update commentMsg model.commentsModel model.authModel
-            in
-            ( { model | commentsModel = commentsModel }, Cmd.map CommentsMsg cmd )
-
-        SurveyMsg surveyMsg ->
-            case surveyMsg of
-                Survey.SaveCurrentSurvey ->
+                DashboardMsg dashboardMsg ->
                     let
-                        ( surveyModel, cmd ) =
-                            Survey.update surveyMsg model.surveyModel model.authModel
-
-                        ( surveyResponseModel, respCmd ) =
-                            SurveyResponses.update SurveyResponses.GetResponses model.surveyResponseModel model.authModel
-
-                        _ =
-                            Debug.log "SavedCurrentSurvey " (toString respCmd)
+                        ( dashboardModel, cmd ) =
+                            Dashboard.update dashboardMsg model.dashboardModel
                     in
-                    ( { model | surveyModel = surveyModel, surveyResponseModel = surveyResponseModel }
-                    , Cmd.batch [ Cmd.map SurveyResponseMsg respCmd, Cmd.map SurveyMsg cmd ]
-                    )
+                    ( { model | dashboardModel = dashboardModel }, Cmd.map DashboardMsg cmd )
 
-                _ ->
+                CommentsMsg commentMsg ->
                     let
-                        ( surveyModel, cmd ) =
-                            Survey.update surveyMsg model.surveyModel model.authModel
+                        ( commentsModel, cmd ) =
+                            Comments.update commentMsg model.commentsModel model.authModel
                     in
-                    ( { model | surveyModel = surveyModel }, Cmd.map SurveyMsg cmd )
+                    ( { model | commentsModel = commentsModel }, Cmd.map CommentsMsg cmd )
 
-        SurveyResponseMsg surveyResponseMsg ->
-            let
-                ( surveyResponseModel, cmd ) =
-                    SurveyResponses.update surveyResponseMsg model.surveyResponseModel model.authModel
-            in
-            ( { model | surveyResponseModel = surveyResponseModel }, Cmd.map SurveyResponseMsg cmd )
+                SurveyMsg surveyMsg ->
+                    case surveyMsg of
+                        Survey.SaveCurrentSurvey ->
+                            let
+                                ( surveyModel, cmd ) =
+                                    Survey.update surveyMsg model.surveyModel model.authModel
+
+                                ( surveyResponseModel, respCmd ) =
+                                    SurveyResponses.update SurveyResponses.GetResponses model.surveyResponseModel model.authModel
+
+                                _ =
+                                    Debug.log "SavedCurrentSurvey " (Debug.toString respCmd)
+                            in
+                            ( { model | surveyModel = surveyModel, surveyResponseModel = surveyResponseModel }
+                            , Cmd.batch [ Cmd.map SurveyResponseMsg respCmd, Cmd.map SurveyMsg cmd ]
+                            )
+
+                        _ ->
+                            let
+                                ( surveyModel, cmd ) =
+                                    Survey.update surveyMsg model.surveyModel model.authModel
+                            in
+                            ( { model | surveyModel = surveyModel }, Cmd.map SurveyMsg cmd )
+
+                SurveyResponseMsg surveyResponseMsg ->
+                    let
+                        ( surveyResponseModel, cmd ) =
+                            SurveyResponses.update surveyResponseMsg model.surveyResponseModel model.authModel
+                    in
+                    ( { model | surveyResponseModel = surveyResponseModel }, Cmd.map SurveyResponseMsg cmd )
 
 
 selectedItem : Route.Model -> String
 selectedItem route =
     let
         item =
-            List.head (List.filter (\m -> m.route == route) navDrawerItems)
+            List.head (List.filter (\m -> m.url == Route.urlForDefault route) navDrawerItems)
     in
     case item of
         Nothing ->
             "dashboard"
 
-        Just item ->
-            String.toLower item.text
+        Just i ->
+            String.toLower i.text
 
 
 getGravatar : String -> String
@@ -253,17 +254,21 @@ getGravatar email =
 
 navDrawerItems : List MenuItem
 navDrawerItems =
-    [ { text = "Dashboard", iconName = "dashboard", route = Just Route.Dashboard }
-    , { text = "Activity", iconName = "history", route = Just Route.Activity }
-    , { text = "Reports", iconName = "library_books", route = Just Route.Reports }
-    , { text = "Comments", iconName = "gavel", route = Just Route.Comments }
-    , { text = "Survey", iconName = "assignment", route = Just Route.Survey }
-    , { text = "SurveyResponses", iconName = "insert_chart", route = Just Route.SurveyResponses }
+    [ { text = "Dashboard", iconName = "dashboard", url = "/dashboard/" }
+    , { text = "Activity", iconName = "history", url = "/activity/" }
+    , { text = "Reports", iconName = "library_books", url = "/reports/" }
+    , { text = "Comments", iconName = "gavel", url = "/comments/" }
+    , { text = "Survey", iconName = "assignment", url = "/survey/" }
+    , { text = "SurveyResponses", iconName = "insert_chart", url = "surveyResponses/" }
     ]
 
 
-view : Model -> Html Msg
+view : Model -> Browser.Document Msg
 view model =
+    let
+        title =
+            Route.titleFor model.route.
+    in
     case Authentication.tryGetUserProfile model.authModel of
         Nothing ->
             outsideView model
@@ -415,7 +420,7 @@ viewNavDrawerItem menuItem route =
     li [ class "nav-item" ]
         [ a
             [ attribute "name" (String.toLower menuItem.text)
-            , onClick <| NavigateTo <| menuItem.route
+            , href menuItem.url
             , style "cursor" "pointer"
             , classList
                 [ ( "nav-link", True )

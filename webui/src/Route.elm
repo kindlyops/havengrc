@@ -9,12 +9,12 @@
 -- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-module Route exposing (Model, Route(..), init, locFor, titleFor, urlFor)
+module Route exposing (Model, Route(..), init, locFor, titleFor, urlFor, urlForDefault)
 
 import String exposing (fromList, join, split)
 import Url
 import Url.Builder
-import Url.Parser exposing ((</>), (<?>), Parser, int, map, oneOf, s, string)
+import Url.Parser exposing ((</>), (<?>), Parser, int, map, oneOf, parse, s, string)
 
 
 type Route
@@ -33,8 +33,8 @@ type Route
     | Terms
 
 
-route : Parser (Route -> a) a
-route =
+routeParser : Parser (Route -> a) a
+routeParser =
     oneOf
         [ map Activity (s "activity")
         , map Comments (s "comments")
@@ -116,6 +116,16 @@ titleFor r =
            )
 
 
+urlForDefault : Maybe Route -> String
+urlForDefault loc =
+    case loc of
+        Nothing ->
+            "/dashboard/"
+
+        Just l ->
+            urlFor l
+
+
 urlFor : Route -> String
 urlFor loc =
     let
@@ -172,7 +182,7 @@ locFor location =
         Just loc ->
             let
                 selectedRoute =
-                    route loc
+                    parse routeParser loc
 
                 segments =
                     loc.path
