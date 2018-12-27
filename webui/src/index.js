@@ -97,7 +97,7 @@ elmApp.ports.keycloakLogout.subscribe(function () {
 })
 
 elmApp.ports.showError.subscribe(function (messageString) {
-  console.error(messageString)
+  //console.error(messageString)
   let snackBarElement = document.getElementById('snackbar')
   snackBarElement.classList.add('show')
   let snackBarBodyElement = document.getElementById('snackbar-body')
