@@ -1,7 +1,8 @@
 module Visualization exposing (myVis)
 
-import VegaLite exposing (..)
 import Data.Survey
+import Vega
+import VegaLite exposing (..)
 
 
 getData : Data.Survey.Model -> List Data.Survey.IpsativeSingleResponse
@@ -14,13 +15,8 @@ getData model =
 
                 Data.Survey.Likert survey ->
                     []
-
-        _ =
-            Debug.log ("Test Get Data")
-                Debug.log
-                (toString allResponses)
     in
-        allResponses
+    allResponses
 
 
 myVis : Spec
@@ -63,6 +59,6 @@ myVis =
             asSpec [ textMark [ maStyle [ "label" ] ], encoding (text [ tName "b", tMType Quantitative ] []) ]
 
         config =
-            configure << configuration (coNamedStyle "label" [ maAlign AlignLeft, maBaseline AlignMiddle, maDx 3 ])
+            configure << configuration (coNamedStyle "label" [ maAlign haLeft, maBaseline vaMiddle, maDx 3 ])
     in
-        toVegaLite [ des, data [], enc [], layer [ specBar, specText ], config [] ]
+    toVegaLite [ des, data [], enc [], layer [ specBar, specText ], config [] ]

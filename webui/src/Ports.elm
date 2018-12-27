@@ -5,7 +5,6 @@ port module Ports exposing
     , radarChart
     , renderVega
     , saveSurveyState
-    , setTitle
     , showError
     )
 
@@ -22,9 +21,6 @@ port keycloakLogin : Options -> Cmd msg
 
 
 port keycloakLogout : () -> Cmd msg
-
-
-port setTitle : String -> Cmd msg
 
 
 port showError : String -> Cmd msg

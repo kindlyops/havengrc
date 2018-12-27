@@ -1,9 +1,9 @@
 module Page.Home exposing (view)
 
-import Html exposing (Html, div, img, h1, span, text, button, h3, p, footer, a)
-import Html.Attributes exposing (class, alt, attribute, id, src, height, width, href, title)
-import Html.Events exposing (onClick)
 import Authentication
+import Html exposing (Html, a, button, div, footer, h1, h3, img, p, span, text)
+import Html.Attributes exposing (alt, attribute, class, height, href, id, src, title, width)
+import Html.Events exposing (onClick)
 
 
 view : Html Authentication.Msg
@@ -25,7 +25,7 @@ view =
                         ]
                     , button
                         [ class "btn btn-secondary btn-block mx-auto login-btn"
-                        , onClick (Authentication.ShowLogIn)
+                        , onClick Authentication.ShowLogIn
                         ]
                         [ text "Login" ]
                     ]

@@ -45,7 +45,7 @@ jobs:
           no_output_timeout: 15m
           working_directory: webui
       - save_cache:
-          key: dependency-cache-{{ checksum "webui/package.json" }}
+          key: dependency-cache-{{ checksum "webui/elm.json" }}
           paths:
             - ./webui/node_modules
       - run:

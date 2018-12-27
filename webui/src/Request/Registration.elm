@@ -1,9 +1,10 @@
 module Request.Registration exposing (post)
 
-import Data.Registration as Registration exposing (Registration)
-import Http
-import Data.Survey exposing (Model)
 import Authentication
+import Data.Registration as Registration exposing (Registration)
+import Data.Survey exposing (Model)
+import Http
+
 
 registrationUrl : String
 registrationUrl =
@@ -13,17 +14,16 @@ registrationUrl =
 post : Data.Survey.IpsativeSurvey -> String -> Authentication.Model -> Http.Request String
 post surveyModel emailAddress authModel =
     let
-
         responses =
             Data.Survey.ipsativeResponseEncoder surveyModel
                 |> Http.jsonBody
-        registration = Registration emailAddress responses
+
+        registration =
+            Registration emailAddress responses
 
         body =
             Registration.encode registration surveyModel
                 |> Http.jsonBody
-        _ =
-            Debug.log "post new registration called with " emailAddress
 
         headers =
             Authentication.tryGetAuthHeader authModel ++ Authentication.getReturnHeaders
@@ -39,4 +39,4 @@ post surveyModel emailAddress authModel =
                 , withCredentials = False
                 }
     in
-        request
+    request

@@ -1,19 +1,12 @@
--- The MIT License (MIT)
--- Copyright (c) 2016 Josh Adams
 -- Copyright (c) 2016 Kindly Ops, LLC
---
--- Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
---
--- The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
---
--- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-module Route exposing (Route(..), Model, init, locFor, titleFor, urlFor)
+module Route exposing (Route(..), locFor, pathFor, titleFor)
 
-import String exposing (split, fromList, join)
-import Navigation
-import UrlParser exposing ((</>), (<?>), s, int, string, parsePath, Parser, oneOf)
+import String exposing (fromList, join, split)
+import Url
+import Url.Builder
+import Url.Parser exposing ((</>), (<?>), Parser, int, map, oneOf, parse, s, string, top)
 
 
 type Route
@@ -30,100 +23,78 @@ type Route
     | Survey
     | SurveyResponses
     | Terms
+    | NotFound
 
 
-route : Parser (Route -> a) a
-route =
+routeParser : Parser (Route -> a) a
+routeParser =
     oneOf
-        [ UrlParser.map Activity (s "activity")
-        , UrlParser.map Comments (s "comments")
-        , UrlParser.map Dashboard (s "dashboard")
-        , UrlParser.map Home (s "")
-        , UrlParser.map Login (s "login")
-        , UrlParser.map Privacy (s "privacy")
-        , UrlParser.map Landing (s "l")
-        , UrlParser.map Reports (s "reports")
-        , UrlParser.map Survey (s "survey")
-        , UrlParser.map SurveyResponses (s "surveyResponses")
-        , UrlParser.map ShowComment (s "comments" </> int)
-        , UrlParser.map EditComment (s "comments" </> int </> s "edit")
-        , UrlParser.map Terms (s "terms")
+        [ map Home top
+        , map Activity (s "activity")
+        , map Comments (s "comments")
+        , map Dashboard (s "dashboard")
+        , map Login (s "login")
+        , map Privacy (s "privacy")
+        , map Landing (s "l")
+        , map Reports (s "reports")
+        , map Survey (s "survey")
+        , map SurveyResponses (s "surveyResponses")
+        , map ShowComment (s "comments" </> int)
+        , map EditComment (s "comments" </> int </> s "edit")
+        , map Terms (s "terms")
         ]
 
 
-type alias Model =
-    Maybe Route
-
-
-init : Maybe Navigation.Location -> ( Model, Cmd msg )
-init location =
-    let
-        route =
-            locFor location
-
-        _ =
-            Debug.log "Route.init : " (toString route)
-    in
-        -- TODO when we are loaded with an invalid URL, the wildcard case
-        -- in locFor is giving us a route of Nothing, but the browser location
-        -- is invalid. In this case the address needs to be updated to the
-        -- URL that matches the route or we need to introduce a 404 route.
-        -- revisit routing when Elm 0.19 comes out to see if there are better
-        -- patterns we should be using
-        case route of
-            Nothing ->
-                ( route, Navigation.newUrl (urlFor Home) )
-
-            Just _ ->
-                ( route, Cmd.none )
-
-
 titleFor : Route -> String
-titleFor route =
+titleFor r =
     "Haven GRC - "
-        ++ case route of
-            Activity ->
-                "Activity"
+        ++ (case r of
+                Activity ->
+                    "Activity"
 
-            Comments ->
-                "Comments"
+                Comments ->
+                    "Comments"
 
-            Dashboard ->
-                "Dashboard"
+                Dashboard ->
+                    "Dashboard"
 
-            EditComment _ ->
-                "Thread"
+                EditComment _ ->
+                    "Thread"
 
-            Home ->
-                "Home"
+                Home ->
+                    "Home"
 
-            Login ->
-                "Login"
+                Login ->
+                    "Login"
 
-            Privacy ->
-                "Privacy Policy"
+                Privacy ->
+                    "Privacy Policy"
 
-            Landing ->
-                "Welcome"
+                Landing ->
+                    "Welcome"
 
-            Reports ->
-                "Reports"
+                Reports ->
+                    "Reports"
 
-            ShowComment _ ->
-                "Comment"
+                ShowComment _ ->
+                    "Comment"
 
-            Survey ->
-                "Survey"
+                Survey ->
+                    "Survey"
 
-            SurveyResponses ->
-                "Survey Responses"
+                SurveyResponses ->
+                    "Survey Responses"
 
-            Terms ->
-                "Terms of Service"
+                Terms ->
+                    "Terms of Service"
+
+                NotFound ->
+                    "Not Found"
+           )
 
 
-urlFor : Route -> String
-urlFor loc =
+pathFor : Route -> String
+pathFor loc =
     let
         url =
             case loc of
@@ -137,7 +108,7 @@ urlFor loc =
                     "/dashboard/"
 
                 EditComment id ->
-                    "/comments/" ++ toString id ++ "/edit"
+                    "/comments/" ++ String.fromInt id ++ "/edit"
 
                 Home ->
                     "/"
@@ -155,7 +126,7 @@ urlFor loc =
                     "/reports/"
 
                 ShowComment id ->
-                    "/comments/" ++ toString id
+                    "/comments/" ++ String.fromInt id
 
                 Survey ->
                     "/survey/"
@@ -165,33 +136,18 @@ urlFor loc =
 
                 Terms ->
                     "/terms/"
+
+                NotFound ->
+                    "/"
     in
-        url
+    url
 
 
-locFor : Maybe Navigation.Location -> Maybe Route
-locFor location =
-    case location of
+locFor : Url.Url -> Route
+locFor url =
+    case parse routeParser url of
+        Just route ->
+            route
+
         Nothing ->
-            Nothing
-
-        Just location ->
-            let
-                selectedRoute =
-                    parsePath route location
-
-                segments =
-                    location.hash
-                        |> split "/"
-                        |> List.filter (\seg -> seg /= "" && seg /= "#")
-
-                -- _ =
-                --     Debug.log "Route.locFor segments" (toString segments)
-                -- _ =
-                --     Debug.log "Route.locFor selectedRoute" (toString selectedRoute)
-                -- _ =
-                --     Debug.log "Route.locFor normal hash" (toString location.hash)
-                -- _ =
-                --     Debug.log "Route.locFor fixed hash" (toString fixedLocation.hash)
-            in
-                selectedRoute
+            NotFound

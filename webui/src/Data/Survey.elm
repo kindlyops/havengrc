@@ -1,52 +1,51 @@
-module Data.Survey
-    exposing
-        ( createIpsativeSurvey
-        , createLikertSurvey
-        , emptyIpsativeServerMetaData
-        , emptyIpsativeServerSurvey
-        , encodeSurvey
-        , encodeSurveyData
-        , groupIpsativeSurveyData
-        , groupLikertSurveyData
-        , IpsativeAnswer
-        , decodeSurveyMetaData
-        , InitialSurvey
-        , IpsativeQuestion
-        , IpsativeResponse
-        , ipsativeResponseDecoder
-        , ipsativeResponseEncoder
-        , IpsativeServerData
-        , IpsativeSurvey
-        , ipsativeSurveyDataDecoder
-        , ipsativeSingleResponseEncoder
-        , IpsativeSingleResponse
-        , getAllResponsesFromIpsativeSurvey
-        , LikertAnswer
-        , LikertQuestion
-        , LikertResponse
-        , likertResponseDecoder
-        , likertResponseEncoder
-        , LikertServerChoice
-        , LikertServerData
-        , LikertSurvey
-        , likertSurveyChoicesDecoder
-        , likertSurveyDataDecoder
-        , PointsAssigned
-        , PointsLeft
-        , Survey(..)
-        , SurveyMetaData
-        , encodeSurveyMetaData
-        , upgradeSurvey
-        , decodeInitialSurvey
-        , Model
-        , SurveyPage(..)
-        )
+module Data.Survey exposing
+    ( InitialSurvey
+    , IpsativeAnswer
+    , IpsativeQuestion
+    , IpsativeResponse
+    , IpsativeServerData
+    , IpsativeSingleResponse
+    , IpsativeSurvey
+    , LikertAnswer
+    , LikertQuestion
+    , LikertResponse
+    , LikertServerChoice
+    , LikertServerData
+    , LikertSurvey
+    , Model
+    , PointsAssigned
+    , PointsLeft
+    , Survey(..)
+    , SurveyMetaData
+    , SurveyPage(..)
+    , createIpsativeSurvey
+    , createLikertSurvey
+    , decodeInitialSurvey
+    , decodeSurveyMetaData
+    , emptyIpsativeServerMetaData
+    , emptyIpsativeServerSurvey
+    , encodeSurvey
+    , encodeSurveyData
+    , encodeSurveyMetaData
+    , getAllResponsesFromIpsativeSurvey
+    , groupIpsativeSurveyData
+    , groupLikertSurveyData
+    , ipsativeResponseDecoder
+    , ipsativeResponseEncoder
+    , ipsativeSingleResponseEncoder
+    , ipsativeSurveyDataDecoder
+    , likertResponseDecoder
+    , likertResponseEncoder
+    , likertSurveyChoicesDecoder
+    , likertSurveyDataDecoder
+    , upgradeSurvey
+    )
 
-import Json.Decode as Decode exposing (Decoder, decodeString, int, andThen, oneOf)
-import Json.Decode.Pipeline exposing (decode, required)
+import Json.Decode as Decode exposing (Decoder, andThen, field, int, map2, map3, map4, map5, map6, map7, map8, oneOf, string)
 import Json.Encode as Encode
-import List.Zipper as Zipper
 import List.Extra
+import List.Zipper as Zipper
+import Utils exposing (smashList)
 
 
 type SurveyPage
@@ -55,6 +54,7 @@ type SurveyPage
     | IncompleteSurvey
     | Finished
     | Registered
+
 
 type alias Model =
     { currentSurvey : Survey
@@ -124,29 +124,29 @@ encodeSurvey survey =
 encodeSurveyType : Survey -> String
 encodeSurveyType survey =
     case survey of
-        Ipsative survey ->
+        Ipsative s ->
             "Ipsative"
 
-        Likert survey ->
+        Likert s ->
             "Likert"
 
 
 encodeSurveyData : Survey -> Encode.Value
 encodeSurveyData survey =
     case survey of
-        Ipsative survey ->
+        Ipsative s ->
             let
                 ipsativeSurveyWithoutZipper =
-                    downgradeIpsativeSurvey survey
+                    downgradeIpsativeSurvey s
             in
-                encodeipsativeSurveyWithoutZipper ipsativeSurveyWithoutZipper
+            encodeipsativeSurveyWithoutZipper ipsativeSurveyWithoutZipper
 
-        Likert survey ->
+        Likert s ->
             let
                 likertSurveyWithoutZipper =
-                    downgradeLikertSurvey survey
+                    downgradeLikertSurvey s
             in
-                encodeLikertSurveyWithoutZipper likertSurveyWithoutZipper
+            encodeLikertSurveyWithoutZipper likertSurveyWithoutZipper
 
 
 upgradeSurvey : InitialSurvey -> SurveyMetaData -> Int -> Survey
@@ -173,12 +173,12 @@ upgradeIpsativeSurvey survey metaData currentQuestionNumber =
                 _ ->
                     Zipper.singleton emptyIpsativeQuestion
     in
-        Ipsative
-            { metaData = metaData
-            , pointsPerQuestion = survey.pointsPerQuestion
-            , numGroups = survey.numGroups
-            , questions = focusedQuestions
-            }
+    Ipsative
+        { metaData = metaData
+        , pointsPerQuestion = survey.pointsPerQuestion
+        , numGroups = survey.numGroups
+        , questions = focusedQuestions
+        }
 
 
 upgradeLikertSurvey : LikertSurveyWithoutZipper -> SurveyMetaData -> Int -> Survey
@@ -195,10 +195,10 @@ upgradeLikertSurvey survey metaData currentQuestionNumber =
                 _ ->
                     Zipper.singleton emptyLikertQuestion
     in
-        Likert
-            { metaData = metaData
-            , questions = focusedQuestions
-            }
+    Likert
+        { metaData = metaData
+        , questions = focusedQuestions
+        }
 
 
 downgradeIpsativeSurvey : IpsativeSurvey -> IpsativeSurveyWithoutZipper
@@ -211,7 +211,7 @@ downgradeIpsativeSurvey survey =
             , questions = Zipper.toList survey.questions
             }
     in
-        downgraded
+    downgraded
 
 
 downgradeLikertSurvey : LikertSurvey -> LikertSurveyWithoutZipper
@@ -222,7 +222,7 @@ downgradeLikertSurvey survey =
             , questions = Zipper.toList survey.questions
             }
     in
-        downgraded
+    downgraded
 
 
 encodeipsativeSurveyWithoutZipper : IpsativeSurveyWithoutZipper -> Encode.Value
@@ -231,15 +231,15 @@ encodeipsativeSurveyWithoutZipper surveyWithoutZipper =
         [ ( "metaData", encodeSurveyMetaData <| surveyWithoutZipper.metaData )
         , ( "pointsPerQuestion", Encode.int <| surveyWithoutZipper.pointsPerQuestion )
         , ( "numGroups", Encode.int <| surveyWithoutZipper.numGroups )
-        , ( "questions", Encode.list <| List.map encodeIpsativeQuestion <| surveyWithoutZipper.questions )
+        , ( "questions", surveyWithoutZipper.questions |> Encode.list encodeIpsativeQuestion )
         ]
 
 
 encodeLikertSurveyWithoutZipper : LikertSurveyWithoutZipper -> Encode.Value
 encodeLikertSurveyWithoutZipper surveyWithoutZipper =
     Encode.object
-        [ ( "metaData", encodeSurveyMetaData <| surveyWithoutZipper.metaData )
-        , ( "questions", Encode.list <| List.map encodeLikertQuestion <| surveyWithoutZipper.questions )
+        [ ( "metaData", surveyWithoutZipper.metaData |> encodeSurveyMetaData )
+        , ( "questions", surveyWithoutZipper.questions |> Encode.list encodeLikertQuestion )
         ]
 
 
@@ -261,8 +261,8 @@ encodeIpsativeQuestion ipsativeQuestion =
         [ ( "id", Encode.string <| ipsativeQuestion.id )
         , ( "title", Encode.string <| ipsativeQuestion.title )
         , ( "orderNumber", Encode.int <| ipsativeQuestion.orderNumber )
-        , ( "pointsLeft", Encode.list <| List.map encodePointsLeft <| ipsativeQuestion.pointsLeft )
-        , ( "answers", Encode.list <| List.map encodeIpsativeAnswer <| ipsativeQuestion.answers )
+        , ( "pointsLeft", ipsativeQuestion.pointsLeft |> Encode.list encodePointsLeft )
+        , ( "answers", ipsativeQuestion.answers |> Encode.list encodeIpsativeAnswer )
         ]
 
 
@@ -272,8 +272,8 @@ encodeLikertQuestion likertQuestion =
         [ ( "id", Encode.string <| likertQuestion.id )
         , ( "title", Encode.string <| likertQuestion.title )
         , ( "orderNumber", Encode.int <| likertQuestion.orderNumber )
-        , ( "choices", Encode.list <| List.map Encode.string <| likertQuestion.choices )
-        , ( "answers", Encode.list <| List.map encodeLikertAnswer <| likertQuestion.answers )
+        , ( "choices", likertQuestion.choices |> Encode.list Encode.string )
+        , ( "answers", likertQuestion.answers |> Encode.list encodeLikertAnswer )
         ]
 
 
@@ -291,7 +291,7 @@ encodeIpsativeAnswer ipsativeAnswer =
         [ ( "id", Encode.string <| ipsativeAnswer.id )
         , ( "answer", Encode.string <| ipsativeAnswer.answer )
         , ( "orderNumber", Encode.int <| ipsativeAnswer.orderNumber )
-        , ( "pointsAssigned", Encode.list <| List.map encodePointsAssigned <| ipsativeAnswer.pointsAssigned )
+        , ( "pointsAssigned", ipsativeAnswer.pointsAssigned |> Encode.list encodePointsAssigned )
         ]
 
 
@@ -314,18 +314,18 @@ encodePointsAssigned pointsAssigned =
 
 decodeIpsativeSurveyWithoutZipper : Decoder IpsativeSurveyWithoutZipper
 decodeIpsativeSurveyWithoutZipper =
-    decode IpsativeSurveyWithoutZipper
-        |> required "metaData" decodeSurveyMetaData
-        |> required "pointsPerQuestion" int
-        |> required "numGroups" int
-        |> required "questions" (Decode.list decodeIpsativeQuestion)
+    map4 IpsativeSurveyWithoutZipper
+        (field "metadata" decodeSurveyMetaData)
+        (field "pointsPerQuestion" int)
+        (field "numGroups" int)
+        (field "questions" (Decode.list decodeIpsativeQuestion))
 
 
 decodeLikertSurveyWithoutZipper : Decoder LikertSurveyWithoutZipper
 decodeLikertSurveyWithoutZipper =
-    decode LikertSurveyWithoutZipper
-        |> required "metaData" decodeSurveyMetaData
-        |> required "questions" (Decode.list decodeLikertQuestion)
+    map2 LikertSurveyWithoutZipper
+        (field "metaData" decodeSurveyMetaData)
+        (field "questions" (Decode.list decodeLikertQuestion))
 
 
 testZipperCreation : List IpsativeQuestion -> Zipper.Zipper IpsativeQuestion
@@ -335,53 +335,53 @@ testZipperCreation test =
 
 decodeIpsativeQuestion : Decoder IpsativeQuestion
 decodeIpsativeQuestion =
-    decode IpsativeQuestion
-        |> required "id" Decode.string
-        |> required "title" Decode.string
-        |> required "orderNumber" int
-        |> required "pointsLeft" (Decode.list decodePointsLeft)
-        |> required "answers" (Decode.list decodeIpsativeAnswer)
+    map5 IpsativeQuestion
+        (field "id" string)
+        (field "title" string)
+        (field "orderNumber" int)
+        (field "pointsLeft" (Decode.list decodePointsLeft))
+        (field "answers" (Decode.list decodeIpsativeAnswer))
 
 
 decodePointsLeft : Decoder PointsLeft
 decodePointsLeft =
-    decode PointsLeft
-        |> required "group" Decode.int
-        |> required "pointsLeft" Decode.int
+    map2 PointsLeft
+        (field "group" int)
+        (field "pointsLeft" int)
 
 
 decodeIpsativeAnswer : Decoder IpsativeAnswer
 decodeIpsativeAnswer =
-    decode IpsativeAnswer
-        |> required "id" Decode.string
-        |> required "answer" Decode.string
-        |> required "orderNumber" Decode.int
-        |> required "pointsAssigned" (Decode.list decodePointsAssigned)
+    map4 IpsativeAnswer
+        (field "id" string)
+        (field "answer" string)
+        (field "orderNumber" int)
+        (field "pointsAssigned" (Decode.list decodePointsAssigned))
 
 
 decodePointsAssigned : Decoder PointsAssigned
 decodePointsAssigned =
-    decode PointsAssigned
-        |> required "group" Decode.int
-        |> required "points" Decode.int
+    map2 PointsAssigned
+        (field "group" int)
+        (field "points" int)
 
 
 decodeLikertQuestion : Decoder LikertQuestion
 decodeLikertQuestion =
-    decode LikertQuestion
-        |> required "id" Decode.string
-        |> required "title" Decode.string
-        |> required "orderNumber" int
-        |> required "choices" (Decode.list Decode.string)
-        |> required "answers" (Decode.list decodeLikertAnswer)
+    map5 LikertQuestion
+        (field "id" string)
+        (field "title" string)
+        (field "orderNumber" int)
+        (field "choices" (Decode.list Decode.string))
+        (field "answers" (Decode.list decodeLikertAnswer))
 
 
 decodeLikertAnswer : Decoder LikertAnswer
 decodeLikertAnswer =
-    decode LikertAnswer
-        |> required "id" Decode.string
-        |> required "answer" Decode.string
-        |> required "selectedChoice" decodeSelectedChoice
+    map3 LikertAnswer
+        (field "id" string)
+        (field "answer" string)
+        (field "selectedChoice" decodeSelectedChoice)
 
 
 decodeSelectedChoice : Decoder (Maybe String)
@@ -390,6 +390,7 @@ decodeSelectedChoice =
         (\selectedChoice ->
             if selectedChoice == "" then
                 Nothing
+
             else
                 Just selectedChoice
         )
@@ -398,25 +399,25 @@ decodeSelectedChoice =
 
 decodeSurveyMetaData : Decoder SurveyMetaData
 decodeSurveyMetaData =
-    decode SurveyMetaData
-        |> required "uuid" Decode.string
-        |> required "created_at" Decode.string
-        |> required "name" Decode.string
-        |> required "description" Decode.string
-        |> required "instructions" Decode.string
-        |> required "author" Decode.string
+    map6 SurveyMetaData
+        (field "uuid" string)
+        (field "created_at" string)
+        (field "name" string)
+        (field "description" string)
+        (field "instructions" string)
+        (field "author" string)
 
 
 ipsativeResponseDecoder : Decoder IpsativeResponse
 ipsativeResponseDecoder =
-    decode IpsativeResponse
-        |> required "uuid" Decode.string
-        |> required "created_at" Decode.string
-        |> required "user_email" Decode.string
-        |> required "user_id" Decode.string
-        |> required "answer_id" Decode.string
-        |> required "group_number" Decode.int
-        |> required "points_assigned" Decode.int
+    map7 IpsativeResponse
+        (field "uuid" string)
+        (field "created_at" string)
+        (field "user_email" string)
+        (field "user_id" string)
+        (field "answer_id" string)
+        (field "group_number" int)
+        (field "points_assigned" int)
 
 
 ipsativeResponseEncoder : IpsativeSurvey -> Encode.Value
@@ -425,13 +426,9 @@ ipsativeResponseEncoder survey =
         allResponses =
             getAllResponsesFromIpsativeSurvey survey
     in
-        Encode.list
-            (List.map
-                (\x ->
-                    ipsativeSingleResponseEncoder x
-                )
-                allResponses
-            )
+    Encode.list
+        ipsativeSingleResponseEncoder
+        allResponses
 
 
 getAllResponsesFromIpsativeSurvey : IpsativeSurvey -> List IpsativeSingleResponse
@@ -482,13 +479,13 @@ type alias LikertResponse =
 
 likertResponseDecoder : Decoder LikertResponse
 likertResponseDecoder =
-    decode LikertResponse
-        |> required "uuid" Decode.string
-        |> required "created_at" Decode.string
-        |> required "user_email" Decode.string
-        |> required "user_id" Decode.string
-        |> required "answer_id" Decode.string
-        |> required "choice" Decode.string
+    map6 LikertResponse
+        (field "uuid" string)
+        (field "created_at" string)
+        (field "user_email" string)
+        (field "user_id" string)
+        (field "answer_id" string)
+        (field "choice" string)
 
 
 likertResponseEncoder : LikertSurvey -> Encode.Value
@@ -497,13 +494,9 @@ likertResponseEncoder survey =
         allResponses =
             getAllResponsesFromLikertSurvey survey
     in
-        Encode.list
-            (List.map
-                (\x ->
-                    likertSingleResponseEncoder x
-                )
-                allResponses
-            )
+    Encode.list
+        likertSingleResponseEncoder
+        allResponses
 
 
 getAllResponsesFromLikertSurvey : LikertSurvey -> List LikertSingleResponse
@@ -563,13 +556,13 @@ type alias IpsativeServerData =
 
 ipsativeSurveyDataDecoder : Decoder IpsativeServerData
 ipsativeSurveyDataDecoder =
-    decode IpsativeServerData
-        |> required "question_id" Decode.string
-        |> required "question_title" Decode.string
-        |> required "question_order_number" Decode.int
-        |> required "answer_id" Decode.string
-        |> required "answer" Decode.string
-        |> required "answer_order_number" Decode.int
+    map6 IpsativeServerData
+        (field "question_id" string)
+        (field "question_title" string)
+        (field "question_order_number" int)
+        (field "answer_id" string)
+        (field "answer" string)
+        (field "answer_order_number" int)
 
 
 type alias LikertServerData =
@@ -586,15 +579,15 @@ type alias LikertServerData =
 
 likertSurveyDataDecoder : Decoder LikertServerData
 likertSurveyDataDecoder =
-    decode LikertServerData
-        |> required "survey_id" Decode.string
-        |> required "question_id" Decode.string
-        |> required "question_order_number" Decode.int
-        |> required "question_title" Decode.string
-        |> required "question_choice_group" Decode.string
-        |> required "answer_id" Decode.string
-        |> required "answer_order_number" Decode.int
-        |> required "answer" Decode.string
+    map8 LikertServerData
+        (field "survey_id" string)
+        (field "question_id" string)
+        (field "question_order_number" int)
+        (field "question_title" string)
+        (field "question_choice_group" string)
+        (field "answer_id" string)
+        (field "answer_order_number" int)
+        (field "answer" string)
 
 
 type alias LikertServerChoice =
@@ -607,22 +600,24 @@ type alias LikertServerChoice =
 
 likertSurveyChoicesDecoder : Decoder LikertServerChoice
 likertSurveyChoicesDecoder =
-    decode LikertServerChoice
-        |> required "survey_id" Decode.string
-        |> required "choice_group_id" Decode.string
-        |> required "choice" Decode.string
-        |> required "order_number" Decode.int
+    map4 LikertServerChoice
+        (field "survey_id" string)
+        (field "choice_group_id" string)
+        (field "choice" string)
+        (field "order_number" int)
 
 
 groupIpsativeSurveyData : List IpsativeServerData -> List IpsativeServerQuestion
 groupIpsativeSurveyData data =
     let
         grouped =
-            List.Extra.groupWhile
-                (\x y ->
-                    x.question_id == y.question_id
+            smashList
+                (List.Extra.groupWhile
+                    (\x y ->
+                        x.question_id == y.question_id
+                    )
+                    data
                 )
-                data
 
         mapped =
             List.map
@@ -642,34 +637,36 @@ groupIpsativeSurveyData data =
                                     , answer = "Error Answer"
                                     }
                     in
-                        { uuid = firstAnswer.question_id
-                        , title = firstAnswer.question_title
-                        , orderNumber = firstAnswer.question_order_number
-                        , answers =
-                            List.map
-                                (\answer ->
-                                    { uuid = answer.answer_id
-                                    , answer = answer.answer
-                                    , orderNumber = answer.answer_order_number
-                                    }
-                                )
-                                group
-                        }
+                    { uuid = firstAnswer.question_id
+                    , title = firstAnswer.question_title
+                    , orderNumber = firstAnswer.question_order_number
+                    , answers =
+                        List.map
+                            (\answer ->
+                                { uuid = answer.answer_id
+                                , answer = answer.answer
+                                , orderNumber = answer.answer_order_number
+                                }
+                            )
+                            group
+                    }
                 )
                 grouped
     in
-        mapped
+    mapped
 
 
 groupLikertSurveyData : List LikertServerData -> List LikertServerQuestion
 groupLikertSurveyData data =
     let
         grouped =
-            List.Extra.groupWhile
-                (\x y ->
-                    x.question_id == y.question_id
+            smashList
+                (List.Extra.groupWhile
+                    (\x y ->
+                        x.question_id == y.question_id
+                    )
+                    data
                 )
-                data
 
         mapped =
             List.map
@@ -691,23 +688,23 @@ groupLikertSurveyData data =
                                     , answer = "Error Answer"
                                     }
                     in
-                        { uuid = firstAnswer.question_id
-                        , title = firstAnswer.question_title
-                        , choiceGroupId = firstAnswer.question_choice_group
-                        , orderNumber = firstAnswer.question_order_number
-                        , answers =
-                            List.map
-                                (\answer ->
-                                    { uuid = answer.answer_id
-                                    , answer = answer.answer
-                                    }
-                                )
-                                group
-                        }
+                    { uuid = firstAnswer.question_id
+                    , title = firstAnswer.question_title
+                    , choiceGroupId = firstAnswer.question_choice_group
+                    , orderNumber = firstAnswer.question_order_number
+                    , answers =
+                        List.map
+                            (\answer ->
+                                { uuid = answer.answer_id
+                                , answer = answer.answer
+                                }
+                            )
+                            group
+                    }
                 )
                 grouped
     in
-        mapped
+    mapped
 
 
 type alias IpsativeQuestion =
@@ -914,12 +911,12 @@ likertQuestionMapped serverQuestion choices =
                 |> List.sortBy .order_number
                 |> List.map .choice
     in
-        { id = serverQuestion.uuid
-        , title = serverQuestion.title
-        , orderNumber = serverQuestion.orderNumber
-        , answers = likertAnswersMapped serverQuestion.answers
-        , choices = choicesForThisGroup
-        }
+    { id = serverQuestion.uuid
+    , title = serverQuestion.title
+    , orderNumber = serverQuestion.orderNumber
+    , answers = likertAnswersMapped serverQuestion.answers
+    , choices = choicesForThisGroup
+    }
 
 
 choiceGroupIdPredicate : LikertServerQuestion -> LikertServerChoice -> Bool

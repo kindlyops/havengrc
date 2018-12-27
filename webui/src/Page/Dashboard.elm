@@ -1,9 +1,8 @@
-module Page.Dashboard exposing (view, Model, init, update, Msg)
+module Page.Dashboard exposing (Model, Msg, init, update, view)
 
-import Html exposing (Html, div, br, button, text)
+import Html exposing (Html, br, button, div, text)
 import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
-import Views.Centroid as Centroid
 import Ports
 
 
@@ -26,14 +25,16 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         ShowError str ->
-            model ! [ Ports.showError str ]
+            ( model
+            , Ports.showError str
+            )
 
 
 view : Model -> Html Msg
 view model =
     div
         []
-        [ Centroid.view model.data
+        [ div [] [ text "This used to be the Centroid" ]
         , br [] []
         , button
             [ class "btn btn-secondary"

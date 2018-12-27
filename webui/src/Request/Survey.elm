@@ -1,18 +1,17 @@
-module Request.Survey
-    exposing
-        ( getIpsativeSurveys
-        , getLikertSurveys
-        , postIpsativeResponse
-        , postLikertResponses
-        , getLikertChoices
-        , getLikertSurvey
-        , getIpsativeSurvey
-        )
+module Request.Survey exposing
+    ( getIpsativeSurvey
+    , getIpsativeSurveys
+    , getLikertChoices
+    , getLikertSurvey
+    , getLikertSurveys
+    , postIpsativeResponse
+    , postLikertResponses
+    )
 
-import Http
-import Json.Decode as Decode
 import Authentication
 import Data.Survey as Survey exposing (Survey)
+import Http
+import Json.Decode as Decode
 
 
 getIpsativeSurveys : Authentication.Model -> Http.Request (List Survey.SurveyMetaData)
@@ -29,7 +28,7 @@ getIpsativeSurveys authModel =
                 , withCredentials = False
                 }
     in
-        request
+    request
 
 
 getIpsativeSurvey : Authentication.Model -> String -> Http.Request (List Survey.IpsativeServerData)
@@ -46,7 +45,7 @@ getIpsativeSurvey authModel id =
                 , withCredentials = True
                 }
     in
-        request
+    request
 
 
 postIpsativeResponse : Authentication.Model -> Survey.IpsativeSurvey -> Http.Request (List Survey.IpsativeResponse)
@@ -70,7 +69,7 @@ postIpsativeResponse authModel ipsativeSurvey =
                 , withCredentials = True
                 }
     in
-        request
+    request
 
 
 getLikertSurveys : Authentication.Model -> Http.Request (List Survey.SurveyMetaData)
@@ -87,7 +86,7 @@ getLikertSurveys authModel =
                 , withCredentials = True
                 }
     in
-        request
+    request
 
 
 getLikertSurvey : Authentication.Model -> String -> Http.Request (List Survey.LikertServerData)
@@ -104,7 +103,7 @@ getLikertSurvey authModel id =
                 , withCredentials = True
                 }
     in
-        request
+    request
 
 
 getLikertChoices : Authentication.Model -> String -> Http.Request (List Survey.LikertServerChoice)
@@ -121,7 +120,7 @@ getLikertChoices authModel id =
                 , withCredentials = True
                 }
     in
-        request
+    request
 
 
 postLikertResponses : Authentication.Model -> Survey.LikertSurvey -> Http.Request (List Survey.LikertResponse)
@@ -145,4 +144,4 @@ postLikertResponses authModel likertSurvey =
                 , withCredentials = True
                 }
     in
-        request
+    request

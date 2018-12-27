@@ -1,9 +1,9 @@
 module Request.Comments exposing (get, post)
 
-import Json.Decode as Decode
 import Authentication
-import Http
 import Data.Comment
+import Http
+import Json.Decode as Decode
 
 
 commentsUrl : String
@@ -34,9 +34,6 @@ post authModel newComment =
         headers =
             Authentication.tryGetAuthHeader authModel ++ Authentication.getReturnHeaders
 
-        _ =
-            Debug.log "postComment called with " newComment.message
-
         request =
             Http.request
                 { method = "POST"
@@ -48,4 +45,4 @@ post authModel newComment =
                 , withCredentials = True
                 }
     in
-        request
+    request
