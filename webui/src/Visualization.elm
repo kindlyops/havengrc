@@ -15,11 +15,6 @@ getData model =
 
                 Data.Survey.Likert survey ->
                     []
-
-        _ =
-            Debug.log "Test Get Data"
-                Debug.log
-                (Debug.toString allResponses)
     in
     allResponses
 

@@ -133,6 +133,22 @@ commentsForm authModel newComment =
         ]
 
 
-showDebugData : record -> Html Msg
-showDebugData record =
-    div [ class "debug" ] [ text ("DEBUG: " ++ Debug.toString record) ]
+commentToString : Comment -> String
+commentToString comment =
+    "{ "
+        ++ comment.uuid
+        ++ ", "
+        ++ comment.created_at
+        ++ ", "
+        ++ comment.user_email
+        ++ ", "
+        ++ comment.user_id
+        ++ ", "
+        ++ comment.message
+        ++ " }"
+
+
+showDebugData : Comment -> Html Msg
+showDebugData comment =
+    div [ class "debug" ]
+        [ text ("DEBUG: " ++ commentToString comment) ]

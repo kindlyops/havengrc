@@ -139,13 +139,7 @@ update msg model =
                     ( model, Nav.load href )
 
         UrlChange location ->
-            let
-                _ =
-                    Debug.log "UrlChange: " location.path
-            in
-            ( { model | url = location }
-            , Cmd.none
-            )
+            ( { model | url = location }, Cmd.none )
 
         AuthenticationMsg authMsg ->
             let
@@ -196,9 +190,6 @@ update msg model =
 
                         ( surveyResponseModel, respCmd ) =
                             SurveyResponses.update SurveyResponses.GetResponses model.surveyResponseModel model.authModel
-
-                        _ =
-                            Debug.log "SavedCurrentSurvey " (Debug.toString respCmd)
                     in
                     ( { model | surveyModel = surveyModel, surveyResponseModel = surveyResponseModel }
                     , Cmd.batch [ Cmd.map SurveyResponseMsg respCmd, Cmd.map SurveyMsg cmd ]
@@ -363,19 +354,16 @@ viewBody model =
                 notFoundBody model
 
             Route.Login ->
-                Debug.todo "do we need this?"
-                    notFoundBody
-                    model
+                -- TODO: do we need this?
+                notFoundBody model
 
             Route.EditComment _ ->
-                Debug.todo "do we need this?"
-                    notFoundBody
-                    model
+                -- TODO: do we need this?
+                notFoundBody model
 
             Route.Landing ->
-                Debug.todo "do we need this?"
-                    notFoundBody
-                    model
+                -- TODO: do we need this?
+                notFoundBody model
 
             Route.ShowComment _ ->
                 -- TODO: do we need this?

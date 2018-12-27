@@ -98,10 +98,6 @@ tryGetAuthHeader authModel =
             [ Http.header "Authorization" ("Bearer " ++ user.token) ]
 
         Keycloak.LoggedOut ->
-            let
-                _ =
-                    Debug.log "didn't get a user token" ""
-            in
             []
 
 

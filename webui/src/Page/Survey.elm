@@ -269,10 +269,7 @@ update msg model authModel =
                     )
 
         NewUserRegistered (Err error) ->
-            let
-                _ =
-                    Debug.log "New User error" error
-            in
+            -- TODO: figure out how to handle "New User error" error
             ( initialModel
             , Cmd.none
             )
@@ -292,10 +289,6 @@ update msg model authModel =
             )
 
         IpsativeSurveySaved (Ok responses) ->
-            let
-                _ =
-                    Debug.log "saved response" responses
-            in
             ( initialModel
             , Cmd.none
             )
@@ -306,10 +299,6 @@ update msg model authModel =
             )
 
         LikertSurveySaved (Ok responses) ->
-            let
-                _ =
-                    Debug.log "saved response" responses
-            in
             ( initialModel
             , Cmd.none
             )
@@ -1110,12 +1099,6 @@ viewIpsativeSurvey survey =
 
         ready =
             pointsLeft == 0
-
-        _ =
-            Debug.log "Points left is " pointsLeft
-
-        _ =
-            Debug.log "Ready is " ready
     in
     div [ class "" ]
         [ viewIpsativeSurveyTitle survey

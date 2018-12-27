@@ -25,9 +25,6 @@ post surveyModel emailAddress authModel =
             Registration.encode registration surveyModel
                 |> Http.jsonBody
 
-        _ =
-            Debug.log "post new registration called with " emailAddress
-
         headers =
             Authentication.tryGetAuthHeader authModel ++ Authentication.getReturnHeaders
 

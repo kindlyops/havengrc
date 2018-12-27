@@ -34,9 +34,6 @@ post authModel newComment =
         headers =
             Authentication.tryGetAuthHeader authModel ++ Authentication.getReturnHeaders
 
-        _ =
-            Debug.log "postComment called with " newComment.message
-
         request =
             Http.request
                 { method = "POST"
