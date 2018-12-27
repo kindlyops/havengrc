@@ -251,6 +251,9 @@ view model =
 
             Just user ->
                 insideView model user
+        , div [ id "snackbar", class "snackbar" ]
+            [ div [ id "snackbar-body", class "snackbar-body" ] []
+            ]
         ]
     }
 
