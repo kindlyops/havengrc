@@ -1,6 +1,6 @@
 import "./main.scss";
 
-import { Main } from './Main.elm'
+import { Elm } from './Main.elm'
 
 if (process.env.NODE_ENV === 'development') {
   var CLIENT_ID = process.env.ELM_APP_KEYCLOAK_CLIENT_ID
@@ -27,7 +27,10 @@ var initialData = {
   storedSurvey: storedSurveyState ? JSON.parse(storedSurveyState) : null
 }
 
-var elmApp = Main.embed(document.getElementById('root'), initialData)
+var elmApp = Elm.Main.init({
+  node: document.getElementById('elm'),
+  flags: initialData
+});
 
 function sendElmKeycloakToken() {
   sessionStorage.setItem('profile', JSON.stringify(keycloak.profile))
@@ -91,11 +94,6 @@ elmApp.ports.keycloakLogout.subscribe(function () {
   sessionStorage.removeItem('token')
   sessionStorage.removeItem('storedSurvey')
   keycloak.logout()
-})
-
-// set the page title
-elmApp.ports.setTitle.subscribe(function (title) {
-  document.title = title
 })
 
 elmApp.ports.showError.subscribe(function (messageString) {
