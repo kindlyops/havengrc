@@ -1,4 +1,4 @@
-module Page.Dashboard exposing (Model, Msg, init, update, view)
+module Page.Dashboard exposing (Model, Msg(..), init, update, view)
 
 import Html exposing (Html, br, button, div, text)
 import Html.Attributes exposing (class)
@@ -24,9 +24,10 @@ init =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        -- TODO: this is a no-op and handled in Main.elm
         ShowError str ->
             ( model
-            , Ports.showError str
+            , Cmd.none
             )
 
 

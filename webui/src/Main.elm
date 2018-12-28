@@ -21,7 +21,9 @@ import Page.Survey as Survey
 import Page.SurveyResponses as SurveyResponses
 import Page.Terms as Terms
 import Ports
+import Process
 import Route
+import Task
 import Url
 import Visualization exposing (myVis)
 
@@ -34,6 +36,8 @@ type alias Model =
     , surveyResponseModel : SurveyResponses.Model
     , key : Nav.Key
     , url : Url.Url
+    , errorVisible : Bool
+    , errorMessage : String
     }
 
 
@@ -88,6 +92,8 @@ init sessionStorage location key =
             , surveyResponseModel = surveyResponseModel
             , key = key
             , url = location
+            , errorVisible = False
+            , errorMessage = ""
             }
     in
     ( model
@@ -125,6 +131,7 @@ type Msg
     | CommentsMsg Comments.Msg
     | SurveyMsg Survey.Msg
     | SurveyResponseMsg SurveyResponses.Msg
+    | HideError
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -171,8 +178,22 @@ update msg model =
             let
                 ( dashboardModel, cmd ) =
                     Dashboard.update dashboardMsg model.dashboardModel
+
+                newModel =
+                    case dashboardMsg of
+                        Dashboard.ShowError errMsg ->
+                            { model
+                                | errorMessage = errMsg
+                                , errorVisible = True
+                                , dashboardModel = dashboardModel
+                            }
             in
-            ( { model | dashboardModel = dashboardModel }, Cmd.map DashboardMsg cmd )
+            ( newModel
+            , Cmd.batch
+                [ Cmd.map DashboardMsg cmd
+                , Process.sleep 3000 |> Task.perform (always HideError)
+                ]
+            )
 
         CommentsMsg commentMsg ->
             let
@@ -208,6 +229,9 @@ update msg model =
                     SurveyResponses.update surveyResponseMsg model.surveyResponseModel model.authModel
             in
             ( { model | surveyResponseModel = surveyResponseModel }, Cmd.map SurveyResponseMsg cmd )
+
+        HideError ->
+            ( { model | errorVisible = False, errorMessage = "" }, Cmd.none )
 
 
 getGravatar : String -> String
@@ -251,8 +275,21 @@ view model =
 
             Just user ->
                 insideView model user
-        , div [ id "snackbar", class "snackbar" ]
-            [ div [ id "snackbar-body", class "snackbar-body" ] []
+        , div
+            [ id "snackbar"
+            , classList
+                [ ( "snackbar", True )
+                , ( "show", model.errorVisible )
+                ]
+            ]
+            [ div
+                [ id "snackbar-body"
+                , classList
+                    [ ( "snackbar-body", True )
+                    , ( "show", model.errorVisible )
+                    ]
+                ]
+                [ text model.errorMessage ]
             ]
         ]
     }

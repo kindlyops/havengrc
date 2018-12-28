@@ -63,7 +63,8 @@ update msg model authModel =
 
         GotComments (Err error) ->
             ( model
-            , Ports.showError (getHTTPErrorMessage error)
+            , Cmd.none
+              -- TODO refactor Ports.showError (getHTTPErrorMessage error)
             )
 
         NewComment (Ok comment) ->
@@ -77,7 +78,8 @@ update msg model authModel =
 
         NewComment (Err error) ->
             ( model
-            , Ports.showError (getHTTPErrorMessage error)
+            , Cmd.none
+              -- TODO refactor Ports.showError (getHTTPErrorMessage error)
             )
 
         SetCommentMessageInput string ->

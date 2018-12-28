@@ -83,7 +83,8 @@ update msg model authModel =
 
         GotServerIpsativeResponses (Err error) ->
             ( model
-            , Ports.showError (getHTTPErrorMessage error)
+            , Cmd.none
+              -- TODO refactor Ports.showError (getHTTPErrorMessage error)
             )
 
         GotServerIpsativeResponses (Ok groupedResponses) ->

@@ -285,7 +285,8 @@ update msg model authModel =
 
         IpsativeSurveySaved (Err error) ->
             ( model
-            , Ports.showError (getHTTPErrorMessage error)
+            , Cmd.none
+              -- TODO refactor Ports.showError (getHTTPErrorMessage error)
             )
 
         IpsativeSurveySaved (Ok responses) ->
@@ -295,7 +296,8 @@ update msg model authModel =
 
         LikertSurveySaved (Err error) ->
             ( model
-            , Ports.showError (getHTTPErrorMessage error)
+            , Cmd.none
+              -- TODO refactor Ports.showError (getHTTPErrorMessage error)
             )
 
         LikertSurveySaved (Ok responses) ->
@@ -315,7 +317,8 @@ update msg model authModel =
 
         GotServerIpsativeSurveys (Err error) ->
             ( model
-            , Ports.showError (getHTTPErrorMessage error)
+            , Cmd.none
+              -- TODO refactor Ports.showError (getHTTPErrorMessage error)
             )
 
         GotServerIpsativeSurveys (Ok surveys) ->
@@ -325,7 +328,8 @@ update msg model authModel =
 
         GotServerLikertSurveys (Err error) ->
             ( model
-            , Ports.showError (getHTTPErrorMessage error)
+            , Cmd.none
+              -- TODO refactor Ports.showError (getHTTPErrorMessage error)
             )
 
         GotServerLikertSurveys (Ok surveys) ->
@@ -335,7 +339,8 @@ update msg model authModel =
 
         GotIpsativeServerData (Err error) ->
             ( model
-            , Ports.showError (getHTTPErrorMessage error)
+            , Cmd.none
+              -- TODO refactor Ports.showError (getHTTPErrorMessage error)
             )
 
         GotIpsativeServerData (Ok data) ->
@@ -352,7 +357,8 @@ update msg model authModel =
 
         GotLikertServerData (Err error) ->
             ( model
-            , Ports.showError (getHTTPErrorMessage error)
+            , Cmd.none
+              -- TODO refactor Ports.showError (getHTTPErrorMessage error)
             )
 
         GotLikertServerData (Ok data) ->
@@ -362,7 +368,8 @@ update msg model authModel =
 
         GotLikertChoices (Err error) ->
             ( model
-            , Ports.showError (getHTTPErrorMessage error)
+            , Cmd.none
+              -- TODO refactor Ports.showError (getHTTPErrorMessage error)
             )
 
         GotLikertChoices (Ok serverChoices) ->
