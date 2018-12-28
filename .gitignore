@@ -10,6 +10,7 @@ webui/public/node_modules/*
 webui/elm-stuff/*
 webui/bower_components/*
 webui/cypress/videos/*
+webui/cypress/screenshots/*
 docs/_book/*
 .vscode/*
 npm-debug.log
