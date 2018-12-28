@@ -66,6 +66,7 @@ Applications and frameworks that are complementary to Haven. We would prefer to 
     - [Low level JWT interactions](#low-level-jwt-interactions)
   - [Learning Elm](#learning-elm)
     - [Design framework and tooling](#design-framework-and-tooling)
+    - [WebUI testing with Cypress](#webui-testing-with-cypress)
   - [Working with RMarkdown templates](#working-with-rmarkdown-templates)
   - [Deploying with kubernetes / OpenShift](#deploying-with-kubernetes--openshift)
     - [Using OpenShift](#using-openshift)
@@ -311,6 +312,13 @@ Elm is also a language that compiles to javascript. Here are some resources for 
 We are making use of the [Material Design](https://material.io/guidelines/) system as a base for our design. We are also using the implementation at [Daemonite](http://daemonite.github.io/material/).
 
 Within the app we are using [SASS](http://sass-lang.com/), and the guidance from [Inverted Triangle CSS](https://www.xfive.co/blog/itcss-scalable-maintainable-css-architecture/) and [Reasonable CSS](http://rscss.io/) to try and keep the CSS manageable.
+
+### WebUI testing with Cypress
+
+We are starting to use Cypress for some web ui testing.
+
+    npm install
+    npm run cypress:open
 
 ## Working with RMarkdown templates
 

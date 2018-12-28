@@ -8,7 +8,8 @@
     "make": "elm make",
     "repl": "elm repl",
     "reactor": "elm reactor",
-    "test": "elm-test"
+    "test": "elm-test",
+    "cypress:open": "cypress open"
   },
   "devDependencies": {
     "@babel/cli": "7.1.2",
@@ -25,6 +26,7 @@
     "connect-history-api-fallback": "^1.5.0",
     "cosmiconfig": "^5.0.6",
     "css-loader": "^0.28.9",
+    "cypress": "^3.1.4",
     "daemonite-material": "^4.1.1",
     "dotenv": "^5.0.0",
     "elm": "^0.19.0-bugfix2",

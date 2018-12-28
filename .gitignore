@@ -9,6 +9,7 @@ webui/node_modules/*
 webui/public/node_modules/*
 webui/elm-stuff/*
 webui/bower_components/*
+webui/cypress/videos/*
 docs/_book/*
 .vscode/*
 npm-debug.log
