@@ -14,8 +14,11 @@ import Html.Attributes exposing (class, id)
 import Html.Events exposing (onClick)
 import Http
 import List.Extra exposing (groupWhile)
+import Page.Errors exposing (ErrorData, errorInit, setErrorMessage, viewError)
 import Ports
+import Process
 import Request.SurveyResponses
+import Task
 import Utils exposing (getHTTPErrorMessage, smashList)
 
 
@@ -29,6 +32,7 @@ type alias Model =
     , availableResponses : List AvailableResponse
     , groupedIpsativeResponses : List GroupedIpsativeResponse
     , selectedResponse : Maybe AvailableResponse
+    , errorModel : ErrorData
     }
 
 
@@ -45,6 +49,7 @@ initialModel =
     , availableResponses = []
     , groupedIpsativeResponses = []
     , selectedResponse = Nothing
+    , errorModel = errorInit
     }
 
 
@@ -63,6 +68,7 @@ type Msg
     | StartVisualization AvailableResponse
     | GoToHome
     | GenerateChart
+    | HideError
 
 
 update : Msg -> Model -> Authentication.Model -> ( Model, Cmd Msg )
@@ -82,8 +88,10 @@ update msg model authModel =
             )
 
         GotServerIpsativeResponses (Err error) ->
-            ( model
-            , Ports.showError (getHTTPErrorMessage error)
+            ( { model
+                | errorModel = setErrorMessage model.errorModel (getHTTPErrorMessage error)
+              }
+            , Process.sleep 3000 |> Task.perform (always HideError)
             )
 
         GotServerIpsativeResponses (Ok groupedResponses) ->
@@ -91,7 +99,10 @@ update msg model authModel =
                 availableResponses =
                     createAvailableResponses groupedResponses
             in
-            ( { model | groupedIpsativeResponses = groupedResponses, availableResponses = availableResponses }
+            ( { model
+                | groupedIpsativeResponses = groupedResponses
+                , availableResponses = availableResponses
+              }
             , Cmd.none
             )
 
@@ -110,6 +121,9 @@ update msg model authModel =
             ( { model | currentPage = Home }
             , Cmd.none
             )
+
+        HideError ->
+            ( { model | errorModel = errorInit }, Cmd.none )
 
 
 createAvailableResponses : List GroupedIpsativeResponse -> List AvailableResponse
@@ -160,17 +174,20 @@ createAvailableResponseDatum surveyGroup =
 
 view : Authentication.Model -> Model -> Html Msg
 view authModel model =
-    case model.currentPage of
-        Home ->
-            viewHome model
+    div []
+        [ case model.currentPage of
+            Home ->
+                viewHome model
 
-        IpsativeResponse ->
-            case model.selectedResponse of
-                Nothing ->
-                    div [] [ text "there isn't a selected response" ]
+            IpsativeResponse ->
+                case model.selectedResponse of
+                    Nothing ->
+                        div [] [ text "there isn't a selected response" ]
 
-                Just x ->
-                    viewIpsativeResponse x
+                    Just x ->
+                        viewIpsativeResponse x
+        , viewError model.errorModel
+        ]
 
 
 viewIpsativeResponse : AvailableResponse -> Html Msg

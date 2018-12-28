@@ -21,7 +21,9 @@ import Page.Survey as Survey
 import Page.SurveyResponses as SurveyResponses
 import Page.Terms as Terms
 import Ports
+import Process
 import Route
+import Task
 import Url
 import Visualization exposing (myVis)
 
@@ -171,8 +173,11 @@ update msg model =
             let
                 ( dashboardModel, cmd ) =
                     Dashboard.update dashboardMsg model.dashboardModel
+
+                newModel =
+                    { model | dashboardModel = dashboardModel }
             in
-            ( { model | dashboardModel = dashboardModel }, Cmd.map DashboardMsg cmd )
+            ( newModel, Cmd.map DashboardMsg cmd )
 
         CommentsMsg commentMsg ->
             let
@@ -230,7 +235,7 @@ navDrawerItems =
     , { text = "Reports", iconName = "library_books", path = "/reports/" }
     , { text = "Comments", iconName = "gavel", path = "/comments/" }
     , { text = "Survey", iconName = "assignment", path = "/survey/" }
-    , { text = "SurveyResponses", iconName = "insert_chart", path = "surveyResponses/" }
+    , { text = "SurveyResponses", iconName = "insert_chart", path = "/surveyResponses/" }
     ]
 
 
@@ -251,9 +256,6 @@ view model =
 
             Just user ->
                 insideView model user
-        , div [ id "snackbar", class "snackbar" ]
-            [ div [ id "snackbar-body", class "snackbar-body" ] []
-            ]
         ]
     }
 

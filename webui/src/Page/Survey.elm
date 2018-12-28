@@ -40,9 +40,12 @@ import Http
 import Json.Decode as Decode exposing (Decoder, andThen, decodeString, field, int, map, map5, oneOf)
 import Json.Encode as Encode
 import List.Zipper as Zipper
+import Page.Errors exposing (ErrorData, errorInit, setErrorMessage, viewError)
 import Ports
+import Process
 import Request.Registration
 import Request.Survey
+import Task
 import Utils exposing (getHTTPErrorMessage)
 import Views.SurveyCard
 import Visualization exposing (myVis)
@@ -159,6 +162,7 @@ initialModel =
     , isSurveyReady = False
     , inBoundLikertData = Nothing
     , emailAddress = ""
+    , errorModel = errorInit
     }
 
 
@@ -234,11 +238,15 @@ type Msg
     | SaveCurrentSurvey
     | IpsativeSurveySaved (Result Http.Error (List Data.Survey.IpsativeResponse))
     | LikertSurveySaved (Result Http.Error (List Data.Survey.LikertResponse))
+    | HideError
 
 
 update : Msg -> Model -> Authentication.Model -> ( Model, Cmd Msg )
 update msg model authModel =
     case msg of
+        HideError ->
+            ( { model | errorModel = errorInit }, Cmd.none )
+
         UpdateEmail newEmail ->
             ( { model | emailAddress = newEmail }
             , Cmd.none
@@ -284,8 +292,10 @@ update msg model authModel =
             )
 
         IpsativeSurveySaved (Err error) ->
-            ( model
-            , Ports.showError (getHTTPErrorMessage error)
+            ( { model
+                | errorModel = setErrorMessage model.errorModel (getHTTPErrorMessage error)
+              }
+            , Process.sleep 3000 |> Task.perform (always HideError)
             )
 
         IpsativeSurveySaved (Ok responses) ->
@@ -294,8 +304,10 @@ update msg model authModel =
             )
 
         LikertSurveySaved (Err error) ->
-            ( model
-            , Ports.showError (getHTTPErrorMessage error)
+            ( { model
+                | errorModel = setErrorMessage model.errorModel (getHTTPErrorMessage error)
+              }
+            , Process.sleep 3000 |> Task.perform (always HideError)
             )
 
         LikertSurveySaved (Ok responses) ->
@@ -314,8 +326,10 @@ update msg model authModel =
             )
 
         GotServerIpsativeSurveys (Err error) ->
-            ( model
-            , Ports.showError (getHTTPErrorMessage error)
+            ( { model
+                | errorModel = setErrorMessage model.errorModel (getHTTPErrorMessage error)
+              }
+            , Process.sleep 3000 |> Task.perform (always HideError)
             )
 
         GotServerIpsativeSurveys (Ok surveys) ->
@@ -324,8 +338,10 @@ update msg model authModel =
             )
 
         GotServerLikertSurveys (Err error) ->
-            ( model
-            , Ports.showError (getHTTPErrorMessage error)
+            ( { model
+                | errorModel = setErrorMessage model.errorModel (getHTTPErrorMessage error)
+              }
+            , Process.sleep 3000 |> Task.perform (always HideError)
             )
 
         GotServerLikertSurveys (Ok surveys) ->
@@ -334,8 +350,10 @@ update msg model authModel =
             )
 
         GotIpsativeServerData (Err error) ->
-            ( model
-            , Ports.showError (getHTTPErrorMessage error)
+            ( { model
+                | errorModel = setErrorMessage model.errorModel (getHTTPErrorMessage error)
+              }
+            , Process.sleep 3000 |> Task.perform (always HideError)
             )
 
         GotIpsativeServerData (Ok data) ->
@@ -351,8 +369,10 @@ update msg model authModel =
             )
 
         GotLikertServerData (Err error) ->
-            ( model
-            , Ports.showError (getHTTPErrorMessage error)
+            ( { model
+                | errorModel = setErrorMessage model.errorModel (getHTTPErrorMessage error)
+              }
+            , Process.sleep 3000 |> Task.perform (always HideError)
             )
 
         GotLikertServerData (Ok data) ->
@@ -361,8 +381,10 @@ update msg model authModel =
             )
 
         GotLikertChoices (Err error) ->
-            ( model
-            , Ports.showError (getHTTPErrorMessage error)
+            ( { model
+                | errorModel = setErrorMessage model.errorModel (getHTTPErrorMessage error)
+              }
+            , Process.sleep 3000 |> Task.perform (always HideError)
             )
 
         GotLikertChoices (Ok serverChoices) ->
@@ -861,25 +883,28 @@ isPointsInGroup pointsLeft group =
 
 view : Authentication.Model -> Model -> Html Msg
 view authModel model =
-    case model.currentPage of
-        Home ->
-            viewHero model
+    div []
+        [ case model.currentPage of
+            Home ->
+                viewHero model
 
-        Survey ->
-            viewSurvey model.currentSurvey
+            Survey ->
+                viewSurvey model.currentSurvey
 
-        IncompleteSurvey ->
-            viewIncomplete model.currentSurvey
+            IncompleteSurvey ->
+                viewIncomplete model.currentSurvey
 
-        Finished ->
-            if Authentication.isLoggedIn authModel then
-                viewFinished model
+            Finished ->
+                if Authentication.isLoggedIn authModel then
+                    viewFinished model
 
-            else
-                viewRegistration model
+                else
+                    viewRegistration model
 
-        Registered ->
-            viewRegistered model
+            Registered ->
+                viewRegistered model
+        , viewError model.errorModel
+        ]
 
 
 viewIncomplete : Survey -> Html Msg

@@ -96,18 +96,6 @@ elmApp.ports.keycloakLogout.subscribe(function () {
   keycloak.logout()
 })
 
-elmApp.ports.showError.subscribe(function (messageString) {
-  //console.error(messageString)
-  let snackBarElement = document.getElementById('snackbar')
-  snackBarElement.classList.add('show')
-  let snackBarBodyElement = document.getElementById('snackbar-body')
-  snackBarBodyElement.innerHTML = messageString
-  setTimeout(function () {
-    let snackBarElement = document.getElementById('snackbar')
-    snackBarElement.classList.remove('show')
-  }, 3000)
-})
-
 elmApp.ports.radarChart.subscribe(chartConfig => {
   chartConfig.type = 'radar'
   window.myRadar = new Chart(document.getElementById('chart'), chartConfig)

@@ -6,14 +6,18 @@ import Html exposing (Html, button, div, input, label, li, text, ul)
 import Html.Attributes exposing (attribute, class, id)
 import Html.Events exposing (onClick, onInput)
 import Http
+import Page.Errors exposing (ErrorData, errorInit, setErrorMessage, viewError)
 import Ports
+import Process
 import Request.Comments
+import Task
 import Utils exposing (getHTTPErrorMessage)
 
 
 type alias Model =
     { comments : List Comment
     , newComment : Comment
+    , errorModel : ErrorData
     }
 
 
@@ -23,12 +27,14 @@ type Msg
     | GotComments (Result Http.Error (List Comment))
     | NewComment (Result Http.Error (List Comment))
     | SetCommentMessageInput String
+    | HideError
 
 
 init : Authentication.Model -> ( Model, Cmd Msg )
 init authModel =
     ( { comments = []
       , newComment = emptyNewComment
+      , errorModel = errorInit
       }
     , Cmd.batch (initialCommands authModel)
     )
@@ -56,14 +62,19 @@ update msg model authModel =
             , Http.send NewComment (Request.Comments.post aM comment)
             )
 
+        HideError ->
+            ( { model | errorModel = errorInit }, Cmd.none )
+
         GotComments (Ok comments) ->
             ( { model | comments = comments }
             , Cmd.none
             )
 
         GotComments (Err error) ->
-            ( model
-            , Ports.showError (getHTTPErrorMessage error)
+            ( { model
+                | errorModel = setErrorMessage model.errorModel (getHTTPErrorMessage error)
+              }
+            , Process.sleep 3000 |> Task.perform (always HideError)
             )
 
         NewComment (Ok comment) ->
@@ -76,8 +87,10 @@ update msg model authModel =
             )
 
         NewComment (Err error) ->
-            ( model
-            , Ports.showError (getHTTPErrorMessage error)
+            ( { model
+                | errorModel = setErrorMessage model.errorModel (getHTTPErrorMessage error)
+              }
+            , Process.sleep 3000 |> Task.perform (always HideError)
             )
 
         SetCommentMessageInput string ->
@@ -103,6 +116,7 @@ view authModel model =
         , div [ class "row" ]
             [ button [ class "btn btn-secondary", onClick GetComments ] [ text "get comments" ]
             ]
+        , viewError model.errorModel
         ]
 
 
