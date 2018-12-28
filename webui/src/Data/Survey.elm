@@ -45,6 +45,7 @@ import Json.Decode as Decode exposing (Decoder, andThen, field, int, map2, map3,
 import Json.Encode as Encode
 import List.Extra
 import List.Zipper as Zipper
+import Page.Errors exposing (ErrorData)
 import Utils exposing (smashList)
 
 
@@ -65,6 +66,7 @@ type alias Model =
     , isSurveyReady : Bool
     , inBoundLikertData : Maybe (List LikertServerData)
     , emailAddress : String
+    , errorModel : ErrorData
     }
 
 

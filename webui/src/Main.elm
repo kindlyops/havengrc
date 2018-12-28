@@ -36,8 +36,6 @@ type alias Model =
     , surveyResponseModel : SurveyResponses.Model
     , key : Nav.Key
     , url : Url.Url
-    , errorVisible : Bool
-    , errorMessage : String
     }
 
 
@@ -92,8 +90,6 @@ init sessionStorage location key =
             , surveyResponseModel = surveyResponseModel
             , key = key
             , url = location
-            , errorVisible = False
-            , errorMessage = ""
             }
     in
     ( model
@@ -131,7 +127,6 @@ type Msg
     | CommentsMsg Comments.Msg
     | SurveyMsg Survey.Msg
     | SurveyResponseMsg SurveyResponses.Msg
-    | HideError
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -180,20 +175,9 @@ update msg model =
                     Dashboard.update dashboardMsg model.dashboardModel
 
                 newModel =
-                    case dashboardMsg of
-                        Dashboard.ShowError errMsg ->
-                            { model
-                                | errorMessage = errMsg
-                                , errorVisible = True
-                                , dashboardModel = dashboardModel
-                            }
+                    { model | dashboardModel = dashboardModel }
             in
-            ( newModel
-            , Cmd.batch
-                [ Cmd.map DashboardMsg cmd
-                , Process.sleep 3000 |> Task.perform (always HideError)
-                ]
-            )
+            ( newModel, Cmd.map DashboardMsg cmd )
 
         CommentsMsg commentMsg ->
             let
@@ -230,9 +214,6 @@ update msg model =
             in
             ( { model | surveyResponseModel = surveyResponseModel }, Cmd.map SurveyResponseMsg cmd )
 
-        HideError ->
-            ( { model | errorVisible = False, errorMessage = "" }, Cmd.none )
-
 
 getGravatar : String -> String
 getGravatar email =
@@ -254,7 +235,7 @@ navDrawerItems =
     , { text = "Reports", iconName = "library_books", path = "/reports/" }
     , { text = "Comments", iconName = "gavel", path = "/comments/" }
     , { text = "Survey", iconName = "assignment", path = "/survey/" }
-    , { text = "SurveyResponses", iconName = "insert_chart", path = "surveyResponses/" }
+    , { text = "SurveyResponses", iconName = "insert_chart", path = "/surveyResponses/" }
     ]
 
 
@@ -275,22 +256,6 @@ view model =
 
             Just user ->
                 insideView model user
-        , div
-            [ id "snackbar"
-            , classList
-                [ ( "snackbar", True )
-                , ( "show", model.errorVisible )
-                ]
-            ]
-            [ div
-                [ id "snackbar-body"
-                , classList
-                    [ ( "snackbar-body", True )
-                    , ( "show", model.errorVisible )
-                    ]
-                ]
-                [ text model.errorMessage ]
-            ]
         ]
     }
 
