@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"os/exec"
 
 	worker "github.com/contribsys/faktory_worker_go"
 	"github.com/getsentry/raven-go"
@@ -137,6 +138,24 @@ func SaveSurvey(ctx worker.Context, args ...interface{}) error {
 	return err
 }
 
+// CreateSlide creates a slide using R
+func CreateSlide(ctx worker.Context, args ...interface{}) error {
+	userEmail := args[0].(string)
+	fmt.Println("Working on CreateSlide job", ctx.Jid())
+	fmt.Println("Creating Slide for: ", userEmail)
+	compileReport := exec.Command("compilereport", "--help")
+	compileReportOut, err := compileReport.Output()
+	if err != nil {
+		handleError(err)
+	}
+	fmt.Println("Output: ", compileReportOut)
+
+	_, err = keycloak.GetUser(userEmail)
+	handleError(err)
+	fmt.Println("Created Slide for: ", userEmail)
+	return err
+}
+
 func handleError(err error) {
 	if err != nil {
 		raven.CaptureErrorAndWait(err, nil)
@@ -151,6 +170,7 @@ func setupAndRun() {
 	// register job types and the function to execute them
 	mgr.Register("CreateUser", CreateUser)
 	mgr.Register("SaveSurvey", SaveSurvey)
+	mgr.Register("CreateSlide", CreateSlide)
 
 	// use up to N goroutines to execute jobs
 	mgr.Concurrency = 20
