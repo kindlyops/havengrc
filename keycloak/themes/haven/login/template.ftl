@@ -102,10 +102,10 @@
                 });
             }
 
-            $(document).ready(function() {
-                // show chargebee subscription form
-                showEmbeddedCheckout();
-            });
+            //$(document).ready(function() {
+                // show chargebee subscription form 
+                //showEmbeddedCheckout();
+            //});
         </script>
 </head>
 

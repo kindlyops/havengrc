@@ -31,12 +31,14 @@ import java.util.LinkedHashMap;
 
 import org.jboss.logging.Logger;
 
-public class ChargeBeeRegistration implements FormAction, FormActionFactory, ConfiguredProvider, ServerInfoAwareProviderFactory {
+public class ChargeBeeRegistration
+        implements FormAction, FormActionFactory, ConfiguredProvider, ServerInfoAwareProviderFactory {
     private static String FIELD_ORGANIZATION = "user.attributes.organization";
     private static String ATTRIBUTE_ORGANIZATION = "organization";
     public static final String API_KEY = "api.key";
     public static final String PLAN_ID = "plan.id";
     public static final String SITE_NAME = "site.name";
+    public static final String STRIPE_PUBLIC_KEY = "stripe.pubkey";
     private static Requirement[] REQUIREMENT_CHOICES = { Requirement.REQUIRED, Requirement.DISABLED };
     private static final Logger LOG = Logger.getLogger(ChargeBeeRegistration.class);
     private static final ChargeBeeRegistration SINGLETON = new ChargeBeeRegistration();
@@ -78,13 +80,15 @@ public class ChargeBeeRegistration implements FormAction, FormActionFactory, Con
         AuthenticatorConfigModel chargebeeConfig = context.getAuthenticatorConfig();
         if (chargebeeConfig == null || chargebeeConfig.getConfig() == null
                 || chargebeeConfig.getConfig().get(API_KEY) == null || chargebeeConfig.getConfig().get(PLAN_ID) == null
-                || chargebeeConfig.getConfig().get(SITE_NAME) == null) {
+                || chargebeeConfig.getConfig().get(SITE_NAME) == null
+                || chargebeeConfig.getConfig().get(STRIPE_PUBLIC_KEY) == null) {
             form.addError(new FormMessage(null, "Chargebee not configured."));
             return;
         }
         String apiKey = chargebeeConfig.getConfig().get(API_KEY);
         String planID = chargebeeConfig.getConfig().get(PLAN_ID);
         String siteName = chargebeeConfig.getConfig().get(SITE_NAME);
+        String stripeKey = chargebeeConfig.getConfig().get(STRIPE_PUBLIC_KEY);
         Environment.configure(siteName, apiKey);
         Result finalResult;
         try {
@@ -100,6 +104,7 @@ public class ChargeBeeRegistration implements FormAction, FormActionFactory, Con
         form.setAttribute("pageId", hostedPage.id());
         form.setAttribute("pageUrl", hostedPage.url());
         form.setAttribute("siteName", siteName);
+        form.setAttribute("stripe_pk", stripeKey);
     }
 
     @Override
@@ -171,6 +176,12 @@ public class ChargeBeeRegistration implements FormAction, FormActionFactory, Con
         property.setLabel("Chargebee Site Name");
         property.setType(ProviderConfigProperty.STRING_TYPE);
         property.setHelpText("The custom subdomain for your Chargebee site");
+        configProperties.add(property);
+        property = new ProviderConfigProperty();
+        property.setName(STRIPE_PUBLIC_KEY);
+        property.setLabel("Stripe Public API Key");
+        property.setType(ProviderConfigProperty.STRING_TYPE);
+        property.setHelpText("The publishable key for your stripe gateway");
         configProperties.add(property);
     }
 
