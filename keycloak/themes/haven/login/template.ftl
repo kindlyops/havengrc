@@ -25,14 +25,14 @@
             <link href="${url.resourcesPath}/${chargebee_style}" rel="stylesheet" />
         </#list>
     </#if>
-    <#if properties.scripts?has_content>
-        <#list properties.scripts?split(' ') as script>
-            <script src="${url.resourcesPath}/${script}" type="text/javascript"></script>
-        </#list>
-    </#if>
     <#if properties.chargebee_scripts?has_content>
         <#list properties.chargebee_scripts?split(' ') as chargebee_script>
             <script src="${url.resourcesPath}/${chargebee_script}" type="text/javascript"></script>
+        </#list>
+    </#if>
+        <#if properties.scripts?has_content>
+        <#list properties.scripts?split(' ') as script>
+            <script src="${url.resourcesPath}/${script}" type="text/javascript"></script>
         </#list>
     </#if>
     <script type="text/javascript">
@@ -100,7 +100,7 @@
                         alert("Payment Aborted !!");
                     }
                 });
-            }
+            };
 
             //$(document).ready(function() {
                 // show chargebee subscription form 
