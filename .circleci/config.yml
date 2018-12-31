@@ -216,7 +216,9 @@ jobs:
             docker run --network net0 jwilder/dockerize  -wait tcp://api:8180 -timeout 2m
             docker run --volumes-from configs --network net0 -e KC_ADMIN=admin -e KC_PW=admin -e KC_HOST=http://keycloak -e KC_PORT=8080 -e TEST_DATABASE_URL -e HAVEN_JWK_PATH kindlyops/havenapitest /go/bin/buffalo test
             docker run --volumes-from configs --network net0 -e API_SERVER -e AUTH_SERVER --workdir /usr/src/app kindlyops/apitest cucumber
-            docker run -d --volumes-from configs --network net0 -h webui --name havenweb -e ELM_APP_KEYCLOAK_CLIENT_ID=havendev --publish 127.0.0.1:80:8080 kindlyops/havenweb:$CIRCLE_SHA1
+            echo $WEBUI_TEST_CERT|base64 -d - > fullchain.pem
+            echo $WEBUI_TEST_KEY|base64 -d - > privkey.pem
+            docker run -d --volume ./fullchain.pem:/certs/fullchain.pem --volume ./privkey.pem:/certs/privkey.pem --network net0 -h webui --name havenweb -e ELM_APP_KEYCLOAK_CLIENT_ID=havendev --publish 127.0.0.1:80:8080 kindlyops/havenweb:$CIRCLE_SHA1 
             cd webui && npm install cypress
             npx cypress run
       - notify-failed
