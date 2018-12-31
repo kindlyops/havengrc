@@ -222,7 +222,7 @@ jobs:
             docker create -v /certs --name certs alpine:3.4 /bin/true
             docker cp fullchain.pem certs:/certs
             docker cp privkey.pem certs:/certs
-            docker run -d --volumes-from certs --network net0 -h webui --name havenweb -e ELM_APP_KEYCLOAK_CLIENT_ID=havendev --publish 127.0.0.1:80:8080 kindlyops/havenweb:$CIRCLE_SHA1 
+            docker run -d --volumes-from certs --network net0 -h webui --name havenweb -e ELM_APP_KEYCLOAK_CLIENT_ID=havendev --publish 127.0.0.1:443:8443 kindlyops/havenweb:$CIRCLE_SHA1 
             cd webui && npm install cypress
             npx cypress run
       - notify-failed
