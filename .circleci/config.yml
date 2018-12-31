@@ -218,7 +218,7 @@ jobs:
             docker run --volumes-from configs --network net0 -e API_SERVER -e AUTH_SERVER --workdir /usr/src/app kindlyops/apitest cucumber
             docker run -d --volumes-from configs --network net0 -h webui --name havenweb -e ELM_APP_KEYCLOAK_CLIENT_ID=havendev kindlyops/havenweb:$CIRCLE_SHA1
             cd webui && npm install cypress
-            cd webui && npx cypress run
+            npx cypress run
       - notify-failed
   deploy-staging:
     docker:
