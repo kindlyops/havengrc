@@ -1,316 +1,141 @@
-html, .container {
-  height:100%;
+$primary: (
+  color: #2fa09d,
+  dark:  darken(#2fa09d, 30%),
+  light: lighten(#2fa09d, 30%)
+);
+
+$secondary: (
+  color: #E86953,
+  dark:  darken(#E86953, 30%),
+  light: lighten(#E86953, 30%)
+);
+$yiq-contrasted-threshold:  160;
+
+
+/* Material Icons fonts */
+@import "public/fonts/material-icons";
+
+/* Google fonts for Headings and body text */
+@import "public/fonts/google-fonts";
+
+@import "node_modules/daemonite-material/assets/scss/material";
+
+@include media-breakpoint-up(lg) {
+  .content-wrapper {
+    margin-left: $navdrawer-width;
+  }
 }
 
-body {
-  --mdc-theme-primary:#2FA09D;
-  --mdc-theme-secondary:#E86953;
-  --mdc-theme-accent:#E86953;
-  --mdc-theme-background: #f0f0f1;
-  background-color:var(--mdc-theme-background, #f0f0f1);
-  font-family: "ff-tisa-web-pro",serif;
-  font-size: 16px;
-  margin:auto;
-  display: flex;
-  min-height: 100%;
+body p {
+  font-family: 'Bitter';
 }
 
-#root{
-  flex: 1;
+h1,h2,h2,h4,p.lead, .nav-item, .navbar-brand, .navbar-nav {
+  font-family: 'Montserrat';
 }
 
-.elm-overlay {
-  /* make sure the elm time-travel control is on top */
-  z-index: 999;
+.content-wrapper {
+    margin-top: 4rem;
 }
 
-.container{
-  display: flex;
+.navdrawer-header{
+  background-color: var(--dark-dark);
+  padding-top:30px;
 }
 
-.header{
-  background-color: var(--mdc-theme-primary);
-  color: var(--mdc-theme-text-primary-on-primary,#fff);
+li.nav-item.dropdown{
+  width:100%;
 }
 
-section.mdc-toolbar__section--align-start{
-  padding-left:16px;
+#navbarDropdown{
+  color: #fff;
+  opacity:1;
 }
 
-button.menu{
-  display: none;
-  padding: 16px 0px;
+#navbarDropdown::after{
+  float:right;
 }
 
-#MenuDrawer{
-  z-index: 3;
+.user-avatar {
+    margin-top: -15px;
+    border-radius: 50px;
+    max-height: 55px;
+    float:left;
 }
 
-.sidebar{
-    background-color:#fff;
-    border-right-width: 2px;
-    width: 256px;
-    overflow: inherit;
+.nav-link{
+  font-size: 16px !important;
 }
 
-nav.mdc-list{
-    padding-top:0px;
+nav.navdrawer-nav li.nav-item{
+  height:58px; //matches KC theme, which is rendering height differently
 }
 
-nav.mdc-list > a{
-    font-family:"ff-tisa-web-pro",serif !important;
-    font-size: 20px !important;
-    padding:8px 16px !important;
-    cursor: pointer;
+nav.navdrawer-nav i.material-icons{
+  color: var(--dark-light);
 }
 
-.mdc-persistent-drawer .mdc-list-item__start-detail{
-    color:lightgray !important;
+nav.navdrawer-nav a.active i
+, nav.navdrawer-nav a.active:hover{
+  color: var(--primary);
 }
 
-a.mdc-list-item:focus, a.mdc-list-item:active,
-button.user-menu-btn:active, button.user-menu-btn:focus{
-    -webkit-tap-highlight-color:transparent;
+.jumbotron{
+  padding-bottom: 150px;
 }
 
-a.mdc-persistent-drawer--selected {
-    background-color:#888;
-    color: #3F4145 !important;
-}
-
-.nav-list-container { /* excludes user-container. This is to have scroll on the nav and fixes user menu from being hidden in sidebar. Possible mdc fix later. */
-    overflow-y: overlay;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-}
-
-.nav-flex{
-    flex:1; /* keeps .drawer-logo at bottom and not overlaying rest of menu */
-}
-
-#content {
-  padding: 40px;
-}
-
-.mdc-persistent-drawer__toolbar-spacer {
-    height: 56px;
-}
-
-.user-container{
-  background-color: #333333;
-  color: white;
-  padding:20px 5px 5px 5px;
-  position: relative;
-}
-
-.user-avatar{
-  width:55px;
-  height: 55px;
-  border-radius: 50%;
-  vertical-align: middle;
-}
-
-.user-name{
-  margin-left: 15px;
-  vertical-align: sub;
-}
-
-.user-container > .mdc-menu-anchor{
-  float: right;
-  top: 17px;
-}
-
-.user-menu-btn{
-  color: white;
-}
-
-.user-menu-btn, .tooltip-button{
-  border: none;
-  background: none;
-  outline: none;
-  cursor: pointer;
-}
-
-#UserDropdownMenu{
-  top:25px !important;
-  left: 5px !important;
-}
-
-#UserDropdownMenu .mdc-list-item:hover,
-nav.mdc-list a:not(.mdc-persistent-drawer--selected):hover {
-  background-color: #F0F0F1;
-}
-
-#UserDropdownMenu > ul > a {
-    color: #3f4145;
-    text-decoration: none;
-}
-
-.drawer-logo{
-  text-align:center;
-  padding-bottom:30px;
-  margin-top:24px;
-}
-.drawer-logo img {
-  height:71px;
-  width:82px;
-}
-
-/* landing page */
-.header-container{
-  background-color:#fff;
-  padding-top:48px;
-  padding-bottom: 144px;
-}
-
-.login-header{
-  text-transform: uppercase;
-  font-family: "mr-eaves-modern",sans-serif;
-  margin-top: 21px;
-  margin-bottom: 20px;
-}
-
-.text-success{
-  color: var(--mdc-theme-accent,#E86953);
-}
-
-.text-primary{
-  color: var(--mdc-theme-primary,#2FA09D);
+.login-header {
+    text-transform: uppercase;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size:60px;
 }
 
 .login-btn{
-  height: 38px;
-  width: 220px;
+  margin-top:25px;
   border-radius: 25px;
-  font-size: 13px;
-  font-family: "mr-eaves-modern",sans-serif;
-  margin-bottom: 20px;
+  max-width:255px;
 }
 
-#wireframe-container{
-  margin-top: -144px;
+img#Wireframe{
+  margin-top: -150px;
 }
 
-.img-sm, .img-lg{
-  max-width: 100%;
+h3{
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
 }
 
-.advantages-container{
-  max-width: 1170px;
+#footer-image {
+    padding-top: 80px;
+    margin-bottom: -68px;
+    width: 248px;
+    position: relative;
+    z-index: -1;
 }
 
-.advantages-list h2{
-  text-transform: uppercase;
-  font-family: "mr-eaves-modern",sans-serif;
-  margin-bottom: 13px;
-  margin-top: 27px;
+#footer-container {
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
 }
 
-.advantages-list p{
+.underline {
+  text-decoration: underline;
+}
+
+.homeparagraph {
   line-height: 1.6875;
-  margin-top: 0;
 }
 
-footer {
-  font-family: "mr-eaves-modern",sans-serif;
-  height:55px;
-  padding:15px;
-  justify-content: center !important;
-}
- footer a {
-   color: #fff;
-   text-decoration: underline;
- }
-
-.align-center{
-  text-align:center;
-}
-
-#footer-lines-container {
-  overflow: hidden;
-}
-
-#footer-lines {
-  padding-top:80px;
-  margin-bottom:-68px;
-  width: 248px;
-}
-
-@media screen and (max-width:400px){
-  #UserDropdownMenu{
-    right: 0px !important;
-    left: auto !important;
+@media screen and (max-width:768px){
+  .login-header{
+    font-size: 36px;
   }
 }
 
-@media screen and (min-width:640px) {
-    .lg-screen-drawer{
-        width: 240px;
-        pointer-events: auto;
-    }
-    .lg-screen-drawer .mdc-persistent-drawer__drawer{
-        -webkit-transform: none;
-        transform: none;
-    }
-}
-
-@media screen and (max-width:640px){
-  button.menu{
-      display: inherit;
-  }
-
-  .sm-screen-drawer{
-      position: fixed;
-      top: 0;
-      left: 0;
-      contain: strict;
-      z-index: 3;
-  }
-
-  .sm-screen-drawer.mdc-persistent-drawer--open {
-       width:100%;
-       height:100%;
-     }
-
-  .mdc-persistent-drawer:before {
-      display: block;
-      top: 0;
-      width: 100%;
-      background: rgba(0,0,0,.6);
-      content: "";
-      opacity: 0;
-      will-change: opacity;
-  }
-
-  .mdc-persistent-drawer--open:before {
-      opacity: 1;
-  }
-
-  .mdc-persistent-drawer:before, .mdc-persistent-drawer__drawer {
-      position: absolute;
-      left: 0;
-      height: 100%;
-  }
-
-  #Regulations div.mdc-textfield, #Regulations .mdc-textfield__input {
-    width: 200px;
-  }
-
-}
-
-@media screen and (min-width: 768px) {
-  h1.login-header {
-      font-size: 72px;
-  }
-  .img-sm{
-    display: none;
-  }
-
-}
-
-@media screen and (max-width: 767px){
-  .img-lg{
-    display: none;
+@media screen and (max-width:320px){
+  .login-header{
+    font-size: 30px;
   }
 }

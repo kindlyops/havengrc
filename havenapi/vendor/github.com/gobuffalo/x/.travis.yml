@@ -1,0 +1,12 @@
+sudo: required
+
+services:
+  - docker
+
+install: false
+
+go:
+  - 1.8
+
+script:
+  - docker build .

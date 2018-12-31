@@ -16,6 +16,11 @@ spec:
         - name: havenapi
           image: havengrc-docker.jfrog.io/kindlyops/havenapi:latest
           env:
+            - name: FAKTORY_URL
+              valueFrom:
+                secretKeyRef:
+                  name: haven-faktory-credentials
+                  key: url
             - name: GO_ENV
               value: "production"
             - name: DATABASE_NAME
@@ -34,6 +39,24 @@ spec:
                   key: password
             - name: HAVEN_JWK_PATH
               value: "/etc/haven-credentials/jwk.json"
+            - name: KC_HOST
+              value: "https://havenweb"
+            - name: KC_PORT
+              value: "443"
+            - name: KC_ADMIN
+              value: "admin"
+            - name: KC_PW
+              valueFrom:
+                secretKeyRef:
+                  name: haven-database-credentials
+                  key: password
+            - name: SENTRY_ENVIRONMENT
+              value: "staging"
+            - name: SENTRY_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: sentry
+                  key: dsn
           volumeMounts:
             - name: secret-volume
               mountPath: /etc/haven-credentials/

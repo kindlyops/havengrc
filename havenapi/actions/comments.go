@@ -5,7 +5,7 @@ import (
 
 	"github.com/deis/helm/log"
 	"github.com/gobuffalo/buffalo"
-	"github.com/kindlyops/mappamundi/havenapi/models"
+	"github.com/kindlyops/havengrc/havenapi/models"
 )
 
 // CommentPostHandler accepts a comment upost
@@ -27,7 +27,7 @@ func CommentPostHandler(c buffalo.Context) error {
 	return c.Render(200, r.JSON(map[string]string{"message": message}))
 }
 
-// CommentGettHandler accepts a comment upost
+// CommentGetHandler accepts a comment upost
 func CommentGetHandler(c buffalo.Context) error {
 	err := models.DB.RawQuery("set local search_path to mappa, public").Exec()
 	if err != nil {

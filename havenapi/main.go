@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/kindlyops/mappamundi/havenapi/actions"
+	"github.com/kindlyops/havengrc/havenapi/actions"
 )
 
 func main() {

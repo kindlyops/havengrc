@@ -7,6 +7,22 @@ redir 301 {
   / https://{host}{uri}
 }
 
+header / {
+  # Enable HTTP Strict Transport Security (HSTS) to force clients to always
+  # connect via HTTPS (do not use if only testing)
+  Strict-Transport-Security "max-age=31536000; includeSubDomains"
+  # Enable cross-site filter (XSS) and tell browser to block detected attacks
+  X-XSS-Protection "1; mode=block"
+  # Prevent some browsers from MIME-sniffing a response away from the declared Content-Type
+  X-Content-Type-Options "nosniff"
+  # Disallow the site to be rendered within a frame (clickjacking protection)
+  X-Frame-Options "sameorigin"
+  # CSP
+  Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: www.gravatar.com; style-src 'self' 'unsafe-inline';  font-src 'self' data: ;"
+  Feature-Policy "autoplay 'none'; camera 'none'; microphone 'none'; midi 'none'; usb 'none'; vr 'none';"
+  Referrer-Policy "strict-origin"
+}
+
 proxy /auth keycloak:8080 {
   transparent
 }
@@ -18,6 +34,21 @@ proxy /api api:3001 {
 
 proxy /api/files havenapi:3000 {
   transparent
+}
+
+proxy /api/registration_funnel havenapi:3000 {
+  transparent
+}
+
+# this rewrite makes it so anything we are not proxying to api or auth
+# is rewritten to index.html, so that the SPA is served. This is necessary
+# to support path-based-routing in a single page application in cases where
+# the page is reloaded with a path, so that the browser gets the app sent
+# and then the app can interpret the path and render the correct page
+rewrite {
+  if {path} not_starts_with /api
+  if {path} not_starts_with /auth
+  to {path} {path}/ /
 }
 
 log / stdout "{combined}"

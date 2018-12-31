@@ -1,0 +1,67 @@
+version: "2"         # required to adjust maintainability checks
+plugins:
+  fixme:
+    enabled: true
+  gofmt:
+    enabled: true
+  golint:
+    enabled: true
+  govet:
+    enabled: true
+  sonar-java:
+    enabled: true
+    config:
+      sonar.java.source: 8
+  git-legal:
+    enabled: true
+  markdownlint:
+    enabled: true
+exclude_patterns:
+- "**/vendor/"
+- "webui/public/"
+- "webui/elm-stuff/"
+- "webui/node_modules/"
+- "webui/config/"
+- "contrib/curl-auth0/"
+- "keycloak/themes/haven/login/resources/js/"
+- "keycloak/themes/haven/account/resources/js/"
+- "grifts/**/*"
+- "**/*_test.go"
+- "*_test.go"
+- "**_test.go"
+- "logs/*"
+- "public/*"
+- "templates/*"
+
+checks:
+  argument-count:
+    config:
+      threshold: 4
+  complex-logic:
+    config:
+      threshold: 4
+  file-lines:
+    config:
+      threshold: 500
+  method-complexity:
+    config:
+      threshold: 20
+  method-count:
+    config:
+      threshold: 20
+  method-lines:
+    config:
+      threshold: 75
+  nested-control-flow:
+    config:
+      threshold: 4
+  return-statements:
+    config:
+      threshold: 10
+  similar-code:
+    config:
+      threshold: # language-specific defaults. an override will affect all languages.
+  identical-code:
+    config:
+      threshold: # language-specific defaults. an override will affect all languages.
+

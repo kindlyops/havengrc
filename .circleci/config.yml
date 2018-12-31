@@ -1,10 +1,21 @@
-version: 2
+version: 2.1
+commands:
+  notify-failed:
+    description: "Slack notification of failed job"
+    steps:
+      - run:
+          name: notify failed job
+          command: ./notify-slack notifications "CircleCI pipeline for ${CIRCLE_PULL_REQUEST:-$CIRCLE_BRANCH} failed in $CIRCLE_JOB $CIRCLE_BUILD_URL" circleci
+          when: on_fail
 jobs:
   webui-build-job:
     docker:
       - image: circleci/node:7-browsers
     steps:
       - checkout
+      - run:
+          name: notify build started
+          command: ./notify-slack notifications "CircleCI starting pipeline for ${CIRCLE_PULL_REQUEST:-$CIRCLE_BRANCH}" circleci
       - add_ssh_keys
       - run:
           name: Check docker version
@@ -34,7 +45,7 @@ jobs:
           no_output_timeout: 15m
           working_directory: webui
       - save_cache:
-          key: dependency-cache-{{ checksum "webui/package.json" }}
+          key: dependency-cache-{{ checksum "webui/elm.json" }}
           paths:
             - ./webui/node_modules
       - run:
@@ -51,6 +62,7 @@ jobs:
       - run: docker push kindlyops/havenweb:$CIRCLE_SHA1
       - run: docker push kindlyops/havenweb:$CIRCLE_BUILD_NUM
       - run: docker push kindlyops/havenweb:latest
+      - notify-failed
   flyway-build-job:
     docker:
       - image: circleci/openjdk:9
@@ -66,6 +78,8 @@ jobs:
       - run: docker push kindlyops/havenflyway:$CIRCLE_SHA1
       - run: docker push kindlyops/havenflyway:$CIRCLE_BUILD_NUM
       - run: docker push kindlyops/havenflyway:latest
+      - notify-failed
+
   postgrest-build-job:
     docker:
       - image: circleci/openjdk:9
@@ -81,6 +95,7 @@ jobs:
       - run: docker push kindlyops/postgrest:$CIRCLE_SHA1
       - run: docker push kindlyops/postgrest:$CIRCLE_BUILD_NUM
       - run: docker push kindlyops/postgrest:latest
+      - notify-failed
   keycloak-build-job:
     docker:
       - image: circleci/openjdk:9
@@ -96,6 +111,7 @@ jobs:
       - run: docker push kindlyops/keycloak:$CIRCLE_SHA1
       - run: docker push kindlyops/keycloak:$CIRCLE_BUILD_NUM
       - run: docker push kindlyops/keycloak:latest
+      - notify-failed
   havenapi-build-job:
     docker:
       - image: circleci/node:7-browsers
@@ -111,6 +127,29 @@ jobs:
       - run: docker push kindlyops/havenapi:$CIRCLE_BUILD_NUM
       - run: docker push kindlyops/havenapi:$CIRCLE_SHA1
       - run: docker push kindlyops/havenapi:latest
+      - notify-failed
+  havenworker-build-job:
+    docker:
+      - image: circleci/node:7-browsers
+    steps:
+      - checkout
+      - add_ssh_keys
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run: docker build --build-arg=COMMIT=$CIRCLE_SHA1 --rm=false -t kindlyops/havenworker -f worker/Dockerfile .
+      - run: docker tag kindlyops/havenworker:latest kindlyops/havenworker:$CIRCLE_SHA1
+      - run: docker tag kindlyops/havenworker:latest kindlyops/havenworker:$CIRCLE_BUILD_NUM
+      - run: docker build --rm=false -t kindlyops/faktory -f faktory/Dockerfile .
+      - run: docker tag kindlyops/faktory:latest kindlyops/faktory:$CIRCLE_SHA1
+      - run: docker tag kindlyops/faktory:latest kindlyops/faktory:$CIRCLE_BUILD_NUM
+      - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
+      - run: docker push kindlyops/havenworker:$CIRCLE_BUILD_NUM
+      - run: docker push kindlyops/havenworker:$CIRCLE_SHA1
+      - run: docker push kindlyops/havenworker:latest
+      - run: docker push kindlyops/faktory:$CIRCLE_BUILD_NUM
+      - run: docker push kindlyops/faktory:$CIRCLE_SHA1
+      - run: docker push kindlyops/faktory:latest
+      - notify-failed
   havenapi-testing-job:
     docker:
       - image: circleci/ruby:2.4
@@ -125,41 +164,64 @@ jobs:
             - POSTGRES_USER: circleci
             - POSTGRES_DB: mappamundi_dev
             - POSTGRES_PASSWORD: ""
-            - POSTGRES_DATABASE: mappadmundi_dev
-            - POSTGRES_USER: circleci
-            - POSTGRES_PORT_5432_TCP_ADDR: localhost
+            - DB_DATABASE: mappamundi_dev
+            - DB_ADDR: db
+            - DB_USER: circleci
+            - DATABASE_NAME: mappamundi_dev
+            - DATABASE_USERNAME: circleci
+            - DATABASE_PASSWORD: ""
+            - DATABASE_HOST: db
+            - HAVEN_JWK_PATH: /keycloak-dev-public-key.json
+            - PGRST_JWT_AUD_CLAIM: havendev
+            - PGRST_SERVER_PROXY_URI: http://api:8180
             - KEYCLOAK_USER: admin
             - KEYCLOAK_PASSWORD: admin
             - PROXY_ADDRESS_FORWARDING: "true"
-            - FLYWAY_URL: "jdbc:postgresql://localhost/mappamundi_dev"
+            - FLYWAY_URL: "jdbc:postgresql://db/mappamundi_dev"
             - FLYWAY_USER: circleci
             - FLYWAY_IGNORE_MISSING_MIGRATIONS: "true"
             - FLYWAY_GROUP: "true"
             - FLYWAY_SCHEMAS: mappa,1
             - HAVEN_JWK_PATH: /cfg/keycloak-dev-public-key.json
-            - TEST_DATABASE_URL: postgres://circleci@localhost:5432/mappamundi_test?sslmode=disable
+            - TEST_DATABASE_URL: postgres://circleci@db:5432/mappamundi_test?sslmode=disable
+            - API_SERVER: api:8180
+            - AUTH_SERVER: keycloak:8080
           command: |
-            docker run -d -e POSTGRES_USER -e POSTGRES_DB -e POSTGRES_PASSWORD --name db circleci/postgres:9.6.4-alpine
+            # create network for containers
+            docker network create -d bridge net0
+            # run db
+            docker run --network net0 -d -e POSTGRES_USER -e POSTGRES_DB -e POSTGRES_PASSWORD -h db --name db circleci/postgres:9.6.4-alpine
             # wait for DB
-            docker run --network container:db jwilder/dockerize -wait tcp://localhost:5432 -timeout 1m
-            # start keycloak in background container
-            docker run --network container:db -d -e POSTGRES_DATABASE -e POSTGRES_USER -e POSTGRES_PORT_5432_TCP_ADDR -e KEYCLOAK_USER -e KEYCLOAK_PASSWORD -e PROXY_ADDRESS_FORWARDING --name keycloak kindlyops/keycloak:$CIRCLE_SHA1
-            # Wait for keycloak
-            docker run --network container:db jwilder/dockerize  -wait tcp://localhost:8080 -timeout 2m
-            docker run --network container:db -e FLYWAY_URL -e FLYWAY_USER -e FLYWAY_IGNORE_MISSING_MIGRATIONS -e FLYWAY_GROUP -e FLYWAY_SCHEMAS kindlyops/havenflyway:$CIRCLE_SHA1 migrate -placeholders.databaseUser=circleci
+            docker run --network net0 jwilder/dockerize -wait tcp://db:5432 -timeout 1m
+            sleep 2
+            docker run --network net0 circleci/postgres:9.6.4-alpine /usr/local/bin/psql -l -h db -U circleci || true
             # create dummy DB to work around https://github.com/markbates/pop/issues/175
-            docker run --network container:db circleci/postgres:9.6.4-alpine /usr/local/bin/createdb -h localhost -U circleci circleci
+            docker run --network net0 circleci/postgres:9.6.4-alpine /usr/local/bin/createdb -h db -U circleci circleci
+            # run mailhog
+            docker run --network net0 -d -h mailhog --name mailhog mailhog/mailhog:v1.0.0
+            # wait for mailhog
+            docker run --network net0 jwilder/dockerize  -wait tcp://mailhog:8025 -timeout 2m
             # creating dummy container which will hold a volume with config
-            docker create -v /cfg --name configs alpine:3.4 /bin/true
+            docker create -v /cfg -v /keycloak --name configs alpine:3.4 /bin/true
             docker cp postgrest/keycloak-dev-public-key.json configs:/cfg
+            docker cp keycloak/data/havendev-realm.json configs:/keycloak
+            # start keycloak in background container
+            docker run --volumes-from configs --network net0 -d -e DB_DATABASE -e DB_USER -e DB_ADDR -e KEYCLOAK_USER -e KEYCLOAK_PASSWORD -e PROXY_ADDRESS_FORWARDING -h keycloak --name keycloak kindlyops/keycloak:$CIRCLE_SHA1 -b 0.0.0.0 -Dkeycloak.migration.file=/keycloak/havendev-realm.json -Dkeycloak.migration.strategy=IGNORE_EXISTING -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.action=import
+            # Wait for keycloak
+            docker run --network net0 jwilder/dockerize  -wait tcp://keycloak:8080 -timeout 2m
+            docker run --network net0 -e FLYWAY_URL -e FLYWAY_USER -e FLYWAY_IGNORE_MISSING_MIGRATIONS -e FLYWAY_GROUP -e FLYWAY_SCHEMAS kindlyops/havenflyway:$CIRCLE_SHA1 migrate -placeholders.databaseUser=circleci
             docker build -t kindlyops/havenapitest -f havenapi/Dockerfile-hotreload .
-            docker run --volumes-from configs --network container:db -e TEST_DATABASE_URL -e HAVEN_JWK_PATH kindlyops/havenapitest /go/bin/buffalo test
-            # TODO build the testing container
-            # TODO run cucumber test
+            docker build -t kindlyops/apitest -f apitest/Dockerfile .
+            docker run -d --volumes-from configs --network net0 -h api --name api -e DATABASE_USERNAME -e DATABASE_PASSWORD -e DATABASE_HOST -e HAVEN_JWK_PATH -e PGRST_JWT_AUD_CLAIM -e PGRST_SERVER_PROXY_URI kindlyops/postgrest postgrest config
+            docker run --network net0 jwilder/dockerize  -wait tcp://api:8180 -timeout 2m
+            docker run --volumes-from configs --network net0 -e KC_ADMIN=admin -e KC_PW=admin -e KC_HOST=http://keycloak -e KC_PORT=8080 -e TEST_DATABASE_URL -e HAVEN_JWK_PATH kindlyops/havenapitest /go/bin/buffalo test
+            docker run --volumes-from configs --network net0 -e API_SERVER -e AUTH_SERVER --workdir /usr/src/app kindlyops/apitest cucumber
+      - notify-failed
   deploy-staging:
     docker:
       - image: circleci/ruby:2.4
     steps:
+      - checkout
       - add_ssh_keys
       - setup_remote_docker:
           docker_layer_caching: true
@@ -171,14 +233,31 @@ jobs:
             sudo mv openshift-origin-client-tools-v3.7.0-7ed6862-linux-64bit/oc /usr/local/bin/oc
             oc version
             # todo: authenticate
-            oc login https://console.pro-us-east-1.openshift.com/ --token=$OPENSHIFT_TOKEN
+            oc login https://api.pro-us-east-1.openshift.com --token=$OPENSHIFT_TOKEN
+            # this url suddenly started saying the only project available was mo1w
+            #oc login https://console.pro-us-east-1.openshift.com/ --token=$OPENSHIFT_TOKEN
             oc project haven-production
+      - run:
+          name: Install Sentry CLI
+          command: |
+            curl -sL https://sentry.io/get-cli/ | bash
       - deploy:
           name: Prerelease
           command: |
-            echo release temporarily disabled
-            #oc set image deployment/havenapi havenapi=havengrc-docker.jfrog.io/kindlyops/havenapi:$CIRCLE_SHA1
-            #oc set image deployment/havenweb havenweb=havengrc-docker.jfrog.io/kindlyops/havenweb:$CIRCLE_SHA1
+            VERSION=$(sentry-cli releases propose-version)
+            # Create a release
+            sentry-cli releases new -p haven-grc $VERSION
+            # Associate commits with the release
+            sentry-cli releases set-commits --auto $VERSION || true
+            oc set image deployment/havenapi havenapi=havengrc-docker.jfrog.io/kindlyops/havenapi:$CIRCLE_SHA1
+            oc set image deployment/havenweb havenweb=havengrc-docker.jfrog.io/kindlyops/havenweb:$CIRCLE_SHA1
+            oc set image deployment/keycloak keycloak=havengrc-docker.jfrog.io/kindlyops/keycloak:$CIRCLE_SHA1
+            oc set image deployment/worker   worker=kindlyops/havenworker:$CIRCLE_SHA1
+      - notify-failed
+      - run:
+          name: notify deploy complete
+          command: ./notify-slack notifications "CircleCI completed deploy for ${CIRCLE_PULL_REQUEST:-$CIRCLE_BRANCH}" circleci
+          when: on_success
 workflows:
   version: 2
   builds:
@@ -187,6 +266,7 @@ workflows:
       - flyway-build-job
       - keycloak-build-job
       - havenapi-build-job
+      - havenworker-build-job
       - postgrest-build-job
       - havenapi-testing-job:
           requires:
@@ -194,17 +274,10 @@ workflows:
             - keycloak-build-job
             - havenapi-build-job
             - postgrest-build-job
-      - approve-deploy:
-          type: approval
+      - deploy-staging:
           requires:
             - havenapi-testing-job
             - webui-build-job
-          filters:
-            branches:
-              only: master
-      - deploy-staging:
-          requires:
-            - approve-deploy
           filters:
             branches:
               only: master

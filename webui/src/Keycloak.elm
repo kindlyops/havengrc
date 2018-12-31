@@ -1,22 +1,42 @@
-module Keycloak
-    exposing
-        ( AuthenticationState(..)
-        , AuthenticationError
-        , AuthenticationResult
-        , RawAuthenticationResult
-        , Options
-        , defaultOpts
-        , LoggedInUser
-        , UserProfile
-        , Token
-        , mapResult
-        )
+module Keycloak exposing
+    ( AuthenticationError
+    , AuthenticationResult
+    , AuthenticationState(..)
+    , LoggedInUser
+    , Options
+    , RawAuthenticationResult
+    , Token
+    , UserProfile
+    , defaultOpts
+    , loggedInUserDecoder
+    , mapResult
+    )
+
+import Json.Decode as Decode exposing (Decoder, bool, field, int, map2, map5, oneOf, string, succeed)
+import Json.Decode.Pipeline exposing (required)
 
 
 type alias LoggedInUser =
     { profile : UserProfile
     , token : Token
     }
+
+
+loggedInUserDecoder : Decoder LoggedInUser
+loggedInUserDecoder =
+    map2 LoggedInUser
+        (field "profile" userProfileDecoder)
+        (field "token" string)
+
+
+userProfileDecoder : Decoder UserProfile
+userProfileDecoder =
+    map5 UserProfile
+        (field "username" string)
+        (field "emailVerified" bool)
+        (field "firstName" string)
+        (field "lastName" string)
+        (field "email" string)
 
 
 type AuthenticationState

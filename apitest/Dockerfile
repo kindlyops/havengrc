@@ -1,4 +1,4 @@
-FROM havengrc-docker.jfrog.io/ruby:2.4
+FROM havengrc-docker.jfrog.io/ruby:2.5
 
 RUN bundle config --global frozen 1
 
@@ -7,5 +7,6 @@ WORKDIR /usr/src/app
 
 COPY ./apitest/Gemfile /usr/src/app
 COPY ./apitest/Gemfile.lock /usr/src/app
+COPY ./apitest/features/ /usr/src/app/features
 RUN bundle install
 CMD ["cucumber"]

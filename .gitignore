@@ -4,6 +4,7 @@
 postgresql-data/*
 mailhog/*
 docs/node_modules/*
+worker/output/*
 webui/node_modules/*
 webui/public/node_modules/*
 webui/elm-stuff/*
@@ -12,3 +13,10 @@ docs/_book/*
 .vscode/*
 npm-debug.log
 docs/plantuml/*.png
+.bazelrc
+/bazel-*
+.vs/
+*.swp
+*.swo
+faktory-data/db
+

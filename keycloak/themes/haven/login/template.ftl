@@ -15,9 +15,6 @@
     </#if>
     <title><#nested "title"></title>
     <link rel="icon" href="${url.resourcesPath}/img/favicon.ico" />
-    <script src="https://use.typekit.net/fru8myg.js"></script>
-    <script>try{Typekit.load({ async: true });}catch(e){}</script>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <#if properties.styles?has_content>
         <#list properties.styles?split(' ') as style>
             <link href="${url.resourcesPath}/${style}" rel="stylesheet" />
@@ -35,7 +32,7 @@
     </#if>
     <#if properties.chargebee_scripts?has_content>
         <#list properties.chargebee_scripts?split(' ') as chargebee_script>
-            <script src="${chargebee_script}" type="text/javascript"></script>
+            <script src="${url.resourcesPath}/${chargebee_script}" type="text/javascript"></script>
         </#list>
     </#if>
     <script type="text/javascript">
@@ -66,7 +63,7 @@
                     /*
                     * This function will be called once when iframe is loaded.
                     * Since checkout pages are responsive you need to handle only height.
-                    */        
+                    */
                     onLoad: function(iframe, width, height) {
                         var style= 'border:none;overflow:hidden;width:100%;';
                         style = style + 'height:' + height + 'px;';
@@ -77,7 +74,7 @@
 
                     /*
                     * This will be triggered when any content of iframe is resized.
-                    */        
+                    */
                     onResize: function(iframe, width, height) {
                         var style = 'border:none;overflow:hidden;width:100%;';
                         style = style + 'height:' + height + 'px;';
@@ -86,10 +83,10 @@
 
                     /*
                     * This will be triggered when checkout is complete.
-                    */        
+                    */
                     onSuccess: function(iframe) {
-                        // TODO: when chargebee told us it successfully created a subscription,
-                        //  we need to trigger the POST of the keycloak registration form
+                        // when chargebee told us it successfully created a subscription,
+                        // we need to trigger the POST of the keycloak registration form
                         // We include hostedPageId in the form data. This will allow keycloak to register
                         // the user and retrieve the subscription info for that user from the hostedPageId
                         //redirectCall(hostedPageId);
@@ -97,7 +94,7 @@
                     },
 
                     /*
-                    * This will be triggered when user clicks on cancel button. 
+                    * This will be triggered when user clicks on cancel button.
                     */
                     onCancel: function(iframe) {
                         alert("Payment Aborted !!");
@@ -112,19 +109,58 @@
         </script>
 </head>
 
-<body class="${properties.kcBodyClass!}">
+<body class="d-flex flex-column">
 
-    <div id="kc-logo"><a href="${properties.kcLogoLink!'#'}"><div id="kc-logo-wrapper"></div></a></div>
-
-
-    <div class="mdc-layout-grid">
-        <div id="kc-header-wrapper" class="mdc-layout-grid__inner header-container align-center">
-            <div class="mdc-layout-grid__cell--span-12">
-                <img src="${url.resourcesPath}/img/logo@2x.png" width="82" height="71" />
-                <#nested "header">
-            </div>
+  <div class="jumbotron">
+    <div class="container">
+      <div class="row">
+        <div class="col-12 text-center">
+          <img src="${url.resourcesPath}/img/logo@2x.png" width="82" height="71" />
+          <#nested "header">
         </div>
+      </div>
     </div>
+  </div>
+
+  <main style="flex-grow:2">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+
+          <#if displayMessage && message?has_content>
+            <div class="row justify-content-center">
+              <div class="col-lg-6">
+                <div class="alert alert-${message.type}">
+                  <#if message.type = 'success'><i class="material-icons">check_circle</i></#if>
+                  <#if message.type = 'warning'><i class="material-icons">warning</i></#if>
+                  <#if message.type = 'error'><i class="material-icons">error</i></#if>
+                  <#if message.type = 'info'><i class="material-icons">info</i></#if>
+                  <span class="alert-text">${message.summary}</span>
+                </div>
+              </div>
+            </div>
+          </#if>
+
+          <div class="row justify-content-center">
+            <#nested "form">
+            <#if displayInfo>
+              <#nested "info">
+            </#if>
+          </div>
+
+        </div> <#-- end col-12 -->
+      </div> <#-- end row -->
+    </div> <#-- end container -->
+  </main>
+
+  <div class="bottom-container">
+    <div style="overflow:hidden;">
+      <img alt="Wireframe graphic of compliance and risk dashboard Haven GRC" data-rjs="2" id="footer-lines" src="/img/footer_lines@2x.png" data-rjs-processed="true" title="" >
+    </div>
+    <footer class="align-center">
+      <p>© 2017 <a href="https://kindlyops.com" title="Kindly Ops Website">KINDLY OPS</a></p>
+    </footer>
+  </div>
 
     <#if realm.internationalizationEnabled>
         <div id="kc-locale" class="${properties.kcLocaleClass!}">
@@ -140,51 +176,6 @@
             </div>
         </div>
     </#if>
-    <#if displayMessage && message?has_content>
-<div class="mdc-layout-grid" style="max-width:550px; padding-top:0;">
-    <div class="mdc-layout-grid__inner">
-        <div class="mdc-layout-grid__cell--span-12 align-center">
-            <div class="alert alert-${message.type}">
-                <#if message.type = 'success'><i class="material-icons">check_circle</i></#if>
-                <#if message.type = 'warning'><i class="material-icons">warning</i></#if>
-                <#if message.type = 'error'><i class="material-icons">error</i></#if>
-                <#if message.type = 'info'><i class="material-icons">info</i></#if>
-                <span class="alert-text">${message.summary}</span>
-            </div>
-        </div>
-    </div>
-</div>
-
-    </#if>
-    <div class="login-content-container mdc-layout-grid">
-        <div class="mdc-layout-grid__inner">
-                <#nested "form">
-
-            <#if displayInfo>
-                        <#nested "info">
-            </#if>
-        </div>
-    </div>
-    <div class="bottom-container align-center">
-        <div>
-            <img alt="Wireframe graphic of compliance and risk dashboard Haven GRC" data-rjs="2" id="footer-lines" src="/img/footer_lines@2x.png" data-rjs-processed="true" title="" >
-        </div>
-        <footer class="mdc-toolbar align-center">
-            <div class="mdc-toolbar__row">
-                <section class="mdc-toolbar__section" style="align-items:center !important;">
-                    <span>© 2017 <a href="https://kindlyops.com" title="Kindly Ops Website">KINDLY OPS</a></span>
-                </section>
-            </div>
-        </footer>
-    </div>
-
-    <script>window.mdc.autoInit();</script>
-    <script>
-        mdc.textfield.MDCTextfield.attachTo(document.querySelector('.mdc-textfield'));
-    </script>
-    <script>
-        mdc.ripple.MDCRipple.attachTo(document.querySelector('.mdc-button'));
-    </script>
 
 </body>
 </html>

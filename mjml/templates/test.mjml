@@ -1,0 +1,31 @@
+  <mjml>
+    <mj-body background-color="#fff">
+
+      <mj-section background-color="#ffffff" padding-bottom="20px" padding-top="20px">
+       <mj-column>
+         <mj-image src="https://staging.havengrc.com/auth/resources/4.3.0.final/email/haven/img/logo@2x.png" alt="Haven GRC Company Logo" width="82px" height="71px"></mj-image>
+         <mj-divider border-color="#2fa09d" padding="10px 0px"></mj-divider>
+       </mj-column>
+      </mj-section>
+
+      <mj-section>
+        <mj-column>
+          <mj-text align="center" font-family="Montserrat, sans-serif" font-size="16px">
+            ${kcSanitize(msg("emailVerificationBodyHtml",link, linkExpiration, realmName, linkExpirationFormatter(linkExpiration)))?no_esc}
+          </mj-text>
+        </mj-column>
+      </mj-section>
+
+      <mj-section  padding-top="0px" padding-bottom="0px">
+        <mj-column width="100%" padding-bottom="0px">
+          <mj-image src="https://staging.havengrc.com/auth/resources/4.3.0.final/email/haven/img/footer_lines@2x.png" width="248px" padding-bottom="0px"></mj-image>
+        </mj-column>
+        <mj-column width="100%" background-color="#2fa09d">
+          <mj-text align="center" font-family="Montserrat, sans-serif" font-size="16px" color="#fff">
+            <p>© 2017 <a href="www.kindlyops.com" style="text-decoration: none; color: inherit;">Kindly Ops</a></p>
+          </mj-text>
+         </mj-column>
+       </mj-section>
+
+    </mj-body>
+  </mjml>
