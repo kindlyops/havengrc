@@ -152,7 +152,7 @@ jobs:
       - notify-failed
   havenapi-testing-job:
     docker:
-      - image: circleci/node:lts-browsers
+      - image: circleci/node:8-browsers
     steps:
       - checkout
       - add_ssh_keys
