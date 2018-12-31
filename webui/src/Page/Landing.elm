@@ -1,9 +1,9 @@
 module Page.Landing exposing (view)
 
+import Authentication
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import Authentication
 
 
 view : Html Authentication.Msg
@@ -25,7 +25,7 @@ view =
                         ]
                     , button
                         [ class "btn btn-primary mt-4"
-                        , onClick (Authentication.ShowLogIn)
+                        , onClick Authentication.ShowLogIn
                         ]
                         [ text "Login" ]
                     ]
@@ -59,8 +59,8 @@ view =
                             []
                         , h3 [ class "py-3" ]
                             [ text "Landing" ]
-                        , p [ class "homeparagraph" ]
-                            [ text "This is a landing page!" ]
+                        , p [ class "homeparagraph" ] [ text "This is a landing page!" ]
+                        , div [ id "lottie" ] []
                         ]
                     ]
                 ]

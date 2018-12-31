@@ -1,4 +1,5 @@
 version: '2'
+
 volumes:
   database: {}
   prometheus_data: {}
@@ -60,6 +61,8 @@ services:
     environment:
       - MH_STORAGE=maildir
       - MH_MAILDIR_PATH=/maildir
+      - VIRTUAL_HOST=mailhog.dev.havengrc.com
+      - VIRTUAL_PORT=8025
     volumes:
       - ./mailhog/maildir:/maildir
   faktory:
@@ -78,6 +81,10 @@ services:
     build:
       context: .
       dockerfile: ./keycloak/Dockerfile
+    # to use the image line, you must first build & load the image
+    # bazel run //keycloak:keycloak
+    # image: bazel/keycloak:keycloak
+    # TODO: trouble with neverlink, need to figure out how to neverlink antlr and dom4j
     environment:
       - DB_DATABASE=mappamundi_dev
       - DB_USER=postgres
@@ -92,7 +99,7 @@ services:
     volumes:
       - ./keycloak/themes/haven:/opt/jboss/keycloak/themes/haven
       - ./keycloak/data:/keycloak
-    command: ["start-keycloak.sh", "-b", "0.0.0.0", "-Dkeycloak.migration.file=/keycloak/havendev-realm.json", "-Dkeycloak.migration.strategy=IGNORE_EXISTING", "-Dkeycloak.migration.provider=singleFile", "-Dkeycloak.migration.action=import"]
+    command: ["-b", "0.0.0.0", "-Dkeycloak.migration.file=/keycloak/havendev-realm.json", "-Dkeycloak.migration.strategy=IGNORE_EXISTING", "-Dkeycloak.migration.provider=singleFile", "-Dkeycloak.migration.action=import"]
   flyway:
     build:
       context: flyway/
@@ -152,6 +159,22 @@ services:
       - "3002:8080"
     volumes:
       - ./swagger/index.html:/usr/share/nginx/html/index.html
+  unleash:
+    build:
+      context: ./unleash
+    ports:
+      - "4242:4242"
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@db/mappamundi_dev
+      - KEYCLOAK_HOST=http://localhost:2015
+      - KEYCLOAK_REALM=havendev
+      - KEYCLOAK_CLIENT_ID=unleash
+      - KEYCLOAK_CLIENT_SECRET=2e78e079-b39a-4a8b-8f33-0ab327518ae6
+      - SITE_URL=http://localhost:2015/unleash
+    depends_on:
+      - start_dependencies
+    links:
+      - keycloak
   db:
     image: postgres:9.6.4
     ports:
@@ -167,18 +190,26 @@ services:
       - "PGADMIN_DEFAULT_PASSWORD=password"
     ports:
       - "8081:80"
+  proxy:
+    image: jwilder/nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
   worker:
     environment:
       - FAKTORY_URL=tcp://:fassword@faktory:7419
       - KC_ADMIN=admin
       - KC_PW=admin
-      - KC_HOST=http://keycloak
-      - KC_PORT=8080
+      - KC_HOST=http://dev.havengrc.com
+      - KC_PORT=
     build:
       dockerfile: ./worker/Dockerfile
       context: .
     links:
       - faktory
+      - proxy:dev.havengrc.com
     volumes:
       - ./worker/compilereport:/home/havenuser/compilereport
       - ./worker/presentation.Rmd:/home/havenuser/presentation.Rmd
@@ -226,15 +257,18 @@ services:
     build:
       context: .
       dockerfile: ./webui/Dockerfile-hotreload
-    links:
+    depends_on:
       - api
       - havenapi
       - keycloak
+      - unleash
+      - proxy
     ports:
       - "2015:2016"
     command: [/code/installrun.sh]
     environment:
       - ELM_APP_KEYCLOAK_CLIENT_ID=havendev
+      - VIRTUAL_HOST=dev.havengrc.com
   docs:
     working_dir: /docs
     volumes:
@@ -246,6 +280,8 @@ services:
     ports:
       - "4000:4000"
     command: [serve]
+    environment:
+      - VIRTUAL_HOST=docs.dev.havengrc.com
   plantuml:
     working_dir: /docs
     volumes:

@@ -22,13 +22,14 @@ const paths = require('../config/paths');
 const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
 const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
 const FileSizeReporter = require('react-dev-utils/FileSizeReporter');
-const highlightElmCompilerErrors = require('./utils/highlightElmCompilerErrors');
+const formatElmCompilerErrors = require('./utils/formatElmCompilerErrors');
+const warn = require('./utils/warn');
 
 const measureFileSizesBeforeBuild =
   FileSizeReporter.measureFileSizesBeforeBuild;
 const printFileSizesAfterBuild = FileSizeReporter.printFileSizesAfterBuild;
 
-if (fs.existsSync('elm-package.json') === false) {
+if (fs.existsSync('elm.json') === false) {
   console.log('Please, run the build script from project root directory');
   process.exit(1);
 }
@@ -57,13 +58,13 @@ measureFileSizesBeforeBuild(paths.appBuild)
         console.log(warnings.join('\n\n'));
         console.log(
           '\nSearch for the ' +
-            chalk.underline(chalk.yellow('keywords')) +
-            ' to learn more about each warning.'
+          chalk.underline(chalk.yellow('keywords')) +
+          ' to learn more about each warning.'
         );
         console.log(
           'To ignore, add ' +
-            chalk.cyan('// eslint-disable-next-line') +
-            ' to the line before.\n'
+          chalk.cyan('// eslint-disable-next-line') +
+          ' to the line before.\n'
         );
       } else {
         console.log(chalk.green('Compiled successfully.\n'));
@@ -72,25 +73,36 @@ measureFileSizesBeforeBuild(paths.appBuild)
       console.log('File sizes after gzip:\n');
       printFileSizesAfterBuild(stats, previousFileSizes, paths.appBuild);
       console.log();
+      warn(paths.elmJson);
     },
     err => {
       console.log(chalk.red('Failed to compile.\n'));
       console.log((err.message || err) + '\n');
-    process.exit(1);
+      process.exit(1);
     }
   );
 
 // Create the production build and print the deployment instructions.
 function build(previousFileSizes) {
-  console.log('Creating an optimized production build...');
+  const withDebugger = process.env.ELM_DEBUGGER === 'true' ? true : false;
+  console.log();
+  if (withDebugger) {
+    console.log(
+      `Creating a ${process.env.NODE_ENV} build with debugger enabled...`
+    );
+  } else {
+    console.log(`Creating an optimized ${process.env.NODE_ENV} build...`);
+  }
 
-  const compiler = webpack(config);
+  const compiler = webpack(
+    paths.configureWebpack(config, process.env.NODE_ENV)
+  );
   return new Promise((resolve, reject) => {
     compiler.run((err, stats) => {
       if (err) {
         return reject(err);
       }
-      const messages = highlightElmCompilerErrors(
+      const messages = formatElmCompilerErrors(
         formatWebpackMessages(stats.toJson({}, true))
       );
       if (messages.errors.length) {
@@ -100,7 +112,7 @@ function build(previousFileSizes) {
         console.log(
           chalk.yellow(
             '\nTreating warnings as errors because process.env.CI = true.\n' +
-              'Most CI servers set it automatically.\n'
+            'Most CI servers set it automatically.\n'
           )
         );
         return reject(new Error(messages.warnings.join('\n\n')));
@@ -112,11 +124,11 @@ function build(previousFileSizes) {
       });
     });
   });
-  }
+}
 
 function copyPublicFolder() {
   fs.copySync(paths.appPublic, paths.appBuild, {
     dereference: true,
     filter: file => file !== paths.appHtml
-});
+  });
 }

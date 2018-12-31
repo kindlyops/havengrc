@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/kindlyops/mappamundi.svg?style=svg)](https://circleci.com/gh/kindlyops/mappamundi) [![experimental](http://badges.github.io/stability-badges/dist/experimental.svg)](http://github.com/badges/stability-badges) [![Say Thanks!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/statik) [![Maintainability](https://api.codeclimate.com/v1/badges/d2af9dcd5ad434172a27/maintainability)](https://codeclimate.com/github/kindlyops/mappamundi/maintainability)
+[![CircleCI](https://circleci.com/gh/kindlyops/havengrc.svg?style=svg)](https://circleci.com/gh/kindlyops/havengrc) [![experimental](http://badges.github.io/stability-badges/dist/experimental.svg)](http://github.com/badges/stability-badges) [![Say Thanks!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/statik) [![Maintainability](https://api.codeclimate.com/v1/badges/d2af9dcd5ad434172a27/maintainability)](https://codeclimate.com/github/kindlyops/havengrc/maintainability)
 
 # Haven GRC is a modern risk & compliance dashboard
 
@@ -6,46 +6,71 @@ We help organizations avoid getting bogged down in rules that no longer make sen
 
 By prioritizing people and culture (beliefs and assumptions aka mental models) over prescriptive checklists, we build resilience and cut down on toil.
 
-By connecting controls to policies to values & customer requirements, we break the cycle of inability to improve processes "because security reasons".
+### But what does Haven GRC do?
 
-![screenshot of app](demo2.png)
----
+-   Measures and reports on key security metrics. such as SCDS and FORCE.
+-   Guided tool for performing scenario-based risk analysis as required by NIST CSF. Risk analysis modules is based on FAIR topology for quantitative risk estimation.
+-   Calibration exercises for subject matter experts. Subject matter experts provide estimates based on their expert judgement, calibration training improves accuracy of estimates.
+-   Tamper proof evidence store for compliance artifacts. Examples include risk acceptance documents, attestations that management oversight tasks have been completed, and third-party security assessment reports. Make your audits much easier!
+
+### Future roadmap
+
+-   Custom risk analysis models to support domains where subject matter experts have specific insights into the probability distribution of threats or losses
+-   Guided tool for performing controls assessments
+-   Features for Vendor Risk Management
+
+### Complementary tools
+
+Applications and frameworks that are complementary to Haven. We would prefer to integrate with rather than compete against these tools. They are great!
+
+-   IT asset management with [SnipeIT](https://snipeitapp.com)
+-   FISMA, NIST 800-53, NIST RMF, DFARS 800-171 documentation preparation for Authority To Operate [GovReady](https://govready.com)
+-   SOC2 documentation and workflow assistance with [Comply](https://github.com/strongdm/comply)
+-   Controls frameworks such as CIS Top 20 and NIST CSF
+
+## ![screenshot of app](demo2.png)
 
 ## Table of Contents
 
 <!--ts-->
--   [Table of Contents](#table-of-contents)
--   [thank you to vendors that support the project](#thank-you-to-vendors-that-support-the-project)
--   [setting up the dev environment](#setting-up-the-dev-environment)
-    -   [Tmux](#tmux)
-    -   [Windows users](#windows-users)
--   [running the service](#running-the-service)
-    -   [to access the main webUI](#to-access-the-main-webui)
-    -   [to access the swagger-ui for the postgrest API](#to-access-the-swagger-ui-for-the-postgrest-api)
-    -   [to access keycloak](#to-access-keycloak)
-    -   [to access the GitBook documentation site](#to-access-the-gitbook-documentation-site)
-    -   [to see emails sent from Haven / keycloak](#to-see-emails-sent-from-haven--keycloak)
-    -   [Background jobs](#background-jobs)
-    -   [Monitoring activity with Grafana](#monitoring-activity-with-grafana)
-    -   [Security scanning with Zed Attack Proxy](#security-scanning-with-zed-attack-proxy)
-    -   [Bazel](#bazel)
--   [Developer tips](#developer-tips)
-    -   [look around inside the database](#look-around-inside-the-database)
-    -   [Run Go Buffalo tasks](#run-go-buffalo-tasks)
-    -   [to export keycloak realm data (to refresh the dev users)](#to-export-keycloak-realm-data-to-refresh-the-dev-users)
-    -   [To clear local storage in Chrome for your local site](#to-clear-local-storage-in-chrome-for-your-local-site)
-    -   [Testing on a real mobile device](#testing-on-a-real-mobile-device)
-    -   [add a database migration](#add-a-database-migration)
--   [Authentication with JWT and Keycloak](#authentication-with-jwt-and-keycloak)
-    -   [roles and permissions](#roles-and-permissions)
-    -   [multi-tenancy](#multi-tenancy)
-    -   [Low level JWT interactions](#low-level-jwt-interactions)
--   [Learning Elm](#learning-elm)
-    -   [Design framework and tooling](#design-framework-and-tooling)
--   [Deploying with kubernetes / OpenShift](#deploying-with-kubernetes--openshift)
-    -   [Using OpenShift](#using-openshift)
-    -   [Database resource](#database-resource)
-    -   [TLS](#tls)
+- [Haven GRC is a modern risk & compliance dashboard](#haven-grc-is-a-modern-risk--compliance-dashboard)
+    - [But what does Haven GRC do?](#but-what-does-haven-grc-do)
+    - [Future roadmap](#future-roadmap)
+    - [Complementary tools](#complementary-tools)
+  - [!screenshot of app](#screenshot-of-app)
+  - [Table of Contents](#table-of-contents)
+  - [thank you to vendors that support the project](#thank-you-to-vendors-that-support-the-project)
+  - [setting up the dev environment](#setting-up-the-dev-environment)
+    - [Tmux](#tmux)
+    - [Windows users](#windows-users)
+  - [running the service](#running-the-service)
+    - [to access the main webUI](#to-access-the-main-webui)
+    - [to access the swagger-ui for the postgrest API](#to-access-the-swagger-ui-for-the-postgrest-api)
+    - [to access keycloak](#to-access-keycloak)
+    - [to access the GitBook documentation site](#to-access-the-gitbook-documentation-site)
+    - [to see emails sent from Haven / keycloak](#to-see-emails-sent-from-haven--keycloak)
+    - [Background jobs](#background-jobs)
+    - [Monitoring activity with Grafana](#monitoring-activity-with-grafana)
+    - [Security scanning with Zed Attack Proxy](#security-scanning-with-zed-attack-proxy)
+    - [Bazel](#bazel)
+  - [Developer tips](#developer-tips)
+    - [look around inside the database](#look-around-inside-the-database)
+    - [Run Go Buffalo tasks](#run-go-buffalo-tasks)
+    - [to export keycloak realm data (to refresh the dev users)](#to-export-keycloak-realm-data-to-refresh-the-dev-users)
+    - [To clear local storage in Chrome for your local site](#to-clear-local-storage-in-chrome-for-your-local-site)
+    - [Testing on a real mobile device](#testing-on-a-real-mobile-device)
+    - [add a database migration](#add-a-database-migration)
+  - [Authentication with JWT and Keycloak](#authentication-with-jwt-and-keycloak)
+    - [roles and permissions](#roles-and-permissions)
+    - [multi-tenancy](#multi-tenancy)
+    - [Low level JWT interactions](#low-level-jwt-interactions)
+  - [Learning Elm](#learning-elm)
+    - [Design framework and tooling](#design-framework-and-tooling)
+  - [Working with RMarkdown templates](#working-with-rmarkdown-templates)
+  - [Deploying with kubernetes / OpenShift](#deploying-with-kubernetes--openshift)
+    - [Using OpenShift](#using-openshift)
+    - [Database resource](#database-resource)
+    - [TLS](#tls)
 
 <!--te-->
 ## thank you to vendors that support the project
@@ -72,13 +97,20 @@ If you don't have docker running, use [these instructions](https://docs.docker.c
 We have a tmux session defined with https://github.com/tmux-python/tmuxp/ this may make it easier to monitor logs as you work. This is also handy if you want to do development on a remote VM.
 
     pip install --user tmuxp
-    tmuxp load ~/go/src/github.com/kindlyops/mappamundi
+    tmuxp load ~/go/src/github.com/kindlyops/havengrc
 
 ### Windows users
 
 Before you continue, you need to configure git to auto-correct line ending formats:
 
      git config --global core.autocrlf false
+
+Docker versions prior to 18.0.9.0 have a bug on windows. To work around the bug
+set this in your PowerShell before invoking docker
+
+    $Env:COMPOSE_CONVERT_WINDOWS_PATHS=1
+
+This workaround is described in the [GitHub issue](https://github.com/docker/for-win/issues/1829#issuecomment-376928286).
 
 ## running the service
 
@@ -91,9 +123,9 @@ From this point on, you just just be able to use docker-compose up/down normally
 
 ### to access the main webUI
 
-Open [localhost:2015](http://localhost:2015/), click the login button. You can login with user1\@havengrc.com/password or user2\@havengrc.com/password. User2 will prompt you to configure 2Factor authentication.
+Open [dev.havengrc.com](http://dev.havengrc.com/), click the login button. You can login with user1\@havengrc.com/password or user2\@havengrc.com/password. User2 will prompt you to configure 2Factor authentication.
 
-If you cannot connect to [localhost](http://localhost:2015), try getting the docker machine ip using the command `docker-machine ip default` and use that instead.
+If you cannot connect to [dev.havengrc.com](http://dev.havengrc.com), try getting the docker machine ip using the command `docker-machine ip default` and use that instead.
 
 ### to access the swagger-ui for the postgrest API
 
@@ -113,11 +145,11 @@ Open [localhost:2015/auth/](http://localhost:2015/auth/), you can sign in with a
 
 ### to access the GitBook documentation site
 
-Open [localhost:4000](http://localhost:4000/)
+Open [docs.dev.havengrc.com](http://docs.dev.havengrc.com/)
 
 ### to see emails sent from Haven / keycloak
 
-Open [localhost:8025](http://localhost:8025), you can use mailhog to see messages stored in memory
+Open [mailhog.dev.havengrc.com](http://mailhog.dev.havengrc.com), you can use mailhog to see messages stored in memory
 
 ### Background jobs
 
@@ -272,7 +304,7 @@ Elm is also a language that compiles to javascript. Here are some resources for 
 -   [Free elm course](http://courses.knowthen.com/p/elm-for-beginners)
 -   Daily Drip has an [excellent elm course](https://www.dailydrip.com/topics/elm) that sends you a little bit of code each day to work on
 -   [Pragmatic Programmers course](https://pragmaticstudio.com/elm)
--   [Frontend Masters 2-day elm workshop](https://frontendmasters.com/workshops/elm/)
+-   [Frontend Masters elm workshop](https://frontendmasters.com/courses/intro-elm/)
 
 ### Design framework and tooling
 

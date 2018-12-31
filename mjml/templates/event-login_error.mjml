@@ -1,0 +1,23 @@
+  <mjml>
+    <mj-body background-color="#fff">
+
+      <mj-section background-color="#ffffff" padding-bottom="10px" padding-top="20px">
+       <mj-column>
+         <mj-image src="https://staging.havengrc.com/auth/resources/4.5.0.final/email/haven/img/logo@2x.png" alt="Haven GRC Company Logo" width="82px" height="71px"></mj-image>
+         <mj-divider border-color="#2fa09d" padding="10px 0px"></mj-divider>
+       </mj-column>
+      </mj-section>
+
+      <mj-section padding-bottom="40px" padding-top="0px">
+        <mj-column>
+          <mj-text align="center" font-family="sans-serif" font-size="16px">
+            ${kcSanitize(msg("eventLoginErrorBodyHtml",event.date,event.ipAddress))?no_esc}
+          </mj-text>
+        </mj-column>
+      </mj-section>
+
+      <mj-section padding-bottom="35px" background-color="#2fa09d">
+      </mj-section>
+
+    </mj-body>
+  </mjml>

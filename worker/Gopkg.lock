@@ -2,68 +2,117 @@
 
 
 [[projects]]
+  digest = "1:fed1f537c2f1269fe475a8556c393fe466641682d73ef8fd0491cd3aa1e47bad"
+  name = "github.com/certifi/gocertifi"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "deb3ae2ef2610fde3330947281941c562861188b"
+  version = "2018.01.18"
+
+[[projects]]
+  digest = "1:220c771a0d6e04b9187de34504b1438f4b4b89ea129b812f3f08f4f19e2c2b37"
   name = "github.com/contribsys/faktory"
   packages = ["client"]
+  pruneopts = "UT"
   revision = "f8d9d21b3e04c3d9f3cb62f0298eb42bb007d745"
   version = "v0.9.0-beta1-1"
 
 [[projects]]
   branch = "master"
+  digest = "1:5b2cd542e9744bf0af41fd6265f0bc42aa9f5d8f460f5c1e8e5bd2e43d6ba02d"
   name = "github.com/contribsys/faktory_worker_go"
   packages = ["."]
+  pruneopts = "UT"
   revision = "de58a756280d12741a9b36e7acc26aa9e639b178"
 
 [[projects]]
+  digest = "1:c6f310047d51949b72a6bd433266ae365206c0fca397c2388d49290b4113bb54"
   name = "github.com/deis/helm"
   packages = ["log"]
+  pruneopts = "UT"
   revision = "e4b3983bd8dc5b8682de168a322c20a941b49aa3"
   version = "0.8.1"
 
 [[projects]]
+  digest = "1:73406634f1b0888bb8eb4b3fdeb5ea43aafbdf2b8ba790b98083fd92e9c4b6ad"
   name = "github.com/deis/pkg"
   packages = ["prettyprint"]
+  pruneopts = "UT"
   revision = "d8ef2e67e88941808f1bfcf28d0a91a122718459"
   version = "v0.5.0"
 
 [[projects]]
+  digest = "1:e51147e761aa8b6769e05e586c7012eb221c8be72fbc68a4340a53b974e67b9f"
+  name = "github.com/getsentry/raven-go"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "3033899c76deb3fb6570d9c4074d00443aeab88f"
+  version = "v0.1.0"
+
+[[projects]]
+  digest = "1:38101365bdbea4ca2746cf7bac064b3f18d6a5561787d653a54f80c7afb4b513"
   name = "github.com/gobuffalo/envy"
   packages = ["."]
+  pruneopts = "UT"
   revision = "3c96536452167a705ca5a70b831d3810e1e10452"
   version = "v1.6.4"
 
 [[projects]]
   branch = "master"
+  digest = "1:7654989089e5bd5b6734ec3be8b695e87d3f1f8d95620b343fd7d3995a5b60d7"
   name = "github.com/jmoiron/sqlx"
   packages = [
     ".",
-    "reflectx"
+    "reflectx",
   ]
+  pruneopts = "UT"
   revision = "0dae4fefe7c0e190f7b5a78dac28a1c82cc8d849"
 
 [[projects]]
+  digest = "1:ecd9aa82687cf31d1585d4ac61d0ba180e42e8a6182b85bd785fcca8dfeefc1b"
   name = "github.com/joho/godotenv"
   packages = ["."]
+  pruneopts = "UT"
   revision = "23d116af351c84513e1946b527c88823e476be13"
   version = "v1.3.0"
 
 [[projects]]
+  digest = "1:8ef506fc2bb9ced9b151dafa592d4046063d744c646c1bbe801982ce87e4bc24"
   name = "github.com/lib/pq"
   packages = [
     ".",
-    "oid"
+    "oid",
   ]
+  pruneopts = "UT"
   revision = "4ded0e9383f75c197b3a2aaa6d590ac52df6fd79"
   version = "v1.0.0"
 
 [[projects]]
+  digest = "1:4e3d8630f07ff7ae1fc43b2d73b872807f1a038576d303910829aeeb20ee1e63"
   name = "github.com/nleof/goyesql"
   packages = ["."]
+  pruneopts = "UT"
   revision = "736fe14cafb0b195a659821fb90ecfa9226441b5"
   version = "v1.0.1"
+
+[[projects]]
+  digest = "1:40e195917a951a8bf867cd05de2a46aaf1806c50cf92eebf4c16f78cd196f747"
+  name = "github.com/pkg/errors"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
+  version = "v0.8.0"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "7c978c95c479ae2bf80dbc015b6a83cdbb2d96d448f9a56bda9f937de6a0fbc0"
+  input-imports = [
+    "github.com/contribsys/faktory_worker_go",
+    "github.com/getsentry/raven-go",
+    "github.com/gobuffalo/envy",
+    "github.com/jmoiron/sqlx",
+    "github.com/lib/pq",
+    "github.com/nleof/goyesql",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1

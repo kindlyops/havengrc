@@ -5,8 +5,6 @@ port module Ports exposing
     , radarChart
     , renderVega
     , saveSurveyState
-    , setTitle
-    , showError
     )
 
 import Data.RadarChart exposing (RadarChartConfig)
@@ -22,12 +20,6 @@ port keycloakLogin : Options -> Cmd msg
 
 
 port keycloakLogout : () -> Cmd msg
-
-
-port setTitle : String -> Cmd msg
-
-
-port showError : String -> Cmd msg
 
 
 port radarChart : RadarChartConfig -> Cmd msg

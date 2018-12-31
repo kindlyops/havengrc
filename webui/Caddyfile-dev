@@ -1,4 +1,4 @@
-0.0.0.0:2016 
+0.0.0.0:2016
 on startup npm run-script start &
 
 header / {
@@ -9,12 +9,17 @@ header / {
   # Disallow the site to be rendered within a frame (clickjacking protection)
   X-Frame-Options "sameorigin"
   # CSP
-  Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: www.gravatar.com; style-src 'self' 'unsafe-inline';  font-src 'self' data: ;"
+  Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: www.gravatar.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;  font-src 'self' https://fonts.gstatic.com data: ;"
   Feature-Policy "autoplay 'none'; camera 'none'; microphone 'none'; midi 'none'; usb 'none'; vr 'none';"
   Referrer-Policy "strict-origin"
 }
 
 cors /swagger http://localhost:3002
+
+proxy /unleash unleash:4242 {
+  without /unleash
+  transparent
+}
 
 proxy / localhost:2015 {
   transparent
@@ -37,6 +42,7 @@ proxy /api/files havenapi:3000 {
 proxy /api/registration_funnel havenapi:3000 {
   transparent
 }
+
 
 log / stdout "{combined}"
 errors stdout

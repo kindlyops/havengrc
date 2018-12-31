@@ -2,11 +2,11 @@
 <@layout.mainLayout active='account' bodyClass='user'; section>
 
   <div class="heading py-3 mb-3">
-    <span class="subtitle float-sm-right pt-lg-2">
+    <h2>${msg("editAccountHtmlTitle")}</h2>
+    <span class="subtitle">
         <span class="required">*</span>
         ${msg("requiredFields")}
     </span>
-    <h2>${msg("editAccountHtmlTitle")}</h2>
   </div>
 
   <form action="${url.accountUrl}" class="px-4" id="AccountForm" method="post">

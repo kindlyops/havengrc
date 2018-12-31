@@ -64,3 +64,7 @@
 [[constraint]]
   branch = "master"
   name = "go.uber.org/ratelimit"
+
+[[constraint]]
+  name = "github.com/getsentry/raven-go"
+  version = "0.1.0"

@@ -16,7 +16,6 @@ view metaData title msg =
                 ]
             , p [ class "card-text" ] [ text metaData.description ]
             ]
-        , div [ id "lottie" ] []
         , ul [ class "list-group list-group-flush" ]
             [ li [ class "list-group-item" ] [ text ("Created: " ++ metaData.created_at) ]
             , li [ class "list-group-item" ] [ text ("Created By: " ++ metaData.author) ]

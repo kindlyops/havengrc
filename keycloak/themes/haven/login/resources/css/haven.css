@@ -23,7 +23,6 @@
 
 body {
   background-color:white;
-  font-family: 'Bitter', serif;
   font-size: 16px !important;
 }
 
@@ -31,7 +30,11 @@ header{
   height:64px;
 }
 
-label{
+.primary-font{
+  font-family: 'Montserrat', sans-serif;
+}
+
+label, #Registration a{
   font-family: 'Bitter', serif
 }
 
@@ -100,7 +103,7 @@ h2{
 
 .orText{
   background:#fff;
-  margin: auto -62px auto 62px;
+  margin: auto -60px auto 60px;
 }
 
 .bottom-container{

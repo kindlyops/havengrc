@@ -116,7 +116,16 @@ func GetUser(email string) ([]Users, error) {
 
 }
 
-// CreateUser creates a new user.
+// UserExistsError is returned when the user already exists
+type UserExistsError struct {
+	User string
+}
+
+func (e *UserExistsError) Error() string {
+	return fmt.Sprintf("keycloak: could not create user: %s because it already exists", e.User)
+}
+
+// CreateUser creates a new user if the user does not already exist.
 func CreateUser(email string) error {
 	err := GetToken()
 	if err != nil {
@@ -126,10 +135,10 @@ func CreateUser(email string) error {
 	log.Info("Try to create: %s", email)
 	userList, err := GetUser(email)
 	if err != nil {
-		return fmt.Errorf("Could not create user:%s because of: %s", email, err.Error())
+		return fmt.Errorf("trouble creating user:%s because %v", email, err)
 	}
 	if len(userList) > 0 {
-		return fmt.Errorf("Could not create user:%s because it already exists", email)
+		return &UserExistsError{email}
 	}
 
 	var jsonStr = []byte(
@@ -188,9 +197,10 @@ func SendVerificationEmail(email string) error {
 		fmt.Sprintf(`["UPDATE_PASSWORD"]`))
 
 	body := bytes.NewBuffer(jsonStr)
+	redirectURI := "&redirect_uri=/#new-user"
 	req, err := http.NewRequest(
 		"PUT",
-		keycloakHost+getUsersURL+"/"+userList[0].ID+"/send-verify-email?client_id=havendev",
+		keycloakHost+getUsersURL+"/"+userList[0].ID+"/execute-actions-email?client_id=havendev"+redirectURI,
 		body,
 	)
 

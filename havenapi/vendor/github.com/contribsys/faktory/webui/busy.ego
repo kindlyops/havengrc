@@ -1,0 +1,119 @@
+<%
+package webui
+
+import (
+  "net/http"
+
+  "github.com/contribsys/faktory/server"
+  "github.com/contribsys/faktory/manager"
+)
+
+func ego_busy(w io.Writer, req *http.Request) {
+%>
+
+<% ego_layout(w, req, func() { %>
+
+
+<div class="row header">
+  <div class="col-sm-8 pull-left flip">
+    <h3><%= t(req, "Processes") %></h3>
+  </div>
+  <div class="col-sm-4 pull-right flip">
+    <form method="POST" class="warning-messages">
+      <%== csrfTag(req) %>
+      <input type="hidden" name="wid" value="all"/>
+      <button class="btn btn-primary" type="submit" name="signal" value="quiet" data-confirm="<%= t(req, "AreYouSure") %>"><%= t(req, "QuietAll") %></button>
+      <button class="btn btn-danger" type="submit" name="signal" value="terminate" data-confirm="<%= t(req, "AreYouSure") %>"><%= t(req, "StopAll") %></button>
+    </form>
+  </div>
+</div>
+
+<div class="table_container">
+  <table class="processes table table-hover table-bordered table-striped table-white">
+    <thead>
+      <th><%= t(req, "ID") %></th>
+      <th><%= t(req, "Name") %></th>
+      <th><%= t(req, "Started") %></th>
+      <th><%= t(req, "Busy") %></th>
+      <th>&nbsp;</th>
+    </thead>
+    <% busyWorkers(req, func(worker *server.ClientData) { %>
+      <tr>
+        <td>
+          <code>
+            <%= worker.Wid %>
+          </code>
+        </td>
+        <td>
+          <code><%= worker.Hostname %>:<%= worker.Pid %></code>
+          <% for _, label := range worker.Labels { %>
+            <span class="label label-info"><%= label %></span>
+          <% } %>
+          <% if worker.IsQuiet() { %>
+            <span class="label label-danger">quiet</span>
+          <% } %>
+        </td>
+        <td><%= Timeago(worker.StartedAt) %></td>
+        <td><%= ctx(req).Server().Manager().BusyCount(worker.Wid) %></td>
+        <td>
+          <div class="btn-group pull-right flip">
+            <form method="POST">
+              <%== csrfTag(req) %>
+              <input type="hidden" name="wid" value="<%= worker.Wid %>"/>
+              <div class="pull-right flip">
+                <% if !worker.IsQuiet() { %>
+                  <button class="btn btn-primary btn-xs" type="submit" name="signal" value="quiet"><%= t(req, "Quiet") %></button>
+                <% } %>
+                <button class="btn btn-danger btn-xs" type="submit" name="signal" value="terminate"><%= t(req, "Stop") %></button>
+              </div>
+            </form>
+          </div>
+        </td>
+      </tr>
+    <% }) %>
+  </table>
+</div>
+
+<div class="row header">
+  <div class="col-sm-7">
+    <h3><%= t(req, "Jobs") %></h3>
+  </div>
+</div>
+
+<div class="table_container">
+  <table class="workers table table-hover table-bordered table-striped table-white">
+    <thead>
+      <th><%= t(req, "Process") %></th>
+      <th><%= t(req, "JID") %></th>
+      <th><%= t(req, "Queue") %></th>
+      <th><%= t(req, "Job") %></th>
+      <th><%= t(req, "Arguments") %></th>
+      <th><%= t(req, "Started") %></th>
+    </thead>
+    <% busyReservations(req, func(res *manager.Reservation) { %>
+      <% job := res.Job %>
+      <tr>
+        <td>
+          <code>
+            <%= res.Wid %>
+          </code>
+        </td>
+        <td>
+          <code>
+            <%= job.Jid %>
+          </code>
+        </td>
+        <td>
+          <a href="/queues/<%= job.Queue %>"><%= job.Queue %></a>
+        </td>
+        <td><code><%= job.Type %></code></td>
+        <td>
+          <div class="args"><code><%= job.Args %></code></div>
+        </td>
+        <td><%= relativeTime(res.Since) %></td>
+      </tr>
+    <% }) %>
+  </table>
+</div>
+<% }) %>
+<% } %>

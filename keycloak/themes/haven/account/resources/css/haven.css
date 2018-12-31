@@ -33,7 +33,6 @@ nav.navdrawer-nav i.material-icons{
 
 body {
   background-color:var(--body-bg) !important;
-  font-family: 'Bitter', serif;
 }
 
 header{
@@ -89,8 +88,15 @@ button{
   font-family: 'Montserrat', sans-serif;
 }
 
+button[type=submit], button[id^="add-link-"], button[id^="remove-link-"], button#logout-all-sessions{
+  min-width:92px !important;
+  text-align: center !important;
+  white-space: normal;
+  line-height: inherit;
+}
+
 h2{
-    font-family: 'Bitter', serif;
+    font-family: 'Montserrat', sans-serif;
     font-size: 28px;
 }
 
@@ -99,9 +105,13 @@ h2{
     padding: 16px 5px;
 }
 
+.heading h2{
+  flex-grow: 2;
+}
+
 .subtitle{
+  font-family: 'Bitter', serif;
     align-self: center;
-    font-family: 'Montserrat', sans-serif;
 }
 
 label {
@@ -144,6 +154,7 @@ label {
 /* Authenticator Page */
 ol#AccountForm{
   font-family:'Bitter',serif ;
+  padding-inline-start:14px;
 }
 
 #TotpTable thead tr th{
@@ -157,14 +168,27 @@ ol#AccountForm{
     font-family: 'Montserrat', sans-serif;
 }
 
+@media screen and (min-width:576px){
+  .heading{
+    display: flex;
+  }
+}
+
 @media screen and (min-width:992px){
   main.ml-lg-5{
     margin-left: 15rem !important;
   }
 }
 
-@media screen and (max-width:330px){
+@media screen and (max-width:372px){
+    button[type=submit], button[id^="add-link"], button[id^="remove-link"]{
+      width:100% !important;
+      margin-bottom: 5px;
+    }
     .totp-img{
-        margin-left:-8px;
+        margin-left:-40px;
+    }
+    #TotpForm div.form-group{
+      padding-left: 0px !important;
     }
 }

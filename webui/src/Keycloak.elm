@@ -1,20 +1,19 @@
-module Keycloak
-    exposing
-        ( AuthenticationState(..)
-        , AuthenticationError
-        , AuthenticationResult
-        , RawAuthenticationResult
-        , Options
-        , defaultOpts
-        , LoggedInUser
-        , loggedInUserDecoder
-        , UserProfile
-        , Token
-        , mapResult
-        )
+module Keycloak exposing
+    ( AuthenticationError
+    , AuthenticationResult
+    , AuthenticationState(..)
+    , LoggedInUser
+    , Options
+    , RawAuthenticationResult
+    , Token
+    , UserProfile
+    , defaultOpts
+    , loggedInUserDecoder
+    , mapResult
+    )
 
-import Json.Decode as Decode exposing (Decoder, decodeString, int, andThen, oneOf)
-import Json.Decode.Pipeline exposing (decode, required)
+import Json.Decode as Decode exposing (Decoder, bool, field, int, map2, map5, oneOf, string, succeed)
+import Json.Decode.Pipeline exposing (required)
 
 
 type alias LoggedInUser =
@@ -25,19 +24,19 @@ type alias LoggedInUser =
 
 loggedInUserDecoder : Decoder LoggedInUser
 loggedInUserDecoder =
-    decode LoggedInUser
-        |> required "profile" userProfileDecoder
-        |> required "token" Decode.string
+    map2 LoggedInUser
+        (field "profile" userProfileDecoder)
+        (field "token" string)
 
 
 userProfileDecoder : Decoder UserProfile
 userProfileDecoder =
-    decode UserProfile
-        |> required "username" Decode.string
-        |> required "emailVerified" Decode.bool
-        |> required "firstName" Decode.string
-        |> required "lastName" Decode.string
-        |> required "email" Decode.string
+    map5 UserProfile
+        (field "username" string)
+        (field "emailVerified" bool)
+        (field "firstName" string)
+        (field "lastName" string)
+        (field "email" string)
 
 
 type AuthenticationState

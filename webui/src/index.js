@@ -1,6 +1,6 @@
 import "./main.scss";
 
-import { Main } from './Main.elm'
+import { Elm } from './Main.elm'
 
 if (process.env.NODE_ENV === 'development') {
   var CLIENT_ID = process.env.ELM_APP_KEYCLOAK_CLIENT_ID
@@ -27,7 +27,10 @@ var initialData = {
   storedSurvey: storedSurveyState ? JSON.parse(storedSurveyState) : null
 }
 
-var elmApp = Main.embed(document.getElementById('root'), initialData)
+var elmApp = Elm.Main.init({
+  node: document.getElementById('elm'),
+  flags: initialData
+});
 
 function sendElmKeycloakToken() {
   sessionStorage.setItem('profile', JSON.stringify(keycloak.profile))
@@ -93,23 +96,6 @@ elmApp.ports.keycloakLogout.subscribe(function () {
   keycloak.logout()
 })
 
-// set the page title
-elmApp.ports.setTitle.subscribe(function (title) {
-  document.title = title
-})
-
-elmApp.ports.showError.subscribe(function (messageString) {
-  console.error(messageString)
-  let snackBarElement = document.getElementById('snackbar')
-  snackBarElement.classList.add('show')
-  let snackBarBodyElement = document.getElementById('snackbar-body')
-  snackBarBodyElement.innerHTML = messageString
-  setTimeout(function () {
-    let snackBarElement = document.getElementById('snackbar')
-    snackBarElement.classList.remove('show')
-  }, 3000)
-})
-
 elmApp.ports.radarChart.subscribe(chartConfig => {
   chartConfig.type = 'radar'
   window.myRadar = new Chart(document.getElementById('chart'), chartConfig)
@@ -133,9 +119,10 @@ elmApp.ports.renderVega.subscribe(updateChart);
 
 document.arrive("#lottie", () => {
   var element = document.getElementById('lottie');
-  var animationPath = process.env.PUBLIC_URL + '/animations/drone-animation.json'
+  var animationPath = process.env.PUBLIC_URL + '/animations/haven-demo.json'
   if (element) {
     console.log("got lottie element");
+    lottie.setLocationHref(document.location.href)
     lottie.loadAnimation({
       container: element, // Required
       path: animationPath, // Required

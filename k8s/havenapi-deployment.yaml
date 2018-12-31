@@ -50,6 +50,13 @@ spec:
                 secretKeyRef:
                   name: haven-database-credentials
                   key: password
+            - name: SENTRY_ENVIRONMENT
+              value: "staging"
+            - name: SENTRY_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: sentry
+                  key: dsn
           volumeMounts:
             - name: secret-volume
               mountPath: /etc/haven-credentials/

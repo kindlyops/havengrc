@@ -11,9 +11,10 @@ import (
 
 	faktory "github.com/contribsys/faktory/client"
 	"github.com/deis/helm/log"
+	"github.com/getsentry/raven-go"
 	"github.com/gobuffalo/buffalo"
 	"github.com/gobuffalo/pop"
-	"github.com/kindlyops/mappamundi/havenapi/models"
+	"github.com/kindlyops/havengrc/havenapi/models"
 	"go.uber.org/ratelimit"
 )
 
@@ -44,12 +45,15 @@ func RegistrationHandler(c buffalo.Context) error {
 	err = json.Unmarshal(body, &registration)
 
 	if err != nil {
+		raven.CaptureError(err, nil)
 		return c.Error(500, err)
 	}
 	log.Info(registration.Email)
 	log.Info("body: %s", body)
 	results, err := json.Marshal(registration.Results)
 	if err != nil {
+		raven.CaptureError(err, nil)
+
 		return c.Error(500, err)
 	}
 	remoteAddress := strings.Split(request.RemoteAddr, ":")[0]
@@ -62,6 +66,8 @@ func RegistrationHandler(c buffalo.Context) error {
 	).Exec()
 
 	if err != nil {
+		raven.CaptureError(err, nil)
+
 		return c.Error(
 			500,
 			fmt.Errorf(
@@ -73,20 +79,29 @@ func RegistrationHandler(c buffalo.Context) error {
 	// Add job to the queue
 	client, err := faktory.Open()
 	if err != nil {
+		raven.CaptureError(err, nil)
+
 		return c.Error(500, err)
 	}
 	createUserJob := faktory.NewJob("CreateUser", registration.Email)
 	err = client.Push(createUserJob)
 	if err != nil {
+		raven.CaptureError(err, nil)
+
 		return c.Error(500, err)
 	}
 	saveSurveyJob := faktory.NewJob("SaveSurvey", registration.Email)
 	err = client.Push(saveSurveyJob)
 	if err != nil {
+		raven.CaptureError(err, nil)
+
 		return c.Error(500, err)
 	}
 	message := fmt.Sprintf("New registration for: %s", registration.Email)
-	_ = sendSlackNotification(message)
+	err = sendSlackNotification(message)
+	if err != nil {
+		raven.CaptureError(err, nil)
+	}
 
 	log.Info(message)
 

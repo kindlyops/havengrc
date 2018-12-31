@@ -1,8 +1,8 @@
-module Tests exposing (..)
+module Tests exposing (all)
 
-import Test exposing (..)
 import Expect
 import String
+import Test exposing (..)
 
 
 all : Test

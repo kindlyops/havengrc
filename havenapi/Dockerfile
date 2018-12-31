@@ -2,8 +2,8 @@
 # https://docs.docker.com/engine/userguide/eng-image/multistage-build/
 FROM gobuffalo/buffalo:v0.12.4 as builder
 
-RUN mkdir -p $GOPATH/src/github.com/kindlyops/mappamundi/havenapi
-WORKDIR $GOPATH/src/github.com/kindlyops/mappamundi/havenapi
+RUN mkdir -p $GOPATH/src/github.com/kindlyops/havengrc/havenapi
+WORKDIR $GOPATH/src/github.com/kindlyops/havengrc/havenapi
 
 # this will cache the npm install step, unless package.json changes
 #ADD package.json .

@@ -2,11 +2,11 @@
   <@layout.mainLayout active='password' bodyClass='password' ; section>
 
     <div class="heading py-3 mb-3">
-      <span class="subtitle float-sm-right pt-lg-2">
+      <h2>${msg("changePasswordHtmlTitle")}</h2>
+      <span class="subtitle">
           <span class="required">*</span>
           ${msg("requiredFields")}
       </span>
-      <h2>${msg("changePasswordHtmlTitle")}</h2>
     </div>
 
     <form action="${url.passwordUrl}" id="PasswordForm" method="post" class="px-4">
@@ -18,7 +18,7 @@
       <#if password.passwordSet>
           <div class="form-group">
             <label for="password">${msg("password")}</label><span class="required">*</span>
-            <input type="password" class="form-control" id="password" name="password" autocomplete="current-password" value="${(account.username!'')}" required />
+            <input type="password" class="form-control" id="password" name="password" autocomplete="current-password" required>
           </div>
       </#if>
 
@@ -26,12 +26,12 @@
 
       <div class="form-group">
         <label for="password-new">${msg("passwordNew")}</label><span class="required">*</span>
-        <input type="password" class="form-control" id="password-new" name="password-new" autofocus autocomplete="off" required />
+        <input type="password" class="form-control" id="password-new" name="password-new" autocomplete="new-password" autofocus required>
       </div>
 
       <div class="form-group">
         <label for="password-confirm">${msg("passwordConfirm")}</label><span class="required">*</span>
-        <input type="password" class="form-control" id="password-confirm" name="password-confirm" autocomplete="off" required />
+        <input type="password" class="form-control" id="password-confirm" name="password-confirm" autocomplete="new-password" required>
       </div>
 
       <div class="float-right mt-2">

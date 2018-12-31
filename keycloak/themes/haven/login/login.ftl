@@ -53,7 +53,7 @@
         <div class="col-sm-6 d-sm-flex flex-column align-items-sm-start pl-sm-5 py-sm-4">
             <#if realm.password && social.providers??>
                 <div id="kc-social-providers" class="mb-auto text-center">
-                    <h5>Log In With:</h5>
+                    <p class="mb-0 primary-font">Log In With:</p>
                         <#list social.providers as p>
                             <p class="mb-1"><a href="${p.loginUrl}" id="zocial-${p.alias}" class="zocial ${p.providerId}"> <span class="text">${p.displayName}</span></a></p>
                         </#list>
@@ -61,7 +61,7 @@
             </#if>
             <#if realm.password && realm.registrationAllowed && !usernameEditDisabled??>
                 <div id="Registration" class="text-center">
-                    <p>${msg("noAccount")} <a href="${url.registrationUrl}">${msg("doRegister")}</a></p>
+                    <p class="primary-font">${msg("noAccount")} <a href="${url.registrationUrl}">${msg("doRegister")}</a></p>
                 </div>
             </#if>
 
