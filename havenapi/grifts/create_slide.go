@@ -1,7 +1,7 @@
 package grifts
 
 import (
-	"github.com/kindlyops/mappamundi/havenapi/actions"
+	"github.com/kindlyops/havengrc/havenapi/actions"
 
 	. "github.com/markbates/grift/grift"
 )
