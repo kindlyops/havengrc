@@ -226,6 +226,10 @@ jobs:
             docker build -t kindlyops/cypress -f webui/Dockerfile-cypress ./webui
             docker run --network net0 --link havenweb kindlyops/cypress
       - notify-failed
+      - run:
+          name: notify tests complete
+          command: ./notify-slack notifications "CircleCI tests completed successfully for ${CIRCLE_PULL_REQUEST:-$CIRCLE_BRANCH}" circleci
+          when: on_success
   deploy-staging:
     docker:
       - image: circleci/ruby:2.4
