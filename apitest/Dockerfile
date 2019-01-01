@@ -8,5 +8,6 @@ WORKDIR /usr/src/app
 COPY ./apitest/Gemfile /usr/src/app
 COPY ./apitest/Gemfile.lock /usr/src/app
 COPY ./apitest/features/ /usr/src/app/features
-RUN bundle install
+COPY ./apitest/vendor /usr/src/app/vendor
+RUN bundle install --local
 CMD ["cucumber"]
