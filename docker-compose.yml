@@ -1,3 +1,4 @@
+---
 version: '2'
 
 volumes:
@@ -254,6 +255,7 @@ services:
     volumes:
       - ./webui:/code
       - /code/node_modules
+      - /code/elm-stuff
     build:
       context: .
       dockerfile: ./webui/Dockerfile-hotreload
