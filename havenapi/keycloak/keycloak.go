@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -108,6 +109,9 @@ func GetUser(email string) ([]Users, error) {
 
 	// Look for an empty array if no users exist with that email.
 	err = json.NewDecoder(resp.Body).Decode(&data)
+	if err == io.EOF {
+		err = nil
+	}
 	if err != nil {
 		return data, fmt.Errorf("Error checking for existing user: %s", err.Error())
 	}

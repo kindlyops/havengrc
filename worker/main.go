@@ -143,7 +143,7 @@ func CreateSlide(ctx worker.Context, args ...interface{}) error {
 	userEmail := args[0].(string)
 	fmt.Println("Working on CreateSlide job", ctx.Jid())
 	fmt.Println("Creating Slide for: ", userEmail)
-	compileReport := exec.Command("compilereport", "--help")
+	compileReport := exec.Command("compilereport")
 	compileReportOut, err := compileReport.Output()
 	if err != nil {
 		handleError(err)
