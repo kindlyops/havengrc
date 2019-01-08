@@ -62,7 +62,7 @@ postIpsativeResponse authModel ipsativeSurvey =
             Http.request
                 { method = "POST"
                 , headers = headers
-                , url = "api/ipsative_responses"
+                , url = "/api/ipsative_responses"
                 , body = body
                 , expect = Http.expectJson (Decode.list Survey.ipsativeResponseDecoder)
                 , timeout = Nothing
