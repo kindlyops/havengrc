@@ -1,106 +1,151 @@
 module Authentication exposing
-    ( Model
+    ( LoggedInUser
+    , Model
     , Msg(..)
+    , UserProfile
     , getReturnHeaders
-    , handleAuthResult
     , init
     , isLoggedIn
+    , loggedInUserDecoder
     , tryGetAuthHeader
     , tryGetUserProfile
     , update
     )
 
+import Browser.Navigation as Nav
 import Http
-import Keycloak
+import Json.Decode as Decode exposing (Decoder, bool, field, int, map2, map5, oneOf, string, succeed)
+import Json.Decode.Pipeline exposing (required)
 import Ports as Ports exposing (saveSurveyState)
 
 
-type alias Model =
-    { state : Keycloak.AuthenticationState
-    , lastError : Maybe Keycloak.AuthenticationError
-    , logIn : Keycloak.Options -> Cmd Msg
-    , logOut : () -> Cmd Msg
+type AuthenticationState
+    = LoggedOut
+    | LoggedIn LoggedInUser
+
+
+type alias Options =
+    {}
+
+
+type alias UserProfile =
+    { username : String
+    , emailVerified : Bool
+    , firstName : String
+    , lastName : String
+    , email : String
     }
 
 
-init : (Keycloak.Options -> Cmd Msg) -> (() -> Cmd Msg) -> Maybe Keycloak.LoggedInUser -> Model
-init logIn logOut initialUser =
-    { state =
-        case initialUser of
-            Just user ->
-                Keycloak.LoggedIn user
+type alias LoggedInUser =
+    { profile : UserProfile
+    , token : Token
+    }
 
-            Nothing ->
-                Keycloak.LoggedOut
-    , lastError = Nothing
-    , logIn = logIn
-    , logOut = logOut
+
+type alias Token =
+    String
+
+
+type alias AuthenticationError =
+    { name : Maybe String
+    , code : Maybe String
+    , description : String
+    , statusCode : Maybe Int
+    }
+
+
+type alias AuthenticationResult =
+    Result AuthenticationError LoggedInUser
+
+
+type alias RawAuthenticationResult =
+    { err : Maybe AuthenticationError
+    , ok : Maybe LoggedInUser
+    }
+
+
+type alias Model =
+    { state : AuthenticationState
+    , lastError : Maybe AuthenticationError
     }
 
 
 type Msg
-    = AuthenticationResult Keycloak.AuthenticationResult
-    | ShowLogIn
+    = HandleProfileResult
     | LogOut
+    | LoginMsg
+
+
+init : ( Model, Cmd Msg )
+init =
+    ( { state = LoggedOut
+      , lastError = Nothing
+      }
+    , Cmd.none
+      -- TODO: fire the HTTP request to load the user profile
+    )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        AuthenticationResult result ->
-            let
-                ( newState, error ) =
-                    case result of
-                        Ok user ->
-                            ( Keycloak.LoggedIn user, Nothing )
+        HandleProfileResult ->
+            -- TODO: load the user profile info from
+            -- /realms/{realm-name}/protocol/openid-connect/userinfo
+            ( model, Cmd.none )
 
-                        Err err ->
-                            ( Keycloak.LoggedOut, Just err )
-            in
-            ( { model | state = newState, lastError = error }, Cmd.none )
-
-        ShowLogIn ->
-            ( model, model.logIn Keycloak.defaultOpts )
+        LoginMsg ->
+            -- Force full page reload of dashboard using Nav.load, which will trigger
+            -- gatekeeper to initiate the OIDC redirect for login at Keycloak
+            ( model, Nav.load "http://dev.havengrc.com/dashboard/" )
 
         LogOut ->
-            ( { model | state = Keycloak.LoggedOut }, Cmd.batch [ model.logOut (), Ports.saveSurveyState Nothing ] )
+            ( { model | state = LoggedOut }, Ports.saveSurveyState Nothing )
 
 
-handleAuthResult : Keycloak.RawAuthenticationResult -> Msg
-handleAuthResult =
-    Keycloak.mapResult >> AuthenticationResult
-
-
-tryGetUserProfile : Model -> Maybe Keycloak.UserProfile
+tryGetUserProfile : Model -> Maybe UserProfile
 tryGetUserProfile model =
     case model.state of
-        Keycloak.LoggedIn user ->
+        LoggedIn user ->
             Just user.profile
 
-        Keycloak.LoggedOut ->
+        LoggedOut ->
             Nothing
 
 
 isLoggedIn : Model -> Bool
 isLoggedIn model =
     case model.state of
-        Keycloak.LoggedIn _ ->
+        LoggedIn _ ->
             True
 
-        Keycloak.LoggedOut ->
+        LoggedOut ->
             False
 
 
 tryGetAuthHeader : Model -> List Http.Header
 tryGetAuthHeader authModel =
-    case authModel.state of
-        Keycloak.LoggedIn user ->
-            [ Http.header "Authorization" ("Bearer " ++ user.token) ]
-
-        Keycloak.LoggedOut ->
-            []
+    []
 
 
 getReturnHeaders : List Http.Header
 getReturnHeaders =
     [ Http.header "Prefer" "return=representation" ]
+
+
+loggedInUserDecoder : Decoder LoggedInUser
+loggedInUserDecoder =
+    map2 LoggedInUser
+        (field "profile" userProfileDecoder)
+        (field "token" string)
+
+
+userProfileDecoder : Decoder UserProfile
+userProfileDecoder =
+    map5 UserProfile
+        (field "username" string)
+        (field "emailVerified" bool)
+        (field "firstName" string)
+        (field "lastName" string)
+        (field "email" string)

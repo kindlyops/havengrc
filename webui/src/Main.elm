@@ -9,7 +9,6 @@ import Html exposing (Html, a, button, div, i, img, li, nav, span, text, ul)
 import Html.Attributes exposing (attribute, class, classList, href, id, style)
 import Html.Events exposing (onClick)
 import Json.Decode as Decode
-import Keycloak
 import Page.Activity as Activity
 import Page.Comments as Comments
 import Page.Dashboard as Dashboard
@@ -47,12 +46,12 @@ type alias MenuItem =
     }
 
 
-decodeKeyCloak : Decode.Value -> Maybe Keycloak.LoggedInUser
+decodeKeyCloak : Decode.Value -> Maybe Authentication.LoggedInUser
 decodeKeyCloak json =
     json
         |> Decode.decodeValue Decode.string
         |> Result.toMaybe
-        |> Maybe.andThen (Decode.decodeString Keycloak.loggedInUserDecoder >> Result.toMaybe)
+        |> Maybe.andThen (Decode.decodeString Authentication.loggedInUserDecoder >> Result.toMaybe)
 
 
 decodeSavedState : Decode.Value -> Maybe Survey.TestStructure
@@ -66,8 +65,8 @@ decodeSavedState json =
 init : Decode.Value -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init sessionStorage location key =
     let
-        initialAuthModel =
-            Authentication.init Ports.keycloakLogin Ports.keycloakLogout (decodeKeyCloak sessionStorage)
+        ( initialAuthModel, authCmd ) =
+            Authentication.init
 
         ( commentsModel, commentsCmd ) =
             Comments.init initialAuthModel
@@ -108,9 +107,9 @@ init sessionStorage location key =
     )
 
 
-subscriptions : a -> Sub Msg
-subscriptions model =
-    Ports.keycloakAuthResult (Authentication.handleAuthResult >> AuthenticationMsg)
+subscriptions : Model -> Sub Msg
+subscriptions _ =
+    Sub.none
 
 
 main : Program Decode.Value Model Msg
@@ -317,7 +316,7 @@ outsideView model =
             Home.view |> Html.map AuthenticationMsg
 
 
-insideView : Model -> Keycloak.UserProfile -> Html Msg
+insideView : Model -> Authentication.UserProfile -> Html Msg
 insideView model user =
     div []
         [ viewNavBar model
@@ -338,7 +337,7 @@ viewNavBar model =
         ]
 
 
-viewNavigationDrawer : Model -> Keycloak.UserProfile -> Html Msg
+viewNavigationDrawer : Model -> Authentication.UserProfile -> Html Msg
 viewNavigationDrawer model user =
     div [ attribute "aria-hidden" "true", class "navdrawer navdrawer-permanent-lg navdrawer-permanent-clipped", id "navdrawerDefault", attribute "tabindex" "-1" ]
         [ div [ class "navdrawer-content" ]
@@ -412,7 +411,7 @@ notFoundBody model =
     div [] [ text "This is the notFound view" ]
 
 
-viewNavUser : Model -> Keycloak.UserProfile -> Html Msg
+viewNavUser : Model -> Authentication.UserProfile -> Html Msg
 viewNavUser model user =
     ul [ class "navbar-nav" ]
         [ li [ class "nav-item dropdown" ]
@@ -424,7 +423,7 @@ viewNavUser model user =
                     [ text "Profile" ]
                 , div [ class "dropdown-divider" ]
                     []
-                , a [ class "dropdown-item", href "/", onClick (AuthenticationMsg Authentication.LogOut) ]
+                , a [ class "dropdown-item", href "http://dev.havengrc.com/logout" ]
                     [ text "Logout" ]
                 ]
             ]

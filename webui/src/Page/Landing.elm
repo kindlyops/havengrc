@@ -1,6 +1,7 @@
 module Page.Landing exposing (view)
 
 import Authentication
+import Browser
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -25,7 +26,7 @@ view =
                         ]
                     , button
                         [ class "btn btn-primary mt-4"
-                        , onClick Authentication.ShowLogIn
+                        , onClick Authentication.LoginMsg
                         ]
                         [ text "Login" ]
                     ]

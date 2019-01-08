@@ -274,7 +274,7 @@ services:
       dockerfile: ./webui/Dockerfile-hotreload
     depends_on:
       - api
-      # - havenapi
+      - havenapi
       - keycloak
       - unleash
     ports:
