@@ -100,7 +100,9 @@ func SaveSurvey(ctx worker.Context, args ...interface{}) error {
 	err = db.Select(&registration, "SELECT * FROM mappa.registration_funnel_1 WHERE registered=false AND email=$1 LIMIT 1", userEmail)
 	log.Printf("SQL Result found user: %v", registration)
 	handleError(err)
-
+	// Get user id for registered user.
+	users, err := keycloak.GetUser(userEmail)
+	handleError(err)
 	// Set registered to true
 	tx, err := db.Begin()
 	handleError(err)
@@ -109,7 +111,7 @@ func SaveSurvey(ctx worker.Context, args ...interface{}) error {
 	handleError(err)
 	_, err = tx.Exec("SELECT set_config('request.jwt.claim.email', $1, true)", userEmail)
 	handleError(err)
-	_, err = tx.Exec("SELECT set_config('request.jwt.claim.sub', $1, true)", registration[0].ID)
+	_, err = tx.Exec("SELECT set_config('request.jwt.claim.sub', $1, true)", users[0].ID)
 	handleError(err)
 	org, _ := json.Marshal(nil)
 	_, err = tx.Exec("SELECT set_config('request.jwt.claim.org', $1, true)", string(org))
@@ -136,7 +138,7 @@ func SaveSurvey(ctx worker.Context, args ...interface{}) error {
 // SaveSurveyResponses creates a survey_response and saves all responses
 func SaveSurveyResponses(responses []SurveyResponse, tx *sql.Tx) error {
 
-	rows, err := tx.Query("INSERT INTO mappa.survey_responses DEFAULT VALUES RETURNING uuid;")
+	rows, err := tx.Query("INSERT INTO mappa.survey_responses DEFAUlT VALUES RETURNING uuid;")
 	handleError(err)
 	defer rows.Close()
 	var surveyResponseID string

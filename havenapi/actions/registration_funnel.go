@@ -84,6 +84,7 @@ func RegistrationHandler(c buffalo.Context) error {
 		return c.Error(500, err)
 	}
 	createUserJob := faktory.NewJob("CreateUser", registration.Email)
+	createUserJob.Queue = "critical"
 	err = client.Push(createUserJob)
 	if err != nil {
 		raven.CaptureError(err, nil)
