@@ -88,6 +88,10 @@ func GetToken() error {
 
 // GetUser checks if the user exists first.
 func GetUser(email string) ([]Users, error) {
+	err := GetToken()
+	if err != nil {
+		return nil, fmt.Errorf("Trouble getting the auth token: %s", err.Error())
+	}
 	client := &http.Client{}
 	data := []Users{}
 	req, err := http.NewRequest("GET", keycloakHost+getUsersURL, nil)

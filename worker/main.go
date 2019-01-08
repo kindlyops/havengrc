@@ -1,9 +1,11 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 	"os/exec"
 
 	worker "github.com/contribsys/faktory_worker_go"
@@ -142,8 +144,10 @@ func SaveSurvey(ctx worker.Context, args ...interface{}) error {
 func CreateSlide(ctx worker.Context, args ...interface{}) error {
 	userEmail := args[0].(string)
 	fmt.Println("Working on CreateSlide job", ctx.Jid())
+	var outputDir = "output/"
+	var outputFile = outputDir + ctx.Jid() + ".pptx"
 	fmt.Println("Creating Slide for: ", userEmail)
-	compileReport := exec.Command("compilereport")
+	compileReport := exec.Command("compilereport", "-o", outputFile)
 	compileReportOut, err := compileReport.Output()
 	if err != nil {
 		handleError(err)
@@ -153,6 +157,39 @@ func CreateSlide(ctx worker.Context, args ...interface{}) error {
 	_, err = keycloak.GetUser(userEmail)
 	handleError(err)
 	fmt.Println("Created Slide for: ", userEmail)
+	err = saveFileToDB(userEmail, outputFile)
+	handleError(err)
+
+	return err
+}
+
+func saveFileToDB(userEmail string, fileName string) error {
+	file, err := os.Open(fileName)
+	handleError(err)
+	users, err := keycloak.GetUser(userEmail)
+	handleError(err)
+	db, err := sqlx.Connect(
+		"postgres",
+		dbOptions,
+	)
+	handleError(err)
+
+	defer db.Close()
+
+	tx, err := db.Begin()
+	handleError(err)
+
+	buf := new(bytes.Buffer)
+	buf.ReadFrom(file)
+	_, err = tx.Exec("SELECT set_config('request.jwt.claim.sub', $1, true)", users[0].ID)
+	handleError(err)
+	_, err = tx.Exec("INSERT INTO mappa.files (name, file) VALUES ($1, $2)", "report.pptx", buf.Bytes())
+	handleError(err)
+
+	err = tx.Commit()
+	handleError(err)
+
+	fmt.Println("processed a file")
 	return err
 }
 
