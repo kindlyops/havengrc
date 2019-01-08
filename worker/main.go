@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -29,14 +30,15 @@ type Registration struct {
 
 // SurveyResponse is a data type for the survey
 type SurveyResponse struct {
-	ID             string `json:"uuid"`
-	UserID         string `json:"user_id"`
-	Email          string `json:"user_email"`
-	Org            string `json:"org"`
-	AnswerID       string `json:"answer_id"`
-	GroupNumber    int    `json:"group_number"`
-	PointsAssigned int    `json:"points_assigned"`
-	CreatedAt      string `json:"created_at"`
+	ID               string `json:"uuid"`
+	UserID           string `json:"user_id"`
+	Email            string `json:"user_email"`
+	Org              string `json:"org"`
+	AnswerID         string `json:"answer_id"`
+	GroupNumber      int    `json:"group_number"`
+	PointsAssigned   int    `json:"points_assigned"`
+	CreatedAt        string `json:"created_at"`
+	SurveyResponseID string `json:"survey_response_id"`
 }
 
 // SurveyResponses is for a collection of SurveyResponse.
@@ -122,20 +124,45 @@ func SaveSurvey(ctx worker.Context, args ...interface{}) error {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	for _, response := range responses {
-		_, err = tx.Exec(
-			"INSERT INTO mappa.ipsative_responses (answer_id, group_number, points_assigned) VALUES ($1, $2, $3)",
-			response.AnswerID,
-			response.GroupNumber,
-			response.PointsAssigned,
-		)
-		handleError(err)
-	}
-
+	err = SaveSurveyResponses(responses, tx)
+	handleError(err)
 	err = tx.Commit()
 	if err != nil {
 		log.Fatal(err)
+	}
+	return err
+}
+
+// SaveSurveyResponses creates a survey_response and saves all responses
+func SaveSurveyResponses(responses []SurveyResponse, tx *sql.Tx) error {
+
+	rows, err := tx.Query("INSERT INTO mappa.survey_responses DEFAULT VALUES RETURNING uuid;")
+	handleError(err)
+	defer rows.Close()
+	var surveyResponseID string
+	for rows.Next() {
+		var uuid string
+		err = rows.Scan(&uuid)
+		fmt.Println("Created new survey_response: %s", uuid)
+		if err != nil {
+			return err
+		}
+		surveyResponseID = uuid
+	}
+
+	if err := rows.Err(); err != nil {
+		log.Fatal(err)
+	}
+
+	for _, response := range responses {
+		_, err = tx.Exec(
+			"INSERT INTO mappa.ipsative_responses (answer_id, group_number, points_assigned, survey_response_id) VALUES ($1, $2, $3, $4)",
+			response.AnswerID,
+			response.GroupNumber,
+			response.PointsAssigned,
+			surveyResponseID,
+		)
+		handleError(err)
 	}
 	return err
 }

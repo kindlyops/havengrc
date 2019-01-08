@@ -1,0 +1,1 @@
+ALTER TABLE mappa.ipsative_responses ADD COLUMN survey_response_id UUID;
