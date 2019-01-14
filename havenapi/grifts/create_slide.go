@@ -7,6 +7,7 @@ import (
 	. "github.com/markbates/grift/grift"
 )
 
+// TODO needs refactor after recent changes to CreateSlide
 var _ = Namespace("files", func() {
 
 	Desc("create_slide", "Create a test slide.")
