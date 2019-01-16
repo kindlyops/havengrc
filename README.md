@@ -6,27 +6,35 @@ We help organizations avoid getting bogged down in rules that no longer make sen
 
 By prioritizing people and culture (beliefs and assumptions aka mental models) over prescriptive checklists, we build resilience and cut down on toil.
 
+<details><summary>
 ### But what does Haven GRC do?
+</summary>
 
 -   Measures and reports on key security metrics. such as SCDS and FORCE.
 -   Guided tool for performing scenario-based risk analysis as required by NIST CSF. Risk analysis modules is based on FAIR topology for quantitative risk estimation.
 -   Calibration exercises for subject matter experts. Subject matter experts provide estimates based on their expert judgement, calibration training improves accuracy of estimates.
 -   Tamper proof evidence store for compliance artifacts. Examples include risk acceptance documents, attestations that management oversight tasks have been completed, and third-party security assessment reports. Make your audits much easier!
+</details>
 
+<details><summary>
 ### Future roadmap
+</summary>
 
 -   Custom risk analysis models to support domains where subject matter experts have specific insights into the probability distribution of threats or losses
 -   Guided tool for performing controls assessments
 -   Features for Vendor Risk Management
+</details>
 
+<details><summary>
 ### Complementary tools
-
+</summary>
 Applications and frameworks that are complementary to Haven. We would prefer to integrate with rather than compete against these tools. They are great!
 
 -   IT asset management with [SnipeIT](https://snipeitapp.com)
 -   FISMA, NIST 800-53, NIST RMF, DFARS 800-171 documentation preparation for Authority To Operate [GovReady](https://govready.com)
 -   SOC2 documentation and workflow assistance with [Comply](https://github.com/strongdm/comply)
 -   Controls frameworks such as CIS Top 20 and NIST CSF
+</details>
 
 ## ![screenshot of app](demo2.png)
 
