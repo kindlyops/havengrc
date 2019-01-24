@@ -6,9 +6,7 @@ We help organizations avoid getting bogged down in rules that no longer make sen
 
 By prioritizing people and culture (beliefs and assumptions aka mental models) over prescriptive checklists, we build resilience and cut down on toil.
 
-<details><summary>
-### But what does Haven GRC do?
-</summary>
+<details><summary>What does Haven GRC do </summary>
 
 -   Measures and reports on key security metrics. such as SCDS and FORCE.
 -   Guided tool for performing scenario-based risk analysis as required by NIST CSF. Risk analysis modules is based on FAIR topology for quantitative risk estimation.
@@ -17,7 +15,7 @@ By prioritizing people and culture (beliefs and assumptions aka mental models) o
 </details>
 
 <details><summary>
-### Future roadmap
+Future roadmap
 </summary>
 
 -   Custom risk analysis models to support domains where subject matter experts have specific insights into the probability distribution of threats or losses
@@ -26,7 +24,7 @@ By prioritizing people and culture (beliefs and assumptions aka mental models) o
 </details>
 
 <details><summary>
-### Complementary tools
+Complementary tools
 </summary>
 Applications and frameworks that are complementary to Haven. We would prefer to integrate with rather than compete against these tools. They are great!
 
@@ -42,9 +40,6 @@ Applications and frameworks that are complementary to Haven. We would prefer to 
 
 <!--ts-->
 - [Haven GRC is a modern risk & compliance dashboard](#haven-grc-is-a-modern-risk--compliance-dashboard)
-    - [But what does Haven GRC do?](#but-what-does-haven-grc-do)
-    - [Future roadmap](#future-roadmap)
-    - [Complementary tools](#complementary-tools)
   - [!screenshot of app](#screenshot-of-app)
   - [Table of Contents](#table-of-contents)
   - [thank you to vendors that support the project](#thank-you-to-vendors-that-support-the-project)
