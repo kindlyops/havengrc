@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -110,6 +111,10 @@ func SaveSurvey(ctx worker.Context, args ...interface{}) error {
 	err = db.Select(&registration, "SELECT * FROM mappa.registration_funnel_1 WHERE registered=false AND email=$1 LIMIT 1", userEmail)
 	log.Printf("SQL Result found user: %v", registration)
 	handleError(err)
+	if len(registration) == 0 {
+		log.Printf("db.select: User already registered. %s", userEmail)
+		return err
+	}
 	// Get user id for registered user.
 	users, err := keycloak.GetUser(userEmail)
 	handleError(err)
@@ -141,9 +146,7 @@ func SaveSurvey(ctx worker.Context, args ...interface{}) error {
 	}
 	surveyID, err := SaveSurveyResponses(responses, tx)
 	handleError(err)
-	err = createSurveyInput(surveyID, tx)
-	handleError(err)
-	err = createSlide(surveyID, userEmail)
+	err = createSlide(surveyID, userEmail, tx)
 	handleError(err)
 	err = tx.Commit()
 	if err != nil {
@@ -189,21 +192,57 @@ func SaveSurveyResponses(responses []SurveyResponse, tx *sqlx.Tx) (string, error
 
 // CreateSlideJob creates a slide using R for testing
 func CreateSlideJob(ctx worker.Context, args ...interface{}) error {
+	// db is for the postgres connection.
+	db, err := sqlx.Connect(
+		"postgres",
+		dbOptions,
+	)
+	handleError(err)
+
+	defer db.Close()
+	tx, err := db.Beginx()
+	handleError(err)
+
 	fmt.Println("Working on CreateSlide job ", ctx.Jid())
 	surveyResponseID := args[0].(string)
+	fmt.Println("RespID ", surveyResponseID)
+
 	userEmail := args[1].(string)
-	err := createSlide(surveyResponseID, userEmail)
+	err = createSlide(surveyResponseID, userEmail, tx)
 	handleError(err)
 	return err
 }
 
 // createSlide creates a slide user R
-func createSlide(surveyID string, userEmail string) error {
-	var inputFile = "/tmp/" + surveyID + ".csv"
+func createSlide(surveyID string, userEmail string, tx *sqlx.Tx) error {
 	var outputDir = "output/"
-	var outputFile = outputDir + surveyID + ".pptx"
+	fileContents, err := createSurveyInput(surveyID, tx)
+	handleError(err)
+	// Create new file
+	file, err := ioutil.TempFile("/tmp/", "*.csv")
+	handleError(err)
+
+	// Close file on exit and check for its returned error
+	defer func() {
+		os.Remove(file.Name())
+		handleError(err)
+	}()
+
+	// Write the string to the file
+	_, err = file.WriteString(fileContents)
+	handleError(err)
+
+	outputFile, err := ioutil.TempFile(outputDir, "*.pptx")
+	handleError(err)
+
+	// Close file on exit and check for its returned error
+	defer func() {
+		os.Remove(outputFile.Name())
+		handleError(err)
+	}()
+
 	fmt.Println("Creating Slide for survey id: ", surveyID)
-	compileReport := exec.Command("compilereport", "-d", inputFile, "-o", outputFile)
+	compileReport := exec.Command("compilereport", "-d", file.Name(), "-o", outputFile.Name())
 	compileReportOut, err := compileReport.Output()
 	if err != nil {
 		handleError(err)
@@ -213,13 +252,13 @@ func createSlide(surveyID string, userEmail string) error {
 	_, err = keycloak.GetUser(userEmail)
 	handleError(err)
 	fmt.Println("Created Slide for: ", userEmail)
-	err = saveFileToDB(userEmail, outputFile)
+	err = saveFileToDB(userEmail, outputFile.Name())
 	handleError(err)
 	return err
 }
 
 // createSurveyInput creates a new survey input file for the user
-func createSurveyInput(surveyID string, tx *sqlx.Tx) error {
+func createSurveyInput(surveyID string, tx *sqlx.Tx) (string, error) {
 
 	surveyData := []SurveyData{}
 
@@ -257,21 +296,7 @@ func createSurveyInput(surveyID string, tx *sqlx.Tx) error {
 		fileContents += fmt.Sprintf("%d,%s,%s\n", i, strings.Trim(strings.Join(strings.Fields(fmt.Sprint(questions[i])), ","), "[]"), respondent)
 	}
 
-	// Create new file
-	file, err := os.Create("/tmp/" + surveyID + ".csv")
-	handleError(err)
-
-	// Close file on exit and check for its returned error
-	defer func() {
-		err := file.Close()
-		handleError(err)
-	}()
-
-	// Write the string to the file
-	_, err = file.WriteString(fileContents)
-	handleError(err)
-
-	return err
+	return fileContents, err
 }
 
 func saveFileToDB(userEmail string, fileName string) error {
