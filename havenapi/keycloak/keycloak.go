@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/deis/helm/log"
@@ -149,10 +150,21 @@ func CreateUser(email string) error {
 		return &UserExistsError{email}
 	}
 
+	components := strings.Split(email, "@")
 	var jsonStr = []byte(
-		fmt.Sprintf(`{"username": "%s", "email": "%s", "enabled": true}`,
+		fmt.Sprintf(`{
+			"username": "%s",
+			"email": "%s",
+			"enabled": true,
+			"firstName": "%s",
+			"lastName": "",
+			"attributes": {
+				"role": "member"
+			}
+			}`,
 			email,
 			email,
+			components[0],
 		))
 
 	body := bytes.NewBuffer(jsonStr)
