@@ -42,6 +42,7 @@ module Data.Survey exposing
     )
 
 import Json.Decode as Decode exposing (Decoder, andThen, field, int, map2, map3, map4, map5, map6, map7, map8, oneOf, string)
+import Json.Decode.Pipeline exposing (hardcoded, optional, required)
 import Json.Encode as Encode
 import List.Extra
 import List.Zipper as Zipper
@@ -292,6 +293,7 @@ encodeIpsativeAnswer ipsativeAnswer =
     Encode.object
         [ ( "id", Encode.string <| ipsativeAnswer.id )
         , ( "answer", Encode.string <| ipsativeAnswer.answer )
+        , ( "category", Encode.string <| ipsativeAnswer.category )
         , ( "orderNumber", Encode.int <| ipsativeAnswer.orderNumber )
         , ( "pointsAssigned", ipsativeAnswer.pointsAssigned |> Encode.list encodePointsAssigned )
         ]
@@ -354,9 +356,10 @@ decodePointsLeft =
 
 decodeIpsativeAnswer : Decoder IpsativeAnswer
 decodeIpsativeAnswer =
-    map4 IpsativeAnswer
+    map5 IpsativeAnswer
         (field "id" string)
         (field "answer" string)
+        (field "category" string)
         (field "orderNumber" int)
         (field "pointsAssigned" (Decode.list decodePointsAssigned))
 
@@ -552,18 +555,20 @@ type alias IpsativeServerData =
     , question_order_number : Int
     , answer_id : String
     , answer : String
+    , category : String
     , answer_order_number : Int
     }
 
 
 ipsativeSurveyDataDecoder : Decoder IpsativeServerData
 ipsativeSurveyDataDecoder =
-    map6 IpsativeServerData
+    map7 IpsativeServerData
         (field "question_id" string)
         (field "question_title" string)
         (field "question_order_number" int)
         (field "answer_id" string)
         (field "answer" string)
+        (field "category" string)
         (field "answer_order_number" int)
 
 
@@ -576,20 +581,22 @@ type alias LikertServerData =
     , answer_id : String
     , answer_order_number : Int
     , answer : String
+    , category : String
     }
 
 
 likertSurveyDataDecoder : Decoder LikertServerData
 likertSurveyDataDecoder =
-    map8 LikertServerData
-        (field "survey_id" string)
-        (field "question_id" string)
-        (field "question_order_number" int)
-        (field "question_title" string)
-        (field "question_choice_group" string)
-        (field "answer_id" string)
-        (field "answer_order_number" int)
-        (field "answer" string)
+    Decode.succeed LikertServerData
+        |> required "survey_id" string
+        |> required "question_id" string
+        |> required "question_order_number" int
+        |> required "question_title" string
+        |> required "question_choice_group" string
+        |> required "answer_id" string
+        |> required "answer_order_number" int
+        |> required "answer" string
+        |> required "category" string
 
 
 type alias LikertServerChoice =
@@ -637,6 +644,7 @@ groupIpsativeSurveyData data =
                                     , answer_id = "Error Answer UUID"
                                     , answer_order_number = 0
                                     , answer = "Error Answer"
+                                    , category = "Error Category"
                                     }
                     in
                     { uuid = firstAnswer.question_id
@@ -647,6 +655,7 @@ groupIpsativeSurveyData data =
                             (\answer ->
                                 { uuid = answer.answer_id
                                 , answer = answer.answer
+                                , category = answer.category
                                 , orderNumber = answer.answer_order_number
                                 }
                             )
@@ -688,6 +697,7 @@ groupLikertSurveyData data =
                                     , answer_id = "UNKNOWN"
                                     , answer_order_number = 0
                                     , answer = "Error Answer"
+                                    , category = "Error Category"
                                     }
                     in
                     { uuid = firstAnswer.question_id
@@ -699,6 +709,7 @@ groupLikertSurveyData data =
                             (\answer ->
                                 { uuid = answer.answer_id
                                 , answer = answer.answer
+                                , category = answer.category
                                 }
                             )
                             group
@@ -721,6 +732,7 @@ type alias IpsativeQuestion =
 type alias IpsativeAnswer =
     { id : String
     , answer : String
+    , category : String
     , orderNumber : Int
     , pointsAssigned : List PointsAssigned
     }
@@ -737,6 +749,7 @@ type alias IpsativeServerQuestion =
 type alias IpsativeServerAnswer =
     { uuid : String
     , answer : String
+    , category : String
     , orderNumber : Int
     }
 
@@ -813,6 +826,7 @@ type alias LikertAnswer =
 type alias LikertServerAnswer =
     { uuid : String
     , answer : String
+    , category : String
     }
 
 
@@ -856,6 +870,7 @@ emptyAnswer : IpsativeAnswer
 emptyAnswer =
     { id = "UNKNOWN"
     , answer = "EMPTY QUESTION"
+    , category = "EMPTY CATEGORY"
     , orderNumber = 0
     , pointsAssigned = [ emptyPointsAssigned ]
     }
@@ -969,6 +984,7 @@ createAnswers serverAnswers numGroups =
         (\x ->
             { id = x.uuid
             , answer = x.answer
+            , category = x.category
             , orderNumber = x.orderNumber
             , pointsAssigned = createPointsAssigned numGroups
             }
