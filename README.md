@@ -205,6 +205,12 @@ To see the grift tasks defined in havenapi, run this buffalo command
 
     docker-compose run havenapi buffalo task list
 
+To run a create_slide task and save it for a user run this command
+
+    docker-compose run havenapi buffalo task files:create_slide $SURVEYID $USEREMAIL
+
+The above command will create a slide for the user email address provided.
+
 ### to export keycloak realm data (to refresh the dev users)
 
 After keycloak is running and you have made any desired config changes:

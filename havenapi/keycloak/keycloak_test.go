@@ -19,6 +19,7 @@ func TestGetUser(t *testing.T) {
 	if len(users) == 0 {
 		t.Errorf("Failed and found %s", users)
 	}
+	t.Logf("Found %s", users[0].ID)
 }
 
 func TestVerifyEmail(t *testing.T) {

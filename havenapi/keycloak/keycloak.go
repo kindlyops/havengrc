@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -87,6 +88,10 @@ func GetToken() error {
 
 // GetUser checks if the user exists first.
 func GetUser(email string) ([]Users, error) {
+	err := GetToken()
+	if err != nil {
+		return nil, fmt.Errorf("Trouble getting the auth token: %s", err.Error())
+	}
 	client := &http.Client{}
 	data := []Users{}
 	req, err := http.NewRequest("GET", keycloakHost+getUsersURL, nil)
@@ -108,6 +113,9 @@ func GetUser(email string) ([]Users, error) {
 
 	// Look for an empty array if no users exist with that email.
 	err = json.NewDecoder(resp.Body).Decode(&data)
+	if err == io.EOF {
+		err = nil
+	}
 	if err != nil {
 		return data, fmt.Errorf("Error checking for existing user: %s", err.Error())
 	}
