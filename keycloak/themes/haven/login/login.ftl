@@ -54,12 +54,12 @@
             <#if realm.password && social.providers??>
                 <div id="kc-social-providers" class="mb-auto text-center">
                     <p class="mb-0 primary-font">Log In With:</p>
-                        <list>
-                            <p class="mb-1"><a href="/auth/realms/havendev/clients/magic-link/redirect" id="zocial-magic-link" class="zocial magic-link"> <span class="text">Get MagicLink</span></a></p>
-                        </list>
                         <#list social.providers as p>
                             <p class="mb-1"><a href="${p.loginUrl}" id="zocial-${p.alias}" class="zocial ${p.providerId}"> <span class="text">${p.displayName}</span></a></p>
                         </#list>
+                        <list>
+                            <p class="mb-1"><a href="/auth/realms/${realm.name}/protocol/openid-connect/auth?client_id=magic-link&response_mode=fragment&response_type=code&login=true&redirect_uri=%2Fauth%2Frealms%2Fhavendev%2Faccount" id="zocial-magic-link" class="zocial magic-link"> <span class="text">Email me a sign-in link</span></a></p>
+                        </list>
                 </div>
             </#if>
             <#if realm.password && realm.registrationAllowed && !usernameEditDisabled??>

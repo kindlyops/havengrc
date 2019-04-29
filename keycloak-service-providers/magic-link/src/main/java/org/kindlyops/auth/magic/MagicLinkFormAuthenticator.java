@@ -24,10 +24,12 @@ import org.keycloak.authentication.authenticators.browser.AbstractUsernameFormAu
 import org.keycloak.common.util.KeycloakUriBuilder;
 import org.keycloak.email.EmailException;
 import org.keycloak.email.EmailSenderProvider;
+import org.keycloak.events.Errors;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.utils.KeycloakModelUtils;
+import org.keycloak.services.messages.Messages;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -44,10 +46,9 @@ public class MagicLinkFormAuthenticator extends AbstractUsernameFormAuthenticato
 
         UserModel user = context.getSession().users().getUserByEmail(email, context.getRealm());
         if (user == null) {
-            // Register user
-            user = context.getSession().users().addUser(context.getRealm(), email);
-            user.setEnabled(true);
-            user.setEmail(email);
+            context.getEvent().error(Errors.USER_NOT_FOUND);
+            context.failure(AuthenticationFlowError.INVALID_CREDENTIALS);
+            return;
 
             // Uncomment the following line to require user to update profile on first login
             // user.addRequiredAction(UserModel.RequiredAction.UPDATE_PROFILE);
