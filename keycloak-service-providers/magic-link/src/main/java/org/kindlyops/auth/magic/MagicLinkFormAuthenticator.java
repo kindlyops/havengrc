@@ -29,10 +29,8 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.utils.KeycloakModelUtils;
-import org.keycloak.services.messages.Messages;
 
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
 
 /**
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
@@ -100,10 +98,12 @@ public class MagicLinkFormAuthenticator extends AbstractUsernameFormAuthenticato
 
     @Override
     public void setRequiredActions(KeycloakSession session, RealmModel realm, UserModel user) {
+        // Intentionally blank
     }
 
     @Override
     public void close() {
+        // Intentionally blank
     }
 
 }

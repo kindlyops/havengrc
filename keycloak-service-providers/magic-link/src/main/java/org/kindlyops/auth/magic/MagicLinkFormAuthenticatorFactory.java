@@ -87,14 +87,17 @@ public class MagicLinkFormAuthenticatorFactory implements AuthenticatorFactory {
 
     @Override
     public void init(Config.Scope config) {
+        // Intentionally blank
     }
 
     @Override
     public void postInit(KeycloakSessionFactory factory) {
+        // Intentionally blank
     }
 
     @Override
     public void close() {
+        // Intentionally blank
     }
 
 }
