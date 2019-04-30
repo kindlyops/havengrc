@@ -2517,8 +2517,24 @@
     "publicClient" : false,
     "frontchannelLogout" : false,
     "protocol" : "openid-connect",
-    "attributes" : { },
-    "authenticationFlowBindingOverrides" : { },
+    "attributes" : {
+      "saml.assertion.signature" : "false",
+      "saml.force.post.binding" : "false",
+      "saml.multivalued.roles" : "false",
+      "saml.encrypt" : "false",
+      "saml.server.signature" : "false",
+      "saml.server.signature.keyinfo.ext" : "false",
+      "exclude.session.state.from.auth.response" : "false",
+      "saml_force_name_id_format" : "false",
+      "saml.client.signature" : "false",
+      "tls.client.certificate.bound.access.tokens" : "false",
+      "saml.authnstatement" : "false",
+      "display.on.consent.screen" : "false",
+      "saml.onetimeuse.condition" : "false"
+    },
+    "authenticationFlowBindingOverrides" : {
+      "browser" : "e8fda363-ab58-4463-a562-93c1040d3f45"
+    },
     "fullScopeAllowed" : false,
     "nodeReRegistrationTimeout" : 0,
     "protocolMappers" : [ {
@@ -2600,7 +2616,7 @@
         "jsonType.label" : "String"
       }
     } ],
-    "defaultClientScopes" : [ "web-origins", "role_list", "roles", "profile", "email" ],
+    "defaultClientScopes" : [ "role_list", "roles" ],
     "optionalClientScopes" : [ "address", "phone", "offline_access" ]
   }, {
     "id" : "f292fcd9-4b25-4d58-bddc-9d29a72d7a59",
@@ -2928,7 +2944,7 @@
         "jsonType.label" : "String"
       }
     } ],
-    "defaultClientScopes" : [ "web-origins", "role_list", "roles", "profile", "email" ],
+    "defaultClientScopes" : [ "role_list", "roles" ],
     "optionalClientScopes" : [ "address", "phone", "offline_access" ]
   }, {
     "id" : "c8da9725-a7a3-4525-ada7-2a1896c733c7",
@@ -3333,6 +3349,17 @@
         "multivalued" : "true"
       }
     }, {
+      "id" : "940fa8e9-709c-48d0-9f80-f47586ce7c82",
+      "name" : "roles-audience",
+      "protocol" : "openid-connect",
+      "protocolMapper" : "oidc-audience-mapper",
+      "consentRequired" : false,
+      "config" : {
+        "included.client.audience" : "havendev",
+        "id.token.claim" : "false",
+        "access.token.claim" : "true"
+      }
+    }, {
       "id" : "33558f2e-607d-4768-934f-0db06acd3bb1",
       "name" : "client roles",
       "protocol" : "openid-connect",
@@ -3345,13 +3372,6 @@
         "jsonType.label" : "String",
         "multivalued" : "true"
       }
-    }, {
-      "id" : "a62a34d0-36c0-44a2-82fc-9fa98146e58c",
-      "name" : "audience resolve",
-      "protocol" : "openid-connect",
-      "protocolMapper" : "oidc-audience-resolve-mapper",
-      "consentRequired" : false,
-      "config" : { }
     } ]
   }, {
     "id" : "8daef861-6db5-406d-b31f-90a5717a6c01",
