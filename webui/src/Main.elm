@@ -135,7 +135,20 @@ update msg model =
         LinkClicked urlRequest ->
             case urlRequest of
                 Browser.Internal url ->
-                    ( model, Nav.pushUrl model.key (Url.toString url) )
+                    let
+                        -- a few paths in our application are not part of the SPA
+                        -- but are instead other mini apps mounted at the path.
+                        -- for things like keycloak (and in the future, unleash)
+                        -- force a full browser page load even though it's a path
+                        -- on the same domain.
+                        isKeycloak =
+                            String.startsWith "/auth" url.path
+                    in
+                    if isKeycloak then
+                        ( model, Nav.load (Url.toString url) )
+
+                    else
+                        ( model, Nav.pushUrl model.key (Url.toString url) )
 
                 Browser.External href ->
                     ( model, Nav.load href )
