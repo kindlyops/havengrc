@@ -1900,7 +1900,7 @@
     "offlineSessionMaxLifespanEnabled" : "false",
     "waitIncrementSeconds" : "60"
   },
-  "keycloakVersion" : "4.5.0.Final",
+  "keycloakVersion" : "6.0.1",
   "userManagedAccessAllowed" : false
 }, {
   "id" : "havendev",
@@ -4023,6 +4023,6 @@
     "offlineSessionMaxLifespanEnabled" : "false",
     "waitIncrementSeconds" : "60"
   },
-  "keycloakVersion" : "4.5.0.Final",
+  "keycloakVersion" : "6.0.1",
   "userManagedAccessAllowed" : false
 } ]
