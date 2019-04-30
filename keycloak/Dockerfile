@@ -8,12 +8,15 @@ RUN mvn -f /keycloak-service-providers/pom.xml dependency:resolve
 # now copy the rest of the source code in a later layer
 COPY keycloak-service-providers /keycloak-service-providers
 RUN mvn -f /keycloak-service-providers/pom.xml clean package
+RUN mvn -f /keycloak-service-providers/magic-link/pom.xml dependency:resolve
+RUN mvn -f /keycloak-service-providers/magic-link/pom.xml clean package
 
 FROM                havengrc-docker.jfrog.io/jboss/keycloak:6.0.1
 MAINTAINER          Kindly Ops, LLC <support@kindlyops.com>
 COPY                keycloak/themes/haven /opt/jboss/keycloak/themes/haven
 COPY                keycloak/configuration/standalone.xml /opt/jboss/keycloak/standalone/configuration/standalone.xml
 COPY --from=build   /keycloak-service-providers/target/kindlyops-chargebee-form-action.jar /opt/jboss/keycloak/standalone/deployments
+COPY --from=build   /keycloak-service-providers/magic-link/target/magic-link.jar /opt/jboss/keycloak/standalone/deployments
 
 ENV         DB_VENDOR postgres
 ENV         ENV_VERBOSITY 无
