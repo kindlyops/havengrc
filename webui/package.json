@@ -29,7 +29,7 @@
     "cypress": "^3.1.4",
     "daemonite-material": "^4.1.1",
     "dotenv": "^5.0.0",
-    "elm": "^0.19.0-bugfix2",
+    "elm": "^0.19.0-bugfix6",
     "elm-hot-webpack-loader": "^1.0.2",
     "elm-test": "^0.19.0-rev3",
     "elm-webpack-loader": "^5.0.0",
