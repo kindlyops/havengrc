@@ -78,7 +78,7 @@ keycloak.onTokenExpired = function () {
   keycloak.updateToken(300)
 }
 
-keycloak.init({ onLoad: 'check-sso', checkLoginIframe: true })
+keycloak.init({ onLoad: 'check-sso', checkLoginIframe: false })
 
 elmApp.ports.keycloakLogin.subscribe(function () {
   keycloak.login().error(function (/* errorData */) {
