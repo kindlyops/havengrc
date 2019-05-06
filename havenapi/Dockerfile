@@ -1,6 +1,6 @@
 # This is a multi-stage Dockerfile and requires >= Docker 17.05
 # https://docs.docker.com/engine/userguide/eng-image/multistage-build/
-FROM gobuffalo/buffalo:v0.12.4 as builder
+FROM gobuffalo/buffalo:v0.14.3 as builder
 
 RUN mkdir -p $GOPATH/src/github.com/kindlyops/havengrc/havenapi
 WORKDIR $GOPATH/src/github.com/kindlyops/havengrc/havenapi
@@ -10,7 +10,7 @@ WORKDIR $GOPATH/src/github.com/kindlyops/havengrc/havenapi
 #ADD yarn.lock .
 #RUN yarn install --no-progress
 ADD . .
-RUN dep ensure -vendor-only
+ENV GO111MODULE=on
 RUN buffalo build --static -o /bin/app
 
 FROM alpine
