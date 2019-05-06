@@ -1,14 +1,13 @@
 # This is a multi-stage Dockerfile and requires >= Docker 17.05
 # https://docs.docker.com/engine/userguide/eng-image/multistage-build/
-FROM golang:1.11 as builder
+FROM golang:1.12.4 as builder
 
 RUN mkdir -p $GOPATH/src/github.com/kindlyops/havengrc
 WORKDIR $GOPATH/src/github.com/kindlyops/havengrc
 
 ADD . .
 WORKDIR $GOPATH/src/github.com/kindlyops/havengrc/worker
-RUN go get -u github.com/golang/dep/cmd/dep
-RUN dep ensure -vendor-only
+ENV GO111MODULE=on
 RUN go build -o app main.go
 
 FROM kindlyops/reporter:worker-base
