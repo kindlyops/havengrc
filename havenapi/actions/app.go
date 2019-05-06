@@ -9,9 +9,10 @@ import (
 
 	"github.com/deis/helm/log"
 	"github.com/gobuffalo/buffalo"
-	"github.com/gobuffalo/buffalo/middleware"
-	"github.com/gobuffalo/buffalo/middleware/ssl"
+	popmw "github.com/gobuffalo/buffalo-pop/pop/popmw"
 	"github.com/gobuffalo/envy"
+	ssl "github.com/gobuffalo/mw-forcessl"
+	mp "github.com/gobuffalo/mw-paramlogger"
 	"github.com/gobuffalo/pop"
 	"github.com/gobuffalo/x/sessions"
 	"github.com/rs/cors"
@@ -57,20 +58,20 @@ func App() *buffalo.App {
 		}
 
 		if ENV == "development" {
-			app.Use(middleware.ParameterLogger)
+			app.Use(mp.ParameterLogger)
 		}
 
 		app.GET("/healthz", HealthzHandler)
 
 		api := app.Group("/api/")
 		// Automatically redirect to SSL
-		api.Use(ssl.ForceSSL(secure.Options{
+		api.Use(ssl.Middleware(secure.Options{
 			SSLRedirect:     ENV == "production",
 			SSLProxyHeaders: map[string]string{"X-Forwarded-Proto": "https"},
 		}))
 
 		// TODO refactor to use dependency injection instead of a package global
-		api.Use(middleware.PopTransaction(models.DB))
+		api.Use(popmw.Transaction(models.DB))
 		api.Use(JwtMiddleware)
 		api.Middleware.Skip(JwtMiddleware, RegistrationHandler)
 		api.POST("files", UploadHandler)
