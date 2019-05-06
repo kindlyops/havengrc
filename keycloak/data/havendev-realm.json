@@ -2957,7 +2957,7 @@
     "enabled" : true,
     "clientAuthenticatorType" : "client-secret",
     "secret" : "3268665c-2aab-4ad1-a759-d4b41b508bc7",
-    "redirectUris" : [ "/auth/realms/havendev/account/*", "/auth/realms/havendev/protocol/openid-connect/*" ],
+    "redirectUris" : [ "/auth/realms/havendev/account/*", "/auth/realms/havendev/protocol/openid-connect/*", "/*" ],
     "webOrigins" : [ ],
     "notBefore" : 0,
     "bearerOnly" : false,
