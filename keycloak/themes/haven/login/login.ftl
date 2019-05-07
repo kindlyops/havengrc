@@ -1,14 +1,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <#import "template.ftl" as layout>
 <@layout.registrationLayout displayInfo=social.displayInfo; section>
-<script>
-window.onload = function(){
-    const urlParams = new URLSearchParams(window.location.search);
-    const state = urlParams.get('state');
-    var magic_url = "/auth/realms/${realm.name}/protocol/openid-connect/auth?client_id=magic-link&response_mode=fragment&response_type=code&login=true&redirect_uri=/?state=" + state;
-    document.getElementById('zocial-magic-link').href = magic_url;
-};
-</script>
     <#if section = "title">
         ${msg("loginTitle",(realm.displayName!''))}
 
@@ -66,7 +58,7 @@ window.onload = function(){
                             <p class="mb-1"><a href="${p.loginUrl}" id="zocial-${p.alias}" class="zocial ${p.providerId}"> <span class="text">${p.displayName}</span></a></p>
                         </#list>
                         <list>
-                            <p class="mb-1"><a id="zocial-magic-link" class="zocial magic-link"> <span class="text">Email me a sign-in link</span></a></p>
+                            <p class="mb-1"><a id="zocial-magic-link" class="zocial magic-link" href="/auth/realms/${realm.name}/protocol/openid-connect/auth?client_id=magic-link&response_mode=fragment&response_type=code&login=true&redirect_uri=/dashboard/"> <span class="text">Email me a sign-in link</span></a></p>
                         </list>
                 </div>
             </#if>
