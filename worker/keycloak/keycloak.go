@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/deis/helm/log"
+	"golang.org/x/net/html"
 )
 
 type token struct {
@@ -42,6 +43,9 @@ var adminPw = os.Getenv("KC_PW")
 var keycloakHost = os.Getenv("KC_HOST") + ":" + os.Getenv("KC_PORT")
 var getTokenURL = "/auth/realms/master/protocol/openid-connect/token"
 var getUsersURL = "/auth/admin/realms/havendev/users"
+var getFormURL = "/auth/realms/havendev/protocol/openid-connect/auth" +
+	"?client_id=magic-link&response_mode=fragment&response_type=code" +
+	"&login=true&redirect_uri=%2Fdashboard&auth_session_id=none"
 
 // GetToken grabs the token for the admin api.
 func GetToken() error {
@@ -192,7 +196,7 @@ func CreateUser(email string) error {
 		return fmt.Errorf("Trouble creating user - StatusCode: %d", resp.StatusCode)
 	}
 
-	err = SendVerificationEmail(email)
+	err = SendWelcomeEmail(email)
 	if err != nil {
 		return fmt.Errorf("Trouble sending verification email: %s", err.Error())
 	}
@@ -200,50 +204,56 @@ func CreateUser(email string) error {
 	return err
 }
 
-// SendVerificationEmail verifies the email and let the user set a password.
-func SendVerificationEmail(email string) error {
+// SendWelcomeEmail sends the user a magic link
+func SendWelcomeEmail(email string) error {
 	err := GetToken()
 	if err != nil {
 		return fmt.Errorf("Trouble getting the auth token: %s", err.Error())
 	}
-	client := &http.Client{}
-	log.Info("Try to verify email for: %s", email)
-	userList, err := GetUser(email)
+	log.Info("Try to get form url for: %s", email)
+	_, err = GetUser(email)
 	if err != nil {
 		return fmt.Errorf("Could not find user:%s because of: %s", email, err.Error())
 	}
 
-	var jsonStr = []byte(
-		fmt.Sprintf(`["UPDATE_PASSWORD"]`))
-
-	body := bytes.NewBuffer(jsonStr)
-	redirectURI := "&redirect_uri=/#new-user"
-	req, err := http.NewRequest(
-		"PUT",
-		keycloakHost+getUsersURL+"/"+userList[0].ID+"/execute-actions-email?client_id=havendev"+redirectURI,
-		body,
-	)
-
+	resp, err := http.Get(keycloakHost + getFormURL)
 	if err != nil {
-		return fmt.Errorf("Trouble executing verify email for user: %s", err.Error())
+		return fmt.Errorf("http get error: %s because of: %s", email, err.Error())
 	}
-
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Add("Authorization", "bearer "+adminToken.AccessToken)
-	log.Info("Added headers")
-	resp, err := client.Do(req)
-	if err != nil {
-		return fmt.Errorf("Trouble processing the response body error: %s", err.Error())
-	}
-
 	defer resp.Body.Close()
+	doc, err := html.Parse(resp.Body)
+	if err != nil {
+		return fmt.Errorf("http read error: %s because of: %s", email, err.Error())
+	}
+	formURL := ""
+	var f func(*html.Node)
+	f = func(n *html.Node) {
+		if n.Type == html.ElementNode && n.Data == "form" {
+			for _, s := range n.Attr {
+				if s.Key == "action" {
+					formURL = s.Val
+				}
+			}
+		}
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			f(c)
+		}
+	}
+	f(doc)
 
-	if resp.StatusCode != 200 {
-		return fmt.Errorf(
-			"Trouble sending verify email for user - StatusCode: %d - Url: %s %s",
-			resp.StatusCode,
-			req.Host,
-			req.URL.Path)
+	urlData := url.Values{}
+	urlData.Set("email", email)
+
+	response, err := http.PostForm(
+		formURL,
+		urlData,
+	)
+	if response.StatusCode != 200 {
+		return fmt.Errorf("Trouble sending welcome email to user - StatusCode: %d", response.StatusCode)
+	}
+
+	if err != nil {
+		return fmt.Errorf("http get error: %s because of: %s", email, err.Error())
 	}
 
 	return err
