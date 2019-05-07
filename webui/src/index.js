@@ -7,12 +7,7 @@ if (process.env.NODE_ENV === 'development') {
 } else {
   var CLIENT_ID = '{{.Env.ELM_APP_KEYCLOAK_CLIENT_ID}}'
 }
-/* global Keycloak */
-var keycloak = Keycloak({
-  url: '/auth',
-  realm: 'havendev',
-  clientId: 'havendev'
-})
+
 var storedProfile = sessionStorage.getItem('profile')
 var storedToken = sessionStorage.getItem('token')
 var storedSurveyState = sessionStorage.getItem('storedSurvey')
@@ -27,11 +22,6 @@ var initialData = {
   storedSurvey: storedSurveyState ? JSON.parse(storedSurveyState) : null
 }
 
-var elmApp = Elm.Main.init({
-  node: document.getElementById('elm'),
-  flags: initialData
-});
-
 function sendElmKeycloakToken() {
   sessionStorage.setItem('profile', JSON.stringify(keycloak.profile))
   sessionStorage.setItem('token', keycloak.token)
@@ -39,6 +29,13 @@ function sendElmKeycloakToken() {
   result.ok = { profile: keycloak.profile, token: keycloak.token }
   elmApp.ports.keycloakAuthResult.send(result)
 }
+
+/* global Keycloak */
+var keycloak = Keycloak({
+  url: '/auth',
+  realm: 'havendev',
+  clientId: 'havendev'
+})
 
 keycloak.onAuthSuccess = function () {
   keycloak
@@ -49,8 +46,6 @@ keycloak.onAuthSuccess = function () {
       elmApp.ports.keycloakAuthResult.send(result)
     })
 }
-
-
 
 keycloak.onAuthLogout = function () {
   console.log("got onAuthLogout callback");
@@ -79,6 +74,27 @@ keycloak.onTokenExpired = function () {
 }
 
 keycloak.init({ onLoad: 'check-sso', checkLoginIframe: false })
+
+document.arrive("#lottie", () => {
+  var element = document.getElementById('lottie');
+  var animationPath = process.env.PUBLIC_URL + '/animations/haven-demo.json'
+  if (element) {
+    console.log("got lottie element");
+    lottie.setLocationHref(document.location.href)
+    lottie.loadAnimation({
+      container: element, // Required
+      path: animationPath, // Required
+      renderer: 'svg', // Required
+      loop: true, // Optional
+      autoplay: true, // Optional
+    });
+  }
+});
+
+var elmApp = Elm.Main.init({
+  node: document.getElementById('elm'),
+  flags: initialData
+});
 
 elmApp.ports.keycloakLogin.subscribe(function () {
   keycloak.login().error(function (/* errorData */) {
@@ -116,19 +132,3 @@ let updateChart = function (spec) {
 }
 
 elmApp.ports.renderVega.subscribe(updateChart);
-
-document.arrive("#lottie", () => {
-  var element = document.getElementById('lottie');
-  var animationPath = process.env.PUBLIC_URL + '/animations/haven-demo.json'
-  if (element) {
-    console.log("got lottie element");
-    lottie.setLocationHref(document.location.href)
-    lottie.loadAnimation({
-      container: element, // Required
-      path: animationPath, // Required
-      renderer: 'svg', // Required
-      loop: true, // Optional
-      autoplay: true, // Optional
-    });
-  }
-});
