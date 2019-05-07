@@ -1,7 +1,0 @@
-#!/bin/sh
-set -e
-
-if [ "$1" = 0 ] ; then
-  echo Stopping faktory
-  initctl stop faktory || :
-fi
