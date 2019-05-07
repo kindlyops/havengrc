@@ -14,7 +14,7 @@ import (
 	"github.com/getsentry/raven-go"
 	"github.com/gobuffalo/envy"
 	"github.com/jmoiron/sqlx"
-	keycloak "github.com/kindlyops/havengrc/havenapi/keycloak"
+	keycloak "github.com/kindlyops/havengrc/worker/keycloak"
 	_ "github.com/lib/pq"
 	"github.com/nleof/goyesql"
 )
@@ -349,7 +349,10 @@ func setupAndRun() {
 	mgr.Concurrency = 20
 
 	// pull jobs from these queues, in this order of precedence
-	mgr.Queues = []string{"critical", "default", "bulk"}
+	// mgr.ProcessStrictPriorityQueues("critical", "default", "bulk")
+
+	// alternatively you can use weights to avoid starvation
+	mgr.ProcessWeightedPriorityQueues(map[string]int{"critical": 3, "default": 2, "bulk": 1})
 	fmt.Printf("Haven worker started, processing jobs\n")
 	// Start processing jobs, this method does not return
 	mgr.Run()

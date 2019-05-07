@@ -1,2 +1,0 @@
-// helm:generate2 fail fail fail
-This should fail.

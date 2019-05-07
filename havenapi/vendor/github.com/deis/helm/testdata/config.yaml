@@ -1,6 +1,0 @@
-repos:
-    default: charts
-    tables:
-    - name: charts
-      repo: https://github.com/helm/charts
-workspace:

@@ -1,2 +1,0 @@
-//helm:generate echo foo bar baz
-Alternate comments.
