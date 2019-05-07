@@ -72,6 +72,11 @@ public class MagicLinkFormAuthenticator extends AbstractUsernameFormAuthenticato
         String sessionKey = context.getAuthenticationSession().getAuthNote("email-key");
         if (sessionKey != null) {
             String requestKey = context.getHttpRequest().getUri().getQueryParameters().getFirst("key");
+            UserModel user = context.getUser();
+            // Check if email is verified.
+            if (!user.isEmailVerified()) {
+                user.setEmailVerified(true);
+            }
             if (requestKey != null) {
                 if (requestKey.equals(sessionKey)) {
                     context.success();
