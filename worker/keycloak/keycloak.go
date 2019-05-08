@@ -57,6 +57,19 @@ func GetToken() error {
 	}
 	log.Info("the admin api token is being renewed.")
 
+	// set up some default values for unit test environment
+	if adminUser == "" {
+		adminUser = "admin"
+	}
+
+	if adminPw == "" {
+		adminPw = "admin"
+	}
+
+	if keycloakHost == ":" {
+		keycloakHost = "http://dev.havengrc.com:2015"
+	}
+
 	form := url.Values{
 		"username":   {adminUser},
 		"password":   {adminPw},
@@ -204,6 +217,80 @@ func CreateUser(email string) error {
 	return err
 }
 
+// SendVerificationEmail verifies the email and let the user set a password.
+func SendVerificationEmail(email string) error {
+	err := GetToken()
+	if err != nil {
+		return fmt.Errorf("Trouble getting the auth token: %s", err.Error())
+	}
+	client := &http.Client{}
+	log.Info("Try to verify email for: %s", email)
+	userList, err := GetUser(email)
+	if err != nil {
+		return fmt.Errorf("Could not find user:%s because of: %s", email, err.Error())
+	}
+
+	var jsonStr = []byte(
+		fmt.Sprintf(`["UPDATE_PASSWORD"]`))
+
+	body := bytes.NewBuffer(jsonStr)
+	redirectURI := "&redirect_uri=/#new-user"
+	req, err := http.NewRequest(
+		"PUT",
+		keycloakHost+getUsersURL+"/"+userList[0].ID+"/execute-actions-email?client_id=havendev"+redirectURI,
+		body,
+	)
+
+	if err != nil {
+		return fmt.Errorf("Trouble executing verify email for user: %s", err.Error())
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Add("Authorization", "bearer "+adminToken.AccessToken)
+	log.Info("Added headers")
+	resp, err := client.Do(req)
+	if err != nil {
+		return fmt.Errorf("Trouble processing the response body error: %s", err.Error())
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return fmt.Errorf(
+			"Trouble sending verify email for user - StatusCode: %d - Url: %s %s",
+			resp.StatusCode,
+			req.Host,
+			req.URL.Path)
+	}
+
+	return err
+}
+
+// ParseMagicLinkForm parses the formUrl out of a keycloak magic link http response
+func ParseMagicLinkForm(body io.Reader) (string, error) {
+	doc, err := html.Parse(body)
+	formURL := ""
+	if err != nil {
+		return formURL, fmt.Errorf("http read error: %s", err.Error())
+	}
+	var f func(*html.Node)
+	f = func(n *html.Node) {
+		if n.Type == html.ElementNode && n.Data == "form" {
+			for _, s := range n.Attr {
+				if s.Key == "action" {
+					formURL = s.Val
+				}
+			}
+		}
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			f(c)
+		}
+	}
+	f(doc)
+
+	return formURL, nil
+}
+
 // SendWelcomeEmail sends the user a magic link
 func SendWelcomeEmail(email string) error {
 	err := GetToken()
@@ -221,25 +308,11 @@ func SendWelcomeEmail(email string) error {
 		return fmt.Errorf("http get error: %s because of: %s", email, err.Error())
 	}
 	defer resp.Body.Close()
-	doc, err := html.Parse(resp.Body)
+
+	formURL, err := ParseMagicLinkForm(resp.Body)
 	if err != nil {
-		return fmt.Errorf("http read error: %s because of: %s", email, err.Error())
+		return fmt.Errorf("Could not parse MagicLinkForm because %s", err.Error())
 	}
-	formURL := ""
-	var f func(*html.Node)
-	f = func(n *html.Node) {
-		if n.Type == html.ElementNode && n.Data == "form" {
-			for _, s := range n.Attr {
-				if s.Key == "action" {
-					formURL = s.Val
-				}
-			}
-		}
-		for c := n.FirstChild; c != nil; c = c.NextSibling {
-			f(c)
-		}
-	}
-	f(doc)
 
 	urlData := url.Values{}
 	urlData.Set("email", email)
