@@ -56,7 +56,7 @@ public class MagicLinkFormAuthenticator extends AbstractUsernameFormAuthenticato
         String key = KeycloakModelUtils.generateId();
         context.getAuthenticationSession().setAuthNote("email-key", key);
         String link = "";
-        if (sessionId == "none") {
+        if (sessionId.equals("none")) {
             RootAuthenticationSessionModel rootAuthSession = context.getSession().authenticationSessions().createRootAuthenticationSession(context.getRealm());
             link = KeycloakUriBuilder.fromUri(context.getRefreshExecutionUrl())
             .queryParam("key", key)
