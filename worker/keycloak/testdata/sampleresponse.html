@@ -1,0 +1,148 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" class="">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="robots" content="noindex, nofollow">
+
+    <title>        Log in to Haven GRC Developer Edition
+</title>
+    <link rel="icon" href="/auth/resources/6.0.1/login/haven/img/favicon.ico" />
+            <link href="/auth/resources/6.0.1/login/haven/css/material.min.css" rel="stylesheet" />
+            <link href="/auth/resources/6.0.1/login/haven/css/haven.css" rel="stylesheet" />
+            <link href="/auth/resources/6.0.1/login/haven/css/google-fonts.css" rel="stylesheet" />
+            <link href="/auth/resources/6.0.1/login/haven/css/material-icons.css" rel="stylesheet" />
+            <script src="/auth/resources/6.0.1/login/haven/js/jquery.js" type="text/javascript"></script>
+            <script src="/auth/resources/6.0.1/login/haven/js/chargebee.js" type="text/javascript"></script>
+            <script src="/auth/resources/6.0.1/login/haven/js/material.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+
+            function showEmbeddedCheckout() {
+                var hostedPageURL = "NONE";
+                var hostedPageId = "NONE";
+                var siteName = "NONE";
+                var iframeContainer = $('#checkout-info');
+                ChargeBee.embed(hostedPageURL, siteName).load({
+                    /*
+                    * This function will be called when iframe is created.
+                    * addIframe callback will recieve iframe as parameter.
+                    * you can use this iframe to add iframe to your page.
+                    * Loading image in container can also be showed in this callback.
+                    * Note: visiblity will be none for the iframe at this moment
+                    */
+                    addIframe: function(iframe) {
+                        iframeContainer.append(iframe);
+                    },
+
+                    /*
+                    * This function will be called once when iframe is loaded.
+                    * Since checkout pages are responsive you need to handle only height.
+                    */
+                    onLoad: function(iframe, width, height) {
+                        var style= 'border:none;overflow:hidden;width:100%;';
+                        style = style + 'height:' + height + 'px;';
+                        style = style + 'display:none;';//This is for slide down effect
+                        iframe.setAttribute('style', style);
+                        $(iframe).slideDown(1000);
+                    },
+
+                    /*
+                    * This will be triggered when any content of iframe is resized.
+                    */
+                    onResize: function(iframe, width, height) {
+                        var style = 'border:none;overflow:hidden;width:100%;';
+                        style = style + 'height:' + height + 'px;';
+                        iframe.setAttribute('style',style);
+                    },
+
+                    /*
+                    * This will be triggered when checkout is complete.
+                    */
+                    onSuccess: function(iframe) {
+                        // when chargebee told us it successfully created a subscription,
+                        // we need to trigger the POST of the keycloak registration form
+                        // We include hostedPageId in the form data. This will allow keycloak to register
+                        // the user and retrieve the subscription info for that user from the hostedPageId
+                        //redirectCall(hostedPageId);
+                        alert("onSuccess");
+                    },
+
+                    /*
+                    * This will be triggered when user clicks on cancel button.
+                    */
+                    onCancel: function(iframe) {
+                        alert("Payment Aborted !!");
+                    }
+                });
+            };
+
+            //$(document).ready(function() {
+                // show chargebee subscription form
+                //showEmbeddedCheckout();
+            //});
+        </script>
+</head>
+
+<body class="d-flex flex-column">
+
+  <div class="jumbotron">
+    <div class="container">
+      <div class="row">
+        <div class="col-12 text-center">
+          <img src="/auth/resources/6.0.1/login/haven/img/logo@2x.png" width="82" height="71" />
+        Haven GRC (dev)
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <main style="flex-grow:2">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+
+
+          <div class="row justify-content-center">
+            <form id="kc-form-login" class="" onsubmit="login.disabled = true; return true;" action="http://dev.havengrc.com:2015/auth/realms/havendev/login-actions/authenticate?session_code=jo9UJuwfVBlyG5gjC2oD3JI6zJoDq_pvH8W2oUixFxc&amp;execution=493080ce-170a-40ec-b755-a6dedb6c756a&amp;client_id=magic-link&amp;tab_id=C8mveqnFOb8&amp;auth_session_id=ecb387bb-c812-4bf9-b6ce-51a6bf9c70d0" method="post">
+                <div class="">
+                    <div class="">
+                        <label for="email" class="">Email</label>
+                    </div>
+
+                    <div class="">
+                        <input tabindex="1" id="email" class="" name="email"  type="text" autofocus autocomplete="off" />
+                    </div>
+                </div>
+
+                <div class="">
+                    <div id="kc-form-options" class="">
+                    </div>
+
+                    <div id="kc-form-buttons" class="">
+                        <div class="">
+                            <input tabindex="4" class="  " name="login" id="kc-login" type="submit" value="Log In"/>
+                        </div>
+                     </div>
+                </div>
+            </form>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="bottom-container">
+    <div style="overflow:hidden;">
+      <img alt="Wireframe graphic of compliance and risk dashboard Haven GRC" data-rjs="2" id="footer-lines" src="/img/footer_lines@2x.png" data-rjs-processed="true" title="" >
+    </div>
+    <footer class="align-center">
+      <p>© 2017 <a href="https://kindlyops.com" title="Kindly Ops Website">KINDLY OPS</a></p>
+    </footer>
+  </div>
+
+
+</body>
+</html>
