@@ -56,19 +56,20 @@ public class MagicLinkFormAuthenticator extends AbstractUsernameFormAuthenticato
         String key = KeycloakModelUtils.generateId();
         context.getAuthenticationSession().setAuthNote("email-key", key);
         String link = "";
-        if (sessionId.equals("none")) {
-            RootAuthenticationSessionModel rootAuthSession = context.getSession().authenticationSessions().createRootAuthenticationSession(context.getRealm());
-            link = KeycloakUriBuilder.fromUri(context.getRefreshExecutionUrl())
-            .queryParam("key", key)
-            .queryParam("auth_session_id", rootAuthSession.getId())
-            .build().toString();
+        if ("none".equals(sessionId)) {
+            RootAuthenticationSessionModel rootAuthSession = context.getSession().authenticationSessions()
+                    .createRootAuthenticationSession(context.getRealm());
+            link = KeycloakUriBuilder.fromUri(context.getRefreshExecutionUrl()).queryParam("key", key)
+                    .queryParam("auth_session_id", rootAuthSession.getId()).build().toString();
         } else {
-            link = KeycloakUriBuilder.fromUri(context.getRefreshExecutionUrl()).queryParam("key", key).build().toString();
+            link = KeycloakUriBuilder.fromUri(context.getRefreshExecutionUrl()).queryParam("key", key).build()
+                    .toString();
         }
 
         String body = "<a href=\"" + link + "\">Click to login</a>";
         try {
-            context.getSession().getProvider(EmailSenderProvider.class).send(context.getRealm().getSmtpConfig(), user, "Login link", null, body);
+            context.getSession().getProvider(EmailSenderProvider.class).send(context.getRealm().getSmtpConfig(), user,
+                    "Login link", null, body);
         } catch (EmailException e) {
             e.printStackTrace();
         }
