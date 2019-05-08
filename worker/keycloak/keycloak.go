@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/deis/helm/log"
+	"golang.org/x/net/html"
 )
 
 type token struct {
@@ -42,6 +43,9 @@ var adminPw = os.Getenv("KC_PW")
 var keycloakHost = os.Getenv("KC_HOST") + ":" + os.Getenv("KC_PORT")
 var getTokenURL = "/auth/realms/master/protocol/openid-connect/token"
 var getUsersURL = "/auth/admin/realms/havendev/users"
+var getFormURL = "/auth/realms/havendev/protocol/openid-connect/auth" +
+	"?client_id=magic-link&response_mode=fragment&response_type=code" +
+	"&login=true&redirect_uri=%2Fdashboard&auth_session_id=none"
 
 // GetToken grabs the token for the admin api.
 func GetToken() error {
@@ -52,6 +56,19 @@ func GetToken() error {
 		return nil
 	}
 	log.Info("the admin api token is being renewed.")
+
+	// set up some default values for unit test environment
+	if adminUser == "" {
+		adminUser = "admin"
+	}
+
+	if adminPw == "" {
+		adminPw = "admin"
+	}
+
+	if keycloakHost == ":" {
+		keycloakHost = "http://dev.havengrc.com:2015"
+	}
 
 	form := url.Values{
 		"username":   {adminUser},
@@ -192,7 +209,7 @@ func CreateUser(email string) error {
 		return fmt.Errorf("Trouble creating user - StatusCode: %d", resp.StatusCode)
 	}
 
-	err = SendVerificationEmail(email)
+	err = SendWelcomeEmail(email)
 	if err != nil {
 		return fmt.Errorf("Trouble sending verification email: %s", err.Error())
 	}
@@ -244,6 +261,72 @@ func SendVerificationEmail(email string) error {
 			resp.StatusCode,
 			req.Host,
 			req.URL.Path)
+	}
+
+	return err
+}
+
+// ParseMagicLinkForm parses the formUrl out of a keycloak magic link http response
+func ParseMagicLinkForm(body io.Reader) (string, error) {
+	doc, err := html.Parse(body)
+	formURL := ""
+	if err != nil {
+		return formURL, fmt.Errorf("http read error: %s", err.Error())
+	}
+	var f func(*html.Node)
+	f = func(n *html.Node) {
+		if n.Type == html.ElementNode && n.Data == "form" {
+			for _, s := range n.Attr {
+				if s.Key == "action" {
+					formURL = s.Val
+				}
+			}
+		}
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			f(c)
+		}
+	}
+	f(doc)
+
+	return formURL, nil
+}
+
+// SendWelcomeEmail sends the user a magic link
+func SendWelcomeEmail(email string) error {
+	err := GetToken()
+	if err != nil {
+		return fmt.Errorf("Trouble getting the auth token: %s", err.Error())
+	}
+	log.Info("Try to get form url for: %s", email)
+	_, err = GetUser(email)
+	if err != nil {
+		return fmt.Errorf("Could not find user:%s because of: %s", email, err.Error())
+	}
+
+	resp, err := http.Get(keycloakHost + getFormURL)
+	if err != nil {
+		return fmt.Errorf("http get error: %s because of: %s", email, err.Error())
+	}
+	defer resp.Body.Close()
+
+	formURL, err := ParseMagicLinkForm(resp.Body)
+	if err != nil {
+		return fmt.Errorf("Could not parse MagicLinkForm because %s", err.Error())
+	}
+
+	urlData := url.Values{}
+	urlData.Set("email", email)
+
+	response, err := http.PostForm(
+		formURL,
+		urlData,
+	)
+	if response.StatusCode != 200 {
+		return fmt.Errorf("Trouble sending welcome email to user - StatusCode: %d", response.StatusCode)
+	}
+
+	if err != nil {
+		return fmt.Errorf("http get error: %s because of: %s", email, err.Error())
 	}
 
 	return err

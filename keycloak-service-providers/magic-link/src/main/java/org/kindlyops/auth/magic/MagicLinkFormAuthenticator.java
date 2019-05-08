@@ -29,6 +29,7 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.utils.KeycloakModelUtils;
+import org.keycloak.sessions.RootAuthenticationSessionModel;
 
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -41,7 +42,7 @@ public class MagicLinkFormAuthenticator extends AbstractUsernameFormAuthenticato
     public void action(AuthenticationFlowContext context) {
         MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
         String email = formData.getFirst("email");
-
+        String sessionId = context.getHttpRequest().getUri().getQueryParameters().getFirst("auth_session_id");
         UserModel user = context.getSession().users().getUserByEmail(email, context.getRealm());
         if (user == null) {
             context.getEvent().error(Errors.USER_NOT_FOUND);
@@ -54,11 +55,21 @@ public class MagicLinkFormAuthenticator extends AbstractUsernameFormAuthenticato
 
         String key = KeycloakModelUtils.generateId();
         context.getAuthenticationSession().setAuthNote("email-key", key);
+        String link = "";
+        if ("none".equals(sessionId)) {
+            RootAuthenticationSessionModel rootAuthSession = context.getSession().authenticationSessions()
+                    .createRootAuthenticationSession(context.getRealm());
+            link = KeycloakUriBuilder.fromUri(context.getRefreshExecutionUrl()).queryParam("key", key)
+                    .queryParam("auth_session_id", rootAuthSession.getId()).build().toString();
+        } else {
+            link = KeycloakUriBuilder.fromUri(context.getRefreshExecutionUrl()).queryParam("key", key).build()
+                    .toString();
+        }
 
-        String link = KeycloakUriBuilder.fromUri(context.getRefreshExecutionUrl()).queryParam("key", key).build().toString();
         String body = "<a href=\"" + link + "\">Click to login</a>";
         try {
-            context.getSession().getProvider(EmailSenderProvider.class).send(context.getRealm().getSmtpConfig(), user, "Login link", null, body);
+            context.getSession().getProvider(EmailSenderProvider.class).send(context.getRealm().getSmtpConfig(), user,
+                    "Login link", null, body);
         } catch (EmailException e) {
             e.printStackTrace();
         }
@@ -72,6 +83,11 @@ public class MagicLinkFormAuthenticator extends AbstractUsernameFormAuthenticato
         String sessionKey = context.getAuthenticationSession().getAuthNote("email-key");
         if (sessionKey != null) {
             String requestKey = context.getHttpRequest().getUri().getQueryParameters().getFirst("key");
+            UserModel user = context.getUser();
+            // Check if email is verified.
+            if (!user.isEmailVerified()) {
+                user.setEmailVerified(true);
+            }
             if (requestKey != null) {
                 if (requestKey.equals(sessionKey)) {
                     context.success();

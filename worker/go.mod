@@ -10,9 +10,12 @@ require (
 	github.com/deis/pkg v0.5.0 // indirect
 	github.com/getsentry/raven-go v0.2.0
 	github.com/gobuffalo/envy v1.7.0
+	github.com/google/go-cmp v0.3.0
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/lib/pq v1.1.1
 	github.com/nleof/goyesql v1.0.1
 	github.com/pkg/errors v0.8.1 // indirect
+	github.com/stretchr/testify v1.3.0
+	golang.org/x/net v0.0.0-20180724234803-3673e40ba225
 	google.golang.org/appengine v1.5.0 // indirect
 )
