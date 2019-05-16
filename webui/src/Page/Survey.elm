@@ -33,8 +33,8 @@ import Data.Survey
         , encodeSurveyMetaData
         , upgradeSurvey
         )
-import Html exposing (Html, br, button, div, h1, h3, h4, hr, i, input, li, p, table, tbody, td, text, th, thead, tr, ul, img, span, a, footer)
-import Html.Attributes exposing (class, disabled, id, placeholder, style, type_, value, min, max, alt, attribute, src, height, width, href, title)
+import Html exposing (Html, a, br, button, div, footer, h1, h3, h4, hr, i, img, input, li, p, span, table, tbody, td, text, th, thead, tr, ul)
+import Html.Attributes exposing (alt, attribute, class, disabled, height, href, id, max, min, placeholder, src, style, title, type_, value, width)
 import Html.Events exposing (onClick, onInput)
 import Http
 import Json.Decode as Decode exposing (Decoder, andThen, decodeString, field, int, map, map5, oneOf)
@@ -220,6 +220,7 @@ type Msg
     | StartIpsativeSurvey SurveyMetaData
     | IncrementAnswer IpsativeAnswer Int
     | DecrementAnswer IpsativeAnswer Int
+    | UpdateAnswer IpsativeAnswer Int String
     | NextQuestion
     | PreviousQuestion
     | GoToHome
@@ -533,6 +534,26 @@ update msg model authModel =
                             , Cmd.none
                             )
 
+        UpdateAnswer answer groupNumber newPointsValue ->
+            let
+                newPoints =
+                    Maybe.withDefault 0 (String.toInt newPointsValue)
+
+                newSurvey =
+                    case model.currentSurvey of
+                        Ipsative survey ->
+                            Ipsative (updateAnswer survey answer groupNumber newPoints)
+
+                        _ ->
+                            model.currentSurvey
+
+                newModel =
+                    { model | currentSurvey = newSurvey }
+            in
+            ( newModel
+            , storeSurvey newModel (getQuestionNumber newModel)
+            )
+
         DecrementAnswer answer groupNumber ->
             --if points for this answer is > 0,
             --then decrement the point in this answer and
@@ -722,6 +743,51 @@ selectLikertAnswer survey answerNumber choice =
                                     answer
                             )
                             question.answers
+                    }
+                )
+                survey.questions
+    in
+    { survey | questions = newQuestions }
+
+
+updateAnswer : IpsativeSurvey -> IpsativeAnswer -> Int -> Int -> IpsativeSurvey
+updateAnswer survey answer groupNumber newPoints =
+    let
+        newQuestions =
+            Zipper.mapCurrent
+                (\question ->
+                    let
+                        newAnswers =
+                            List.map
+                                (\x ->
+                                    if x.id == answer.id then
+                                        { x
+                                            | pointsAssigned =
+                                                List.map
+                                                    (\y ->
+                                                        if y.group == groupNumber then
+                                                            if isPointsInGroup question.pointsLeft groupNumber then
+                                                                { y | points = newPoints }
+
+                                                            else
+                                                                y
+
+                                                        else
+                                                            y
+                                                    )
+                                                    x.pointsAssigned
+                                        }
+
+                                    else
+                                        x
+                                )
+                                question.answers
+                    in
+                    { id = question.id
+                    , title = question.title
+                    , orderNumber = question.orderNumber
+                    , pointsLeft = question.pointsLeft
+                    , answers = newAnswers
                     }
                 )
                 survey.questions
@@ -1126,10 +1192,11 @@ viewIpsativeSurvey survey =
             pointsLeft == 0
     in
     div [ class "p-4" ]
-        [ div [ class "row"]
+        [ div [ class "row" ]
             [ viewIpsativeSurveyTitle survey
             , br [] []
             , viewIpsativeSurveyBoxes (Zipper.current survey.questions)
+
             -- , br [] []
             -- , viewInlineSurveyInstructions survey.metaData.instructions
             ]
@@ -1175,12 +1242,12 @@ viewIpsativeSurveyTitle survey =
         questionTitle =
             currentQuestion.title
     in
-      div [ class "col-md-4 d-flex flex-column"]
-            [ img [ class "img-fluid mb-5", alt "Haven GRC Company Logo", attribute "data-rjs" "2", id "logo", src "/img/logo@2x.png", height 71, width 82 ] []
-            , h3 [] [ text questionTitle ]
-            , p [ class "", style "color" "#B1B1B1" ] [ text ("Q " ++ String.fromInt questionNumber ++ "/" ++ String.fromInt totalQuestions) ]
-            , div [ class "row" ] (viewPointsLeft currentQuestion.pointsLeft survey.pointsPerQuestion)
-            ]
+    div [ class "col-md-4 d-flex flex-column" ]
+        [ img [ class "img-fluid mb-5", alt "Haven GRC Company Logo", attribute "data-rjs" "2", id "logo", src "/img/logo@2x.png", height 71, width 82 ] []
+        , h3 [] [ text questionTitle ]
+        , p [ class "", style "color" "#B1B1B1" ] [ text ("Q " ++ String.fromInt questionNumber ++ "/" ++ String.fromInt totalQuestions) ]
+        , div [ class "row" ] (viewPointsLeft currentQuestion.pointsLeft survey.pointsPerQuestion)
+        ]
 
 
 viewPointsLeft : List PointsLeft -> Int -> List (Html Msg)
@@ -1188,7 +1255,7 @@ viewPointsLeft pointsLeft pointsPerQuestion =
     List.map
         (\x ->
             div [ class "col-md" ]
-                [ p [] [ text ("Group " ++ String.fromInt x.group ++ ": " ++ String.fromInt x.pointsLeft ++ "/" ++ String.fromInt pointsPerQuestion) ]
+                [ p [] [ text ("Points remaining: " ++ String.fromInt x.pointsLeft ++ " of " ++ String.fromInt pointsPerQuestion) ]
                 , div [ class "progress" ]
                     [ div [ class "progress-bar bg-secondary", (\( a, b ) -> style a b) (calculateProgressBarPercent x.pointsLeft pointsPerQuestion) ] []
                     ]
@@ -1204,7 +1271,7 @@ calculateProgressBarPercent current max =
             100 * (toFloat current / toFloat max)
 
         newPercent =
-          100 - percent
+            100 - percent
 
         percentString =
             String.fromFloat newPercent ++ "%"
@@ -1216,44 +1283,62 @@ viewIpsativeSurveyBoxes : IpsativeQuestion -> Html Msg
 viewIpsativeSurveyBoxes surveyQuestion =
     div [ class "col-md-8 mt-5" ]
         [ div [ class "row" ]
-        (List.map
-            (\answer ->
-                viewSurveyBox answer
+            (List.map
+                (\answer ->
+                    viewSurveyBox answer
+                )
+                surveyQuestion.answers
             )
-            surveyQuestion.answers
-        )
         ]
+
 
 viewSurveyBox : IpsativeAnswer -> Html Msg
 viewSurveyBox answer =
+    div [ class "col-md-6 pt-5" ]
+        [ div [ class "question-container" ]
+            [ p [ class "question-category" ] [ text answer.category ]
+            , p [ class "question-text" ] [ text answer.answer ]
+            , div []
+                (List.map
+                    (\group -> viewSurveyPointsGroup answer group)
+                    answer.pointsAssigned
+                )
+            ]
+        ]
 
-      div [ class "col-md-6 pt-5" ]
-          [ div [ class "question-container" ]
-                [ p [ class "question-category" ] [ text answer.category ]
-                ,  p [ class "question-text" ] [ text answer.answer ]
-                , div []
-                    (List.map
-                        (\group -> viewSurveyPointsGroup answer group)
-                        answer.pointsAssigned
-                    )
-                ]
-          ]
+
+getPointsAssigned : IpsativeAnswer -> Int -> Int
+getPointsAssigned answer group =
+    let
+        filtered =
+            List.filter (\x -> x.group == group) answer.pointsAssigned
+
+        first =
+            List.head filtered
+    in
+    case first of
+        Just x ->
+            x.points
+
+        _ ->
+            0
 
 
 viewSurveyPointsGroup : IpsativeAnswer -> PointsAssigned -> Html Msg
 viewSurveyPointsGroup answer group =
-
-     div [ class "question-range-container" ]
-          [ div [ class "question-slider" ]
-              [ input [ type_ "range"
+    div [ class "question-range-container" ]
+        [ div [ class "question-slider" ]
+            [ input
+                [ type_ "range"
                 , class "custom-range"
                 , min "0"
                 , max "10"
-                , value "0"
-              ]
-              []
-              , div [ class "question-list d-flex justify-content-between" ]
-                [ ul [ ]
+                , value (String.fromInt (getPointsAssigned answer group.group))
+                , onInput (UpdateAnswer answer group.group)
+                ]
+                []
+            , div [ class "question-list d-flex justify-content-between" ]
+                [ ul []
                     [ li [] [ text "0" ]
                     , li [] [ text "1" ]
                     , li [] [ text "2" ]
@@ -1264,27 +1349,30 @@ viewSurveyPointsGroup answer group =
                     , li [] [ text "7" ]
                     , li [] [ text "8" ]
                     , li [ style "margin-right" "-3px" ] [ text "9" ]
-                    , li [] [ text "10" ] ]
+                    , li [] [ text "10" ]
+                    ]
                 ]
-              ]
-          , div [ class "d-flex justify-content-around" ] --This div can be deleted once progress with slider is completed
-              [ div [ class "d-flex align-self-center" ]
-                  [ button
-                      [ type_ "button"
-                      , class "btn btn-outline-primary"
-                      , onClick (DecrementAnswer answer group.group)
-                      ]
-                      [ i [ class "material-icons" ] [ text "remove" ] ]
-                  , div [ class " align-self-center" ] [ p [ class "card-text   " ] [ text (String.fromInt group.points) ] ]
-                  , button
-                      [ type_ "button"
-                      , class "btn btn-outline-primary"
-                      , onClick (IncrementAnswer answer group.group)
-                      ]
-                      [ i [ class "material-icons" ] [ text "add" ] ]
-                  ]
-              ]
-          ]
+            ]
+        , div [ class "d-flex justify-content-around" ]
+            --This div can be deleted once progress with slider is completed
+            [ div [ class "d-flex align-self-center" ]
+                [ button
+                    [ type_ "button"
+                    , class "btn btn-outline-primary"
+                    , onClick (DecrementAnswer answer group.group)
+                    ]
+                    [ i [ class "material-icons" ] [ text "remove" ] ]
+                , div [ class " align-self-center" ] [ p [ class "card-text   " ] [ text (String.fromInt group.points) ] ]
+                , button
+                    [ type_ "button"
+                    , class "btn btn-outline-primary"
+                    , onClick (IncrementAnswer answer group.group)
+                    ]
+                    [ i [ class "material-icons" ] [ text "add" ] ]
+                ]
+            ]
+        ]
+
 
 viewSurveyFooter : Bool -> Html Msg
 viewSurveyFooter ready =
