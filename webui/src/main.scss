@@ -128,9 +128,129 @@ h3{
   line-height: 1.6875;
 }
 
+/** Survey Page **/
+.custom-range{
+
+}
+
+.custom-range::-webkit-slider-thumb{
+  -webkit-appearance: none;
+    background: var(--primary);
+    cursor: pointer;
+    height:18px;
+    width: 28px;
+    margin-top: -4px;
+    border-radius: 10px;
+}
+
+.custom-range::-moz-range-thumb
+{
+  background: var(--primary);
+  cursor: pointer;
+}
+
+.custom-range::-ms-thumb{
+  background: #2fa09d;
+  cursor: pointer;
+  height:16px;
+  width: 20px;
+}
+
+.custom-range:focus::-webkit-slider-thumb{
+  box-shadow: none;
+ }
+
+.custom-range::-webkit-slider-runnable-track{
+  height: 10px;
+  background-color: #EAE9EA;
+  border-radius: 5px;
+}
+
+.custom-range:focus::-webkit-slider-runnable-track{
+    background-color: #cccccc;
+}
+
+.custom-range::-ms-track{
+  width: 100%;
+  height: 0px;
+  cursor: pointer;
+  background: transparent;
+  border-color: transparent;
+  color: transparent;
+}
+
+.custom-range::-ms-fill-lower{
+  background: #EAE9EA;
+  border: 0.2px solid #2fa09d;
+  border-radius: 2.6px;
+  box-shadow: 1px 1px 1px #EAE9EA, 0px 0px 1px #EAE9EA;
+}
+
+.custom-range:focus::-ms-fill-lower {
+  background: #2fa09d;
+}
+
+.custom-range::-ms-fill-upper{
+  background: #EAE9EA;
+   border: 0.2px solid #EAE9EA;
+   border-radius: 2.6px;
+   box-shadow: 1px 1px 1px #EAE9EA, 0px 0px 1px #EAE9EA;
+}
+
+.custom-range:focus::-ms-fill-upper {
+  background: #2fa09d;
+}
+
+.question-container{
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.question-text{
+  flex-grow: 2;
+}
+
+.question-list{
+  font-size:12px;
+  font-weight: 500;
+  padding: 0px 9px 0px 11px;
+}
+
+.question-list ul{
+  list-style: none;
+  display: contents;
+  width:100%;
+  padding-left: 0px;
+  display: inline-flex;
+  justify-content: space-between;
+}
+
+.question-category{
+  font-weight: bold;
+  color: var(--secondary);
+  font-family: 'Montserrat', sans-serif;
+}
+
+.question-text{
+  font-family: 'Roboto', sans-serif;
+  line-height: 1.8em;
+}
+
+.next-question-btn{
+  border-radius: 50px;
+  padding: 18px 90px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: bold;
+}
+/** End Survey **/
+
 @media screen and (max-width:768px){
   .login-header{
     font-size: 36px;
+  }
+  img#logo{
+    align-self:center
   }
 }
 

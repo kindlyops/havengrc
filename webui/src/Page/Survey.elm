@@ -33,8 +33,8 @@ import Data.Survey
         , encodeSurveyMetaData
         , upgradeSurvey
         )
-import Html exposing (Html, br, button, div, h1, h3, h4, hr, i, input, li, p, table, tbody, td, text, th, thead, tr, ul)
-import Html.Attributes exposing (class, disabled, id, placeholder, style, type_, value)
+import Html exposing (Html, br, button, div, h1, h3, h4, hr, i, input, li, p, table, tbody, td, text, th, thead, tr, ul, img, span, a, footer)
+import Html.Attributes exposing (class, disabled, id, placeholder, style, type_, value, min, max, alt, attribute, src, height, width, href, title)
 import Html.Events exposing (onClick, onInput)
 import Http
 import Json.Decode as Decode exposing (Decoder, andThen, decodeString, field, int, map, map5, oneOf)
@@ -1125,13 +1125,15 @@ viewIpsativeSurvey survey =
         ready =
             pointsLeft == 0
     in
-    div [ class "" ]
-        [ viewIpsativeSurveyTitle survey
-        , br [] []
-        , viewIpsativeSurveyBoxes (Zipper.current survey.questions)
-        , br [] []
-        , viewInlineSurveyInstructions survey.metaData.instructions
-        , viewSurveyFooter ready
+    div [ class "p-4" ]
+        [ div [ class "row"]
+            [ viewIpsativeSurveyTitle survey
+            , br [] []
+            , viewIpsativeSurveyBoxes (Zipper.current survey.questions)
+            -- , br [] []
+            -- , viewInlineSurveyInstructions survey.metaData.instructions
+            ]
+        , div [ class "row" ] [ viewSurveyFooter ready ]
         ]
 
 
@@ -1173,13 +1175,12 @@ viewIpsativeSurveyTitle survey =
         questionTitle =
             currentQuestion.title
     in
-    div [ class "row" ]
-        [ div [ class "col-lg ", style "text-align" "center" ]
-            [ h3 [ class "" ] [ text ("Question " ++ String.fromInt questionNumber ++ " of " ++ String.fromInt totalQuestions) ]
-            , h4 [] [ text questionTitle ]
+      div [ class "col-md-4 d-flex flex-column"]
+            [ img [ class "img-fluid mb-5", alt "Haven GRC Company Logo", attribute "data-rjs" "2", id "logo", src "/img/logo@2x.png", height 71, width 82 ] []
+            , h3 [] [ text questionTitle ]
+            , p [ class "", style "color" "#B1B1B1" ] [ text ("Q " ++ String.fromInt questionNumber ++ "/" ++ String.fromInt totalQuestions) ]
             , div [ class "row" ] (viewPointsLeft currentQuestion.pointsLeft survey.pointsPerQuestion)
             ]
-        ]
 
 
 viewPointsLeft : List PointsLeft -> Int -> List (Html Msg)
@@ -1189,7 +1190,7 @@ viewPointsLeft pointsLeft pointsPerQuestion =
             div [ class "col-md" ]
                 [ p [] [ text ("Group " ++ String.fromInt x.group ++ ": " ++ String.fromInt x.pointsLeft ++ "/" ++ String.fromInt pointsPerQuestion) ]
                 , div [ class "progress" ]
-                    [ div [ class "progress-bar bg-primary", (\( a, b ) -> style a b) (calculateProgressBarPercent x.pointsLeft pointsPerQuestion) ] []
+                    [ div [ class "progress-bar bg-secondary", (\( a, b ) -> style a b) (calculateProgressBarPercent x.pointsLeft pointsPerQuestion) ] []
                     ]
                 ]
         )
@@ -1202,69 +1203,90 @@ calculateProgressBarPercent current max =
         percent =
             100 * (toFloat current / toFloat max)
 
+        newPercent =
+          100 - percent
+
         percentString =
-            String.fromFloat percent ++ "%"
+            String.fromFloat newPercent ++ "%"
     in
     ( "width", percentString )
 
 
 viewIpsativeSurveyBoxes : IpsativeQuestion -> Html Msg
 viewIpsativeSurveyBoxes surveyQuestion =
-    div [ class "row" ]
+    div [ class "col-md-8 mt-5" ]
+        [ div [ class "row" ]
         (List.map
             (\answer ->
                 viewSurveyBox answer
             )
             surveyQuestion.answers
         )
-
+        ]
 
 viewSurveyBox : IpsativeAnswer -> Html Msg
 viewSurveyBox answer =
-    div [ class "col-md-6" ]
-        [ div [ class "card mb-4 box-shadow" ]
-            [ div [ class "card-body" ]
-                [ div [ class "card-padder", style "height" "120px" ]
-                    [ p [ class "card-text h5 mb-4" ] [ text answer.answer ] ]
-                , ul [ class "list-group list-group-flush" ]
+
+      div [ class "col-md-6 pt-5" ]
+          [ div [ class "question-container" ]
+                [ p [ class "question-category" ] [ text answer.category ]
+                ,  p [ class "question-text" ] [ text answer.answer ]
+                , div []
                     (List.map
                         (\group -> viewSurveyPointsGroup answer group)
                         answer.pointsAssigned
                     )
                 ]
-            ]
-        ]
+          ]
 
 
 viewSurveyPointsGroup : IpsativeAnswer -> PointsAssigned -> Html Msg
 viewSurveyPointsGroup answer group =
-    li [ class "list-group-item" ]
-        [ div [ class "d-flex justify-content-between" ]
-            [ div [ class "align-self-center" ] []
-            , div [ class "" ]
-                [ button
-                    [ type_ "button"
-                    , class "btn btn-outline-primary"
-                    , onClick (DecrementAnswer answer group.group)
-                    ]
-                    [ i [ class "material-icons" ] [ text "remove" ] ]
-                ]
-            , div [ class "align-self-center" ] [ p [ class "card-text   " ] [ text (String.fromInt group.points) ] ]
-            , div [ class "" ]
-                [ button
-                    [ type_ "button"
-                    , class "btn btn-outline-primary"
-                    , onClick (IncrementAnswer answer group.group)
-                    ]
-                    [ i [ class "material-icons" ] [ text "add" ] ]
-                ]
-            ]
-        ]
 
+     div [ class "question-range-container" ]
+          [ div [ class "question-slider" ]
+              [ input [ type_ "range"
+                , class "custom-range"
+                , min "0"
+                , max "10"
+                , value "0"
+              ]
+              []
+              , div [ class "question-list d-flex justify-content-between" ]
+                [ ul [ ]
+                    [ li [] [ text "0" ]
+                    , li [] [ text "1" ]
+                    , li [] [ text "2" ]
+                    , li [] [ text "3" ]
+                    , li [] [ text "4" ]
+                    , li [] [ text "5" ]
+                    , li [] [ text "6" ]
+                    , li [] [ text "7" ]
+                    , li [] [ text "8" ]
+                    , li [ style "margin-right" "-3px" ] [ text "9" ]
+                    , li [] [ text "10" ] ]
+                ]
+              ]
+          , div [ class "d-flex justify-content-around" ] --This div can be deleted once progress with slider is completed
+              [ div [ class "d-flex align-self-center" ]
+                  [ button
+                      [ type_ "button"
+                      , class "btn btn-outline-primary"
+                      , onClick (DecrementAnswer answer group.group)
+                      ]
+                      [ i [ class "material-icons" ] [ text "remove" ] ]
+                  , div [ class " align-self-center" ] [ p [ class "card-text   " ] [ text (String.fromInt group.points) ] ]
+                  , button
+                      [ type_ "button"
+                      , class "btn btn-outline-primary"
+                      , onClick (IncrementAnswer answer group.group)
+                      ]
+                      [ i [ class "material-icons" ] [ text "add" ] ]
+                  ]
+              ]
+          ]
 
 viewSurveyFooter : Bool -> Html Msg
 viewSurveyFooter ready =
-    div [ class "row mb-4 pb-4 px-3 d-flex justify-content-between" ]
-        [ button [ class "btn btn-default btn-lg mx-1", onClick GoToHome ] [ text "Quit Survey" ]
-        , button [ class "btn btn-primary btn-lg mx-1", onClick NextQuestion, disabled (not ready) ] [ text "Next" ]
-        ]
+    div [ class "col text-center mt-4" ]
+        [ button [ class "btn btn-primary next-question-btn", onClick NextQuestion, disabled (not ready) ] [ text "Next Question" ] ]
