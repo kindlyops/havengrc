@@ -9,6 +9,7 @@ import (
 
 	"github.com/deis/helm/log"
 	"github.com/gobuffalo/buffalo"
+	"github.com/gobuffalo/buffalo-pop/pop/popmw"
 	popmw "github.com/gobuffalo/buffalo-pop/pop/popmw"
 	"github.com/gobuffalo/envy"
 	ssl "github.com/gobuffalo/mw-forcessl"

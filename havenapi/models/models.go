@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/gobuffalo/envy"
-	"github.com/gobuffalo/packr"
+	"github.com/gobuffalo/packr/v2"
 	"github.com/gobuffalo/pop"
 	"github.com/nleof/goyesql"
 )
@@ -24,7 +24,7 @@ func init() {
 		log.Fatal(err)
 	}
 	pop.Debug = env == "development"
-	box := packr.NewBox("./sql")
+	box := packr.New("./sql", "./sql")
 	sql, err := box.MustBytes("queries.sql")
 	if err != nil {
 		log.Fatal(err)

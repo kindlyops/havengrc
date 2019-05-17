@@ -10,14 +10,15 @@ require (
 	github.com/deis/pkg v0.5.0 // indirect
 	github.com/getsentry/raven-go v0.2.0
 	github.com/gobuffalo/buffalo v0.14.3
-	github.com/gobuffalo/buffalo-pop v1.10.0
+	github.com/gobuffalo/buffalo-plugins v1.14.1 // indirect
+	github.com/gobuffalo/buffalo-pop v1.12.0
 	github.com/gobuffalo/envy v1.7.0
-	github.com/gobuffalo/flect v0.1.3 // indirect
+	github.com/gobuffalo/fizz v1.8.0 // indirect
 	github.com/gobuffalo/mw-csrf v0.0.0-20190129204204-25460a055517 // indirect
 	github.com/gobuffalo/mw-forcessl v0.0.0-20190224202501-6d1ef7ffb276
 	github.com/gobuffalo/mw-paramlogger v0.0.0-20190224201358-0d45762ab655
 	github.com/gobuffalo/packr v1.25.0
-	github.com/gobuffalo/packr/v2 v2.2.0 // indirect
+	github.com/gobuffalo/packr/v2 v2.2.0
 	github.com/gobuffalo/pop v4.11.0+incompatible
 	github.com/gobuffalo/suite v2.6.2+incompatible
 	github.com/gobuffalo/uuid v2.0.5+incompatible
