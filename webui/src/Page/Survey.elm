@@ -34,7 +34,7 @@ import Data.Survey
         , upgradeSurvey
         )
 import Html exposing (Html, a, br, button, div, footer, h1, h3, h4, hr, i, img, input, li, p, span, table, tbody, td, text, th, thead, tr, ul)
-import Html.Attributes exposing (alt, attribute, class, disabled, height, href, id, max, min, placeholder, src, style, title, type_, value, width)
+import Html.Attributes exposing (alt, attribute, class, disabled, height, href, id, placeholder, src, style, title, type_, value, width)
 import Html.Events exposing (onClick, onInput)
 import Http
 import Json.Decode as Decode exposing (Decoder, andThen, decodeString, field, int, map, map5, oneOf)
@@ -782,11 +782,14 @@ updateAnswer survey answer groupNumber newPoints =
                                         x
                                 )
                                 question.answers
+
+                        newPointsLeft =
+                            calculatePointsLeft newAnswers
                     in
                     { id = question.id
                     , title = question.title
                     , orderNumber = question.orderNumber
-                    , pointsLeft = question.pointsLeft
+                    , pointsLeft = newPointsLeft
                     , answers = newAnswers
                     }
                 )
@@ -1307,8 +1310,8 @@ viewSurveyBox answer =
         ]
 
 
-getPointsAssigned : IpsativeAnswer -> Int -> Int
-getPointsAssigned answer group =
+getPointsAssigned : Int -> IpsativeAnswer -> Int
+getPointsAssigned group answer =
     let
         filtered =
             List.filter (\x -> x.group == group) answer.pointsAssigned
@@ -1324,6 +1327,36 @@ getPointsAssigned answer group =
             0
 
 
+calculatePointsRemaining : List IpsativeAnswer -> Int
+calculatePointsRemaining answers =
+    let
+        group =
+            1
+
+        getPoints =
+            getPointsAssigned group
+
+        pointsAssignedList =
+            List.map getPoints answers
+
+        totalPointsAssigned =
+            List.sum pointsAssignedList
+
+        pointsRemaining =
+            max 0 (10 - totalPointsAssigned)
+    in
+    pointsRemaining
+
+
+calculatePointsLeft : List IpsativeAnswer -> List PointsLeft
+calculatePointsLeft answers =
+    let
+        pointsRemaining =
+            calculatePointsRemaining answers
+    in
+    [ { group = 1, pointsLeft = pointsRemaining } ]
+
+
 viewSurveyPointsGroup : IpsativeAnswer -> PointsAssigned -> Html Msg
 viewSurveyPointsGroup answer group =
     div [ class "question-range-container" ]
@@ -1331,9 +1364,9 @@ viewSurveyPointsGroup answer group =
             [ input
                 [ type_ "range"
                 , class "custom-range"
-                , min "0"
-                , max "10"
-                , value (String.fromInt (getPointsAssigned answer group.group))
+                , Html.Attributes.min "0"
+                , Html.Attributes.max "10"
+                , value (String.fromInt (getPointsAssigned group.group answer))
                 , onInput (UpdateAnswer answer group.group)
                 ]
                 []
@@ -1351,24 +1384,6 @@ viewSurveyPointsGroup answer group =
                     , li [ style "margin-right" "-3px" ] [ text "9" ]
                     , li [] [ text "10" ]
                     ]
-                ]
-            ]
-        , div [ class "d-flex justify-content-around" ]
-            --This div can be deleted once progress with slider is completed
-            [ div [ class "d-flex align-self-center" ]
-                [ button
-                    [ type_ "button"
-                    , class "btn btn-outline-primary"
-                    , onClick (DecrementAnswer answer group.group)
-                    ]
-                    [ i [ class "material-icons" ] [ text "remove" ] ]
-                , div [ class " align-self-center" ] [ p [ class "card-text   " ] [ text (String.fromInt group.points) ] ]
-                , button
-                    [ type_ "button"
-                    , class "btn btn-outline-primary"
-                    , onClick (IncrementAnswer answer group.group)
-                    ]
-                    [ i [ class "material-icons" ] [ text "add" ] ]
                 ]
             ]
         ]
