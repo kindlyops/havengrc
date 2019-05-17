@@ -769,15 +769,11 @@ updateAnswer survey answer groupNumber newPoints =
                                                 List.map
                                                     (\y ->
                                                         if y.group == groupNumber then
-                                                            if isPointsInGroup question.pointsLeft groupNumber then
-                                                                if newPoints > y.points then
-                                                                    { y | points = y.points + min pointsRemaining (newPoints - y.points) }
-
-                                                                else
-                                                                    { y | points = newPoints }
+                                                            if newPoints > y.points then
+                                                                { y | points = y.points + min pointsRemaining (newPoints - y.points) }
 
                                                             else
-                                                                y
+                                                                { y | points = newPoints }
 
                                                         else
                                                             y
@@ -1366,6 +1362,10 @@ calculatePointsLeft answers =
 
 viewSurveyPointsGroup : IpsativeAnswer -> PointsAssigned -> Html Msg
 viewSurveyPointsGroup answer group =
+    let
+        newValue =
+            String.fromInt (getPointsAssigned group.group answer)
+    in
     div [ class "question-range-container" ]
         [ div [ class "question-slider" ]
             [ input
@@ -1373,7 +1373,7 @@ viewSurveyPointsGroup answer group =
                 , class "custom-range"
                 , Html.Attributes.min "0"
                 , Html.Attributes.max "10"
-                , value (String.fromInt (getPointsAssigned group.group answer))
+                , value newValue
                 , onInput (UpdateAnswer answer group.group)
                 ]
                 []
