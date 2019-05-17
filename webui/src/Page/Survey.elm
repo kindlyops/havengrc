@@ -757,6 +757,9 @@ updateAnswer survey answer groupNumber newPoints =
             Zipper.mapCurrent
                 (\question ->
                     let
+                        pointsRemaining =
+                            calculatePointsRemaining question.answers
+
                         newAnswers =
                             List.map
                                 (\x ->
@@ -767,7 +770,11 @@ updateAnswer survey answer groupNumber newPoints =
                                                     (\y ->
                                                         if y.group == groupNumber then
                                                             if isPointsInGroup question.pointsLeft groupNumber then
-                                                                { y | points = newPoints }
+                                                                if newPoints > y.points then
+                                                                    { y | points = y.points + min pointsRemaining (newPoints - y.points) }
+
+                                                                else
+                                                                    { y | points = newPoints }
 
                                                             else
                                                                 y
