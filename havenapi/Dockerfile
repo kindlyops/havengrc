@@ -26,6 +26,7 @@ COPY --from=builder /bin/app .
 RUN chown -R havenuser:havenuser /home/havenuser
 RUN chgrp -R 0 /home/havenuser &&chmod -R g=u /home/havenuser
 EXPOSE 3000
+ENV GO111MODULE=on
 
 # Comment out to run the migrations before running the binary:
 # CMD /bin/app migrate; /bin/app
