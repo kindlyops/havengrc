@@ -242,17 +242,17 @@ services:
       - keycloak
     ports:
       - "3000:3000"
-  grafana:
-    image: grafana/grafana
-    depends_on:
-      - prometheus
-    ports:
-      - 3500:3000
-    volumes:
-      - grafana_data:/var/lib/grafana
-      - ./grafana/provisioning/:/etc/grafana/provisioning/
-    env_file:
-      - ./grafana/config.monitoring
+  # grafana:
+  #   image: grafana/grafana
+  #   depends_on:
+  #     - prometheus
+  #   ports:
+  #     - 3500:3000
+  #   volumes:
+  #     - grafana_data:/var/lib/grafana
+  #     - ./grafana/provisioning/:/etc/grafana/provisioning/
+  #   env_file:
+  #     - ./grafana/config.monitoring
   webui:
     working_dir: /code
     volumes:
