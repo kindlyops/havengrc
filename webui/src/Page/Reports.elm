@@ -1,6 +1,7 @@
 module Page.Reports exposing (Model, Msg, init, update, view)
 
 import Authentication
+import Bytes
 import Data.Report exposing (Report)
 import Html exposing (Html, a, button, div, input, label, li, text, ul)
 import Html.Attributes exposing (attribute, class, href, id)

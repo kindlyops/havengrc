@@ -1,7 +1,9 @@
-module Request.Reports exposing (download, get)
+module Request.Reports exposing (download, downloadBytes, get)
 
 import Authentication
+import Bytes exposing (Bytes)
 import Data.Report
+import File.Download as Download
 import Http
 import Json.Decode as Decode
 
@@ -30,12 +32,22 @@ get authModel =
 
 download : Authentication.Model -> Data.Report.Report -> Http.Request (List Data.Report.Report)
 download authModel report =
+    let
+        headers =
+            Authentication.tryGetAuthHeader authModel
+                ++ [ Http.header "Accept" "application/octet-stream" ]
+    in
     Http.request
         { body = Http.emptyBody
         , expect = Http.expectJson (Decode.list Data.Report.decode)
-        , headers = Authentication.tryGetAuthHeader authModel
+        , headers = headers
         , method = "GET"
         , timeout = Nothing
         , url = "/api/files?select=file&uuid=eq." ++ report.uuid
         , withCredentials = True
         }
+
+
+downloadBytes : Data.Report.Report -> Cmd msg
+downloadBytes report =
+    Download.url ("/api/files?select=file&uuid=eq." ++ report.uuid)

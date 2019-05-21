@@ -1,5 +1,6 @@
 module Data.Report exposing (Report, decode)
 
+import Bytes exposing (Bytes)
 import Json.Decode as Decode exposing (Decoder, field, map4, string)
 
 
