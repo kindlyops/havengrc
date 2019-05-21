@@ -90,6 +90,7 @@ public class MagicLinkFormAuthenticator extends AbstractUsernameFormAuthenticato
             }
             if (requestKey != null) {
                 if (requestKey.equals(sessionKey)) {
+                    context.getUser().removeRequiredAction("terms_and_conditions");
                     context.success();
                 } else {
                     context.failure(AuthenticationFlowError.INVALID_CREDENTIALS);
