@@ -332,7 +332,16 @@ func saveFileToDB(userEmail string, fileName string) error {
 func handleError(err error) {
 	if err != nil {
 		raven.CaptureErrorAndWait(err, nil)
-		log.Fatal(err)
+		log.Print(err)
+		retryJob := false
+		if retryJob {
+			log.Fatal(err)
+		} else {
+			// We are exiting with 0 because we don't expect the job to succeed if
+			// faktory queues it again.
+			log.Print(err)
+			os.Exit(0)
+		}
 	}
 }
 
