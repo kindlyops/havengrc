@@ -301,7 +301,7 @@ To upload a file to the database via havenapi:
 
     curl -X POST -H "Authorization: Bearer $TOKEN" -F "name=filename.pdf" \
       -F "file=@apitest/features/minimal.pdf" \
-      http://localhost:3000/api/files
+      http://localhost:3000/api/reports
 
 You can decode the token to inspect the contents at jwt.io. You will need to get the public cert from the Keycloak Admin interface: Havendev-\>Realm Settings-\>Keys-\>Public Key and enter it into the jwt.io page to decode the token.
 
