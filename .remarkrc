@@ -1,0 +1,11 @@
+{
+    "plugins": [
+        "remark-lint",
+        "remark-preset-lint-recommended",
+        ["lint-list-item-indent", "mixed"],
+        ["lint-no-literal-urls", false]
+    ],
+    "settings": {
+        "no-html": false
+    }
+}
