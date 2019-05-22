@@ -7,6 +7,7 @@ Feature: Basic sqitch API interaction with file storage
             | Prefer | return=representation             |
 
 
+    # TODO: we don't want base64 encoded files. Switch this to use the new HavenAPI, and remove post support from /files
     Scenario: Add a base64 encoded PDF file
         When I set JSON request body to:
         """

@@ -288,20 +288,18 @@ To read a file from the database:
     curl -H "Authorization: Bearer $TOKEN" -H "Accept: application/octet-stream" \
      http://localhost:3001/file?select=file --output result.pdf
 
-To upload a base64 encoded file to the database via postgrest:
-
-    curl -X POST -H "Authorization: Bearer $TOKEN"\
-     -H 'Content-Type: application/json' \
-     http://localhost:3001/file \
-     -d '{"file": "'"$(base64 apitest/features/minimal.pdf)"'"}'
-
-We will need an upgraded version of postgrest with a fix for [this postgrest bug](https://github.com/begriffs/postgrest/issues/906). We also need to modify the user signup process to set up the roles correctly.
-
 To upload a file to the database via havenapi:
 
     curl -X POST -H "Authorization: Bearer $TOKEN" -F "name=filename.pdf" \
       -F "file=@apitest/features/minimal.pdf" \
       http://localhost:3000/api/reports
+
+To get the content-disposition header set with the filename prefilled:
+
+    curl -H "Authorization: Bearer $TOKEN"  http://localhost:3001/files?select=uuid,name
+
+    curl -H "Authorization: Bearer $TOKEN" -H "Accept: application/octet-stream" \
+     http://localhost:3001/rpc/download_file?fileid=2a4eae80-9117-426d-a422-2be242757262 --output result2.pdf
 
 You can decode the token to inspect the contents at jwt.io. You will need to get the public cert from the Keycloak Admin interface: Havendev-\>Realm Settings-\>Keys-\>Public Key and enter it into the jwt.io page to decode the token.
 
