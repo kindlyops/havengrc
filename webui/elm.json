@@ -20,7 +20,7 @@
             "elm/url": "1.0.0",
             "elm-community/json-extra": "4.0.0",
             "elm-community/list-extra": "8.1.0",
-            "elm-community/string-extra": "4.0.0",
+            "elm-community/string-extra": "4.0.1",
             "elm-community/typed-svg": "5.0.1",
             "elm-explorations/markdown": "1.0.0",
             "gampleman/elm-visualization": "2.0.0",
