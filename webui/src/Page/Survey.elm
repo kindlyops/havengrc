@@ -11,6 +11,7 @@ module Page.Survey exposing
     )
 
 import Authentication
+import Data.Registration as Registration exposing (Registration)
 import Data.Survey
     exposing
         ( InitialSurvey
@@ -43,7 +44,6 @@ import List.Zipper as Zipper
 import Page.Errors exposing (ErrorData, errorInit, setErrorMessage, viewError)
 import Ports
 import Process
-import Request.Registration
 import Request.Survey
 import Task
 import Utils exposing (getHTTPErrorMessage)
@@ -242,6 +242,40 @@ type Msg
     | HideError
 
 
+registrationUrl : String
+registrationUrl =
+    "/api/registration_funnel"
+
+
+postRegistration : Data.Survey.IpsativeSurvey -> String -> Authentication.Model -> Cmd Msg
+postRegistration surveyModel emailAddress authModel =
+    let
+        responses =
+            Data.Survey.ipsativeResponseEncoder surveyModel
+                |> Http.jsonBody
+
+        registration =
+            Registration emailAddress responses
+
+        body =
+            Registration.encode registration surveyModel
+                |> Http.jsonBody
+
+        headers =
+            Authentication.tryGetAuthHeader authModel ++ Authentication.getReturnHeaders
+    in
+    Http.send NewUserRegistered <|
+        Http.request
+            { method = "POST"
+            , url = registrationUrl
+            , headers = headers
+            , body = body
+            , timeout = Nothing
+            , expect = Http.expectString
+            , withCredentials = False
+            }
+
+
 update : Msg -> Model -> Authentication.Model -> ( Model, Cmd Msg )
 update msg model authModel =
     case msg of
@@ -257,7 +291,7 @@ update msg model authModel =
             case model.currentSurvey of
                 Ipsative survey ->
                     ( model
-                    , Http.send NewUserRegistered (Request.Registration.post survey model.emailAddress authModel)
+                    , postRegistration survey model.emailAddress authModel
                     )
 
                 Likert survey ->

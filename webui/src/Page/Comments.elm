@@ -6,10 +6,10 @@ import Html exposing (Html, button, div, input, label, li, text, ul)
 import Html.Attributes exposing (attribute, class, id)
 import Html.Events exposing (onClick, onInput)
 import Http
+import Json.Decode as Decode
 import Page.Errors exposing (ErrorData, errorInit, setErrorMessage, viewError)
 import Ports
 import Process
-import Request.Comments
 import Task
 import Utils exposing (getHTTPErrorMessage)
 
@@ -43,10 +43,51 @@ init authModel =
 initialCommands : Authentication.Model -> List (Cmd Msg)
 initialCommands authModel =
     if Authentication.isLoggedIn authModel then
-        [ Http.send GotComments (Request.Comments.get authModel) ]
+        [ getComments authModel ]
 
     else
         []
+
+
+commentsUrl : String
+commentsUrl =
+    "/api/comments"
+
+
+getComments : Authentication.Model -> Cmd Msg
+getComments authModel =
+    Http.send GotComments <|
+        Http.request
+            { method = "GET"
+            , headers = Authentication.tryGetAuthHeader authModel
+            , url = commentsUrl
+            , body = Http.emptyBody
+            , expect = Http.expectJson (Decode.list Data.Comment.decode)
+            , timeout = Nothing
+            , withCredentials = True
+            }
+
+
+postComment : Authentication.Model -> Data.Comment.Comment -> Cmd Msg
+postComment authModel newComment =
+    let
+        body =
+            Data.Comment.encode newComment
+                |> Http.jsonBody
+
+        headers =
+            Authentication.tryGetAuthHeader authModel ++ Authentication.getReturnHeaders
+    in
+    Http.send NewComment <|
+        Http.request
+            { method = "POST"
+            , headers = headers
+            , url = commentsUrl
+            , body = body
+            , expect = Http.expectJson (Decode.list Data.Comment.decode)
+            , timeout = Nothing
+            , withCredentials = True
+            }
 
 
 update : Msg -> Model -> Authentication.Model -> ( Model, Cmd Msg )
@@ -54,12 +95,12 @@ update msg model authModel =
     case msg of
         GetComments ->
             ( model
-            , Http.send GotComments (Request.Comments.get authModel)
+            , getComments authModel
             )
 
         AddComment aM comment ->
             ( model
-            , Http.send NewComment (Request.Comments.post aM comment)
+            , postComment aM comment
             )
 
         HideError ->
