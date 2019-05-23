@@ -28,7 +28,7 @@
             "gicentre/elm-vegalite": "1.0.5",
             "kuzzmi/elm-gravatar": "2.0.2",
             "rtfeldman/elm-css": "16.0.1",
-            "wernerdegroot/listzipper": "3.1.1"
+            "wernerdegroot/listzipper": "4.0.0"
         },
         "indirect": {
             "Skinney/murmur3": "2.0.8",
