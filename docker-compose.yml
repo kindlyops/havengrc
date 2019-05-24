@@ -228,6 +228,7 @@ services:
       - ./postgrest/keycloak-dev-public-key.json:/keycloak-dev-public-key.json
     environment:
       - HAVEN_JWK_PATH=/keycloak-dev-public-key.json
+      - HAVEN_JWT_ISS="http://dev.havengrc.com/auth/realms/havendev"
       - KC_ADMIN=admin
       - KC_PW=admin
       - KC_HOST=http://keycloak
