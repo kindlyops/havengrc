@@ -6,17 +6,20 @@ import Http
 getHTTPErrorMessage : Http.Error -> String
 getHTTPErrorMessage error =
     case error of
+        Http.BadUrl url ->
+            "Couldn't understand that URL!"
+
+        Http.Timeout ->
+            "The request timed out"
+
         Http.NetworkError ->
             "Is the server running?"
 
-        Http.BadStatus response ->
-            response.status.message
+        Http.BadStatus code ->
+            "Bad status reponse " ++ String.fromInt code
 
-        Http.BadPayload message _ ->
+        Http.BadBody message ->
             "Decoding Failed: " ++ message
-
-        _ ->
-            "Unhandled HTTP error type"
 
 
 smashList list =

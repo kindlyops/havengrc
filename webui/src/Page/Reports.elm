@@ -46,16 +46,15 @@ reportsUrl =
 
 getReports : Authentication.Model -> Cmd Msg
 getReports authModel =
-    Http.send GotReports <|
-        Http.request
-            { method = "GET"
-            , headers = Authentication.tryGetAuthHeader authModel
-            , url = reportsUrl
-            , body = Http.emptyBody
-            , expect = Http.expectJson (Decode.list Data.Report.decode)
-            , timeout = Nothing
-            , withCredentials = True
-            }
+    Http.request
+        { method = "GET"
+        , headers = Authentication.tryGetAuthHeader authModel
+        , url = reportsUrl
+        , body = Http.emptyBody
+        , expect = Http.expectJson GotReports (Decode.list Data.Report.decode)
+        , timeout = Nothing
+        , tracker = Nothing
+        }
 
 
 downloadReport : Authentication.Model -> Data.Report.Report -> Cmd Msg
@@ -65,16 +64,15 @@ downloadReport authModel report =
             Authentication.tryGetAuthHeader authModel
                 ++ [ Http.header "Accept" "application/octet-stream" ]
     in
-    Http.send GotDownload <|
-        Http.request
-            { body = Http.emptyBody
-            , expect = Http.expectJson (Decode.list Data.Report.decode)
-            , headers = headers
-            , method = "GET"
-            , timeout = Nothing
-            , url = "/api/files?select=file&uuid=eq." ++ report.uuid
-            , withCredentials = True
-            }
+    Http.request
+        { body = Http.emptyBody
+        , expect = Http.expectJson GotDownload (Decode.list Data.Report.decode)
+        , headers = headers
+        , method = "GET"
+        , url = "/api/files?select=file&uuid=eq." ++ report.uuid
+        , timeout = Nothing
+        , tracker = Nothing
+        }
 
 
 downloadReportBytes : Data.Report.Report -> Cmd msg

@@ -56,16 +56,15 @@ commentsUrl =
 
 getComments : Authentication.Model -> Cmd Msg
 getComments authModel =
-    Http.send GotComments <|
-        Http.request
-            { method = "GET"
-            , headers = Authentication.tryGetAuthHeader authModel
-            , url = commentsUrl
-            , body = Http.emptyBody
-            , expect = Http.expectJson (Decode.list Data.Comment.decode)
-            , timeout = Nothing
-            , withCredentials = True
-            }
+    Http.request
+        { method = "GET"
+        , headers = Authentication.tryGetAuthHeader authModel
+        , url = commentsUrl
+        , body = Http.emptyBody
+        , expect = Http.expectJson GotComments (Decode.list Data.Comment.decode)
+        , timeout = Nothing
+        , tracker = Nothing
+        }
 
 
 postComment : Authentication.Model -> Data.Comment.Comment -> Cmd Msg
@@ -78,16 +77,15 @@ postComment authModel newComment =
         headers =
             Authentication.tryGetAuthHeader authModel ++ Authentication.getReturnHeaders
     in
-    Http.send NewComment <|
-        Http.request
-            { method = "POST"
-            , headers = headers
-            , url = commentsUrl
-            , body = body
-            , expect = Http.expectJson (Decode.list Data.Comment.decode)
-            , timeout = Nothing
-            , withCredentials = True
-            }
+    Http.request
+        { method = "POST"
+        , headers = headers
+        , url = commentsUrl
+        , body = body
+        , expect = Http.expectJson NewComment (Decode.list Data.Comment.decode)
+        , timeout = Nothing
+        , tracker = Nothing
+        }
 
 
 update : Msg -> Model -> Authentication.Model -> ( Model, Cmd Msg )
