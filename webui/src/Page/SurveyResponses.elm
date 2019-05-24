@@ -8,16 +8,16 @@ module Page.SurveyResponses exposing
 
 import Authentication
 import Data.RadarChart
-import Data.SurveyResponses exposing (AvailableResponse, AvailableResponseDatum, GroupedIpsativeResponse)
+import Data.SurveyResponses exposing (AvailableResponse, AvailableResponseDatum, GroupedIpsativeResponse, groupedIpsativeResponseDecoder)
 import Html exposing (Html, button, canvas, div, h1, h2, h5, hr, p, text)
 import Html.Attributes exposing (class, id)
 import Html.Events exposing (onClick)
 import Http
+import Json.Decode as Decode
 import List.Extra exposing (groupWhile)
 import Page.Errors exposing (ErrorData, errorInit, setErrorMessage, viewError)
 import Ports
 import Process
-import Request.SurveyResponses
 import Task
 import Utils exposing (getHTTPErrorMessage, smashList)
 
@@ -53,10 +53,24 @@ initialModel =
     }
 
 
+getIpsativeResponses : Authentication.Model -> Cmd Msg
+getIpsativeResponses authModel =
+    Http.send GotServerIpsativeResponses <|
+        Http.request
+            { method = "GET"
+            , headers = Authentication.tryGetAuthHeader authModel
+            , url = "/api/ipsative_responses_grouped"
+            , body = Http.emptyBody
+            , expect = Http.expectJson (Decode.list groupedIpsativeResponseDecoder)
+            , timeout = Nothing
+            , withCredentials = True
+            }
+
+
 initialCommands : Authentication.Model -> List (Cmd Msg)
 initialCommands authModel =
     if Authentication.isLoggedIn authModel then
-        [ Http.send GotServerIpsativeResponses (Request.SurveyResponses.getIpsativeResponses authModel) ]
+        [ getIpsativeResponses authModel ]
 
     else
         []
@@ -76,7 +90,7 @@ update msg model authModel =
     case msg of
         GetResponses ->
             ( model
-            , Http.send GotServerIpsativeResponses (Request.SurveyResponses.getIpsativeResponses authModel)
+            , getIpsativeResponses authModel
             )
 
         StartVisualization availableResponse ->

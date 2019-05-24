@@ -12,7 +12,7 @@ module Page.Survey exposing
 
 import Authentication
 import Data.Registration as Registration exposing (Registration)
-import Data.Survey
+import Data.Survey as Survey
     exposing
         ( InitialSurvey
         , IpsativeAnswer
@@ -44,7 +44,6 @@ import List.Zipper as Zipper
 import Page.Errors exposing (ErrorData, errorInit, setErrorMessage, viewError)
 import Ports
 import Process
-import Request.Survey
 import Task
 import Utils exposing (getHTTPErrorMessage)
 import Views.SurveyCard
@@ -113,6 +112,120 @@ decodeCurrentPage =
             )
 
 
+getIpsativeSurveys : Authentication.Model -> Cmd Msg
+getIpsativeSurveys authModel =
+    Http.send GotServerIpsativeSurveys <|
+        Http.request
+            { method = "GET"
+            , headers = Authentication.tryGetAuthHeader authModel
+            , url = "/api/ipsative_surveys"
+            , body = Http.emptyBody
+            , expect = Http.expectJson (Decode.list Survey.decodeSurveyMetaData)
+            , timeout = Nothing
+            , withCredentials = False
+            }
+
+
+getIpsativeSurvey : Authentication.Model -> String -> Cmd Msg
+getIpsativeSurvey authModel id =
+    Http.send GotIpsativeServerData <|
+        Http.request
+            { method = "GET"
+            , headers = Authentication.tryGetAuthHeader authModel
+            , url = "/api/ipsative_data?survey_id=eq." ++ id
+            , body = Http.emptyBody
+            , expect = Http.expectJson (Decode.list Survey.ipsativeSurveyDataDecoder)
+            , timeout = Nothing
+            , withCredentials = True
+            }
+
+
+postIpsativeResponse : Authentication.Model -> Survey.IpsativeSurvey -> Cmd Msg
+postIpsativeResponse authModel ipsativeSurvey =
+    let
+        body =
+            Survey.ipsativeResponseEncoder ipsativeSurvey
+                |> Http.jsonBody
+
+        headers =
+            Authentication.tryGetAuthHeader authModel ++ Authentication.getReturnHeaders
+    in
+    Http.send IpsativeSurveySaved <|
+        Http.request
+            { method = "POST"
+            , headers = headers
+            , url = "/api/ipsative_responses"
+            , body = body
+            , expect = Http.expectJson (Decode.list Survey.ipsativeResponseDecoder)
+            , timeout = Nothing
+            , withCredentials = True
+            }
+
+
+getLikertSurveys : Authentication.Model -> Cmd Msg
+getLikertSurveys authModel =
+    Http.send GotServerLikertSurveys <|
+        Http.request
+            { method = "GET"
+            , headers = Authentication.tryGetAuthHeader authModel
+            , url = "/api/likert_surveys"
+            , body = Http.emptyBody
+            , expect = Http.expectJson (Decode.list Survey.decodeSurveyMetaData)
+            , timeout = Nothing
+            , withCredentials = True
+            }
+
+
+getLikertSurvey : Authentication.Model -> String -> Cmd Msg
+getLikertSurvey authModel id =
+    Http.send GotLikertServerData <|
+        Http.request
+            { method = "GET"
+            , headers = Authentication.tryGetAuthHeader authModel
+            , url = "/api/likert_data?survey_id=eq." ++ id
+            , body = Http.emptyBody
+            , expect = Http.expectJson (Decode.list Survey.likertSurveyDataDecoder)
+            , timeout = Nothing
+            , withCredentials = True
+            }
+
+
+getLikertChoices : Authentication.Model -> String -> Cmd Msg
+getLikertChoices authModel id =
+    Http.send GotLikertChoices <|
+        Http.request
+            { method = "GET"
+            , headers = Authentication.tryGetAuthHeader authModel
+            , url = "/api/likert_distinct_choice_groups?survey_id=eq." ++ id
+            , body = Http.emptyBody
+            , expect = Http.expectJson (Decode.list Survey.likertSurveyChoicesDecoder)
+            , timeout = Nothing
+            , withCredentials = True
+            }
+
+
+postLikertResponses : Authentication.Model -> Survey.LikertSurvey -> Cmd Msg
+postLikertResponses authModel likertSurvey =
+    let
+        body =
+            Survey.likertResponseEncoder likertSurvey
+                |> Http.jsonBody
+
+        headers =
+            Authentication.tryGetAuthHeader authModel ++ Authentication.getReturnHeaders
+    in
+    Http.send LikertSurveySaved <|
+        Http.request
+            { method = "POST"
+            , headers = headers
+            , url = "api/likert_responses"
+            , body = body
+            , expect = Http.expectJson (Decode.list Survey.likertResponseDecoder)
+            , timeout = Nothing
+            , withCredentials = True
+            }
+
+
 init : Authentication.Model -> ( Model, Cmd Msg )
 init authModel =
     ( initialModel
@@ -154,11 +267,11 @@ initWithSave authModel testStructure =
 
 initialModel : Model
 initialModel =
-    { currentSurvey = Ipsative Data.Survey.emptyIpsativeServerSurvey
+    { currentSurvey = Ipsative Survey.emptyIpsativeServerSurvey
     , currentPage = Home
     , availableIpsativeSurveys = []
     , availableLikertSurveys = []
-    , selectedSurveyMetaData = Data.Survey.emptyIpsativeServerMetaData
+    , selectedSurveyMetaData = Survey.emptyIpsativeServerMetaData
     , isSurveyReady = False
     , inBoundLikertData = Nothing
     , emailAddress = ""
@@ -210,8 +323,8 @@ initialCommands authModel =
 
 surveyRequests : Authentication.Model -> List (Cmd Msg)
 surveyRequests authModel =
-    [ Http.send GotServerIpsativeSurveys (Request.Survey.getIpsativeSurveys authModel)
-    , Http.send GotServerLikertSurveys (Request.Survey.getLikertSurveys authModel)
+    [ getIpsativeSurveys authModel
+    , getLikertSurveys authModel
     ]
 
 
@@ -228,17 +341,17 @@ type Msg
     | GotoQuestion Int
     | GetIpsativeSurveys
     | GetLikertSurveys
-    | GotServerIpsativeSurveys (Result Http.Error (List Data.Survey.SurveyMetaData))
-    | GotIpsativeServerData (Result Http.Error (List Data.Survey.IpsativeServerData))
-    | GotServerLikertSurveys (Result Http.Error (List Data.Survey.SurveyMetaData))
-    | GotLikertServerData (Result Http.Error (List Data.Survey.LikertServerData))
-    | GotLikertChoices (Result Http.Error (List Data.Survey.LikertServerChoice))
+    | GotServerIpsativeSurveys (Result Http.Error (List Survey.SurveyMetaData))
+    | GotIpsativeServerData (Result Http.Error (List Survey.IpsativeServerData))
+    | GotServerLikertSurveys (Result Http.Error (List Survey.SurveyMetaData))
+    | GotLikertServerData (Result Http.Error (List Survey.LikertServerData))
+    | GotLikertChoices (Result Http.Error (List Survey.LikertServerChoice))
     | UpdateEmail String
     | RegisterNewUser
     | NewUserRegistered (Result Http.Error String)
     | SaveCurrentSurvey
-    | IpsativeSurveySaved (Result Http.Error (List Data.Survey.IpsativeResponse))
-    | LikertSurveySaved (Result Http.Error (List Data.Survey.LikertResponse))
+    | IpsativeSurveySaved (Result Http.Error (List Survey.IpsativeResponse))
+    | LikertSurveySaved (Result Http.Error (List Survey.LikertResponse))
     | HideError
 
 
@@ -247,11 +360,11 @@ registrationUrl =
     "/api/registration_funnel"
 
 
-postRegistration : Data.Survey.IpsativeSurvey -> String -> Authentication.Model -> Cmd Msg
+postRegistration : Survey.IpsativeSurvey -> String -> Authentication.Model -> Cmd Msg
 postRegistration surveyModel emailAddress authModel =
     let
         responses =
-            Data.Survey.ipsativeResponseEncoder surveyModel
+            Survey.ipsativeResponseEncoder surveyModel
                 |> Http.jsonBody
 
         registration =
@@ -303,12 +416,12 @@ update msg model authModel =
             case model.currentSurvey of
                 Ipsative survey ->
                     ( model
-                    , Http.send IpsativeSurveySaved (Request.Survey.postIpsativeResponse authModel survey)
+                    , postIpsativeResponse authModel survey
                     )
 
                 Likert survey ->
                     ( model
-                    , Http.send LikertSurveySaved (Request.Survey.postLikertResponses authModel survey)
+                    , postLikertResponses authModel survey
                     )
 
         NewUserRegistered (Err error) ->
@@ -352,12 +465,12 @@ update msg model authModel =
 
         GetIpsativeSurveys ->
             ( model
-            , Http.send GotServerIpsativeSurveys (Request.Survey.getIpsativeSurveys authModel)
+            , getIpsativeSurveys authModel
             )
 
         GetLikertSurveys ->
             ( model
-            , Http.send GotServerLikertSurveys (Request.Survey.getLikertSurveys authModel)
+            , getLikertSurveys authModel
             )
 
         GotServerIpsativeSurveys (Err error) ->
@@ -394,10 +507,10 @@ update msg model authModel =
         GotIpsativeServerData (Ok data) ->
             let
                 questions =
-                    Data.Survey.groupIpsativeSurveyData data
+                    Survey.groupIpsativeSurveyData data
 
                 survey =
-                    Data.Survey.createIpsativeSurvey 10 totalGroups model.selectedSurveyMetaData questions
+                    Survey.createIpsativeSurvey 10 totalGroups model.selectedSurveyMetaData questions
             in
             ( { model | currentSurvey = survey, isSurveyReady = True }
             , Cmd.none
@@ -412,7 +525,7 @@ update msg model authModel =
 
         GotLikertServerData (Ok data) ->
             ( { model | inBoundLikertData = Just data }
-            , Http.send GotLikertChoices (Request.Survey.getLikertChoices authModel model.selectedSurveyMetaData.uuid)
+            , getLikertChoices authModel model.selectedSurveyMetaData.uuid
             )
 
         GotLikertChoices (Err error) ->
@@ -427,13 +540,13 @@ update msg model authModel =
                 questions =
                     case model.inBoundLikertData of
                         Just x ->
-                            Data.Survey.groupLikertSurveyData x
+                            Survey.groupLikertSurveyData x
 
                         Nothing ->
                             []
 
                 survey =
-                    Data.Survey.createLikertSurvey model.selectedSurveyMetaData questions serverChoices
+                    Survey.createLikertSurvey model.selectedSurveyMetaData questions serverChoices
 
                 isSurveyReady =
                     True
@@ -470,12 +583,12 @@ update msg model authModel =
 
         StartLikertSurvey metaData ->
             ( { model | currentPage = Survey, selectedSurveyMetaData = metaData }
-            , Http.send GotLikertServerData (Request.Survey.getLikertSurvey authModel metaData.uuid)
+            , getLikertSurvey authModel metaData.uuid
             )
 
         StartIpsativeSurvey metaData ->
             ( { model | currentPage = Survey, selectedSurveyMetaData = metaData }
-            , Http.send GotIpsativeServerData (Request.Survey.getIpsativeSurvey authModel metaData.uuid)
+            , getIpsativeSurvey authModel metaData.uuid
             )
 
         NextQuestion ->

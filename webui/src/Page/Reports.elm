@@ -3,14 +3,15 @@ module Page.Reports exposing (Model, Msg, init, update, view)
 import Authentication
 import Bytes
 import Data.Report exposing (Report)
+import File.Download as Download
 import Html exposing (Html, a, button, div, input, label, li, text, ul)
 import Html.Attributes exposing (attribute, class, href, id)
 import Html.Events exposing (onClick, onInput)
 import Http
+import Json.Decode as Decode
 import Page.Errors exposing (ErrorData, errorInit, setErrorMessage, viewError)
 import Ports
 import Process
-import Request.Reports
 import Task
 import Utils exposing (getHTTPErrorMessage)
 
@@ -38,10 +39,53 @@ init authModel =
     )
 
 
+reportsUrl : String
+reportsUrl =
+    "/api/files"
+
+
+getReports : Authentication.Model -> Cmd Msg
+getReports authModel =
+    Http.send GotReports <|
+        Http.request
+            { method = "GET"
+            , headers = Authentication.tryGetAuthHeader authModel
+            , url = reportsUrl
+            , body = Http.emptyBody
+            , expect = Http.expectJson (Decode.list Data.Report.decode)
+            , timeout = Nothing
+            , withCredentials = True
+            }
+
+
+downloadReport : Authentication.Model -> Data.Report.Report -> Cmd Msg
+downloadReport authModel report =
+    let
+        headers =
+            Authentication.tryGetAuthHeader authModel
+                ++ [ Http.header "Accept" "application/octet-stream" ]
+    in
+    Http.send GotDownload <|
+        Http.request
+            { body = Http.emptyBody
+            , expect = Http.expectJson (Decode.list Data.Report.decode)
+            , headers = headers
+            , method = "GET"
+            , timeout = Nothing
+            , url = "/api/files?select=file&uuid=eq." ++ report.uuid
+            , withCredentials = True
+            }
+
+
+downloadReportBytes : Data.Report.Report -> Cmd msg
+downloadReportBytes report =
+    Download.url ("/api/files?select=file&uuid=eq." ++ report.uuid)
+
+
 initialCommands : Authentication.Model -> List (Cmd Msg)
 initialCommands authModel =
     if Authentication.isLoggedIn authModel then
-        [ Http.send GotReports (Request.Reports.get authModel) ]
+        [ getReports authModel ]
 
     else
         []
@@ -52,12 +96,12 @@ update msg model authModel =
     case msg of
         GetReports ->
             ( model
-            , Http.send GotReports (Request.Reports.get authModel)
+            , getReports authModel
             )
 
         DownloadReport report ->
             ( model
-            , Http.send GotDownload (Request.Reports.download authModel report)
+            , downloadReport authModel report
             )
 
         HideError ->
