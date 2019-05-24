@@ -25,7 +25,7 @@ func init() {
 	}
 	pop.Debug = env == "development"
 	box := packr.New("./sql", "./sql")
-	sql, err := box.MustBytes("queries.sql")
+	sql, err := box.Find("queries.sql")
 	if err != nil {
 		log.Fatal(err)
 	}
