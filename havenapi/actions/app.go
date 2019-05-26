@@ -29,6 +29,10 @@ var ENV = envy.Get("GO_ENV", "development")
 
 // KEY gets the haven jwk path
 var KEY = envy.Get("HAVEN_JWK_PATH", "")
+
+// ISS needs to match your deployment.
+// The JWT issuer field is filled out by keycloak based on the
+// hostname that the authentication request comes in on.
 var ISS = envy.Get("HAVEN_JWT_ISS", "")
 
 var key jose.JSONWebKey
