@@ -145,7 +145,7 @@ func JwtMiddleware(next buffalo.Handler) buffalo.Handler {
 		// check if token is expired and from a valid issuer
 		err = validClaims.Validate(jwt.Expected{Issuer: ISS})
 		if err != nil {
-			return c.Error(401, fmt.Errorf("invalid token: %s", err.Error()))
+			return c.Error(401, fmt.Errorf("invalid token: %s, %s, expected %s", err.Error(), allClaims["iss"], ISS))
 		}
 
 		sub := allClaims["sub"]
