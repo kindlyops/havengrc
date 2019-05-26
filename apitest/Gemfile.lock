@@ -41,6 +41,7 @@ GEM
     mime-types (3.2.2)
       mime-types-data (~> 3.2015)
     mime-types-data (3.2018.0812)
+    minitest (5.11.3)
     multi_json (1.13.1)
     multi_test (0.1.2)
     netrc (0.11.0)
@@ -60,6 +61,7 @@ PLATFORMS
 DEPENDENCIES
   cucumber
   cucumber-api
+  minitest
 
 BUNDLED WITH
    1.17.3
