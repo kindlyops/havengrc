@@ -35,7 +35,7 @@ proxy /api api:8180 {
   transparent
 }
 
-proxy /api/files havenapi:3000 {
+proxy /api/reports havenapi:3000 {
   transparent
 }
 

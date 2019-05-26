@@ -32,6 +32,7 @@ type alias Model =
     { authModel : Authentication.Model
     , dashboardModel : Dashboard.Model
     , commentsModel : Comments.Model
+    , reportsModel : Reports.Model
     , surveyModel : SurveyData.Model
     , surveyResponseModel : SurveyResponses.Model
     , key : Nav.Key
@@ -71,6 +72,9 @@ init sessionStorage location key =
         ( commentsModel, commentsCmd ) =
             Comments.init initialAuthModel
 
+        ( reportsModel, reportsCmd ) =
+            Reports.init initialAuthModel
+
         ( surveyModel, surveyCmd ) =
             case Result.toMaybe (Decode.decodeValue Survey.testDecoder sessionStorage) of
                 Just savedState ->
@@ -86,6 +90,7 @@ init sessionStorage location key =
             { authModel = initialAuthModel
             , dashboardModel = Dashboard.init
             , commentsModel = commentsModel
+            , reportsModel = reportsModel
             , surveyModel = surveyModel
             , surveyResponseModel = surveyResponseModel
             , key = key
@@ -95,6 +100,7 @@ init sessionStorage location key =
     ( model
     , Cmd.batch
         [ Cmd.map CommentsMsg commentsCmd
+        , Cmd.map ReportsMsg reportsCmd
         , Cmd.map SurveyMsg surveyCmd
         , Cmd.map SurveyResponseMsg surveyResponsesCmd
         , Ports.renderVega myVis
@@ -125,6 +131,7 @@ type Msg
     | AuthenticationMsg Authentication.Msg
     | DashboardMsg Dashboard.Msg
     | CommentsMsg Comments.Msg
+    | ReportsMsg Reports.Msg
     | SurveyMsg Survey.Msg
     | SurveyResponseMsg SurveyResponses.Msg
 
@@ -164,6 +171,9 @@ update msg model =
                 ( commentsModel, commentsCmd ) =
                     Comments.init authModel
 
+                ( reportsModel, reportsCmd ) =
+                    Reports.init authModel
+
                 ( surveyResponseModel, surveyResponsesCmd ) =
                     SurveyResponses.init authModel
 
@@ -177,6 +187,7 @@ update msg model =
             , Cmd.batch
                 [ Cmd.map AuthenticationMsg cmd
                 , Cmd.map CommentsMsg commentsCmd
+                , Cmd.map ReportsMsg reportsCmd
                 , Cmd.map SurveyMsg surveyCmd
                 , Cmd.map SurveyResponseMsg surveyResponsesCmd
                 ]
@@ -198,6 +209,13 @@ update msg model =
                     Comments.update commentMsg model.commentsModel model.authModel
             in
             ( { model | commentsModel = commentsModel }, Cmd.map CommentsMsg cmd )
+
+        ReportsMsg reportMsg ->
+            let
+                ( reportsModel, cmd ) =
+                    Reports.update reportMsg model.reportsModel model.authModel
+            in
+            ( { model | reportsModel = reportsModel }, Cmd.map ReportsMsg cmd )
 
         SurveyMsg surveyMsg ->
             case surveyMsg of
@@ -345,7 +363,7 @@ viewBody model =
                 Dashboard.view model.dashboardModel |> Html.map DashboardMsg
 
             Route.Reports ->
-                Reports.view
+                Reports.view model.authModel model.reportsModel |> Html.map ReportsMsg
 
             Route.Privacy ->
                 Privacy.view

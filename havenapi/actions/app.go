@@ -29,6 +29,7 @@ var ENV = envy.Get("GO_ENV", "development")
 
 // KEY gets the haven jwk path
 var KEY = envy.Get("HAVEN_JWK_PATH", "")
+var ISS = envy.Get("HAVEN_JWT_ISS", "")
 
 var key jose.JSONWebKey
 var app *buffalo.App
@@ -74,7 +75,7 @@ func App() *buffalo.App {
 		api.Use(popmw.Transaction(models.DB))
 		api.Use(JwtMiddleware)
 		api.Middleware.Skip(JwtMiddleware, RegistrationHandler)
-		api.POST("files", UploadHandler)
+		api.POST("reports", UploadHandler)
 		api.POST("registration_funnel", RegistrationHandler)
 
 	}
@@ -142,11 +143,9 @@ func JwtMiddleware(next buffalo.Handler) buffalo.Handler {
 		}
 
 		// check if token is expired and from a valid issuer
-		// TODO: the issuer needs to be configurable to handle on-prem deployments
-		iss := "http://localhost:2015/auth/realms/havendev"
-		err = validClaims.Validate(jwt.Expected{Issuer: iss})
+		err = validClaims.Validate(jwt.Expected{Issuer: ISS})
 		if err != nil {
-			return c.Error(401, fmt.Errorf("invalid token: %s", err.Error()))
+			return c.Error(401, fmt.Errorf("invalid token: %s, %s, expected %s", err.Error(), allClaims["iss"], ISS))
 		}
 
 		sub := allClaims["sub"]

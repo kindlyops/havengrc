@@ -3,5 +3,5 @@
 USERNAME=${HAVEN_USERNAME:-user1@havengrc.com}
 PASSWORD=${HAVEN_PASSWORD:-password}
 #SERVER=${1:-https://staging.havengrc.com}
-SERVER=${1:-http://localhost:2015}
+SERVER=${1:-http://dev.havengrc.com}
 curl -s --data "grant_type=password&client_id=havendev&scope=openid&username=$USERNAME&password=$PASSWORD" $SERVER/auth/realms/havendev/protocol/openid-connect/token | jq -r '.access_token'

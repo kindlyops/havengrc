@@ -127,12 +127,14 @@ services:
     working_dir: /usr/src/app
     environment:
       - API_SERVER=api:8180
-      - AUTH_SERVER=keycloak:8080
+      - AUTH_SERVER=dev.havengrc.com
+      - BUFFALO_SERVER=dev.havengrc.com
     volumes:
       - ./apitest:/usr/src/app
     links:
       - api
       - keycloak
+      - proxy:dev.havengrc.com
     depends_on:
       - start_dependencies
     command: [cucumber]
@@ -228,6 +230,7 @@ services:
       - ./postgrest/keycloak-dev-public-key.json:/keycloak-dev-public-key.json
     environment:
       - HAVEN_JWK_PATH=/keycloak-dev-public-key.json
+      - HAVEN_JWT_ISS=http://dev.havengrc.com/auth/realms/havendev
       - KC_ADMIN=admin
       - KC_PW=admin
       - KC_HOST=http://keycloak
