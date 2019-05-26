@@ -40,7 +40,7 @@ Then(/^all "([^"]*)" fields should be of type (numeric|string|boolean|numeric_st
     when 'string'
       assert f.is_a? String
     when 'boolean'
-      assert !!f == f
+      assert !!f == f # rubocop:disable Style/DoubleNegation
     when 'numeric_string'
       assertf.is_a?(Numeric) or f.is_a?(String)
     when 'object'
