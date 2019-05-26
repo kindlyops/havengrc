@@ -128,7 +128,7 @@ services:
     environment:
       - API_SERVER=api:8180
       - AUTH_SERVER=dev.havengrc.com
-      - WEB_SERVER=webui:2016
+      - BUFFALO_SERVER=dev.havengrc.com
     volumes:
       - ./apitest:/usr/src/app
     links:

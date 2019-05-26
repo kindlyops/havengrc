@@ -21,7 +21,7 @@ Feature: Basic sqitch API interaction with file storage
         When I set form request body to:
         | name | minimal.pdf                 |
         | file | file://features/minimal.pdf |
-        And I send a POST request to "http://{web_server}/api/reports"
+        And I send a POST request to "http://{buffalo_server}/api/reports"
         Then the response status should be "200"
         And the JSON response root should be object
         And the JSON response should have "$.message" of type string and value "success"

@@ -4,7 +4,7 @@ require 'cucumber-api'
 
 Before do
   @api_server = ENV['API_SERVER'] || 'localhost:8180'
-  @web_server = ENV['WEB_SERVER'] || 'localhost:2015'
+  @buffalo_server = ENV['BUFFALO_SERVER'] || 'localhost:3000'
 end
 
 
