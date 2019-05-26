@@ -6,7 +6,7 @@ require 'minitest'
 
 Given(/^I sign in to keycloak with "([^"]*)" and "([^"]*)"$/) do |username, password|
   realm = 'havendev'
-  auth_server = ENV['AUTH_SERVER'] || 'localhost:8080'
+  auth_server = ENV['AUTH_SERVER'] || 'dev.havengrc.com'
   request_url = "http://#{auth_server}/auth/realms/#{realm}/protocol/openid-connect/token"
   body = {
     'grant_type' => 'password',
@@ -29,8 +29,8 @@ Then(/^all "([^"]*)" fields should be of type (numeric|string|boolean|numeric_st
   raise 'No response found.' if @response.nil?
   json = JSON.parse @response.body
   fields = JsonPath.new("$..#{field}").on(json)
-  puts "we got #{fields.length} fields back"
-  puts fields
+  # puts "we got #{fields.length} fields back"
+  # puts fields
   fields.each do |f|
     case type
     when 'numeric'

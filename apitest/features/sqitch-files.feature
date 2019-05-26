@@ -6,9 +6,7 @@ Feature: Basic sqitch API interaction with file storage
         And I add Headers:
             | Prefer | return=representation             |
 
-
-    # TODO: we don't want base64 encoded files. Switch this to use the new HavenAPI, and remove post support from /files
-    Scenario: Add a base64 encoded PDF file
+    Scenario: Ensure base64 file support is removed from files api
         When I set JSON request body to:
         """
         {
@@ -17,8 +15,14 @@ Feature: Basic sqitch API interaction with file storage
         }
         """
         And I send a POST request to "http://{api_server}/files"
-        Then the response status should be "201"
-        And the JSON response root should be array
-        And the JSON response should have "$[0].user_id" of type string and value "90920d91-3090-4b4a-ae2a-2377cfa06ecd"
-        And the JSON response should have "$[0].name" of type string and value "minimal.pdf"
+        Then the response status should be "403"
+
+    Scenario: Test uploading to new reports API
+        When I set form request body to:
+        | name | minimal.pdf                 |
+        | file | file://features/minimal.pdf |
+        And I send a POST request to "http://{web_server}/api/reports"
+        Then the response status should be "200"
+        And the JSON response root should be object
+        And the JSON response should have "$.message" of type string and value "success"
 
