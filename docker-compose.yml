@@ -134,7 +134,7 @@ services:
     links:
       - api
       - keycloak
-      - proxy:dev.havengrc.com
+      - webui:dev.havengrc.com
     depends_on:
       - start_dependencies
     command: [cucumber]
@@ -196,13 +196,20 @@ services:
       - "PGADMIN_DEFAULT_PASSWORD=password"
     ports:
       - "8081:80"
-  proxy:
-    image: jwilder/nginx-proxy
+  gatekeeper:
+    build:
+      context: gatekeeper/
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./gatekeeper/gatekeeper.yaml:/opt/gatekeeper.yaml
+    command:
+      - --config
+      - /opt/gatekeeper.yaml
+      - --verbose
+    links:
+      - webui:dev.havengrc.com
   worker:
     environment:
       - FAKTORY_URL=tcp://:fassword@faktory:7419
@@ -215,7 +222,7 @@ services:
       context: .
     links:
       - faktory
-      - proxy:dev.havengrc.com
+      - gatekeeper:dev.havengrc.com
     volumes:
       - ./worker/compilereport:/home/havenuser/compilereport
       - ./worker/presentation.Rmd:/home/havenuser/presentation.Rmd
@@ -270,9 +277,8 @@ services:
       - havenapi
       - keycloak
       - unleash
-      - proxy
     ports:
-      - "2015:2016"
+      - "2015:80"
     command: [/code/installrun.sh]
     environment:
       - ELM_APP_KEYCLOAK_CLIENT_ID=havendev
