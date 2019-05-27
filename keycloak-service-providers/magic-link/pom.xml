@@ -19,7 +19,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <properties>
         <version.keycloak>6.0.1</version.keycloak>
-        <version.wildfly.maven.plugin>1.1.0.Final</version.wildfly.maven.plugin>
+        <version.wildfly.maven.plugin>2.0.1.Final</version.wildfly.maven.plugin>
     </properties>
     <name>Magic Link</name>
     <description/>
