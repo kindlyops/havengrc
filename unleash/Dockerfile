@@ -4,6 +4,5 @@ RUN npm install @exlinc/keycloak-passport
 RUN npm install basic-auth
 
 
-
 COPY *.js ./
 COPY frontend /

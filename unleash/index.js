@@ -40,7 +40,6 @@ function serveFrontend(app) {
 
 options.preHook = serveFrontend;
 
-
 if (process.env.DATABASE_URL_FILE) {
     options.databaseUrl = fs.readFileSync(process.env.DATABASE_URL_FILE);
 }
