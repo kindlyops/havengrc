@@ -2,16 +2,15 @@ module Authentication exposing
     ( LoggedInUser
     , Model
     , Msg(..)
-    , UserProfile
     , getReturnHeaders
     , init
     , isLoggedIn
-    , loggedInUserDecoder
     , tryGetUserProfile
     , update
     )
 
 import Browser.Navigation as Nav
+import Data.UserProfile exposing (UserProfile, decode)
 import Http
 import Json.Decode as Decode exposing (Decoder, bool, field, int, map2, map5, oneOf, string, succeed)
 import Json.Decode.Pipeline exposing (required)
@@ -27,51 +26,19 @@ type alias Options =
     {}
 
 
-type alias UserProfile =
-    { username : String
-    , emailVerified : Bool
-    , firstName : String
-    , lastName : String
-    , email : String
-    }
-
-
 type alias LoggedInUser =
     { profile : UserProfile
-    , token : Token
-    }
-
-
-type alias Token =
-    String
-
-
-type alias AuthenticationError =
-    { name : Maybe String
-    , code : Maybe String
-    , description : String
-    , statusCode : Maybe Int
-    }
-
-
-type alias AuthenticationResult =
-    Result AuthenticationError LoggedInUser
-
-
-type alias RawAuthenticationResult =
-    { err : Maybe AuthenticationError
-    , ok : Maybe LoggedInUser
     }
 
 
 type alias Model =
     { state : AuthenticationState
-    , lastError : Maybe AuthenticationError
+    , lastError : Maybe Http.Error
     }
 
 
 type Msg
-    = HandleProfileResult (Result Http.Error String)
+    = HandleProfileResult (Result Http.Error UserProfile)
     | LogOut
     | LoginMsg
 
@@ -96,35 +63,34 @@ profileUrl =
     "/auth/realms/havendev/protocol/openid-connect/userinfo"
 
 
+
+-- Http.expectJson GotComments (Decode.list Data.Comment.decode)
+
+
 getProfile : Cmd Msg
 getProfile =
     Http.get
         { url = profileUrl
-        , expect = Http.expectString HandleProfileResult
+        , expect = Http.expectJson HandleProfileResult Data.UserProfile.decode
         }
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        HandleProfileResult profile ->
-            -- TODO: load the user profile info from
+        HandleProfileResult result ->
+            -- we loaded the user profile info from
             -- /realms/{realm-name}/protocol/openid-connect/userinfo
-            -- the OIDC user profile service returns results that look like
-            -- {
-            --   "sub": "90920d91-3090-4b4a-ae2a-2377cfa06ecd",
-            --   "email_verified": true,
-            --   "name": "User1 One",
-            --   "preferred_username": "user1@havengrc.com",
-            --   "given_name": "User1",
-            --   "family_name": "One",
-            --   "email": "user1@havengrc.com"
-            -- }
             let
-                _ =
-                    "profile results"
+                ( newState, error ) =
+                    case result of
+                        Ok profile ->
+                            ( LoggedIn { profile = profile }, Nothing )
+
+                        Err err ->
+                            ( LoggedOut, Just err )
             in
-            ( model, Cmd.none )
+            ( { model | state = newState, lastError = error }, Cmd.none )
 
         LoginMsg ->
             -- Force full page reload of dashboard using Nav.load, which will trigger
@@ -158,20 +124,3 @@ isLoggedIn model =
 getReturnHeaders : List Http.Header
 getReturnHeaders =
     [ Http.header "Prefer" "return=representation" ]
-
-
-loggedInUserDecoder : Decoder LoggedInUser
-loggedInUserDecoder =
-    map2 LoggedInUser
-        (field "profile" userProfileDecoder)
-        (field "token" string)
-
-
-userProfileDecoder : Decoder UserProfile
-userProfileDecoder =
-    map5 UserProfile
-        (field "username" string)
-        (field "emailVerified" bool)
-        (field "firstName" string)
-        (field "lastName" string)
-        (field "email" string)

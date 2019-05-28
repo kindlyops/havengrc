@@ -4,6 +4,7 @@ import Authentication
 import Browser
 import Browser.Navigation as Nav
 import Data.Survey as SurveyData
+import Data.UserProfile as UserProfile
 import Gravatar
 import Html exposing (Html, a, button, div, i, img, li, nav, span, text, ul)
 import Html.Attributes exposing (attribute, class, classList, href, id, style)
@@ -44,14 +45,6 @@ type alias MenuItem =
     , iconName : String
     , path : String
     }
-
-
-decodeKeyCloak : Decode.Value -> Maybe Authentication.LoggedInUser
-decodeKeyCloak json =
-    json
-        |> Decode.decodeValue Decode.string
-        |> Result.toMaybe
-        |> Maybe.andThen (Decode.decodeString Authentication.loggedInUserDecoder >> Result.toMaybe)
 
 
 decodeSavedState : Decode.Value -> Maybe Survey.TestStructure
@@ -317,7 +310,7 @@ outsideView model =
             Home.view |> Html.map AuthenticationMsg
 
 
-insideView : Model -> Authentication.UserProfile -> Html Msg
+insideView : Model -> UserProfile.UserProfile -> Html Msg
 insideView model user =
     div []
         [ viewNavBar model
@@ -338,7 +331,7 @@ viewNavBar model =
         ]
 
 
-viewNavigationDrawer : Model -> Authentication.UserProfile -> Html Msg
+viewNavigationDrawer : Model -> UserProfile.UserProfile -> Html Msg
 viewNavigationDrawer model user =
     div [ attribute "aria-hidden" "true", class "navdrawer navdrawer-permanent-lg navdrawer-permanent-clipped", id "navdrawerDefault", attribute "tabindex" "-1" ]
         [ div [ class "navdrawer-content" ]
@@ -412,7 +405,7 @@ notFoundBody model =
     div [] [ text "This is the notFound view" ]
 
 
-viewNavUser : Model -> Authentication.UserProfile -> Html Msg
+viewNavUser : Model -> UserProfile.UserProfile -> Html Msg
 viewNavUser model user =
     ul [ class "navbar-nav" ]
         [ li [ class "nav-item dropdown" ]
