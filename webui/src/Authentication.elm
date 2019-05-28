@@ -93,7 +93,7 @@ initialCommands =
 
 profileUrl : String
 profileUrl =
-    "/realms/havendev/protocol/openid-connect/userinfo"
+    "/auth/realms/havendev/protocol/openid-connect/userinfo"
 
 
 getProfile : Cmd Msg
@@ -110,9 +110,19 @@ update msg model =
         HandleProfileResult profile ->
             -- TODO: load the user profile info from
             -- /realms/{realm-name}/protocol/openid-connect/userinfo
+            -- the OIDC user profile service returns results that look like
+            -- {
+            --   "sub": "90920d91-3090-4b4a-ae2a-2377cfa06ecd",
+            --   "email_verified": true,
+            --   "name": "User1 One",
+            --   "preferred_username": "user1@havengrc.com",
+            --   "given_name": "User1",
+            --   "family_name": "One",
+            --   "email": "user1@havengrc.com"
+            -- }
             let
                 _ =
-                    Debug.todo "profile results"
+                    "profile results"
             in
             ( model, Cmd.none )
 

@@ -99,6 +99,7 @@ init sessionStorage location key =
     ( model
     , Cmd.batch
         [ Cmd.map CommentsMsg commentsCmd
+        , Cmd.map AuthenticationMsg authCmd
         , Cmd.map ReportsMsg reportsCmd
         , Cmd.map SurveyMsg surveyCmd
         , Cmd.map SurveyResponseMsg surveyResponsesCmd
