@@ -1,0 +1,46 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: gatekeeper
+spec:
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+        alpha.image.policy.openshift.io/resolve-names: '*'
+      labels:
+        service: gatekeeper
+    spec:
+      containers:
+        - name: gatekeeper
+          image: havengrc-docker.jfrog.io/kindlyops/gatekeeper:latest
+          env:
+            - name: DISCOVERY_URL
+              value: " https://staging.havengrc.com/auth/realms/havendev"
+            - name: CLIENT_SECRET
+              value: ""
+            - name: UPSTREAM_URL
+              value: "https://staging.havengrc.com/"
+          volumeMounts:
+            - name: secret-volume
+              mountPath: /etc/haven-credentials/
+              readOnly: true
+          ports:
+            - containerPort: 80
+              protocol: TCP
+              targetPort: 80
+            - containerPort: 443
+              protocol: TCP
+              targetPort: 443
+      volumes:
+        - name: secret-volume
+          secret:
+            secretName: haven-database-credentials
+      restartPolicy: Always
+  strategy:
+    type: "Recreate"
+  paused: false
+  revisionHistoryLimit: 2
+  minReadySeconds: 0
+status: {}
