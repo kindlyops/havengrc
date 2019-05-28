@@ -33,9 +33,17 @@ resources:
   white-listed: true
 - uri: /static/js/*
   white-listed: true
-- uri: /sockjs-node
+- uri: /sockjs-node/*
   white-listed: true
+- uri: /logout
+  white-listed: true # this is the page after you have logged out
+- uri: /survey
+  white-listed: true # this is the registration funnel entry point
+- uri: /api/ipsative_surveys
+  white-listed: true # publicly readable due to registration funnel
+- uri: /api/likert_surveys
+  white-listed: true # publicly readable due to registration funnel
+- uri: /api/registration_funnel
+  white-listed: true # we allow registration funnel posts here
 - uri: /auth/*
   white-listed: true # this is the keycloak server, handles it's own auth
-- uri: /auth/realms/havendev/protocol/openid-connect/userinfo
-  require-any-role: true # we require a role so that gatekeeper forwards the JWT

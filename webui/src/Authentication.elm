@@ -54,17 +54,13 @@ init =
 
 initialCommands : List (Cmd Msg)
 initialCommands =
-    -- fire the HTTP request to load the user profile if logged int
+    -- fire the HTTP request to load the user profile if logged in
     [ getProfile ]
 
 
 profileUrl : String
 profileUrl =
-    "/auth/realms/havendev/protocol/openid-connect/userinfo"
-
-
-
--- Http.expectJson GotComments (Decode.list Data.Comment.decode)
+    "/oauth/token"
 
 
 getProfile : Cmd Msg

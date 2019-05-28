@@ -17,6 +17,7 @@ import Page.Home as Home
 import Page.Landing as Landing
 import Page.Privacy as Privacy
 import Page.Reports as Reports
+import Page.Logout as Logout
 import Page.Survey as Survey
 import Page.SurveyResponses as SurveyResponses
 import Page.Terms as Terms
@@ -143,8 +144,14 @@ update msg model =
                         -- on the same domain.
                         isKeycloak =
                             String.startsWith "/auth" url.path
+
+                        isGatekeeper =
+                            String.startsWith "/oauth/" url.path
                     in
                     if isKeycloak then
+                        ( model, Nav.load (Url.toString url) )
+
+                    else if isGatekeeper then
                         ( model, Nav.load (Url.toString url) )
 
                     else
@@ -397,6 +404,9 @@ viewBody model =
             Route.ShowComment _ ->
                 -- TODO: do we need this?
                 notFoundBody model
+
+            Route.Logout ->
+                Logout.view
         ]
 
 
@@ -417,7 +427,7 @@ viewNavUser model user =
                     [ text "Profile" ]
                 , div [ class "dropdown-divider" ]
                     []
-                , a [ class "dropdown-item", href "http://dev.havengrc.com/logout" ]
+                , a [ class "dropdown-item", href "/oauth/logout?redirect=/logout" ]
                     [ text "Logout" ]
                 ]
             ]
