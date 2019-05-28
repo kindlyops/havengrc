@@ -1,8 +1,9 @@
 # is the url for retrieve the OpenID configuration - normally the <server>/auth/realm/<realm_name>
-discovery-url: http://dev.havengrc.com/auth/realms/havendev
+discovery-url: {{ .Env.DISCOVERY_URL }}
+
 # the client id for the 'client' application
 client-id: gatekeeper
-client-secret: df2ba720-1d10-4d85-940a-6df77ef69baa
+client-secret: {{ .Env.CLIENT_SECRET }}
 
  # whether to enable refresh tokens
 #enable-refresh-tokens: true
@@ -10,7 +11,7 @@ client-secret: df2ba720-1d10-4d85-940a-6df77ef69baa
 #redirection-url: http://dev.havengrc.com/
 
 listen: 0.0.0.0:80
-upstream-url: http://dev.havengrc.com/
+upstream-url: {{ .Env.UPSTREAM_URL }}
 secure-cookie: false
 
 

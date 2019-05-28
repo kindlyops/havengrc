@@ -203,7 +203,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./gatekeeper/gatekeeper.yaml:/opt/gatekeeper.yaml
+      - ./gatekeeper/gatekeeper.tpml:/opt/gatekeeper.tpml
     command:
       - --config
       - /opt/gatekeeper.yaml
