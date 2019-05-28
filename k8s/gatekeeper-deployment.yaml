@@ -19,7 +19,10 @@ spec:
             - name: DISCOVERY_URL
               value: "https://staging.havengrc.com/auth/realms/havendev"
             - name: CLIENT_SECRET
-              value: ""
+              valueFrom:
+                secretKeyRef:
+                  name: haven-gatekeeper-credentials
+                  key: secret
             - name: UPSTREAM_URL
               value: "https://staging.havengrc.com/"
           volumeMounts:
