@@ -16,6 +16,6 @@ RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSI
     && tar -C /usr/local/bin -xzvf dockerize-alpine-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
     && rm dockerize-alpine-linux-amd64-$DOCKERIZE_VERSION.tar.gz
 
-ADD gatekeeper.tmpl /opt/gatekeeper.tmpl
+COPY gatekeeper.tmpl /opt/gatekeeper.tmpl
 
 RUN dockerize -template /opt/gatekeeper.tmpl:/opt/gatekeeper.yaml
