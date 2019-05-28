@@ -1,18 +1,5 @@
-get rid of keycloak.js and switch to cookie based auth using gatekeeper
 
-TODO: why is Authentication.init not making http request while Survey.init is?
-this happens on initial page load.
-
-TODO: fix JWT issues in apitest for reports upload with custom audience mapper.
-
-maybe by making Elm make an API call on init to get userProfile - anonymous vs loggedin
-when redirecting back to elm after login we will have a fresh application load.
-then we no longer need to store jwt in sessionStorage, will rely on gatekeeper session instead.
-
-how does logout work with gatekeeper? https://www.keycloak.org/docs/latest/securing_apps/index.html#logout-endpoint
-hit /oauth/logout?redirect=/
-
- add menu item for unleash UI and factory UI based on superadmin role. these 
+add menu item for unleash UI and factory UI based on superadmin role. these 
 need to be populated based on JSON data send back from API server so they can't
 be sniffed from people looking at the webui only?
 
@@ -22,7 +9,6 @@ be sniffed from people looking at the webui only?
 
  set up unleash client requests in Elm to get status of feature flags and save in model
 
- Figure out TLS handling, do it in caddy or in keycloak-gatekeeper?
 
- deploy unleash API to k8s
-deploy faktory API to k8s 
+deploy unleash API to k8s
+deploy faktory UI to k8s
