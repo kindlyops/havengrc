@@ -128,6 +128,22 @@ jobs:
       - run: docker push kindlyops/havenapi:$CIRCLE_SHA1
       - run: docker push kindlyops/havenapi:latest
       - notify-failed
+  gatekeeper-build-job:
+    docker:
+      - image: circleci/node:7-browsers
+    steps:
+      - checkout
+      - add_ssh_keys
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run: docker build --rm=false -t kindlyops/gatekeeper gatekeeper
+      - run: docker tag kindlyops/gatekeeper:latest kindlyops/gatekeeper:$CIRCLE_SHA1
+      - run: docker tag kindlyops/gatekeeper:latest kindlyops/gatekeeper:$CIRCLE_BUILD_NUM
+      - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
+      - run: docker push kindlyops/gatekeeper:$CIRCLE_BUILD_NUM
+      - run: docker push kindlyops/gatekeeper:$CIRCLE_SHA1
+      - run: docker push kindlyops/gatekeeper:latest
+      - notify-failed
   havenworker-build-job:
     docker:
       - image: circleci/node:7-browsers
@@ -284,6 +300,7 @@ workflows:
       - keycloak-build-job
       - havenapi-build-job
       - havenworker-build-job
+      - gatekeeper-build-job
       - postgrest-build-job
       - havenapi-testing-job:
           requires:

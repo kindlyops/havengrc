@@ -3,6 +3,7 @@ module github.com/kindlyops/havengrc/havenapi
 go 1.12
 
 require (
+	cloud.google.com/go v0.36.0 // indirect
 	github.com/certifi/gocertifi v0.0.0-20190506164543-d2eda7129713 // indirect
 	github.com/codegangsta/negroni v1.0.0 // indirect
 	github.com/contribsys/faktory v0.9.0-1
@@ -10,10 +11,9 @@ require (
 	github.com/deis/pkg v0.5.0 // indirect
 	github.com/getsentry/raven-go v0.2.0
 	github.com/gobuffalo/buffalo v0.14.4
-	github.com/gobuffalo/buffalo-plugins v1.14.1 // indirect
 	github.com/gobuffalo/buffalo-pop v1.12.0
 	github.com/gobuffalo/envy v1.7.0
-	github.com/gobuffalo/fizz v1.8.0 // indirect
+	github.com/gobuffalo/makr v1.1.5 // indirect
 	github.com/gobuffalo/mw-csrf v0.0.0-20190129204204-25460a055517 // indirect
 	github.com/gobuffalo/mw-forcessl v0.0.0-20190224202501-6d1ef7ffb276
 	github.com/gobuffalo/mw-paramlogger v0.0.0-20190224201358-0d45762ab655
@@ -29,7 +29,6 @@ require (
 	github.com/rs/cors v1.6.0
 	github.com/uber-go/atomic v1.4.0 // indirect
 	github.com/unrolled/secure v1.0.0
-	go.uber.org/atomic v1.4.0 // indirect
 	go.uber.org/ratelimit v0.0.0-20180316092928-c15da0234277
 	gopkg.in/square/go-jose.v2 v2.3.1
 )

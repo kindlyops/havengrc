@@ -3,4 +3,4 @@ MAINTAINER  Kindly Ops, LLC <support@kindlyops.com>
 RUN mkdir /code
 WORKDIR /code
 COPY ./webui/package.json /code
-RUN npm install
+RUN npm install --quiet

@@ -2,6 +2,6 @@ FROM        cypress/base:8
 MAINTAINER  Kindly Ops, LLC <support@kindlyops.com>
 WORKDIR     /home/node
 ADD         . .
-RUN         npm install cypress
+RUN         npm install --silent cypress
 RUN         rm cypress.json; mv cypress-ci.json cypress.json
 CMD         ["npx", "cypress", "run"]
