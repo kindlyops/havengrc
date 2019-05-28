@@ -17,7 +17,7 @@ spec:
           image: havengrc-docker.jfrog.io/kindlyops/gatekeeper:latest
           env:
             - name: DISCOVERY_URL
-              value: " https://staging.havengrc.com/auth/realms/havendev"
+              value: "https://staging.havengrc.com/auth/realms/havendev"
             - name: CLIENT_SECRET
               value: ""
             - name: UPSTREAM_URL
