@@ -7,7 +7,6 @@ module Authentication exposing
     , init
     , isLoggedIn
     , loggedInUserDecoder
-    , tryGetAuthHeader
     , tryGetUserProfile
     , update
     )
@@ -72,7 +71,7 @@ type alias Model =
 
 
 type Msg
-    = HandleProfileResult
+    = HandleProfileResult (Result Http.Error String)
     | LogOut
     | LoginMsg
 
@@ -82,17 +81,39 @@ init =
     ( { state = LoggedOut
       , lastError = Nothing
       }
-    , Cmd.none
-      -- TODO: fire the HTTP request to load the user profile
+    , Cmd.batch initialCommands
     )
+
+
+initialCommands : List (Cmd Msg)
+initialCommands =
+    -- fire the HTTP request to load the user profile if logged int
+    [ getProfile ]
+
+
+profileUrl : String
+profileUrl =
+    "/realms/havendev/protocol/openid-connect/userinfo"
+
+
+getProfile : Cmd Msg
+getProfile =
+    Http.get
+        { url = profileUrl
+        , expect = Http.expectString HandleProfileResult
+        }
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        HandleProfileResult ->
+        HandleProfileResult profile ->
             -- TODO: load the user profile info from
             -- /realms/{realm-name}/protocol/openid-connect/userinfo
+            let
+                _ =
+                    Debug.todo "profile results"
+            in
             ( model, Cmd.none )
 
         LoginMsg ->
@@ -122,11 +143,6 @@ isLoggedIn model =
 
         LoggedOut ->
             False
-
-
-tryGetAuthHeader : Model -> List Http.Header
-tryGetAuthHeader authModel =
-    []
 
 
 getReturnHeaders : List Http.Header

@@ -1,5 +1,10 @@
 get rid of keycloak.js and switch to cookie based auth using gatekeeper
 
+TODO: why is Authentication.init not making http request while Survey.init is?
+this happens on initial page load.
+
+TODO: fix JWT issues in apitest for reports upload with custom audience mapper.
+
 maybe by making Elm make an API call on init to get userProfile - anonymous vs loggedin
 when redirecting back to elm after login we will have a fresh application load.
 then we no longer need to store jwt in sessionStorage, will rely on gatekeeper session instead.

@@ -114,27 +114,17 @@ decodeCurrentPage =
 
 getIpsativeSurveys : Authentication.Model -> Cmd Msg
 getIpsativeSurveys authModel =
-    Http.request
-        { method = "GET"
-        , headers = Authentication.tryGetAuthHeader authModel
-        , url = "/api/ipsative_surveys"
-        , body = Http.emptyBody
+    Http.get
+        { url = "/api/ipsative_surveys"
         , expect = Http.expectJson GotServerIpsativeSurveys (Decode.list Survey.decodeSurveyMetaData)
-        , timeout = Nothing
-        , tracker = Nothing
         }
 
 
 getIpsativeSurvey : Authentication.Model -> String -> Cmd Msg
 getIpsativeSurvey authModel id =
-    Http.request
-        { method = "GET"
-        , headers = Authentication.tryGetAuthHeader authModel
-        , url = "/api/ipsative_data?survey_id=eq." ++ id
-        , body = Http.emptyBody
+    Http.get
+        { url = "/api/ipsative_data?survey_id=eq." ++ id
         , expect = Http.expectJson GotIpsativeServerData (Decode.list Survey.ipsativeSurveyDataDecoder)
-        , timeout = Nothing
-        , tracker = Nothing
         }
 
 
@@ -146,7 +136,7 @@ postIpsativeResponse authModel ipsativeSurvey =
                 |> Http.jsonBody
 
         headers =
-            Authentication.tryGetAuthHeader authModel ++ Authentication.getReturnHeaders
+            Authentication.getReturnHeaders
     in
     Http.request
         { method = "POST"
@@ -161,40 +151,25 @@ postIpsativeResponse authModel ipsativeSurvey =
 
 getLikertSurveys : Authentication.Model -> Cmd Msg
 getLikertSurveys authModel =
-    Http.request
-        { method = "GET"
-        , headers = Authentication.tryGetAuthHeader authModel
-        , url = "/api/likert_surveys"
-        , body = Http.emptyBody
+    Http.get
+        { url = "/api/likert_surveys"
         , expect = Http.expectJson GotServerLikertSurveys (Decode.list Survey.decodeSurveyMetaData)
-        , timeout = Nothing
-        , tracker = Nothing
         }
 
 
 getLikertSurvey : Authentication.Model -> String -> Cmd Msg
 getLikertSurvey authModel id =
-    Http.request
-        { method = "GET"
-        , headers = Authentication.tryGetAuthHeader authModel
-        , url = "/api/likert_data?survey_id=eq." ++ id
-        , body = Http.emptyBody
+    Http.get
+        { url = "/api/likert_data?survey_id=eq." ++ id
         , expect = Http.expectJson GotLikertServerData (Decode.list Survey.likertSurveyDataDecoder)
-        , timeout = Nothing
-        , tracker = Nothing
         }
 
 
 getLikertChoices : Authentication.Model -> String -> Cmd Msg
 getLikertChoices authModel id =
-    Http.request
-        { method = "GET"
-        , headers = Authentication.tryGetAuthHeader authModel
-        , url = "/api/likert_distinct_choice_groups?survey_id=eq." ++ id
-        , body = Http.emptyBody
+    Http.get
+        { url = "/api/likert_distinct_choice_groups?survey_id=eq." ++ id
         , expect = Http.expectJson GotLikertChoices (Decode.list Survey.likertSurveyChoicesDecoder)
-        , timeout = Nothing
-        , tracker = Nothing
         }
 
 
@@ -206,7 +181,7 @@ postLikertResponses authModel likertSurvey =
                 |> Http.jsonBody
 
         headers =
-            Authentication.tryGetAuthHeader authModel ++ Authentication.getReturnHeaders
+            Authentication.getReturnHeaders
     in
     Http.request
         { method = "POST"
@@ -368,7 +343,7 @@ postRegistration surveyModel emailAddress authModel =
                 |> Http.jsonBody
 
         headers =
-            Authentication.tryGetAuthHeader authModel ++ Authentication.getReturnHeaders
+            Authentication.getReturnHeaders
     in
     Http.request
         { method = "POST"

@@ -46,14 +46,9 @@ reportsUrl =
 
 getReports : Authentication.Model -> Cmd Msg
 getReports authModel =
-    Http.request
-        { method = "GET"
-        , headers = Authentication.tryGetAuthHeader authModel
-        , url = reportsUrl
-        , body = Http.emptyBody
+    Http.get
+        { url = reportsUrl
         , expect = Http.expectJson GotReports (Decode.list Data.Report.decode)
-        , timeout = Nothing
-        , tracker = Nothing
         }
 
 
@@ -61,8 +56,7 @@ downloadReport : Authentication.Model -> Data.Report.Report -> Cmd Msg
 downloadReport authModel report =
     let
         headers =
-            Authentication.tryGetAuthHeader authModel
-                ++ [ Http.header "Accept" "application/octet-stream" ]
+            [ Http.header "Accept" "application/octet-stream" ]
     in
     Http.request
         { body = Http.emptyBody
