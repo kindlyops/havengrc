@@ -72,7 +72,7 @@ view =
             , footer [ class "bg-primary py-4" ]
                 [ div [ class "text-white" ]
                     [ span []
-                        [ text "© 2018 "
+                        [ text "© 2019 "
                         , a [ class "text-white underline", href "https://kindlyops.com", title "Kindly Ops Website" ]
                             [ text "KINDLY OPS" ]
                         ]

@@ -10,7 +10,10 @@ client-secret: {{ .Env.CLIENT_SECRET }}
 # the redirection url, essentially the site url, note: /oauth/callback is added at the end
 #redirection-url: http://dev.havengrc.com/
 
-listen: 0.0.0.0:80
+listen-http: 0.0.0.0:80
+listen: 0.0.0.0:443
+# enable-security-filter: false
+# enable-https-redirection: false
 upstream-url: {{ .Env.UPSTREAM_URL }}
 secure-cookie: false
 
@@ -35,6 +38,10 @@ resources:
 - uri: /static/js/*
   white-listed: true
 - uri: /sockjs-node/*
+  white-listed: true
+- uri: /terms
+  white-listed: true
+- uri: /privacy
   white-listed: true
 - uri: /logout
   white-listed: true # this is the page after you have logged out

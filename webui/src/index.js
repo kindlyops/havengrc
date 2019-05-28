@@ -9,8 +9,6 @@ if (process.env.NODE_ENV === 'development') {
 }
 var storedSurveyState = sessionStorage.getItem('storedSurvey')
 var initialData = {
-  // profile: authData ? authData.profile : null,
-  // token: authData ? authData.token : null,
   storedSurvey: storedSurveyState ? JSON.parse(storedSurveyState) : null
 }
 

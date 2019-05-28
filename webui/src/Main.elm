@@ -15,9 +15,9 @@ import Page.Comments as Comments
 import Page.Dashboard as Dashboard
 import Page.Home as Home
 import Page.Landing as Landing
+import Page.Logout as Logout
 import Page.Privacy as Privacy
 import Page.Reports as Reports
-import Page.Logout as Logout
 import Page.Survey as Survey
 import Page.SurveyResponses as SurveyResponses
 import Page.Terms as Terms
@@ -312,6 +312,9 @@ outsideView model =
         Route.Survey ->
             outsideContainer (Survey.view model.authModel model.surveyModel |> Html.map SurveyMsg)
 
+        Route.Logout ->
+            outsideContainer Logout.view
+
         -- everything else gets the front page
         _ ->
             Home.view |> Html.map AuthenticationMsg
@@ -406,7 +409,7 @@ viewBody model =
                 notFoundBody model
 
             Route.Logout ->
-                Logout.view
+                notFoundBody model
         ]
 
 

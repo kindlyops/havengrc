@@ -18,4 +18,4 @@ RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSI
 
 COPY gatekeeper.tmpl /opt/gatekeeper.tmpl
 
-RUN dockerize -template /opt/gatekeeper.tmpl:/opt/gatekeeper.yaml
+ENTRYPOINT ["/usr/local/bin/dockerize", "-template", "/opt/gatekeeper.tmpl:/opt/gatekeeper.yaml", "/opt/keycloak-gatekeeper", "--config", "/opt/gatekeeper.yaml", "--verbose"]

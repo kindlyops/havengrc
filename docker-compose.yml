@@ -204,10 +204,6 @@ services:
       - "443:443"
     volumes:
       - ./gatekeeper/gatekeeper.tpml:/opt/gatekeeper.tpml
-    command:
-      - --config
-      - /opt/gatekeeper.yaml
-      - --verbose
     links:
       - webui:dev.havengrc.com
   worker:
@@ -311,3 +307,10 @@ services:
       - ./mjml/templates:/home/mjml/templates
       - ./mjml/dist:/home/mjml/dist
     command: ["templates/*.mjml", "-o", "dist/"]
+  cypress:
+    build:
+      context: webui
+      dockerfile: Dockerfile-cypress
+    links:
+      - gatekeeper:dev.havengrc.com
+    command: ["npx", "cypress", "run"]
