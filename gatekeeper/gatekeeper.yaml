@@ -2,7 +2,7 @@
 discovery-url: http://dev.havengrc.com/auth/realms/havendev
 # the client id for the 'client' application
 client-id: gatekeeper
-client-secret: af2d6165-efb6-4b7c-aa26-bce02a5dadce
+client-secret: df2ba720-1d10-4d85-940a-6df77ef69baa
 
  # whether to enable refresh tokens
 #enable-refresh-tokens: true
@@ -35,5 +35,5 @@ resources:
   white-listed: true
 - uri: /sockjs-node
   white-listed: true
-- uri: /admin/*
+- uri: /auth/*
   white-listed: true # this is the keycloak server, handles it's own auth

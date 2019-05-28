@@ -10,10 +10,10 @@ if (process.env.NODE_ENV === 'development') {
 // var storedProfile = sessionStorage.getItem('profile')
 // var storedToken = sessionStorage.getItem('token')
 var storedSurveyState = sessionStorage.getItem('storedSurvey')
-var authData =
-  storedProfile && storedToken
-    ? { profile: JSON.parse(storedProfile), token: storedToken }
-    : null
+// var authData =
+//   storedProfile && storedToken
+//     ? { profile: JSON.parse(storedProfile), token: storedToken }
+//     : null
 
 var initialData = {
   // profile: authData ? authData.profile : null,
