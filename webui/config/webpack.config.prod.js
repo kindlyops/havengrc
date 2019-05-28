@@ -105,7 +105,7 @@ module.exports = {
             ]
           },
           mangle: {
-            safari10: true
+            debug: false
           },
           output: {
             comments: false,
