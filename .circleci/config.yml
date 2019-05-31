@@ -319,6 +319,8 @@ workflows:
             - keycloak-build-job
             - havenapi-build-job
             - postgrest-build-job
+            - gatekeeper-build-job
+            - webui-build-job
       - deploy-staging:
           requires:
             - havenapi-testing-job
