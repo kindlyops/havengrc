@@ -32,10 +32,10 @@ spec:
           ports:
             - containerPort: 80
               protocol: TCP
-              targetPort: 80
+              targetPort: 8080
             - containerPort: 443
               protocol: TCP
-              targetPort: 443
+              targetPort: 8443
           resources:
             limits:
               memory: 256Mi

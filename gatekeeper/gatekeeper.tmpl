@@ -10,8 +10,8 @@ client-secret: {{ .Env.CLIENT_SECRET }}
 # the redirection url, essentially the site url, note: /oauth/callback is added at the end
 #redirection-url: http://dev.havengrc.com/
 
-listen-http: 0.0.0.0:80
-listen: 0.0.0.0:443
+listen-http: 0.0.0.0:8080
+listen: 0.0.0.0:8443
 
 tls-cert: {{ .Env.TLS_CERT }}
 tls-private-key: {{ .Env.TLS_PRIVATE_KEY }}

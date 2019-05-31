@@ -200,8 +200,8 @@ services:
     build:
       context: gatekeeper/
     ports:
-      - "80:80"
-      - "443:443"
+      - "80:8080"
+      - "443:8443"
     volumes:
       - ./gatekeeper/gatekeeper.tpml:/opt/gatekeeper.tpml
       - ./webui/pki:/certs
