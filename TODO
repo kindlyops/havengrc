@@ -1,13 +1,16 @@
 
+Debug unleash access at dev.havengrc.com/unleash
+path to bundle.js in index.html is wrong.
+
 add menu item for unleash UI and factory UI based on superadmin role. these 
 need to be populated based on JSON data send back from API server so they can't
 be sniffed from people looking at the webui only?
 
- polish up the dependencies to start gatekeeper from webui
+polish up the dependencies to start gatekeeper from webui
 
- add security to faktory UI
+add security to faktory UI
 
- set up unleash client requests in Elm to get status of feature flags and save in model
+ et up unleash client requests in Elm to get status of feature flags and save in model
 
 
 deploy unleash API to k8s

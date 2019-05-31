@@ -8,6 +8,8 @@ LABEL commit=${COMMIT} \
 ENV DISCOVERY_URL http://dev.havengrc.com/auth/realms/havendev
 ENV CLIENT_SECRET df2ba720-1d10-4d85-940a-6df77ef69baa
 ENV UPSTREAM_URL http://dev.havengrc.com/
+ENV TLS_PRIVATE_KEY /certs/privkey.pem
+ENV TLS_CERT /certs/fullchain.pem
 
 RUN apk add --no-cache openssl
 

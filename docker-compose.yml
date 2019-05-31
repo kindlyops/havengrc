@@ -204,6 +204,7 @@ services:
       - "443:443"
     volumes:
       - ./gatekeeper/gatekeeper.tpml:/opt/gatekeeper.tpml
+      - ./webui/pki:/certs
     links:
       - webui:dev.havengrc.com
   worker:
