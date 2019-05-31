@@ -295,7 +295,8 @@ jobs:
             oc set image deployment/havenapi havenapi=havengrc-docker.jfrog.io/kindlyops/havenapi:$CIRCLE_SHA1
             oc set image deployment/havenweb havenweb=havengrc-docker.jfrog.io/kindlyops/havenweb:$CIRCLE_SHA1
             oc set image deployment/keycloak keycloak=havengrc-docker.jfrog.io/kindlyops/keycloak:$CIRCLE_SHA1
-            oc set image deployment/worker   worker=kindlyops/havenworker:$CIRCLE_SHA1
+            oc set image deployment/worker worker=kindlyops/havenworker:$CIRCLE_SHA1
+            oc set image deployment/gatekeeper gatekeeper=kindlyops/gatekeeper:$CIRCLE_SHA1
       - notify-failed
       - run:
           name: notify deploy complete

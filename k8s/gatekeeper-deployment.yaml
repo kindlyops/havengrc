@@ -22,12 +22,12 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: haven-gatekeeper-credentials
-                  key: secret
+                  key: clientsecret
             - name: UPSTREAM_URL
               value: "https://staging.havengrc.com/"
           volumeMounts:
             - name: secret-volume
-              mountPath: /etc/haven-credentials/
+              mountPath: /certs/
               readOnly: true
           ports:
             - containerPort: 80
@@ -36,10 +36,15 @@ spec:
             - containerPort: 443
               protocol: TCP
               targetPort: 443
+          resources:
+            limits:
+              memory: 256Mi
+            requests:
+              memory: 128Mi
       volumes:
         - name: secret-volume
           secret:
-            secretName: haven-database-credentials
+            secretName: haven-tls
       restartPolicy: Always
   strategy:
     type: "Recreate"
