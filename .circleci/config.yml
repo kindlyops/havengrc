@@ -226,7 +226,7 @@ jobs:
             docker cp postgrest/keycloak-dev-public-key.json configs:/cfg
             docker cp keycloak/data/havendev-realm.json configs:/keycloak
             mkdir -p home/node
-            cp webui/cypress-ci.json /webui/cypress.json
+            cp webui/cypress-ci.json webui/cypress.json
             docker cp home configs:/home
             # start keycloak in background container
             docker run --volumes-from configs --network net0 -d -e DB_DATABASE -e DB_USER -e DB_ADDR -e KEYCLOAK_USER -e KEYCLOAK_PASSWORD -e PROXY_ADDRESS_FORWARDING -h keycloak --name keycloak kindlyops/keycloak:$CIRCLE_SHA1 -b 0.0.0.0 -Dkeycloak.migration.file=/keycloak/havendev-realm.json -Dkeycloak.migration.strategy=IGNORE_EXISTING -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.action=import
