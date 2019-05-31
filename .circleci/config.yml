@@ -205,7 +205,7 @@ jobs:
             - AUTH_SERVER: keycloak:8080
             - BUFFALO_SERVER: havenapi:3000
             - DISCOVERY_URL: http://keycloak:8080/auth/realms/havendev
-            - UPSTREAM_URL: https://havenweb:8443
+            - UPSTREAM_URL: https://webui:8443
           command: |
             # create network for containers
             docker network create -d bridge net0
