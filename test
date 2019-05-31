@@ -2,3 +2,4 @@
 set -x
 docker-compose run apitest
 docker-compose run havenapi buffalo test
+docker-compose run cypress

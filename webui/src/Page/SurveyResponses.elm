@@ -55,14 +55,9 @@ initialModel =
 
 getIpsativeResponses : Authentication.Model -> Cmd Msg
 getIpsativeResponses authModel =
-    Http.request
-        { method = "GET"
-        , headers = Authentication.tryGetAuthHeader authModel
-        , url = "/api/ipsative_responses_grouped"
-        , body = Http.emptyBody
+    Http.get
+        { url = "/api/ipsative_responses_grouped"
         , expect = Http.expectJson GotServerIpsativeResponses (Decode.list groupedIpsativeResponseDecoder)
-        , timeout = Nothing
-        , tracker = Nothing
         }
 
 

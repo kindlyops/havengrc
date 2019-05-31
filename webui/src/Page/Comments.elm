@@ -56,14 +56,9 @@ commentsUrl =
 
 getComments : Authentication.Model -> Cmd Msg
 getComments authModel =
-    Http.request
-        { method = "GET"
-        , headers = Authentication.tryGetAuthHeader authModel
-        , url = commentsUrl
-        , body = Http.emptyBody
+    Http.get
+        { url = commentsUrl
         , expect = Http.expectJson GotComments (Decode.list Data.Comment.decode)
-        , timeout = Nothing
-        , tracker = Nothing
         }
 
 
@@ -75,7 +70,7 @@ postComment authModel newComment =
                 |> Http.jsonBody
 
         headers =
-            Authentication.tryGetAuthHeader authModel ++ Authentication.getReturnHeaders
+            Authentication.getReturnHeaders
     in
     Http.request
         { method = "POST"

@@ -4,17 +4,18 @@ import Authentication
 import Browser
 import Browser.Navigation as Nav
 import Data.Survey as SurveyData
+import Data.UserProfile as UserProfile
 import Gravatar
 import Html exposing (Html, a, button, div, i, img, li, nav, span, text, ul)
 import Html.Attributes exposing (attribute, class, classList, href, id, style)
 import Html.Events exposing (onClick)
 import Json.Decode as Decode
-import Keycloak
 import Page.Activity as Activity
 import Page.Comments as Comments
 import Page.Dashboard as Dashboard
 import Page.Home as Home
 import Page.Landing as Landing
+import Page.Logout as Logout
 import Page.Privacy as Privacy
 import Page.Reports as Reports
 import Page.Survey as Survey
@@ -47,14 +48,6 @@ type alias MenuItem =
     }
 
 
-decodeKeyCloak : Decode.Value -> Maybe Keycloak.LoggedInUser
-decodeKeyCloak json =
-    json
-        |> Decode.decodeValue Decode.string
-        |> Result.toMaybe
-        |> Maybe.andThen (Decode.decodeString Keycloak.loggedInUserDecoder >> Result.toMaybe)
-
-
 decodeSavedState : Decode.Value -> Maybe Survey.TestStructure
 decodeSavedState json =
     json
@@ -66,8 +59,8 @@ decodeSavedState json =
 init : Decode.Value -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init sessionStorage location key =
     let
-        initialAuthModel =
-            Authentication.init Ports.keycloakLogin Ports.keycloakLogout (decodeKeyCloak sessionStorage)
+        ( initialAuthModel, authCmd ) =
+            Authentication.init
 
         ( commentsModel, commentsCmd ) =
             Comments.init initialAuthModel
@@ -100,6 +93,7 @@ init sessionStorage location key =
     ( model
     , Cmd.batch
         [ Cmd.map CommentsMsg commentsCmd
+        , Cmd.map AuthenticationMsg authCmd
         , Cmd.map ReportsMsg reportsCmd
         , Cmd.map SurveyMsg surveyCmd
         , Cmd.map SurveyResponseMsg surveyResponsesCmd
@@ -108,9 +102,9 @@ init sessionStorage location key =
     )
 
 
-subscriptions : a -> Sub Msg
-subscriptions model =
-    Ports.keycloakAuthResult (Authentication.handleAuthResult >> AuthenticationMsg)
+subscriptions : Model -> Sub Msg
+subscriptions _ =
+    Sub.none
 
 
 main : Program Decode.Value Model Msg
@@ -150,8 +144,14 @@ update msg model =
                         -- on the same domain.
                         isKeycloak =
                             String.startsWith "/auth" url.path
+
+                        isGatekeeper =
+                            String.startsWith "/oauth/" url.path
                     in
                     if isKeycloak then
+                        ( model, Nav.load (Url.toString url) )
+
+                    else if isGatekeeper then
                         ( model, Nav.load (Url.toString url) )
 
                     else
@@ -312,12 +312,15 @@ outsideView model =
         Route.Survey ->
             outsideContainer (Survey.view model.authModel model.surveyModel |> Html.map SurveyMsg)
 
+        Route.Logout ->
+            outsideContainer Logout.view
+
         -- everything else gets the front page
         _ ->
             Home.view |> Html.map AuthenticationMsg
 
 
-insideView : Model -> Keycloak.UserProfile -> Html Msg
+insideView : Model -> UserProfile.UserProfile -> Html Msg
 insideView model user =
     div []
         [ viewNavBar model
@@ -338,7 +341,7 @@ viewNavBar model =
         ]
 
 
-viewNavigationDrawer : Model -> Keycloak.UserProfile -> Html Msg
+viewNavigationDrawer : Model -> UserProfile.UserProfile -> Html Msg
 viewNavigationDrawer model user =
     div [ attribute "aria-hidden" "true", class "navdrawer navdrawer-permanent-lg navdrawer-permanent-clipped", id "navdrawerDefault", attribute "tabindex" "-1" ]
         [ div [ class "navdrawer-content" ]
@@ -404,6 +407,9 @@ viewBody model =
             Route.ShowComment _ ->
                 -- TODO: do we need this?
                 notFoundBody model
+
+            Route.Logout ->
+                notFoundBody model
         ]
 
 
@@ -412,7 +418,7 @@ notFoundBody model =
     div [] [ text "This is the notFound view" ]
 
 
-viewNavUser : Model -> Keycloak.UserProfile -> Html Msg
+viewNavUser : Model -> UserProfile.UserProfile -> Html Msg
 viewNavUser model user =
     ul [ class "navbar-nav" ]
         [ li [ class "nav-item dropdown" ]
@@ -424,7 +430,7 @@ viewNavUser model user =
                     [ text "Profile" ]
                 , div [ class "dropdown-divider" ]
                     []
-                , a [ class "dropdown-item", href "/", onClick (AuthenticationMsg Authentication.LogOut) ]
+                , a [ class "dropdown-item", href "/oauth/logout?redirect=/logout" ]
                     [ text "Logout" ]
                 ]
             ]

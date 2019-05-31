@@ -41,6 +41,11 @@ spec:
           volumeMounts:
             - mountPath: "/var/lib/faktory/db"
               name: faktory-db
+          resources:
+            limits:
+              memory: 256Mi
+            requests:
+              memory: 128Mi
       volumes:
         - name: secret-volume
           secret:

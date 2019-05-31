@@ -11,6 +11,7 @@ import Url.Parser exposing ((</>), (<?>), Parser, int, map, oneOf, parse, s, str
 
 type Route
     = Login
+    | Logout
     | Activity
     | Comments
     | Dashboard
@@ -34,6 +35,7 @@ routeParser =
         , map Comments (s "comments")
         , map Dashboard (s "dashboard")
         , map Login (s "login")
+        , map Logout (s "logout")
         , map Privacy (s "privacy")
         , map Landing (s "l")
         , map Reports (s "reports")
@@ -66,6 +68,9 @@ titleFor r =
 
                 Login ->
                     "Login"
+
+                Logout ->
+                    "Logout"
 
                 Privacy ->
                     "Privacy Policy"
@@ -118,6 +123,9 @@ pathFor loc =
 
                 Login ->
                     "/login/"
+
+                Logout ->
+                    "/logout/"
 
                 Privacy ->
                     "/privacy/"
