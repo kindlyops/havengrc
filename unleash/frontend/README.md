@@ -1,3 +1,3 @@
-Files taken from unleash-frontend npm package dist/ directory
-version 3.1.3
+Files taken from unleash-frontend  npm module dist/ directory
+version 3.2.4
 

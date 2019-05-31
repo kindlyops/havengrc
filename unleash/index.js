@@ -35,7 +35,7 @@ options.preRouterHook = gatekeeperAuthentication;
 
 
 function serveFrontend(app) {
-    app.use('/', express.static('/frontend'));
+    app.use(express.static('/frontend'));
 }
 
 options.preHook = serveFrontend;
@@ -48,6 +48,6 @@ unleash
     .start(options)
     .then(server => {
         console.log(
-            `Unleash API started on http://localhost:${server.app.get('port')}`
+            `Unleash API and Frontend started on http://localhost:${server.app.get('port')}`
         );
     });
