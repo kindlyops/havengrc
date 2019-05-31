@@ -207,6 +207,9 @@ services:
       - ./webui/pki:/certs
     links:
       - webui:dev.havengrc.com
+    environment:
+      - TLS_CERT=/certs/server.pem
+      - TLS_PRIVATE_KEY=/certs/privkey.pem
   worker:
     environment:
       - FAKTORY_URL=tcp://:fassword@faktory:7419
