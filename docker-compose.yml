@@ -55,8 +55,8 @@ services:
   #     - /var/run:/var/run:rw
   #     - /sys:/sys:ro
   #     - /var/lib/docker/:/var/lib/docker:ro
-    ports:
-      - 8080:8080
+  #  ports:
+  #    - 8080:8080
   mailhog:
     image: mailhog/mailhog:v1.0.0
     ports:
@@ -96,7 +96,11 @@ services:
       - DB_ADDR=postgres
       - KEYCLOAK_USER=admin
       - KEYCLOAK_PASSWORD=admin
+      - KEYCLOAK_LOGLEVEL=info
       - PROXY_ADDRESS_FORWARDING=true
+      - KEYCLOAK_HOSTNAME=dev.havengrc.com
+      - KEYCLOAK_HTTP_PORT=80
+      - KEYCLOAK_HTTPS_PORT=443
     links:
       - db:postgres
       - mailhog
@@ -200,16 +204,24 @@ services:
     build:
       context: gatekeeper/
     ports:
-      - "80:8080"
+      - "80:80"
       - "443:8443"
     volumes:
-      - ./gatekeeper/gatekeeper.tpml:/opt/gatekeeper.tpml
+      - ./gatekeeper/config:/opt/config
       - ./webui/pki:/certs
     links:
       - webui:dev.havengrc.com
     environment:
       - TLS_CERT=/certs/server.pem
       - TLS_PRIVATE_KEY=/certs/privkey.pem
+      - CLIENT_SECRET=df2ba720-1d10-4d85-940a-6df77ef69baa
+      - UPSTREAM_URL=http://dev.havengrc.com/
+      - DISCOVERY_URL=http://dev.havengrc.com/auth/realms/havendev
+      - BASE_URI=
+      - REDIRECTION_URL=http://dev.havengrc.com/
+      - GATEKEEPER_SESSION_KEY=c01f3736e640ea874d66c3704ddb7a9a
+      - GATEKEEPER_LISTEN_PORT=80
+      - SECURE_COOKIE=false
   worker:
     environment:
       - FAKTORY_URL=tcp://:fassword@faktory:7419
