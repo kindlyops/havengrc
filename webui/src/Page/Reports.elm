@@ -63,7 +63,7 @@ downloadReport authModel report =
         , expect = Http.expectJson GotDownload (Decode.list Data.Report.decode)
         , headers = headers
         , method = "GET"
-        , url = "/api/files?select=file&uuid=eq." ++ report.uuid
+        , url = "/rpc/download_file?fileid=" ++ report.uuid
         , timeout = Nothing
         , tracker = Nothing
         }
@@ -71,7 +71,7 @@ downloadReport authModel report =
 
 downloadReportBytes : Data.Report.Report -> Cmd msg
 downloadReportBytes report =
-    Download.url ("/api/files?select=file&uuid=eq." ++ report.uuid)
+    Download.url ("/rpc/download_file?fileid=" ++ report.uuid)
 
 
 initialCommands : Authentication.Model -> List (Cmd Msg)
@@ -93,7 +93,7 @@ update msg model authModel =
 
         DownloadReport report ->
             ( model
-            , downloadReport authModel report
+            , downloadReportBytes report
             )
 
         HideError ->
