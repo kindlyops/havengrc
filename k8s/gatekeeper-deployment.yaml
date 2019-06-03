@@ -16,6 +16,8 @@ spec:
         - name: gatekeeper
           image: havengrc-docker.jfrog.io/kindlyops/gatekeeper:latest
           env:
+            - name: GATEKEEPER_LISTEN_PORT
+              value: 8443
             - name: DISCOVERY_URL
               value: "https://staging.havengrc.com/auth/realms/havendev"
             - name: CLIENT_SECRET
@@ -24,18 +26,14 @@ spec:
                   name: haven-gatekeeper-credentials
                   key: clientsecret
             - name: UPSTREAM_URL
-              value: "https://staging.havengrc.com/"
+              value: "http://havenweb:8081/"
           volumeMounts:
             - name: secret-volume
               mountPath: /certs/
               readOnly: true
           ports:
-            - containerPort: 80
+            - containerPort: 8443
               protocol: TCP
-              targetPort: 8080
-            - containerPort: 443
-              protocol: TCP
-              targetPort: 8443
           resources:
             limits:
               memory: 256Mi
