@@ -5,25 +5,28 @@ ARG COMMIT=""
 LABEL commit=${COMMIT} \
     maintainer="Kindly Ops, LLC <support@kindlyops.com>"
 
-ENV DISCOVERY_URL http://dev.havengrc.com/auth/realms/havendev
-ENV CLIENT_SECRET df2ba720-1d10-4d85-940a-6df77ef69baa
-ENV UPSTREAM_URL http://dev.havengrc.com/
-ENV TLS_PRIVATE_KEY /certs/privkey.pem
-ENV TLS_CERT /certs/fullchain.pem
+ENV DISCOVERY_URL ""
+ENV CLIENT_SECRET ""
+ENV UPSTREAM_URL ""
+ENV TLS_PRIVATE_KEY ""
+ENV TLS_CERT ""
+ENV REDIRECTION_URL ""
+ENV SECURE_COOKIE ""
 
 RUN addgroup -S havenuser && adduser -S -g havenuser havenuser
 
-RUN apk add --no-cache openssl
+RUN apk add --no-cache openssl curl libcap
 
 ENV DOCKERIZE_VERSION v0.6.1
 RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-alpine-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
     && tar -C /usr/local/bin -xzvf dockerize-alpine-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
     && rm dockerize-alpine-linux-amd64-$DOCKERIZE_VERSION.tar.gz
 
+RUN mkdir /opt/config
+COPY config/gatekeeper.tmpl /opt/config/gatekeeper.tmpl
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chown -R havenuser:havenuser /opt && chgrp -R 0 /opt && chmod -R g=u /opt
-COPY gatekeeper.tmpl /opt/gatekeeper.tmpl
-RUN chown -R havenuser:havenuser /opt/gatekeeper.tmpl
-
+RUN setcap CAP_NET_BIND_SERVICE=+eip /opt/keycloak-gatekeeper
 USER havenuser
 
-ENTRYPOINT ["/usr/local/bin/dockerize", "-template", "/opt/gatekeeper.tmpl:/opt/gatekeeper.yaml", "/opt/keycloak-gatekeeper", "--config", "/opt/gatekeeper.yaml", "--verbose"]
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh", "-template", "/opt/config/gatekeeper.tmpl:/opt/gatekeeper.yaml", "/opt/keycloak-gatekeeper", "--config", "/opt/gatekeeper.yaml", "--verbose"]

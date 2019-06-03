@@ -1,25 +1,34 @@
 # is the url for retrieve the OpenID configuration - normally the <server>/auth/realm/<realm_name>
 discovery-url: {{ .Env.DISCOVERY_URL }}
 
+base-uri: {{ .Env.BASE_URI }}
+
 # the client id for the 'client' application
 client-id: gatekeeper
 client-secret: {{ .Env.CLIENT_SECRET }}
 
- # whether to enable refresh tokens
-#enable-refresh-tokens: true
 # the redirection url, essentially the site url, note: /oauth/callback is added at the end
-#redirection-url: http://dev.havengrc.com/
+redirection-url: {{ .Env.REDIRECTION_URL }}
 
-listen-http: 0.0.0.0:8080
-listen: 0.0.0.0:8443
+# the name of the access cookie, defaults to kc-access
+cookie-access-name: havengrc-access
+secure-cookie: {{ .Env.SECURE_COOKIE }}
+
+enable-refresh-tokens: false
+# the name of the refresh cookie, default to kc-state
+cookie-refresh-name: havengrc-state
+# the encryption key used to encode the session state
+encryption-key: {{ .Env.GATEKEEPER_SESSION_KEY }}
+
+listen: 0.0.0.0:{{ .Env.GATEKEEPER_LISTEN_PORT }}
 
 tls-cert: {{ .Env.TLS_CERT }}
 tls-private-key: {{ .Env.TLS_PRIVATE_KEY }}
 
-# enable-security-filter: false
+enable-security-filter: false
 enable-https-redirection: false
 upstream-url: {{ .Env.UPSTREAM_URL }}
-secure-cookie: false
+skip-upstream-tls-verify: true
 
 
 enable-default-deny: false
