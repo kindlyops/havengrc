@@ -23,10 +23,13 @@ RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSI
     && rm dockerize-alpine-linux-amd64-$DOCKERIZE_VERSION.tar.gz
 
 RUN mkdir /opt/config
+COPY vendor/linux/caddy /opt
+COPY Caddyfile.tmpl /opt/
 COPY config/gatekeeper.tmpl /opt/config/gatekeeper.tmpl
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chown -R havenuser:havenuser /opt && chgrp -R 0 /opt && chmod -R g=u /opt
 RUN setcap CAP_NET_BIND_SERVICE=+eip /opt/keycloak-gatekeeper
+RUN setcap CAP_NET_BIND_SERVICE=+eip /opt/caddy
 USER havenuser
 
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh", "-template", "/opt/config/gatekeeper.tmpl:/opt/gatekeeper.yaml", "/opt/keycloak-gatekeeper", "--config", "/opt/gatekeeper.yaml", "--verbose"]
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

@@ -1,0 +1,6 @@
+:80
+
+proxy / {{ .Env.KEYCLOAK_INTERNAL }}
+
+log / stdout "{combined}"
+errors stdout
