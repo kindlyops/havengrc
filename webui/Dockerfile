@@ -11,8 +11,6 @@ ADD         Caddyfile .
 ENV         ENV_VERBOSITY 无
 ENV         HOME /home/havenuser
 RUN chown -R havenuser:havenuser /home/havenuser && chgrp -R 0 /home/havenuser && chmod -R g=u /home/havenuser
-EXPOSE 8080
-EXPOSE 8443
 USER havenuser
 ENTRYPOINT  ["/home/havenuser/caddy"]
 CMD         ["-agree", "-http-port", "8081"]
