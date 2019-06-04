@@ -1,7 +1,7 @@
 module Page.Reports exposing (Model, Msg, init, update, view)
 
 import Authentication
-import Bytes
+import Bytes exposing (Bytes)
 import Data.Report exposing (Report)
 import File.Download as Download
 import Html exposing (Html, a, button, div, input, label, li, text, ul)
@@ -26,7 +26,7 @@ type Msg
     = GetReports
     | DownloadReport Report
     | GotReports (Result Http.Error (List Report))
-    | GotDownload (Result Http.Error (List Report))
+    | GotDownload (Result Http.Error Bytes)
     | HideError
 
 
@@ -52,15 +52,36 @@ getReports authModel =
         }
 
 
-downloadReport : Authentication.Model -> Data.Report.Report -> Cmd Msg
-downloadReport authModel report =
+expectBytes : (Result Http.Error Bytes -> msg) -> Http.Expect msg
+expectBytes toMsg =
+    Http.expectBytesResponse toMsg <|
+        \response ->
+            case response of
+                Http.BadUrl_ url ->
+                    Err (Http.BadUrl url)
+
+                Http.Timeout_ ->
+                    Err Http.Timeout
+
+                Http.NetworkError_ ->
+                    Err Http.NetworkError
+
+                Http.BadStatus_ metadata body ->
+                    Err (Http.BadStatus metadata.statusCode)
+
+                Http.GoodStatus_ metadata body ->
+                    Ok body
+
+
+downloadReport : Data.Report.Report -> Cmd Msg
+downloadReport report =
     let
         headers =
             [ Http.header "Accept" "application/octet-stream" ]
     in
     Http.request
         { body = Http.emptyBody
-        , expect = Http.expectJson GotDownload (Decode.list Data.Report.decode)
+        , expect = expectBytes GotDownload
         , headers = headers
         , method = "GET"
         , url = "/rpc/download_file?fileid=" ++ report.uuid
@@ -69,9 +90,9 @@ downloadReport authModel report =
         }
 
 
-downloadReportBytes : Data.Report.Report -> Cmd msg
-downloadReportBytes report =
-    Download.url ("/rpc/download_file?fileid=" ++ report.uuid)
+downloadReportBytes : Bytes -> Cmd msg
+downloadReportBytes content =
+    Download.bytes "report.pptx" "application/pptx" content
 
 
 initialCommands : Authentication.Model -> List (Cmd Msg)
@@ -92,9 +113,7 @@ update msg model authModel =
             )
 
         DownloadReport report ->
-            ( model
-            , downloadReportBytes report
-            )
+            ( model, downloadReport report )
 
         HideError ->
             ( { model | errorModel = errorInit }, Cmd.none )
@@ -111,10 +130,8 @@ update msg model authModel =
             , Process.sleep 3000 |> Task.perform (always HideError)
             )
 
-        GotDownload (Ok reports) ->
-            ( { model | reports = reports }
-            , Cmd.none
-            )
+        GotDownload (Ok response) ->
+            ( model, downloadReportBytes response )
 
         GotDownload (Err error) ->
             ( { model
