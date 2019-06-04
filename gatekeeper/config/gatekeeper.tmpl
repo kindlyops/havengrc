@@ -24,10 +24,14 @@ encryption-key: {{ .Env.GATEKEEPER_SESSION_KEY }}
 
 listen: 0.0.0.0:{{ .Env.GATEKEEPER_LISTEN_PORT }}
 
+{{if .Env.TLS_CERT }}
 tls-cert: {{ .Env.TLS_CERT }}
 tls-private-key: {{ .Env.TLS_PRIVATE_KEY }}
+enable-security-filter: true
+{{ end }}
 
-enable-security-filter: false
+
+
 enable-https-redirection: false
 upstream-url: {{ .Env.UPSTREAM_URL }}
 skip-upstream-tls-verify: true
