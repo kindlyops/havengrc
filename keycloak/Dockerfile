@@ -18,6 +18,16 @@ COPY                keycloak/configuration/standalone.xml /opt/jboss/keycloak/st
 COPY --from=build   /keycloak-service-providers/target/kindlyops-chargebee-form-action.jar /opt/jboss/keycloak/standalone/deployments
 COPY --from=build   /keycloak-service-providers/magic-link/target/magic-link.jar /opt/jboss/keycloak/standalone/deployments
 
+# this is so that we can debug network traffic in the keycloak container on openshift
+USER root
+RUN yum update -y && yum install -y tcpdump ngrep && yum clean all
+RUN groupadd pcap
+RUN usermod -a -G pcap jboss
+RUN chgrp pcap /usr/sbin/ngrep
+RUN chmod 750 /usr/sbin/ngrep
+RUN setcap cap_net_raw,cap_net_admin=eip /usr/sbin/ngrep
+USER 1000
+
 ENV         DB_VENDOR postgres
 ENV         ENV_VERBOSITY 无
 ENV         DB_DATABASE mappamundi_dev
