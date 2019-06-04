@@ -47,7 +47,7 @@ init authModel =
 
 reportsUrl : String
 reportsUrl =
-    "/api/files"
+    "/api/files?select=uuid,created_at,user_id,name"
 
 
 getReports : Authentication.Model -> Cmd Msg
