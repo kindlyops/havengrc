@@ -220,6 +220,7 @@ services:
       - UPSTREAM_URL=http://webui/
       - DISCOVERY_URL=http://dev.havengrc.com/auth/realms/havendev
       - KEYCLOAK_INTERNAL=http://keycloak:8080
+      - KEYCLOAK_SCHEME=http
       - BASE_URI=
       - REDIRECTION_URL=http://dev.havengrc.com/
       - GATEKEEPER_SESSION_KEY=c01f3736e640ea874d66c3704ddb7a9a

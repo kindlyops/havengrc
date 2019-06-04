@@ -14,10 +14,16 @@ spec:
     spec:
       containers:
         - name: keycloak
-          image: havengrc-docker.jfrog.io/kindlyops/keycloak:4.0.0.Final
+          image: havengrc-docker.jfrog.io/kindlyops/keycloak:latest
           env:
             - name: DB_DATABASE
               value: "havenstage"
+            - name: KEYCLOAK_HOSTNAME
+              value: "staging.havengrc.com"
+            - name: KEYCLOAK_HTTP_PORT
+              value: "80"
+            - name: KEYCLOAK_HTTPS_PORT
+              value: "443"
             - name: DB_USER
               valueFrom:
                 secretKeyRef:
