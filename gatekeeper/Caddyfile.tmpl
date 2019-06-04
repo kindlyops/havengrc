@@ -1,6 +1,8 @@
 :80
 
-proxy / {{ .Env.KEYCLOAK_INTERNAL }}
+proxy / {{ .Env.KEYCLOAK_INTERNAL }} {
+    header_upstream X-Forwarded-Proto https
+}
 
 log / stdout "{combined}"
 errors stdout
