@@ -22,11 +22,17 @@ type alias Model =
     }
 
 
+type alias FileDownload =
+    { body : Bytes
+    , report : Report
+    }
+
+
 type Msg
     = GetReports
     | DownloadReport Report
     | GotReports (Result Http.Error (List Report))
-    | GotDownload (Result Http.Error Bytes)
+    | GotDownload (Result Http.Error FileDownload)
     | HideError
 
 
@@ -52,8 +58,8 @@ getReports authModel =
         }
 
 
-expectBytes : (Result Http.Error Bytes -> msg) -> Http.Expect msg
-expectBytes toMsg =
+expectBytes : Report -> (Result Http.Error FileDownload -> msg) -> Http.Expect msg
+expectBytes report toMsg =
     Http.expectBytesResponse toMsg <|
         \response ->
             case response of
@@ -70,7 +76,7 @@ expectBytes toMsg =
                     Err (Http.BadStatus metadata.statusCode)
 
                 Http.GoodStatus_ metadata body ->
-                    Ok body
+                    Ok { body = body, report = report }
 
 
 downloadReport : Data.Report.Report -> Cmd Msg
@@ -81,7 +87,7 @@ downloadReport report =
     in
     Http.request
         { body = Http.emptyBody
-        , expect = expectBytes GotDownload
+        , expect = expectBytes report GotDownload
         , headers = headers
         , method = "GET"
         , url = "/rpc/download_file?fileid=" ++ report.uuid
@@ -90,9 +96,9 @@ downloadReport report =
         }
 
 
-downloadReportBytes : Bytes -> Cmd msg
-downloadReportBytes content =
-    Download.bytes "report.pptx" "application/pptx" content
+downloadReportBytes : String -> Bytes -> Cmd msg
+downloadReportBytes name content =
+    Download.bytes name "application/pptx" content
 
 
 initialCommands : Authentication.Model -> List (Cmd Msg)
@@ -131,7 +137,7 @@ update msg model authModel =
             )
 
         GotDownload (Ok response) ->
-            ( model, downloadReportBytes response )
+            ( model, downloadReportBytes response.report.name response.body )
 
         GotDownload (Err error) ->
             ( { model
