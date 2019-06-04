@@ -1,10 +1,10 @@
-module Page.Reports exposing (Model, Msg, init, update, view)
+module Page.Reports exposing (Model, Msg(..), dashboardView, getReports, init, update, view)
 
 import Authentication
 import Bytes exposing (Bytes)
 import Data.Report exposing (Report)
 import File.Download as Download
-import Html exposing (Html, a, button, div, input, label, li, text, ul)
+import Html exposing (Html, a, button, div, i, input, label, li, p, text, ul)
 import Html.Attributes exposing (attribute, class, href, id)
 import Html.Events exposing (onClick, onInput)
 import Http
@@ -165,6 +165,27 @@ view authModel model =
             [ button [ class "btn btn-secondary", onClick GetReports ] [ text "get reports" ]
             ]
         , viewError model.errorModel
+        ]
+
+
+dashboardView : Authentication.Model -> Model -> Html Msg
+dashboardView authModel model =
+    div [ class "card" ]
+        [ div
+            [ class "card-body" ]
+            [ div [ class "card-title" ] [ text "Latest Report:" ]
+            , ul [ class "list-group" ]
+                (List.map
+                    (\l ->
+                        li [ class "list-group-item" ]
+                            [ p [] [ text ("Report created on " ++ l.created_at) ]
+                            , button [ class "btn btn-secondary", onClick (DownloadReport l) ] [ text l.name, i [ class "material-icons pl-2" ] [ text "cloud_download" ] ]
+                            ]
+                    )
+                    model.reports
+                )
+            , viewError model.errorModel
+            ]
         ]
 
 

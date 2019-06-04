@@ -65,6 +65,9 @@ init sessionStorage location key =
         ( commentsModel, commentsCmd ) =
             Comments.init initialAuthModel
 
+        ( dashboardModel, dashboardCmd ) =
+            Dashboard.init initialAuthModel
+
         ( reportsModel, reportsCmd ) =
             Reports.init initialAuthModel
 
@@ -81,7 +84,7 @@ init sessionStorage location key =
 
         model =
             { authModel = initialAuthModel
-            , dashboardModel = Dashboard.init
+            , dashboardModel = dashboardModel
             , commentsModel = commentsModel
             , reportsModel = reportsModel
             , surveyModel = surveyModel
@@ -363,7 +366,7 @@ viewBody model =
     div [ id "content", class "content-wrapper container" ]
         [ case Route.locFor model.url of
             Route.Home ->
-                Dashboard.view model.dashboardModel |> Html.map DashboardMsg
+                Dashboard.view model.authModel model.dashboardModel model.reportsModel |> Html.map DashboardMsg
 
             Route.Reports ->
                 Reports.view model.authModel model.reportsModel |> Html.map ReportsMsg
@@ -375,7 +378,7 @@ viewBody model =
                 Terms.view
 
             Route.Dashboard ->
-                Dashboard.view model.dashboardModel |> Html.map DashboardMsg
+                Dashboard.view model.authModel model.dashboardModel model.reportsModel |> Html.map DashboardMsg
 
             Route.Comments ->
                 Comments.view model.authModel model.commentsModel |> Html.map CommentsMsg

@@ -1,30 +1,61 @@
 module Page.Dashboard exposing (Model, Msg(..), init, update, view)
 
+import Authentication
+import Browser.Navigation as Nav
 import Html exposing (Html, br, button, div, text)
 import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
+import Json.Decode as Decode
 import Page.Errors exposing (ErrorData, errorInit, setErrorMessage, viewError)
+import Page.Reports
 import Ports
 import Process
 import Task
+import Url
 
 
 type Msg
     = ShowError String
     | HideError
+    | ReportsMsg Page.Reports.Msg
 
 
 type alias Model =
     { data : List Float
     , errorModel : ErrorData
+    , authModel : Authentication.Model
+    , reportsModel : Page.Reports.Model
     }
 
 
-init : Model
-init =
-    { data = [ 1, 1, 2, 3, 5, 8, 13 ]
-    , errorModel = errorInit
-    }
+init : Authentication.Model -> ( Model, Cmd Page.Reports.Msg )
+init authModel =
+    let
+        ( initialAuthModel, authCmd ) =
+            Authentication.init
+
+        ( reportsModel, reportsCmd ) =
+            Page.Reports.init initialAuthModel
+
+        model =
+            { data = []
+            , reportsModel = reportsModel
+            , authModel = initialAuthModel
+            , errorModel = errorInit
+            }
+    in
+    ( model
+    , Cmd.batch (initialCommands model.authModel)
+    )
+
+
+initialCommands : Authentication.Model -> List (Cmd Page.Reports.Msg)
+initialCommands authModel =
+    if Authentication.isLoggedIn authModel then
+        [ Page.Reports.getReports authModel ]
+
+    else
+        []
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -38,17 +69,19 @@ update msg model =
         HideError ->
             ( { model | errorModel = errorInit }, Cmd.none )
 
+        ReportsMsg reportMsg ->
+            let
+                ( reportsModel, cmd ) =
+                    Page.Reports.update reportMsg model.reportsModel model.authModel
+            in
+            ( { model | reportsModel = reportsModel }, Cmd.map ReportsMsg cmd )
 
-view : Model -> Html Msg
-view model =
+
+view : Authentication.Model -> Model -> Page.Reports.Model -> Html Msg
+view authModel model reportsModel =
     div
         []
-        [ div [] [ text "This used to be the Centroid" ]
+        [ div [] [ text "Welcome to your Haven GRC Dashboard!" ]
         , br [] []
-        , button
-            [ class "btn btn-secondary"
-            , onClick (ShowError "this is an error message")
-            ]
-            [ text "Show Error" ]
-        , viewError model.errorModel
+        , div [] [ Page.Reports.dashboardView authModel reportsModel |> Html.map ReportsMsg ]
         ]
