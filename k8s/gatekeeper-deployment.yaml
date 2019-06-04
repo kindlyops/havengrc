@@ -30,7 +30,7 @@ spec:
             - name: KEYCLOAK_INTERNAL
               value: "http://keycloak.haven-production.svc:8080"
             - name: DISCOVERY_URL
-              value: "https://staging.havengrc.com/auth/realms/havendev"
+              value: "http://staging.havengrc.com/auth/realms/havendev"
             - name: CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
