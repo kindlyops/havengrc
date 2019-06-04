@@ -29,6 +29,8 @@ spec:
                   key: sessionkey
             - name: KEYCLOAK_INTERNAL
               value: "http://keycloak.haven-production.svc:8080"
+            - name: KEYCLOAK_SCHEME
+              value: "https"
             - name: DISCOVERY_URL
               value: "http://staging.havengrc.com/auth/realms/havendev"
             - name: CLIENT_SECRET
