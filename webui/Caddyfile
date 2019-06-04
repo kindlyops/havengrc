@@ -27,6 +27,10 @@ header / {
 
 proxy /auth keycloak:8080 {
   transparent
+  header_upstream X-Forwarded-Proto {>X-Forwarded-Proto}
+  # see https://github.com/mholt/caddy/issues/2550#issuecomment-480314316 for
+  # how caddy needs this help to forward proto correctly when behind another
+  # proxy (gatekeeper)
 }
 
 proxy /api api:3001 {
