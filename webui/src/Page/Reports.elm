@@ -1,10 +1,10 @@
-module Page.Reports exposing (Model, Msg, init, update, view)
+module Page.Reports exposing (Model, Msg(..), dashboardView, getReports, init, update, view)
 
 import Authentication
-import Bytes
+import Bytes exposing (Bytes)
 import Data.Report exposing (Report)
 import File.Download as Download
-import Html exposing (Html, a, button, div, input, label, li, text, ul)
+import Html exposing (Html, a, button, div, i, input, label, li, p, text, ul)
 import Html.Attributes exposing (attribute, class, href, id)
 import Html.Events exposing (onClick, onInput)
 import Http
@@ -22,11 +22,17 @@ type alias Model =
     }
 
 
+type alias FileDownload =
+    { body : Bytes
+    , report : Report
+    }
+
+
 type Msg
     = GetReports
     | DownloadReport Report
     | GotReports (Result Http.Error (List Report))
-    | GotDownload (Result Http.Error (List Report))
+    | GotDownload (Result Http.Error FileDownload)
     | HideError
 
 
@@ -41,7 +47,7 @@ init authModel =
 
 reportsUrl : String
 reportsUrl =
-    "/api/files"
+    "/api/files?select=uuid,created_at,user_id,name"
 
 
 getReports : Authentication.Model -> Cmd Msg
@@ -52,26 +58,47 @@ getReports authModel =
         }
 
 
-downloadReport : Authentication.Model -> Data.Report.Report -> Cmd Msg
-downloadReport authModel report =
+expectBytes : Report -> (Result Http.Error FileDownload -> msg) -> Http.Expect msg
+expectBytes report toMsg =
+    Http.expectBytesResponse toMsg <|
+        \response ->
+            case response of
+                Http.BadUrl_ url ->
+                    Err (Http.BadUrl url)
+
+                Http.Timeout_ ->
+                    Err Http.Timeout
+
+                Http.NetworkError_ ->
+                    Err Http.NetworkError
+
+                Http.BadStatus_ metadata body ->
+                    Err (Http.BadStatus metadata.statusCode)
+
+                Http.GoodStatus_ metadata body ->
+                    Ok { body = body, report = report }
+
+
+downloadReport : Data.Report.Report -> Cmd Msg
+downloadReport report =
     let
         headers =
             [ Http.header "Accept" "application/octet-stream" ]
     in
     Http.request
         { body = Http.emptyBody
-        , expect = Http.expectJson GotDownload (Decode.list Data.Report.decode)
+        , expect = expectBytes report GotDownload
         , headers = headers
         , method = "GET"
-        , url = "/api/files?select=file&uuid=eq." ++ report.uuid
+        , url = "/rpc/download_file?fileid=" ++ report.uuid
         , timeout = Nothing
         , tracker = Nothing
         }
 
 
-downloadReportBytes : Data.Report.Report -> Cmd msg
-downloadReportBytes report =
-    Download.url ("/api/files?select=file&uuid=eq." ++ report.uuid)
+downloadReportBytes : String -> Bytes -> Cmd msg
+downloadReportBytes name content =
+    Download.bytes name "application/octet-stream" content
 
 
 initialCommands : Authentication.Model -> List (Cmd Msg)
@@ -92,9 +119,7 @@ update msg model authModel =
             )
 
         DownloadReport report ->
-            ( model
-            , downloadReport authModel report
-            )
+            ( model, downloadReport report )
 
         HideError ->
             ( { model | errorModel = errorInit }, Cmd.none )
@@ -111,10 +136,8 @@ update msg model authModel =
             , Process.sleep 3000 |> Task.perform (always HideError)
             )
 
-        GotDownload (Ok reports) ->
-            ( { model | reports = reports }
-            , Cmd.none
-            )
+        GotDownload (Ok response) ->
+            ( model, downloadReportBytes response.report.name response.body )
 
         GotDownload (Err error) ->
             ( { model
@@ -142,6 +165,27 @@ view authModel model =
             [ button [ class "btn btn-secondary", onClick GetReports ] [ text "get reports" ]
             ]
         , viewError model.errorModel
+        ]
+
+
+dashboardView : Authentication.Model -> Model -> Html Msg
+dashboardView authModel model =
+    div [ class "card" ]
+        [ div
+            [ class "card-body" ]
+            [ div [ class "card-title" ] [ text "Latest Report:" ]
+            , ul [ class "list-group" ]
+                (List.map
+                    (\l ->
+                        li [ class "list-group-item" ]
+                            [ p [] [ text ("Report created on " ++ l.created_at) ]
+                            , button [ class "btn btn-secondary", onClick (DownloadReport l) ] [ text l.name, i [ class "material-icons pl-2" ] [ text "cloud_download" ] ]
+                            ]
+                    )
+                    model.reports
+                )
+            , viewError model.errorModel
+            ]
         ]
 
 

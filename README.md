@@ -64,6 +64,7 @@ Applications and frameworks that are complementary to Haven. We would prefer to 
     - [Testing on a real mobile device](#testing-on-a-real-mobile-device)
     - [add a database migration](#add-a-database-migration)
   - [Authentication with JWT and Keycloak](#authentication-with-jwt-and-keycloak)
+    - [architecture](#architecture)
     - [roles and permissions](#roles-and-permissions)
     - [multi-tenancy](#multi-tenancy)
     - [Low level JWT interactions](#low-level-jwt-interactions)
@@ -257,6 +258,14 @@ CREATE TABLE mappa.foo
     git commit -m "Adding foo table"
 
 ## Authentication with JWT and Keycloak
+
+### architecture
+
+We use Keycloak and OpenID for Authorization. Google, GitHub, and other
+identity providers such as LDAP/Active Directory may be configured as
+Keycloak identify providers. Here is the basic flow
+
+![](docs/plantuml/havengrc.png)
 
 ### roles and permissions
 

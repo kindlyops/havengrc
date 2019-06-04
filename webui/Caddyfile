@@ -1,11 +1,13 @@
-:8443
+:8081
 
-tls /certs/fullchain.pem /certs/privkey.pem
+# terminating TLS at gatekeeper for now
+# tls /certs/fullchain.pem /certs/privkey.pem
 
-redir 301 {
-  if {>X-Forwarded-Proto} is http
-  / https://{host}{uri}
-}
+# https redirect is handled at kubernetes route object (load balancer)
+# redir 301 {
+#   if {>X-Forwarded-Proto} is http
+#   / https://{host}{uri}
+# }
 
 header / {
   # Enable HTTP Strict Transport Security (HSTS) to force clients to always
@@ -32,7 +34,11 @@ proxy /api api:3001 {
   transparent
 }
 
-proxy /api/files havenapi:3000 {
+proxy /rpc api:3001 {
+  transparent
+}
+
+proxy /api/reports havenapi:3000 {
   transparent
 }
 

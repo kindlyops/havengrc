@@ -12,10 +12,35 @@ spec:
       labels:
         service: gatekeeper
     spec:
+      hostAliases:
+        - ip: "127.0.0.1"
+          hostnames:
+          - "staging.havengrc.com"
       containers:
         - name: gatekeeper
           image: havengrc-docker.jfrog.io/kindlyops/gatekeeper:latest
           env:
+            - name: GATEKEEPER_LISTEN_PORT
+              value: "8443"
+            - name: GATEKEEPER_SESSION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: haven-gatekeeper-credentials
+                  key: sessionkey
+            - name: KEYCLOAK_INTERNAL
+              value: "http://keycloak.haven-production.svc:8080"
+            - name: REDIRECTION_URL
+              value: "https://staging.havengrc.com"
+            - name: BASE_URI
+              value: ""
+            - name: SECURE_COOKIE
+              value: "true"
+            - name: TLS_CERT
+              value: "/certs/fullchain.pem"
+            - name: TLS_PRIVATE_KEY
+              value: "/certs/privkey.pem"
+            - name: KEYCLOAK_SCHEME
+              value: "https"
             - name: DISCOVERY_URL
               value: "https://staging.havengrc.com/auth/realms/havendev"
             - name: CLIENT_SECRET
@@ -24,18 +49,14 @@ spec:
                   name: haven-gatekeeper-credentials
                   key: clientsecret
             - name: UPSTREAM_URL
-              value: "https://staging.havengrc.com/"
+              value: "http://havenweb.haven-production.svc:8081/"
           volumeMounts:
             - name: secret-volume
               mountPath: /certs/
               readOnly: true
           ports:
-            - containerPort: 80
+            - containerPort: 8443
               protocol: TCP
-              targetPort: 8080
-            - containerPort: 443
-              protocol: TCP
-              targetPort: 8443
           resources:
             limits:
               memory: 256Mi

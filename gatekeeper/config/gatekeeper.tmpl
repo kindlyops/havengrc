@@ -1,0 +1,82 @@
+# is the url for retrieve the OpenID configuration - normally the <server>/auth/realm/<realm_name>
+discovery-url: {{ .Env.DISCOVERY_URL }}
+
+base-uri: {{ .Env.BASE_URI }}
+
+# the client id for the 'client' application
+client-id: gatekeeper
+client-secret: {{ .Env.CLIENT_SECRET }}
+
+# the redirection url, essentially the site url, note: /oauth/callback is added at the end
+redirection-url: {{ .Env.REDIRECTION_URL }}
+
+# the name of the access cookie, defaults to kc-access
+cookie-access-name: havengrc-access
+secure-cookie: {{ .Env.SECURE_COOKIE }}
+
+skip-openid-provider-tls-verify: true
+
+enable-refresh-tokens: false
+# the name of the refresh cookie, default to kc-state
+cookie-refresh-name: havengrc-state
+# the encryption key used to encode the session state
+encryption-key: {{ .Env.GATEKEEPER_SESSION_KEY }}
+
+listen: 0.0.0.0:{{ .Env.GATEKEEPER_LISTEN_PORT }}
+
+{{if .Env.TLS_CERT }}
+tls-cert: {{ .Env.TLS_CERT }}
+tls-private-key: {{ .Env.TLS_PRIVATE_KEY }}
+enable-security-filter: true
+headers:
+  X-Forwarded-Proto: https
+{{ end }}
+
+
+
+enable-https-redirection: false
+upstream-url: {{ .Env.UPSTREAM_URL }}
+skip-upstream-tls-verify: true
+
+
+enable-default-deny: false
+resources:
+- uri: /unleash/*
+  roles:
+  - superadmin
+- uri: /*
+  require-any-role: true
+- uri: /
+  white-listed: true
+- uri: /l/*
+  white-listed: true
+- uri: /img/*
+  white-listed: true
+- uri: /js/*
+  white-listed: true
+- uri: /fonts/*
+  white-listed: true
+- uri: /static/js/*
+  white-listed: true
+- uri: /static/css/*
+  white-listed: true
+- uri: /sockjs-node/*
+  white-listed: true
+- uri: /terms
+  white-listed: true
+- uri: /privacy
+  white-listed: true
+- uri: /logout
+  white-listed: true # this is the page after you have logged out
+- uri: /survey/
+  white-listed: true # this is the registration funnel entry point
+- uri: /api/ipsative_data
+  white-listed: true # publicly readable due to registration funnel
+- uri: /api/ipsative_surveys
+  white-listed: true # publicly readable due to registration funnel
+- uri: /api/likert_surveys
+  white-listed: true # publicly readable due to registration funnel
+- uri: /api/registration_funnel
+  white-listed: true # we allow registration funnel posts here
+- uri: /auth/*
+  white-listed: true # this is the keycloak server, handles it's own auth
