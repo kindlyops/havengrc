@@ -98,7 +98,7 @@ downloadReport report =
 
 downloadReportBytes : String -> Bytes -> Cmd msg
 downloadReportBytes name content =
-    Download.bytes name "application/pptx" content
+    Download.bytes name "application/octet-stream" content
 
 
 initialCommands : Authentication.Model -> List (Cmd Msg)
