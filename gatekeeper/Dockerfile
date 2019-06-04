@@ -30,6 +30,9 @@ COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chown -R havenuser:havenuser /opt && chgrp -R 0 /opt && chmod -R g=u /opt
 RUN setcap CAP_NET_BIND_SERVICE=+eip /opt/keycloak-gatekeeper
 RUN setcap CAP_NET_BIND_SERVICE=+eip /opt/caddy
+# set up nsswitch.conf for Go's "netgo" implementation
+# - https://github.com/golang/go/blob/go1.9.1/src/net/conf.go#L194-L275
+RUN [ ! -e /etc/nsswitch.conf ] && echo 'hosts: files dns' > /etc/nsswitch.conf
 USER havenuser
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
