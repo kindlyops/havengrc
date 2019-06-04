@@ -13,4 +13,4 @@ ENV         HOME /home/havenuser
 RUN chown -R havenuser:havenuser /home/havenuser && chgrp -R 0 /home/havenuser && chmod -R g=u /home/havenuser
 USER havenuser
 ENTRYPOINT  ["/home/havenuser/caddy"]
-CMD         ["-agree", "-http-port", "8081"]
+CMD         ["-agree"]
