@@ -28,6 +28,8 @@ listen: 0.0.0.0:{{ .Env.GATEKEEPER_LISTEN_PORT }}
 tls-cert: {{ .Env.TLS_CERT }}
 tls-private-key: {{ .Env.TLS_PRIVATE_KEY }}
 enable-security-filter: true
+headers:
+  X-Forwarded-Proto: https
 {{ end }}
 
 
