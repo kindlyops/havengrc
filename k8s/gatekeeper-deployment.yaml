@@ -28,7 +28,7 @@ spec:
                   name: haven-gatekeeper-credentials
                   key: sessionkey
             - name: KEYCLOAK_INTERNAL
-              value: "keycloak.haven-production.svc"
+              value: "http://keycloak.haven-production.svc:8080"
             - name: DISCOVERY_URL
               value: "https://staging.havengrc.com/auth/realms/havendev"
             - name: CLIENT_SECRET
@@ -37,7 +37,7 @@ spec:
                   name: haven-gatekeeper-credentials
                   key: clientsecret
             - name: UPSTREAM_URL
-              value: "http://havenweb:8081/"
+              value: "http://havenweb.haven-production.svc:8081/"
           volumeMounts:
             - name: secret-volume
               mountPath: /certs/
