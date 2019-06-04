@@ -29,10 +29,6 @@ proxy /auth keycloak:8080 {
   transparent
 }
 
-proxy /oauth/logout keycloak:8080 {
-  transparent
-}
-
 proxy /api api:3001 {
   without /api
   transparent
