@@ -29,6 +29,16 @@ spec:
                   key: sessionkey
             - name: KEYCLOAK_INTERNAL
               value: "http://keycloak.haven-production.svc:8080"
+            - name: REDIRECTION_URL
+              value: "https://staging.havengrc.com"
+            - name: BASE_URI
+              value: ""
+            - name: SECURE_COOKIE
+              value: "true"
+            - name: TLS_CERT
+              value: "/certs/fullchain.pem"
+            - name: TLS_PRIVATE_KEY
+              value: "/certs/privkey.pem"
             - name: KEYCLOAK_SCHEME
               value: "https"
             - name: DISCOVERY_URL
