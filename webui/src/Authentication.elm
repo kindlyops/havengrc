@@ -91,7 +91,7 @@ update msg model =
         LoginMsg ->
             -- Force full page reload of dashboard using Nav.load, which will trigger
             -- gatekeeper to initiate the OIDC redirect for login at Keycloak
-            ( model, Nav.load "http://dev.havengrc.com/dashboard/" )
+            ( model, Nav.load "/dashboard/" )
 
         LogOut ->
             ( { model | state = LoggedOut }, Ports.saveSurveyState Nothing )
