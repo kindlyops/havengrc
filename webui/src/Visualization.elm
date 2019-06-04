@@ -1,4 +1,4 @@
-module Visualization exposing (myVis)
+module Visualization exposing (compliance, havenSpecs)
 
 import Data.Survey
 import Vega
@@ -19,10 +19,10 @@ getData model =
     allResponses
 
 
-myVis : Spec
-myVis =
+compliance : Spec
+compliance =
     let
-        _ =
+        responses =
             -- Do something here with some data eventually!
             getData
 
@@ -31,7 +31,7 @@ myVis =
 
         data =
             dataFromColumns []
-                << dataColumn "a"
+                << dataColumn "Compliance"
                     (strs
                         [ "Org Values"
                         , "Org Behaves"
@@ -50,7 +50,7 @@ myVis =
         enc =
             encoding
                 << position X [ pName "b", pMType Quantitative ]
-                << position Y [ pName "a", pMType Ordinal ]
+                << position Y [ pName "Compliance", pMType Ordinal ]
 
         specBar =
             asSpec [ bar [] ]
@@ -62,3 +62,53 @@ myVis =
             configure << configuration (coNamedStyle "label" [ maAlign haLeft, maBaseline vaMiddle, maDx 3 ])
     in
     toVegaLite [ des, data [], enc [], layer [ specBar, specText ], config [] ]
+
+
+process : Spec
+process =
+    let
+        responses =
+            -- Do something here with some data eventually!
+            getData
+
+        des =
+            description "SCDS Assessment"
+
+        data =
+            dataFromColumns []
+                << dataColumn "Process"
+                    (strs
+                        [ "Org Values"
+                        , "Org Behaves"
+                        , "Definition"
+                        , "Information"
+                        , "Operations"
+                        , "Technology"
+                        , "People"
+                        , "Risk"
+                        , "Accountability"
+                        , "Performance"
+                        ]
+                    )
+                << dataColumn "d" (nums [ 1, 1, 1 ])
+
+        enc =
+            encoding
+                << position X [ pName "d", pMType Quantitative ]
+                << position Y [ pName "Process", pMType Ordinal ]
+
+        specBar =
+            asSpec [ bar [] ]
+
+        specText =
+            asSpec [ textMark [ maStyle [ "label" ] ], encoding (text [ tName "d", tMType Quantitative ] []) ]
+
+        config =
+            configure << configuration (coNamedStyle "label" [ maAlign haLeft, maBaseline vaMiddle, maDx 3 ])
+    in
+    toVegaLite [ des, data [], enc [], layer [ specBar, specText ], config [] ]
+
+
+havenSpecs : List Spec
+havenSpecs =
+    [ compliance, process ]

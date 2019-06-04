@@ -15,4 +15,4 @@ port radarChart : RadarChartConfig -> Cmd msg
 port saveSurveyState : Maybe Value -> Cmd msg
 
 
-port renderVega : Spec -> Cmd msg
+port renderVega : List Spec -> Cmd msg

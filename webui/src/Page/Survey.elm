@@ -47,7 +47,7 @@ import Process
 import Task
 import Utils exposing (getHTTPErrorMessage)
 import Views.SurveyCard
-import Visualization exposing (myVis)
+import Visualization exposing (havenSpecs)
 
 
 
@@ -585,7 +585,7 @@ update msg model authModel =
                                     { model | currentPage = Finished }
 
                                 cmd =
-                                    Ports.renderVega myVis
+                                    Ports.renderVega havenSpecs
                             in
                             ( newModel
                             , Cmd.batch [ storeSurvey newModel (getQuestionNumber newModel), cmd ]
@@ -608,7 +608,7 @@ update msg model authModel =
                                     { model | currentPage = Finished }
 
                                 cmd =
-                                    Ports.renderVega myVis
+                                    Ports.renderVega havenSpecs
                             in
                             ( newModel
                             , Cmd.batch [ storeSurvey newModel (getQuestionNumber newModel), cmd ]
@@ -1172,7 +1172,10 @@ viewRegistration model =
                 , input [ placeholder "Email Address", value model.emailAddress, onInput UpdateEmail ] []
                 , br [] []
                 , br [] []
-                , div [ class "vis", id "vis" ] []
+                , div [ class "vis", id "vis0" ] []
+                , br [] []
+                , br [] []
+                , div [ class "vis", id "vis1" ] []
                 , br [] []
                 , br [] []
                 , button [ class "btn btn-primary", onClick RegisterNewUser ] [ text "Click to save results to the server." ]
