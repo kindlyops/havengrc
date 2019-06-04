@@ -21,11 +21,8 @@ COPY --from=build   /keycloak-service-providers/magic-link/target/magic-link.jar
 # this is so that we can debug network traffic in the keycloak container on openshift
 USER root
 RUN yum update -y && yum install -y tcpdump ngrep && yum clean all
-RUN groupadd pcap
-RUN usermod -a -G pcap jboss
-RUN chgrp pcap /usr/sbin/ngrep
-RUN chmod 750 /usr/sbin/ngrep
-RUN setcap cap_net_raw,cap_net_admin=eip /usr/sbin/ngrep
+#RUN setcap cap_net_raw,cap_net_admin=eip /usr/sbin/ngrep
+#RUN setcap cap_net_raw,cap_net_admin=eip /usr/sbin/tcpdump
 USER 1000
 
 ENV         DB_VENDOR postgres
