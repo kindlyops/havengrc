@@ -5,4 +5,4 @@ openssl genrsa -out privkey.pem 2048
 
 openssl req -new -key privkey.pem -out server.csr -subj "/CN=dev.havengrc.com"
 
-openssl x509 -req -signkey privkey.pem -in server.csr -out server.pem
+openssl x509 -req -signkey privkey.pem -in server.csr -out fullchain.pem

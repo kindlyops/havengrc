@@ -1,4 +1,10 @@
+{{if .Env.TLS_CERT }}
+:443
+tls {{ .Env.TLS_CERT }} {{ .Env.TLS_PRIVATE_KEY }}
+{{ else }}
 :80
+{{ end }}
+
 
 proxy / {{ .Env.KEYCLOAK_INTERNAL }} {
     header_upstream Host {host}

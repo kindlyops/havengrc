@@ -14,6 +14,8 @@ redirection-url: {{ .Env.REDIRECTION_URL }}
 cookie-access-name: havengrc-access
 secure-cookie: {{ .Env.SECURE_COOKIE }}
 
+skip-openid-provider-tls-verify: true
+
 enable-refresh-tokens: false
 # the name of the refresh cookie, default to kc-state
 cookie-refresh-name: havengrc-state
