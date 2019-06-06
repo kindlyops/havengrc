@@ -150,14 +150,17 @@ h3{
 }
 
 .custom-range::-ms-thumb{
-  background: #2fa09d;
+  background: var(--primary);
   cursor: pointer;
   height:16px;
   width: 20px;
 }
 
-.custom-range:focus::-webkit-slider-thumb{
+.custom-range:focus::-webkit-slider-thumb,
+.custom-range:active::-webkit-slider-thumb{
   box-shadow: none;
+  outline:none;
+  background: var(--primary);
  }
 
 .custom-range::-webkit-slider-runnable-track{
@@ -187,7 +190,7 @@ h3{
 }
 
 .custom-range:focus::-ms-fill-lower {
-  background: #2fa09d;
+  background: var(--primary);
 }
 
 .custom-range::-ms-fill-upper{
@@ -198,7 +201,7 @@ h3{
 }
 
 .custom-range:focus::-ms-fill-upper {
-  background: #2fa09d;
+  background: var(--primary);
 }
 
 .question-container{
