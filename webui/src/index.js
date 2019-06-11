@@ -46,7 +46,8 @@ let updateChart = function (spec) {
   //console.log("updateChart was called");
   window.requestAnimationFrame(() => {
     var element = $('#vis');
-    if (element) {
+    if (element.length) {
+      console.log(spec);
       vegaEmbed("#vis", spec, { actions: false }).catch(console.warn);
     }
   });

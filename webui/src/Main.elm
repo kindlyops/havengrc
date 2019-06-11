@@ -26,7 +26,7 @@ import Process
 import Route
 import Task
 import Url
-import Visualization exposing (myVis)
+import Visualization exposing (havenSpecs)
 
 
 type alias Model =
@@ -100,7 +100,7 @@ init sessionStorage location key =
         , Cmd.map ReportsMsg reportsCmd
         , Cmd.map SurveyMsg surveyCmd
         , Cmd.map SurveyResponseMsg surveyResponsesCmd
-        , Ports.renderVega myVis
+        , Ports.renderVega (havenSpecs surveyModel)
         ]
     )
 
@@ -193,6 +193,7 @@ update msg model =
                 , Cmd.map ReportsMsg reportsCmd
                 , Cmd.map SurveyMsg surveyCmd
                 , Cmd.map SurveyResponseMsg surveyResponsesCmd
+                , Ports.renderVega (havenSpecs model.surveyModel)
                 ]
             )
 

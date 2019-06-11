@@ -47,7 +47,7 @@ import Process
 import Task
 import Utils exposing (getHTTPErrorMessage)
 import Views.SurveyCard
-import Visualization exposing (myVis)
+import Visualization exposing (havenSpecs)
 
 
 
@@ -585,7 +585,7 @@ update msg model authModel =
                                     { model | currentPage = Finished }
 
                                 cmd =
-                                    Ports.renderVega myVis
+                                    Ports.renderVega (havenSpecs model)
                             in
                             ( newModel
                             , Cmd.batch [ storeSurvey newModel (getQuestionNumber newModel), cmd ]
@@ -608,7 +608,7 @@ update msg model authModel =
                                     { model | currentPage = Finished }
 
                                 cmd =
-                                    Ports.renderVega myVis
+                                    Cmd.none
                             in
                             ( newModel
                             , Cmd.batch [ storeSurvey newModel (getQuestionNumber newModel), cmd ]
