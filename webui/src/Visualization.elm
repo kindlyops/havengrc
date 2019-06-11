@@ -200,7 +200,7 @@ spec model =
     toVegaLite
         [ des
         , data []
-        , bar []
+        , bar [ maColor "#2fa09d" ]
         , columns columnCount
         , enc [ ( "facet", Json.Encode.object [ ( "field", Json.Encode.string "category" ), ( "type", Json.Encode.string "ordinal" ) ] ) ]
         , config []
