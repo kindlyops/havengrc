@@ -13,9 +13,20 @@ import Vega
 import VegaLite exposing (..)
 
 
-getData : Data.Survey.IpsativeSurvey -> List Data.Survey.IpsativeSingleResponse
-getData model =
-    Data.Survey.getAllResponsesFromIpsativeSurvey model
+type alias AnswerResponse =
+    { answer : String
+    , category : String
+    , questionNumber : Int
+    , points : Int
+    }
+
+
+type alias ColumnCount =
+    Maybe Int
+
+
+
+-- getQuestionNumbers will align the answers with the question
 
 
 getQuestionNumbers : List AnswerResponse -> List String -> List String
@@ -35,11 +46,12 @@ getQuestionNumbers answers questionNames =
                             ""
                 )
                 answers
-
-        resp =
-            Debug.log "List of questionNumbers" questions
     in
     questions
+
+
+
+-- getPoints will get a list of all points from all answers
 
 
 getPoints : List AnswerResponse -> List Float
@@ -51,11 +63,12 @@ getPoints answers =
                     toFloat x.points
                 )
                 answers
-
-        resp =
-            Debug.log "List of points" points
     in
     points
+
+
+
+-- getCategories will get a list of all categories from all answers
 
 
 getCategories : List AnswerResponse -> List String
@@ -67,19 +80,12 @@ getCategories answers =
                     x.category
                 )
                 answers
-
-        resp =
-            Debug.log "List of categories" categories
     in
     categories
 
 
-type alias AnswerResponse =
-    { answer : String
-    , category : String
-    , questionNumber : Int
-    , points : Int
-    }
+
+-- getAnswers gets all answers and flattnes the pointsAssigned object since we dont use groups
 
 
 getAnswers : List Data.Survey.IpsativeQuestion -> List AnswerResponse
@@ -104,21 +110,14 @@ getAnswers questions =
                             output
                         )
                         x.answers
-
-                --   answer =
-                --       Maybe.withDefault Data.Survey.emptyAnswer
-                --          (List.Extra.find (\a -> "null" /= a.category) x.answers)
-                -- assigned =
-                --     Maybe.withDefault Data.Survey.emptyPointsAssigned
-                --        (List.head answer.pointsAssigned)
             in
             answerList
         )
         questions
 
 
-type alias ColumnCount =
-    Maybe Int
+
+-- columnCount is used to set the column count for the chart
 
 
 columnCount : ColumnCount
@@ -126,31 +125,21 @@ columnCount =
     Just 2
 
 
+
+-- spec creates the vega-lite spec to be used by js
+
+
 spec : Data.Survey.IpsativeSurvey -> Spec
 spec model =
     let
-        responses =
-            -- Do something here with some data eventually!
-            getData
-
         questions =
             Zipper.toList model.questions
 
         answerListing =
             getAnswers questions
 
-        debugLog =
-            Debug.log "List of answers for questions" answerListing
-
-        -- TODO
-        -- Create decoder to create json from answerListing
-        -- jsonList =
-        -- Json.Encode.list (Json.Encode.object (Json.Encode.list answerListing))
         categories =
             getCategories answerListing
-
-        resp =
-            Debug.log "Responses" questions
 
         des =
             description "SCDS Assessment"
