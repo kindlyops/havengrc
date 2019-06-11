@@ -1130,11 +1130,8 @@ getTotalAvailableSurveys model =
 
 viewHero : Model -> Html Msg
 viewHero model =
-    div [ class "" ]
-        [ h1 [ class "display-4" ] [ text "KindlyOps Haven Survey" ]
-        , p [ class "lead" ] [ text "Welcome to the Elm Haven Survey. " ]
-        , hr [ class "my-4" ] []
-        , p [ class "" ] [ text "Lets get started! " ]
+    div [ class "col-md-10 p-0" ]
+        [ img [ class "img-fluid mt-3", alt "Haven GRC Company Logo", attribute "data-rjs" "2", id "logo", src "/img/logo@2x.png", height 71, width 82 ] []
         , div [ class "row" ]
             (List.map
                 (\availableSurvey ->
@@ -1311,7 +1308,7 @@ viewIpsativeSurvey survey =
         ready =
             pointsLeft == 0
     in
-    div [ class "p-4" ]
+    div [ class "col-md-10 p-0" ]
         [ div [ class "row" ]
             [ viewIpsativeSurveyTitle survey
             , br [] []
@@ -1363,7 +1360,7 @@ viewIpsativeSurveyTitle survey =
             currentQuestion.title
     in
     div [ class "col-md-4 d-flex flex-column" ]
-        [ img [ class "img-fluid mb-5", alt "Haven GRC Company Logo", attribute "data-rjs" "2", id "logo", src "/img/logo@2x.png", height 71, width 82 ] []
+        [ img [ class "img-fluid mb-5 pt-3", alt "Haven GRC Company Logo", attribute "data-rjs" "2", id "logo", src "/img/logo@2x.png", height 71, width 82 ] []
         , h3 [] [ text questionTitle ]
         , p [ class "", style "color" "#B1B1B1" ] [ text ("Q " ++ String.fromInt questionNumber ++ "/" ++ String.fromInt totalQuestions) ]
         , div [ class "row" ] (viewPointsLeft currentQuestion.pointsLeft survey.pointsPerQuestion)
