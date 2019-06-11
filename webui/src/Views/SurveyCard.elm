@@ -1,24 +1,21 @@
 module Views.SurveyCard exposing (view)
 
 import Data.Survey exposing (SurveyMetaData)
-import Html exposing (Html, button, div, h5, li, p, text, ul)
+import Html exposing (Html, button, div, h5, li, p, text, ul, h1, text, span)
 import Html.Attributes exposing (class, id)
 import Html.Events exposing (onClick)
 
 
 view : SurveyMetaData -> String -> msg -> Html msg
 view metaData title msg =
-    div [ class "card" ]
-        [ div [ class "card-header" ] [ text title ]
-        , div [ class "card-body" ]
-            [ h5 [ class "card-title" ]
-                [ text metaData.name
-                ]
-            , p [ class "card-text" ] [ text metaData.description ]
+    div [ class "col-12 text-center mt-5" ]
+        [ h1 [ class "survey-heading" ]
+            [ text "An organizational "
+            , span [class "text-secondary"] [ text "security" ]
+            , text " profile in five minutes"
             ]
-        , ul [ class "list-group list-group-flush" ]
-            [ li [ class "list-group-item" ] [ text ("Created: " ++ metaData.created_at) ]
-            , li [ class "list-group-item" ] [ text ("Created By: " ++ metaData.author) ]
-            , li [ class "list-group-item" ] [ button [ class "btn btn-primary", onClick msg ] [ text "Click to start survey" ] ]
+        , div [ class "px-5 py-3" ]
+            [ p [ class "" ] [ text ("This brief " ++ metaData.description ++ " " ++ metaData.instructions) ]
             ]
+        , button [ class "btn btn-primary login-btn btn-block mx-auto", onClick msg ] [ text "I'm Ready" ]
         ]
