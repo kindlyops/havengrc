@@ -46,12 +46,12 @@ let updateChart = function (specs) {
   //console.log("updateChart was called");
   window.requestAnimationFrame(() => {
     var element = $('#vis0');
-    if (element) {
-      var index;
+    if (element.length) {
+      var i;
       console.log(specs);
-      vegaEmbed("#vis0", specs[0], { actions: false }).catch(console.warn);
-      vegaEmbed("#vis1", specs[1], { actions: false }).catch(console.warn);
-
+      for (i = 0; i < specs.length; i++) {
+        vegaEmbed("#vis"+i, specs[i], { actions: false }).catch(console.warn);
+      }
     }
   });
 }

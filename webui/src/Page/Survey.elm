@@ -585,7 +585,7 @@ update msg model authModel =
                                     { model | currentPage = Finished }
 
                                 cmd =
-                                    Ports.renderVega havenSpecs
+                                    Ports.renderVega (havenSpecs model)
                             in
                             ( newModel
                             , Cmd.batch [ storeSurvey newModel (getQuestionNumber newModel), cmd ]
@@ -608,7 +608,7 @@ update msg model authModel =
                                     { model | currentPage = Finished }
 
                                 cmd =
-                                    Ports.renderVega havenSpecs
+                                    Cmd.none
                             in
                             ( newModel
                             , Cmd.batch [ storeSurvey newModel (getQuestionNumber newModel), cmd ]
@@ -1176,6 +1176,12 @@ viewRegistration model =
                 , br [] []
                 , br [] []
                 , div [ class "vis", id "vis1" ] []
+                , br [] []
+                , br [] []
+                , div [ class "vis", id "vis2" ] []
+                , br [] []
+                , br [] []
+                , div [ class "vis", id "vis3" ] []
                 , br [] []
                 , br [] []
                 , button [ class "btn btn-primary", onClick RegisterNewUser ] [ text "Click to save results to the server." ]

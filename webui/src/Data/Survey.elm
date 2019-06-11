@@ -21,9 +21,13 @@ module Data.Survey exposing
     , createIpsativeSurvey
     , createLikertSurvey
     , decodeInitialSurvey
+    , decodeIpsativeAnswer
+    , decodeIpsativeQuestion
     , decodeSurveyMetaData
+    , emptyAnswer
     , emptyIpsativeServerMetaData
     , emptyIpsativeServerSurvey
+    , emptyPointsAssigned
     , encodeSurvey
     , encodeSurveyData
     , encodeSurveyMetaData
@@ -356,11 +360,12 @@ decodePointsLeft =
 
 decodeIpsativeAnswer : Decoder IpsativeAnswer
 decodeIpsativeAnswer =
-    map5 IpsativeAnswer
+    map6 IpsativeAnswer
         (field "id" string)
         (field "answer" string)
         (field "category" string)
         (field "orderNumber" int)
+        (field "questionNumber" int)
         (field "pointsAssigned" (Decode.list decodePointsAssigned))
 
 
@@ -449,6 +454,7 @@ ipsativeAnswerToResponse answer =
     List.map
         (\group ->
             { answer_id = answer.id
+            , category = answer.category
             , group_number = group.group
             , points_assigned = group.points
             }
@@ -458,6 +464,7 @@ ipsativeAnswerToResponse answer =
 
 type alias IpsativeSingleResponse =
     { answer_id : String
+    , category : String
     , group_number : Int
     , points_assigned : Int
     }
@@ -468,6 +475,7 @@ ipsativeSingleResponseEncoder singleResponse =
     Encode.object
         [ ( "answer_id", Encode.string <| singleResponse.answer_id )
         , ( "group_number", Encode.int <| singleResponse.group_number )
+        , ( "category", Encode.string <| singleResponse.category )
         , ( "points_assigned", Encode.int <| singleResponse.points_assigned )
         ]
 
@@ -734,6 +742,7 @@ type alias IpsativeAnswer =
     , answer : String
     , category : String
     , orderNumber : Int
+    , questionNumber : Int
     , pointsAssigned : List PointsAssigned
     }
 
@@ -872,6 +881,7 @@ emptyAnswer =
     , answer = "EMPTY QUESTION"
     , category = "EMPTY CATEGORY"
     , orderNumber = 0
+    , questionNumber = 1
     , pointsAssigned = [ emptyPointsAssigned ]
     }
 
@@ -961,7 +971,7 @@ ipsativeQuestionsMapped serverQuestions numGroups numPointsPerQuestion =
             , title = x.title
             , orderNumber = x.orderNumber
             , pointsLeft = createPointsLeft numGroups numPointsPerQuestion
-            , answers = createAnswers x.answers numGroups
+            , answers = createAnswers x.answers numGroups x.orderNumber
             }
         )
         serverQuestions
@@ -978,14 +988,15 @@ createPointsLeft numGroups numPointsPerQuestion =
         (List.range 1 numGroups)
 
 
-createAnswers : List IpsativeServerAnswer -> Int -> List IpsativeAnswer
-createAnswers serverAnswers numGroups =
+createAnswers : List IpsativeServerAnswer -> Int -> Int -> List IpsativeAnswer
+createAnswers serverAnswers numGroups questionNumber =
     List.map
         (\x ->
             { id = x.uuid
             , answer = x.answer
             , category = x.category
             , orderNumber = x.orderNumber
+            , questionNumber = questionNumber
             , pointsAssigned = createPointsAssigned numGroups
             }
         )
