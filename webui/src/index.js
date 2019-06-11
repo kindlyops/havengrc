@@ -42,16 +42,14 @@ elmApp.ports.saveSurveyState.subscribe(storedSurvey => {
   sessionStorage.setItem('storedSurvey', JSON.stringify(storedSurvey));
 })
 
-let updateChart = function (specs) {
+let updateChart = function (spec) {
   //console.log("updateChart was called");
   window.requestAnimationFrame(() => {
-    var element = $('#vis0');
+    var element = $('#vis');
     if (element.length) {
       var i;
-      console.log(specs);
-      for (i = 0; i < specs.length; i++) {
-        vegaEmbed("#vis"+i, specs[i], { actions: false }).catch(console.warn);
-      }
+      console.log(spec);
+      vegaEmbed("#vis", spec, { actions: false }).catch(console.warn);
     }
   });
 }

@@ -1172,7 +1172,7 @@ viewRegistration model =
                 , input [ placeholder "Email Address", value model.emailAddress, onInput UpdateEmail ] []
                 , br [] []
                 , br [] []
-                , div [ class "vis", id "vis0" ] []
+                , div [ class "vis", id "vis" ] []
                 , br [] []
                 , br [] []
                 , button [ class "btn btn-primary", onClick RegisterNewUser ] [ text "Click to save results to the server." ]

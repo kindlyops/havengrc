@@ -207,16 +207,15 @@ spec model =
         ]
 
 
-havenSpecs : Data.Survey.Model -> List Spec
+havenSpecs : Data.Survey.Model -> Spec
 havenSpecs model =
     let
         specs =
             case model.currentSurvey of
                 Data.Survey.Ipsative survey ->
-                    [ spec survey
-                    ]
+                    spec survey
 
                 Data.Survey.Likert survey ->
-                    []
+                    toVegaLite []
     in
     specs
