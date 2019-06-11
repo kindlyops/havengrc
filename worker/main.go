@@ -293,7 +293,7 @@ func createSurveyInput(surveyID string, tx *sqlx.Tx) (string, error) {
 	// Supports only 1 respondent currently.
 	respondent := "1"
 	for i := range questions {
-		fileContents += fmt.Sprintf("%d,%s,%s\n", i, strings.Trim(strings.Join(strings.Fields(fmt.Sprint(questions[i])), ","), "[]"), respondent)
+		fileContents += fmt.Sprintf("%d,%s,%s\n", i+1, strings.Trim(strings.Join(strings.Fields(fmt.Sprint(questions[i])), ","), "[]"), respondent)
 	}
 
 	return fileContents, err
