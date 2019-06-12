@@ -1413,8 +1413,7 @@ viewSurveyBox : IpsativeAnswer -> Html Msg
 viewSurveyBox answer =
     div [ class "col-md-6 pt-5" ]
         [ div [ class "question-container" ]
-            [ p [ class "question-category" ] [ text answer.category ]
-            , p [ class "question-text" ] [ text answer.answer ]
+            [ p [ class "question-text" ] [ text answer.answer ]
             , div []
                 (List.map
                     (\group -> viewSurveyPointsGroup answer group)
