@@ -5,4 +5,4 @@ services:
     working_dir: /docs
     volumes:
       - .:/docs
-    command: [./compilereport.sh]
+    command: [./compilereport]
