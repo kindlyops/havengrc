@@ -4,7 +4,7 @@ const autoprefixer = require('autoprefixer');
 const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
 const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
@@ -67,60 +67,27 @@ module.exports = {
   },
   optimization: {
     minimizer: [
-      new UglifyJsPlugin({
-        uglifyOptions: {
-          // ES5 is required in the minified code if you want compatibility with IE11,
-          // otherwise you can bump it up to ES8
-          ecma: 5,
-          // Compression settings mostly based on <https://guide.elm-lang.org/optimization/asset_size.html>
-          compress: {
-            passes: 2,
-            warnings: false,
-            // Disabled because of an issue with Uglify breaking seemingly valid code:
-            // https://github.com/facebook/create-react-app/issues/2376
-            // Pending further investigation:
-            // https://github.com/mishoo/UglifyJS2/issues/2011
-            comparisons: false,
-            pure_getters: true,
-            keep_fargs: false,
-            unsafe_comps: true,
-            unsafe: true,
-            pure_funcs: [
-              'A2',
-              'A3',
-              'A4',
-              'A5',
-              'A6',
-              'A7',
-              'A8',
-              'A9',
-              'F2',
-              'F3',
-              'F4',
-              'F5',
-              'F6',
-              'F7',
-              'F8',
-              'F9'
-            ]
-          },
-          mangle: {
-            safari10: true
-          },
-          output: {
-            comments: false,
-            // Turned on because emoji and regex is not minified properly using default
-            // https://github.com/facebook/create-react-app/issues/2488
-            ascii_only: true
-          }
-        },
-        // Use multi-process parallel running to improve the build speed
-        // Default number of concurrent runs: os.cpus().length - 1
-        parallel: true,
-        // Enable file caching
+      new TerserPlugin({
         cache: true,
-        sourceMap: shouldUseSourceMap
-      })
+        parallel: true,
+        sourceMap: true, // Must be set to true if using source-maps in production
+        terserOptions: {
+          // https://github.com/webpack-contrib/terser-webpack-plugin#terseroptions
+          ecma: undefined,
+          warnings: false,
+          parse: {},
+          compress: {},
+          mangle: true, // Note `mangle.properties` is `false` by default.
+          module: false,
+          output: null,
+          toplevel: false,
+          nameCache: null,
+          ie8: false,
+          keep_classnames: undefined,
+          keep_fnames: false,
+          safari10: false,
+        }
+      }),
     ],
     // Automatically split vendor and commons
     // https://twitter.com/wSokra/status/969633336732905474
