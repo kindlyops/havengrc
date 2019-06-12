@@ -1,5 +1,0 @@
-Dockerfile that runs the faktory worker
-implement the faktory worker
-- get a job
-- run R
-- save the output from the Job to Haven via API

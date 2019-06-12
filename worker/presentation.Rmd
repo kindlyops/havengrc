@@ -1,5 +1,6 @@
 ---
 title: "Security Culture Diagnostic"
+author: "`r Sys.Date()`"
 output: 
   powerpoint_presentation:
     reference_doc: template.pptx
@@ -31,30 +32,33 @@ library(RColorBrewer)
 knitr::opts_chunk$set(tidy = FALSE, cache.extra = packageVersion('tufte'))
 ```
 
-### Security Culture Overview
+### What is security culture?
 
-This is an R Markdown presentation. Markdown is a simple formatting 
-syntax for authoring HTML, PDF, and MS Word documents. For more 
-details on using R Markdown see [Lance Hayden's Work](http://rmarkdown.rstudio.com).
+The security culture diagnostic breaks down security culture into 4 mental
+models.
 
-When you click the **Knit** button a document will be generated that 
-includes both content as well as the output of any embedded R code 
-chunks within the document.
+Mental models are beliefs and assumptions that drive decisions and actions. You may
+have a preferred or default mental model or way of looking at the world.
 
-### Slide with Bullets
+By learning the models you can be more deliberate
+about which model you are choosing to use.
 
-- Bullet 1
-- Bullet 2
-- Bullet 3
+::: notes
+You can use these slides in your own company presentations. If you prefer
+to use Keynote rather than powerpoint, Keynote can import and convert the
+slides.
 
-### Slide with R Output
+The People-Centric Security Toolkit by [Lance Hayden](http://lancehayden.net/culture/)
+is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.
+:::
 
-```{r cars, echo = TRUE}
-summary(cars)
-```
-### Slide with Plot
+### What are the 4 cultures or models?
 
-```{r fig-secculture, fig.cap = "Security Culture Survey Results", fig.fullwidth=TRUE, cache = FALSE, message=FALSE, echo=FALSE, results='hide'}
+ ![](culture-as-mental-model.png) 
+
+### Security Culture Diagnostic
+
+```{r fig-secculture, fig.width = 15, fig.height = 9, cache = FALSE, message=FALSE, echo=FALSE, results='hide'}
 calculate_control <- function(C) {
   culture = as.character(C[1])
   if (isTRUE(all.equal(culture,"Compliance"))) {
@@ -103,7 +107,7 @@ cdata$orientation2 <- factor(cdata$orientation, levels=rev(levels(factor(cdata$o
 cdata$control2 <- factor(cdata$control, levels=rev(levels(factor(cdata$control))))
 
 p = ggplot(cdata, aes(x=factor(question, levels=c(10:1)), y=mean) ) +
-  geom_bar(stat='identity') + 
+  geom_bar(stat='identity', fill="#e86953") + 
   scale_y_continuous(limits = c(0,10), labels = c("0", "2.5", "5", "7.5", "10")) +
   scale_x_discrete(labels=c("1" = "Org Values", "2" = "Org Behaves",
                             "3" = "Definition", "4" = "Information",
@@ -113,10 +117,39 @@ p = ggplot(cdata, aes(x=factor(question, levels=c(10:1)), y=mean) ) +
   coord_flip() + 
   labs(x="", y="") + 
   theme_few() +
-  theme(text = element_text(size=5), legend.position="none", panel.grid.minor = element_line()) +
-  annotate("text", x=8.5,y=7.5,label=c("Process","Compliance","Trust","Autonomy"), size=1.75) +
+  theme(text = element_text(size=25), legend.position="none", panel.grid.minor = element_line()) +
+  annotate("text", x=8.5,y=7.5,label=c("Process","Compliance","Trust","Autonomy"), size=8.0) +
   facet_grid( control2 ~ orientation2 )
-#ggdraw(p)
-
-ggdraw(add_sub(p, "Security Culture diagnostic created by Lance Hayden, PhD (CC BY-SA 4.0)", x = 0, hjust = 0, size=4))
+ggdraw(p)
 ```
+
+### What is a Process culture?
+
+A process culture has tight control and internal focus. Commonly found in
+government agencies. 
+
+There is discipline but can have a hard time adopting good ideas from outside,
+since thinking is internally focused.
+
+### What is a Compliance culture?
+
+Compliance culture has tight control with an external focus. Typically this
+perspective thrives in healthcare organizations.
+
+People look to outside regulators and standards, and have less room for forming
+a divergent internal opinion.
+
+### What is an Autonomy culture?
+
+Typically found in early stage startups, loose control and external focus.
+Very interested in customers, not much support or oversight from the organization.
+
+It's very much live or die on your own.
+
+### What is a Trust culture?
+
+Loose control, combined with an inward focus. Common in non-profit or mission-driven
+organizations.
+
+Collaboration and the relationships between the people inside the company matter
+a whole lot more than the customers outside the company.
