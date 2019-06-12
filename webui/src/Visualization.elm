@@ -175,19 +175,7 @@ spec model =
                     , pMType Ordinal
                     , pScale
                         [ scDomain
-                            (doStrs
-                                [ "Org Values"
-                                , "Org Behaves"
-                                , "Definition"
-                                , "Information"
-                                , "Operations"
-                                , "Technology"
-                                , "People"
-                                , "Risk"
-                                , "Accountability"
-                                , "Performance"
-                                ]
-                            )
+                            (doStrs questionColumns)
                         ]
                     ]
 
@@ -202,7 +190,9 @@ spec model =
         , data []
         , bar [ maColor "#e86953" ]
         , columns columnCount
-        , enc [ ( "facet", Json.Encode.object [ ( "field", Json.Encode.string "category" ), ( "type", Json.Encode.string "ordinal" ) ] ) ]
+        , enc
+            [ ( "facet", Json.Encode.object [ ( "field", Json.Encode.string "category" ), ( "type", Json.Encode.string "ordinal" ), ( "sort", Json.Encode.list Json.Encode.string [ "Process", "Compliance", "Trust", "Autonomy" ] ) ] )
+            ]
         , config []
         ]
 
