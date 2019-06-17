@@ -9,6 +9,8 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"archive/zip"
+	"io"
 
 	worker "github.com/contribsys/faktory_worker_go"
 	"github.com/getsentry/raven-go"
@@ -232,17 +234,17 @@ func createSlide(surveyID string, userEmail string, tx *sqlx.Tx) error {
 	_, err = file.WriteString(fileContents)
 	handleError(err)
 
-	outputFile, err := ioutil.TempFile(outputDir, "*.pptx")
+	slideshowFile, err := ioutil.TempFile(outputDir, "*.pptx")
 	handleError(err)
 
 	// Close file on exit and check for its returned error
 	defer func() {
-		os.Remove(outputFile.Name())
+		os.Remove(slideshowFile.Name())
 		handleError(err)
 	}()
 
-	fmt.Println("Creating Slide for survey id: ", surveyID)
-	compileReport := exec.Command("compilereport", "-d", file.Name(), "-o", outputFile.Name())
+	fmt.Println("Creating Slide for survey id: ", surveyID, "And file name: ", slideshowFile.Name())
+	compileReport := exec.Command("compilereport", "-d", file.Name(), "-o", slideshowFile.Name())
 	compileReportOut, err := compileReport.Output()
 	if err != nil {
 		handleError(err)
@@ -252,7 +254,25 @@ func createSlide(surveyID string, userEmail string, tx *sqlx.Tx) error {
 	_, err = keycloak.GetUser(userEmail)
 	handleError(err)
 	fmt.Println("Created Slide for: ", userEmail)
-	err = saveFileToDB(userEmail, outputFile.Name())
+	// Zip up all the files related to the survey
+	files := []string{
+		file.Name(),
+		slideshowFile.Name(),
+		"presentation.Rmd",
+		"template.pptx",
+		"docker-compose.yml",
+	}
+	output := "report.zip"
+
+	if err := ZipFiles(output, files); err != nil {
+		handleError(err)
+	}
+	defer func() {
+		os.Remove(output)
+		handleError(err)
+	}()
+
+	err = saveFileToDB(userEmail, slideshowFile.Name())
 	handleError(err)
 	return err
 }
@@ -326,6 +346,62 @@ func saveFileToDB(userEmail string, fileName string) error {
 	handleError(err)
 
 	fmt.Println("processed a file")
+	return err
+}
+
+func ZipFiles(filename string, files []string) error {
+
+	newZipFile, err := os.Create(filename)
+	if err != nil {
+			return err
+	}
+	defer newZipFile.Close()
+
+	zipWriter := zip.NewWriter(newZipFile)
+	defer zipWriter.Close()
+
+	// Add files to zip
+	for _, file := range files {
+			fmt.Println("Adding file to zip: ", file)
+			if err = AddFileToZip(zipWriter, file); err != nil {
+					return err
+			}
+	}
+	return nil
+}
+
+func AddFileToZip(zipWriter *zip.Writer, filename string) error {
+
+	fileToZip, err := os.Open(filename)
+	if err != nil {
+			return err
+	}
+	defer fileToZip.Close()
+
+	// Get the file information
+	info, err := fileToZip.Stat()
+	if err != nil {
+			return err
+	}
+
+	header, err := zip.FileInfoHeader(info)
+	if err != nil {
+			return err
+	}
+
+	// Using FileInfoHeader() above only uses the basename of the file. If we want
+	// to preserve the folder structure we can overwrite this with the full path.
+	header.Name = filename
+
+	// Change to deflate to gain better compression
+	// see http://golang.org/pkg/archive/zip/#pkg-constants
+	header.Method = zip.Deflate
+
+	writer, err := zipWriter.CreateHeader(header)
+	if err != nil {
+			return err
+	}
+	_, err = io.Copy(writer, fileToZip)
 	return err
 }
 
