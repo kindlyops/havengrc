@@ -245,6 +245,8 @@ services:
       - ./worker/template.pptx:/home/havenuser/template.pptx
       - ./worker/input.csv:/home/havenuser/input.csv
       - ./worker/output:/home/havenuser/output
+      - ./worker/docker-compose.yml:/home/havenuser/docker-compose.yml
+      - ./worker/culture-as-mental-model.png:/home/havenuser/culture-as-mental-model.png
   havenapi:
     working_dir: /go/src/github.com/kindlyops/havengrc/havenapi
     volumes:

@@ -12,10 +12,11 @@ import (
 
 // File is the survey data file
 type File struct {
-	ID        uuid.UUID `json:"id" db:"uuid"`
+	ID        uuid.UUID `json:"id" db:"id"`
 	CreatedAt time.Time `json:"created_at" db:"created_at"`
 	UserID    uuid.UUID `json:"user_id" db:"user_id"`
 	Name      string    `json:"name" db:"name"`
+	File      []byte    	`json:"file" db:"file"`
 }
 
 // String is not required by pop and may be deleted

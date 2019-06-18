@@ -1,13 +1,16 @@
 package main
 
 import (
+	"archive/zip"
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 
 	worker "github.com/contribsys/faktory_worker_go"
@@ -219,7 +222,7 @@ func createSlide(surveyID string, userEmail string, tx *sqlx.Tx) error {
 	fileContents, err := createSurveyInput(surveyID, tx)
 	handleError(err)
 	// Create new file
-	file, err := ioutil.TempFile("/tmp/", "*.csv")
+	file, err := ioutil.TempFile("/tmp/", "havengrc-survey-data-*.csv")
 	handleError(err)
 
 	// Close file on exit and check for its returned error
@@ -232,17 +235,17 @@ func createSlide(surveyID string, userEmail string, tx *sqlx.Tx) error {
 	_, err = file.WriteString(fileContents)
 	handleError(err)
 
-	outputFile, err := ioutil.TempFile(outputDir, "*.pptx")
+	slideshowFile, err := ioutil.TempFile(outputDir, "havengrc-slides-*.pptx")
 	handleError(err)
 
 	// Close file on exit and check for its returned error
 	defer func() {
-		os.Remove(outputFile.Name())
+		os.Remove(slideshowFile.Name())
 		handleError(err)
 	}()
 
-	fmt.Println("Creating Slide for survey id: ", surveyID)
-	compileReport := exec.Command("compilereport", "-d", file.Name(), "-o", outputFile.Name())
+	fmt.Println("Creating Slide for survey id: ", surveyID, "And file name: ", slideshowFile.Name())
+	compileReport := exec.Command("compilereport", "-d", file.Name(), "-o", slideshowFile.Name())
 	compileReportOut, err := compileReport.Output()
 	if err != nil {
 		handleError(err)
@@ -252,7 +255,28 @@ func createSlide(surveyID string, userEmail string, tx *sqlx.Tx) error {
 	_, err = keycloak.GetUser(userEmail)
 	handleError(err)
 	fmt.Println("Created Slide for: ", userEmail)
-	err = saveFileToDB(userEmail, outputFile.Name())
+	// Zip up all the files related to the survey
+	files := []string{
+		file.Name(),
+		slideshowFile.Name(),
+		"presentation.Rmd",
+		"template.pptx",
+		"docker-compose.yml",
+		"compilereport",
+		"culture-as-mental-model.png",
+	}
+	output, err := ioutil.TempFile(outputDir, "havengrc-report-*.zip")
+	handleError(err)
+
+	if err := zipFiles(output.Name(), files); err != nil {
+		handleError(err)
+	}
+	defer func() {
+		os.Remove(output.Name())
+		handleError(err)
+	}()
+
+	err = saveFileToDB(userEmail, output.Name())
 	handleError(err)
 	return err
 }
@@ -319,13 +343,65 @@ func saveFileToDB(userEmail string, fileName string) error {
 	buf.ReadFrom(file)
 	_, err = tx.Exec("SELECT set_config('request.jwt.claim.sub', $1, true)", users[0].ID)
 	handleError(err)
-	_, err = tx.Exec("INSERT INTO mappa.files (name, file) VALUES ($1, $2)", "report.pptx", buf.Bytes())
+	_, err = tx.Exec("INSERT INTO mappa.files (name, file) VALUES ($1, $2)", "report.zip", buf.Bytes())
 	handleError(err)
 
 	err = tx.Commit()
 	handleError(err)
 
 	fmt.Println("processed a file")
+	return err
+}
+
+func zipFiles(filename string, files []string) error {
+
+	newZipFile, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+	defer newZipFile.Close()
+
+	zipWriter := zip.NewWriter(newZipFile)
+	defer zipWriter.Close()
+
+	// Add files to zip
+	for _, file := range files {
+		fmt.Println("Adding file to zip: ", file)
+		if err = addFileToZip(zipWriter, file); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func addFileToZip(zipWriter *zip.Writer, filename string) error {
+
+	fileToZip, err := os.Open(filename)
+	if err != nil {
+		return err
+	}
+	defer fileToZip.Close()
+
+	// Get the file information
+	info, err := fileToZip.Stat()
+	if err != nil {
+		return err
+	}
+
+	header, err := zip.FileInfoHeader(info)
+	if err != nil {
+		return err
+	}
+
+	header.Name = filepath.Base(filename)
+
+	header.Method = zip.Deflate
+
+	writer, err := zipWriter.CreateHeader(header)
+	if err != nil {
+		return err
+	}
+	_, err = io.Copy(writer, fileToZip)
 	return err
 }
 

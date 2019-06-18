@@ -9,6 +9,7 @@ import (
 	"github.com/gobuffalo/buffalo"
 	"github.com/gobuffalo/pop"
 	"github.com/kindlyops/havengrc/havenapi/models"
+
 )
 
 // UploadHandler accepts a file upload
@@ -35,6 +36,20 @@ func UploadHandler(c buffalo.Context) error {
 	log.Info("processed a file")
 	message := "success"
 	return c.Render(200, r.JSON(map[string]string{"message": message}))
+}
+
+// DownloadHandler downloads a report
+func DownloadHandler(c buffalo.Context) error {
+	tx := c.Value("tx").(*pop.Connection)
+
+	file := models.File{}
+	err := tx.Find(&file, c.Param("file_id"))
+	if err != nil {
+		return c.Error(500, fmt.Errorf("error retrieving file from database: %s", err.Error()))
+	}
+
+	log.Info("Got Download")
+	return c.Render(200,  r.Download(c, "report.zip", bytes.NewReader(file.File)))
 }
 
 // CreateSlide triggers a worker job to create a report with R

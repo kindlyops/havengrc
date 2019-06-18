@@ -5,7 +5,7 @@ import Json.Decode as Decode exposing (Decoder, field, map4, string)
 
 
 type alias Report =
-    { uuid : String
+    { id : String
     , created_at : String
     , user_id : String
     , name : String
@@ -15,7 +15,7 @@ type alias Report =
 decode : Decoder Report
 decode =
     map4 Report
-        (field "uuid" string)
+        (field "id" string)
         (field "created_at" string)
         (field "user_id" string)
         (field "name" string)

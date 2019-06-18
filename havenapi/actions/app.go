@@ -80,6 +80,7 @@ func App() *buffalo.App {
 		api.Use(JwtMiddleware)
 		api.Middleware.Skip(JwtMiddleware, RegistrationHandler)
 		api.POST("reports", UploadHandler)
+		api.GET("reports", DownloadHandler)
 		api.POST("registration_funnel", RegistrationHandler)
 
 	}

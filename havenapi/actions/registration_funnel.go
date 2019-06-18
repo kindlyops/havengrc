@@ -84,6 +84,7 @@ func RegistrationHandler(c buffalo.Context) error {
 		return c.Error(500, err)
 	}
 	createUserJob := faktory.NewJob("CreateUser", registration.Email)
+	createUserJob.ReserveFor = 60
 	createUserJob.Queue = "critical"
 	err = client.Push(createUserJob)
 	if err != nil {
