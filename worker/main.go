@@ -262,17 +262,18 @@ func createSlide(surveyID string, userEmail string, tx *sqlx.Tx) error {
 		"template.pptx",
 		"docker-compose.yml",
 	}
-	output := "report.zip"
+	output, err := ioutil.TempFile(outputDir, "*.zip")
+	handleError(err)
 
-	if err := ZipFiles(output, files); err != nil {
+	if err := ZipFiles(output.Name(), files); err != nil {
 		handleError(err)
 	}
 	defer func() {
-		os.Remove(output)
+		os.Remove(output.Name())
 		handleError(err)
 	}()
 
-	err = saveFileToDB(userEmail, slideshowFile.Name())
+	err = saveFileToDB(userEmail, output.Name())
 	handleError(err)
 	return err
 }
