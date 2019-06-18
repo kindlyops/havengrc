@@ -11,7 +11,7 @@ require (
 	github.com/deis/pkg v0.5.0 // indirect
 	github.com/getsentry/raven-go v0.2.0
 	github.com/gobuffalo/buffalo v0.14.6
-	github.com/gobuffalo/buffalo-pop v1.13.0
+	github.com/gobuffalo/buffalo-pop v1.14.0
 	github.com/gobuffalo/envy v1.7.0
 	github.com/gobuffalo/makr v1.1.5 // indirect
 	github.com/gobuffalo/mw-csrf v0.0.0-20190129204204-25460a055517 // indirect
