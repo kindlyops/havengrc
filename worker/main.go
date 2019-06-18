@@ -11,6 +11,7 @@ import (
 	"strings"
 	"archive/zip"
 	"io"
+	"path/filepath"
 
 	worker "github.com/contribsys/faktory_worker_go"
 	"github.com/getsentry/raven-go"
@@ -221,7 +222,7 @@ func createSlide(surveyID string, userEmail string, tx *sqlx.Tx) error {
 	fileContents, err := createSurveyInput(surveyID, tx)
 	handleError(err)
 	// Create new file
-	file, err := ioutil.TempFile("/tmp/", "*.csv")
+	file, err := ioutil.TempFile("/tmp/", "havengrc-survey-data-*.csv")
 	handleError(err)
 
 	// Close file on exit and check for its returned error
@@ -234,7 +235,7 @@ func createSlide(surveyID string, userEmail string, tx *sqlx.Tx) error {
 	_, err = file.WriteString(fileContents)
 	handleError(err)
 
-	slideshowFile, err := ioutil.TempFile(outputDir, "*.pptx")
+	slideshowFile, err := ioutil.TempFile(outputDir, "havengrc-slides-*.pptx")
 	handleError(err)
 
 	// Close file on exit and check for its returned error
@@ -262,10 +263,10 @@ func createSlide(surveyID string, userEmail string, tx *sqlx.Tx) error {
 		"template.pptx",
 		"docker-compose.yml",
 	}
-	output, err := ioutil.TempFile(outputDir, "*.zip")
+	output, err := ioutil.TempFile(outputDir, "havengrc-report-*.zip")
 	handleError(err)
 
-	if err := ZipFiles(output.Name(), files); err != nil {
+	if err := zipFiles(output.Name(), files); err != nil {
 		handleError(err)
 	}
 	defer func() {
@@ -340,7 +341,7 @@ func saveFileToDB(userEmail string, fileName string) error {
 	buf.ReadFrom(file)
 	_, err = tx.Exec("SELECT set_config('request.jwt.claim.sub', $1, true)", users[0].ID)
 	handleError(err)
-	_, err = tx.Exec("INSERT INTO mappa.files (name, file) VALUES ($1, $2)", "report.pptx", buf.Bytes())
+	_, err = tx.Exec("INSERT INTO mappa.files (name, file) VALUES ($1, $2)", "report.zip", buf.Bytes())
 	handleError(err)
 
 	err = tx.Commit()
@@ -350,7 +351,7 @@ func saveFileToDB(userEmail string, fileName string) error {
 	return err
 }
 
-func ZipFiles(filename string, files []string) error {
+func zipFiles(filename string, files []string) error {
 
 	newZipFile, err := os.Create(filename)
 	if err != nil {
@@ -364,14 +365,14 @@ func ZipFiles(filename string, files []string) error {
 	// Add files to zip
 	for _, file := range files {
 			fmt.Println("Adding file to zip: ", file)
-			if err = AddFileToZip(zipWriter, file); err != nil {
+			if err = addFileToZip(zipWriter, file); err != nil {
 					return err
 			}
 	}
 	return nil
 }
 
-func AddFileToZip(zipWriter *zip.Writer, filename string) error {
+func addFileToZip(zipWriter *zip.Writer, filename string) error {
 
 	fileToZip, err := os.Open(filename)
 	if err != nil {
@@ -390,12 +391,8 @@ func AddFileToZip(zipWriter *zip.Writer, filename string) error {
 			return err
 	}
 
-	// Using FileInfoHeader() above only uses the basename of the file. If we want
-	// to preserve the folder structure we can overwrite this with the full path.
-	header.Name = filename
+	header.Name = filepath.Base(filename)
 
-	// Change to deflate to gain better compression
-	// see http://golang.org/pkg/archive/zip/#pkg-constants
 	header.Method = zip.Deflate
 
 	writer, err := zipWriter.CreateHeader(header)

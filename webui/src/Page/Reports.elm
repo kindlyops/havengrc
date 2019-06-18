@@ -47,7 +47,7 @@ init authModel =
 
 reportsUrl : String
 reportsUrl =
-    "/api/files?select=uuid,created_at,user_id,name"
+    "/api/files?select=id,created_at,user_id,name"
 
 
 getReports : Authentication.Model -> Cmd Msg
@@ -90,7 +90,7 @@ downloadReport report =
         , expect = expectBytes report GotDownload
         , headers = headers
         , method = "GET"
-        , url = "/rpc/download_file?fileid=" ++ report.uuid
+        , url = "/api/reports?file_id=" ++ report.id
         , timeout = Nothing
         , tracker = Nothing
         }
@@ -192,7 +192,7 @@ dashboardView authModel model =
 reportToString : Report -> String
 reportToString report =
     "{ "
-        ++ report.uuid
+        ++ report.id
         ++ ", "
         ++ report.created_at
         ++ ", "
