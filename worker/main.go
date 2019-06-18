@@ -1,17 +1,17 @@
 package main
 
 import (
+	"archive/zip"
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
-	"strings"
-	"archive/zip"
-	"io"
 	"path/filepath"
+	"strings"
 
 	worker "github.com/contribsys/faktory_worker_go"
 	"github.com/getsentry/raven-go"
@@ -262,6 +262,8 @@ func createSlide(surveyID string, userEmail string, tx *sqlx.Tx) error {
 		"presentation.Rmd",
 		"template.pptx",
 		"docker-compose.yml",
+		"compilereport",
+		"culture-as-mental-model.png",
 	}
 	output, err := ioutil.TempFile(outputDir, "havengrc-report-*.zip")
 	handleError(err)
@@ -355,7 +357,7 @@ func zipFiles(filename string, files []string) error {
 
 	newZipFile, err := os.Create(filename)
 	if err != nil {
-			return err
+		return err
 	}
 	defer newZipFile.Close()
 
@@ -364,10 +366,10 @@ func zipFiles(filename string, files []string) error {
 
 	// Add files to zip
 	for _, file := range files {
-			fmt.Println("Adding file to zip: ", file)
-			if err = addFileToZip(zipWriter, file); err != nil {
-					return err
-			}
+		fmt.Println("Adding file to zip: ", file)
+		if err = addFileToZip(zipWriter, file); err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -376,19 +378,19 @@ func addFileToZip(zipWriter *zip.Writer, filename string) error {
 
 	fileToZip, err := os.Open(filename)
 	if err != nil {
-			return err
+		return err
 	}
 	defer fileToZip.Close()
 
 	// Get the file information
 	info, err := fileToZip.Stat()
 	if err != nil {
-			return err
+		return err
 	}
 
 	header, err := zip.FileInfoHeader(info)
 	if err != nil {
-			return err
+		return err
 	}
 
 	header.Name = filepath.Base(filename)
@@ -397,7 +399,7 @@ func addFileToZip(zipWriter *zip.Writer, filename string) error {
 
 	writer, err := zipWriter.CreateHeader(header)
 	if err != nil {
-			return err
+		return err
 	}
 	_, err = io.Copy(writer, fileToZip)
 	return err
