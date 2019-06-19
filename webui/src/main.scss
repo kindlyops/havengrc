@@ -24,6 +24,10 @@ $yiq-contrasted-threshold:  160;
   .content-wrapper {
     margin-left: $navdrawer-width;
   }
+  #content.content-wrapper{
+    width: calc(100% - 17.5rem);
+    max-width: none !important;
+  }
 }
 
 body p {
@@ -104,6 +108,10 @@ img#Wireframe{
 h3{
   font-family: 'Montserrat', sans-serif;
   font-weight: 600;
+}
+
+button{
+  white-space: inherit;
 }
 
 #footer-image {
@@ -251,6 +259,11 @@ h3{
   font-family: 'Montserrat', sans-serif;
   font-weight: bold;
 }
+
+.vega-embed{
+  padding-right: 0px;
+}
+
 /** End Survey **/
 
 @media screen and (max-width:768px){

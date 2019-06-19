@@ -1130,7 +1130,7 @@ getTotalAvailableSurveys model =
 
 viewHero : Model -> Html Msg
 viewHero model =
-    div [ class "col-md-10 p-0" ]
+    div []
         [ img [ class "img-fluid mt-3", alt "Haven GRC Company Logo", attribute "data-rjs" "2", id "logo", src "/img/logo@2x.png", height 71, width 82 ] []
         , div [ class "row" ]
             (List.map
@@ -1150,11 +1150,12 @@ viewHero model =
 
 viewFinished : Model -> Html Msg
 viewFinished model =
-    div [ class "container mt-3" ]
-        [ div [ class "row" ]
-            [ div [ class "jumbotron" ]
-                [ h1 [ class "display-4" ] [ text "You finished the survey!" ]
-                , button [ class "btn btn-primary", onClick SaveCurrentSurvey ] [ text "Click to save results to the server." ]
+    div []
+        [ img [ class "img-fluid mt-3", alt "Haven GRC Company Logo", attribute "data-rjs" "2", id "logo", src "/img/logo@2x.png", height 71, width 82 ] []
+        , div [ class "row" ]
+            [ div [ class "col-md-12 text-center mt-5" ]
+                [ h1 [ class "survey-heading" ] [ text "You finished the survey!" ]
+                , button [ class "btn btn-primary mt-4", onClick SaveCurrentSurvey ] [ text "Click to save results to the server." ]
                 ]
             ]
         ]
@@ -1162,16 +1163,21 @@ viewFinished model =
 
 viewRegistration : Model -> Html Msg
 viewRegistration model =
-    div [ class "container mt-3" ]
-        [ div [ class "row" ]
-            [ div [ class "jumbotron" ]
-                [ h1 [ class "display-4" ] [ text "You finished the survey! Please enter your email address to save the survey." ]
-                , input [ placeholder "Email Address", value model.emailAddress, onInput UpdateEmail ] []
-                , br [] []
-                , br [] []
+    div []
+        [ img [ class "img-fluid mt-3", alt "Haven GRC Company Logo", attribute "data-rjs" "2", id "logo", src "/img/logo@2x.png", height 71, width 82 ] []
+        , div [ class "row" ]
+            [ div [ class "col-xs-12 text-center mt-5" ]
+                [ h1 [ class "survey-heading mb-5" ] [ text "You finished the survey!" ]
                 , div [ class "vis", id "vis" ] []
-                , br [] []
-                , br [] []
+                , div [ class "col-md-8 mx-auto my-5" ]
+                      [ p [] [ text "Where does Haven GRC fit in? For a detailed deck of these results and how we can personalize your compliance and rish dashboard, just enter your email below." ]
+                      , div [ class "col-md-7 mx-auto mt-5" ]
+                            [ div [ class "input-group"]
+                              [ input [ placeholder "Email Address", class "form-control", value model.emailAddress, onInput UpdateEmail ] []
+                              , i [ class "material-icons" ] [ text "chevron_right" ]
+                              ]
+                            ]
+                      ]
                 , button [ class "btn btn-primary", onClick RegisterNewUser ] [ text "Click to save results to the server." ]
                 ]
             ]
@@ -1308,7 +1314,7 @@ viewIpsativeSurvey survey =
         ready =
             pointsLeft == 0
     in
-    div [ class "col-md-10 p-0" ]
+    div []
         [ div [ class "row" ]
             [ viewIpsativeSurveyTitle survey
             , br [] []
