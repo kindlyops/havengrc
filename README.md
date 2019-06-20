@@ -35,6 +35,7 @@ Applications and frameworks that are complementary to Haven. We would prefer to 
 </details>
 
 ## ![screenshot of app](demo2.png)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fkindlyops%2Fhavengrc.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fkindlyops%2Fhavengrc?ref=badge_shield)
 
 ## Table of Contents
 
@@ -391,3 +392,7 @@ Once you complete the challenge and get the key material, edit the secret.
     oc edit secrets/secretname
 
 Replace the values for fullkey.pem and privkey.pem with base64 encoded versions of the new certificates. Save and exit.
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fkindlyops%2Fhavengrc.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fkindlyops%2Fhavengrc?ref=badge_large)
