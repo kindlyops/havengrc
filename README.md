@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/kindlyops/havengrc.svg?style=svg)](https://circleci.com/gh/kindlyops/havengrc) [![experimental](http://badges.github.io/stability-badges/dist/experimental.svg)](http://github.com/badges/stability-badges) [![Say Thanks!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/statik) [![Maintainability](https://api.codeclimate.com/v1/badges/d2af9dcd5ad434172a27/maintainability)](https://codeclimate.com/github/kindlyops/havengrc/maintainability)
+[![CircleCI](https://circleci.com/gh/kindlyops/havengrc.svg?style=svg)](https://circleci.com/gh/kindlyops/havengrc) [![experimental](http://badges.github.io/stability-badges/dist/experimental.svg)](http://github.com/badges/stability-badges) [![Say Thanks!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/statik) [![Maintainability](https://api.codeclimate.com/v1/badges/d2af9dcd5ad434172a27/maintainability)](https://codeclimate.com/github/kindlyops/havengrc/maintainability)[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fkindlyops%2Fhavengrc.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fkindlyops%2Fhavengrc?ref=badge_shield)
 
 # Haven GRC is a modern risk & compliance dashboard
 
@@ -35,7 +35,6 @@ Applications and frameworks that are complementary to Haven. We would prefer to 
 </details>
 
 ## ![screenshot of app](demo2.png)
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fkindlyops%2Fhavengrc.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fkindlyops%2Fhavengrc?ref=badge_shield)
 
 ## Table of Contents
 
