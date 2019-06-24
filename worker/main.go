@@ -115,8 +115,7 @@ func SaveSurvey(ctx worker.Context, args ...interface{}) error {
 	log.Printf("SQL Result found user: %v", registration)
 	handleError(err)
 	if len(registration) == 0 {
-		log.Printf("db.select: User already registered. %s", userEmail)
-		return err
+		return fmt.Errorf("user registration funnel not found yet for: %s try again later", userEmail)
 	}
 	// Get user id for registered user.
 	users, err := keycloak.GetUser(userEmail)
