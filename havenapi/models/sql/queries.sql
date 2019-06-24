@@ -7,6 +7,14 @@ SELECT count(*) FROM mappa.comments;
 -- name: insertfile
 INSERT INTO mappa.files (name, file) VALUES ($1, $2);
 
+-- name: insertstate
+INSERT INTO mappa.states (json) VALUES ($1);
+
+-- name: updatestate
+UPDATE mappa.states
+SET json = ($1)
+WHERE id = current_setting('request.jwt.claim.sub', true)::uuid
+
 -- name: registeruser
 INSERT
 INTO
