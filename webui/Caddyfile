@@ -42,7 +42,7 @@ proxy /rpc api:3001 {
   transparent
 }
 
-proxy /api/state havenapi:3000 {
+proxy /api/onboarding havenapi:3000 {
   transparent
 }
 

@@ -83,8 +83,8 @@ func App() *buffalo.App {
 		api.GET("reports", DownloadHandler)
 		api.POST("registration_funnel", RegistrationHandler)
 
-		api.GET("state", GetState)
-		api.POST("state", UpdateState)
+		api.GET("onboarding", GetState)
+		api.POST("onboarding", UpdateState)
 
 	}
 
