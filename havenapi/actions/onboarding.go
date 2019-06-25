@@ -2,6 +2,9 @@ package actions
 
 import (
 	"fmt"
+	"bytes"
+	"encoding/json"
+	"io/ioutil"
 	"github.com/gobuffalo/uuid"
 	"github.com/gobuffalo/buffalo"
 	"github.com/gobuffalo/pop"
@@ -41,27 +44,34 @@ func GetState(c buffalo.Context) error {
 // UpdateState updates the state for a user. This function is mapped to
 // the path POST /api/state
 func UpdateState(c buffalo.Context) error {
-
 	b := &models.StateBinding{}
-  if err := c.Bind(b); err != nil {
-    return err
-	}
+	request := c.Request()
+	body, err := ioutil.ReadAll(request.Body)
 
-	tx := c.Value("tx").(*pop.Connection)
+	dec := json.NewDecoder(bytes.NewReader(body))
+	dec.DisallowUnknownFields()
+	if err := dec.Decode(&b); err != nil {
+		return c.Error(400, fmt.Errorf("malformed post"))
+	}
 
 	// Allocate an empty State
 	state := &models.State{}
 
+	// Allocate the db transaction
+	tx := c.Value("tx").(*pop.Connection)
 	// To find the state the value of sub from the Middleware is used.
 	if err := tx.Find(state, c.Value("sub")); err != nil {
 		return c.Error(404, fmt.Errorf("cannot update state"))
 	}
-
-	state.JSON["status"] = b.Status
-	state.JSON["downloaded_report"] = b.DownloadedReport
+	if b.Status != nil {
+		state.JSON["status"] = b.Status
+	}
+	if b.DownloadedReport != nil {
+		state.JSON["downloaded_report"] = b.DownloadedReport
+	}
 
 	// Update the state for the user (User determined by JWT sub.)
-	err := tx.RawQuery(
+	err = tx.RawQuery(
 		models.Q["updatestate"],
 		state.JSON,
 	).Exec()

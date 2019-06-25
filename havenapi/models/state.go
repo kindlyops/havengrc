@@ -2,7 +2,6 @@ package models
 
 import (
 	"encoding/json"
-
 	"github.com/gobuffalo/pop"
 	"github.com/gobuffalo/uuid"
 	"github.com/gobuffalo/validate"
@@ -17,8 +16,8 @@ type State struct {
 }
 // StateBinding provides us with something to bind to
 type StateBinding struct {
-	Status                string `json:"status"`
-	DownloadedReport     bool `json:"downloaded_report"`
+	Status               *string `json:"status"`
+	DownloadedReport     *bool `json:"downloaded_report"`
 }
 
 // String is not required by pop and may be deleted
