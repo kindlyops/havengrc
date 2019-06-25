@@ -15,6 +15,11 @@ type State struct {
 	ID        uuid.UUID `json:"id" db:"id"`
 	JSON      slices.Map    `json:"json" db:"json"`
 }
+// StateBinding provides us with something to bind to
+type StateBinding struct {
+	Status                string `json:"status"`
+	DownloadedReport     bool `json:"downloaded_report"`
+}
 
 // String is not required by pop and may be deleted
 func (c State) String() string {

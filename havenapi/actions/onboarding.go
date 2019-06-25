@@ -22,7 +22,7 @@ func GetState(c buffalo.Context) error {
 		state.ID, err = uuid.FromString(c.Value("sub").(string))
 		state.JSON = make(map[string]interface{})
 		state.JSON["status"] = "new"
-		state.JSON["downloaded_report"] = "never"
+		state.JSON["downloaded_report"] = false
 
 		// State does not exist lets insert the first for the user.
 		err = tx.RawQuery(
@@ -34,22 +34,20 @@ func GetState(c buffalo.Context) error {
 		}
 	}
 
-	return c.Render(200, r.JSON(state))
+	return c.Render(200, r.JSON(state.JSON))
 }
 
 
 // UpdateState updates the state for a user. This function is mapped to
 // the path POST /api/state
 func UpdateState(c buffalo.Context) error {
-	tx := c.Value("tx").(*pop.Connection)
-	// Check for a valid update
-	if c.Param("status") == "" {
-		return c.Error(404, fmt.Errorf("invalid request"))
+
+	b := &models.StateBinding{}
+  if err := c.Bind(b); err != nil {
+    return err
 	}
 
-	if c.Param("downloaded_report") == "" {
-		return c.Error(404, fmt.Errorf("invalid request"))
-	}
+	tx := c.Value("tx").(*pop.Connection)
 
 	// Allocate an empty State
 	state := &models.State{}
@@ -59,8 +57,8 @@ func UpdateState(c buffalo.Context) error {
 		return c.Error(404, fmt.Errorf("cannot update state"))
 	}
 
-	state.JSON["status"] = c.Param("status")
-	state.JSON["downloaded_report"] = c.Param("downloaded_report")
+	state.JSON["status"] = b.Status
+	state.JSON["downloaded_report"] = b.DownloadedReport
 
 	// Update the state for the user (User determined by JWT sub.)
 	err := tx.RawQuery(
@@ -71,5 +69,5 @@ func UpdateState(c buffalo.Context) error {
 		return c.Error(404, err)
 	}
 
-	return c.Render(200, r.JSON(state))
+	return c.Render(200, r.JSON(state.JSON))
 }
