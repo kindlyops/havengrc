@@ -3,6 +3,7 @@ module Main exposing (main)
 import Authentication
 import Browser
 import Browser.Navigation as Nav
+import Data.OnBoarding as OnBoarding
 import Data.Survey as SurveyData
 import Data.UserProfile as UserProfile
 import Gravatar
@@ -32,6 +33,7 @@ import Visualization exposing (havenSpecs)
 type alias Model =
     { authModel : Authentication.Model
     , dashboardModel : Dashboard.Model
+    , onBoardingModel : OnBoarding.Model
     , commentsModel : Comments.Model
     , reportsModel : Reports.Model
     , surveyModel : SurveyData.Model
@@ -65,6 +67,9 @@ init sessionStorage location key =
         ( commentsModel, commentsCmd ) =
             Comments.init initialAuthModel
 
+        ( onBoardingModel, onBoardingCmd ) =
+            OnBoarding.init initialAuthModel
+
         ( dashboardModel, dashboardCmd ) =
             Dashboard.init initialAuthModel
 
@@ -85,6 +90,7 @@ init sessionStorage location key =
         model =
             { authModel = initialAuthModel
             , dashboardModel = dashboardModel
+            , onBoardingModel = onBoardingModel
             , commentsModel = commentsModel
             , reportsModel = reportsModel
             , surveyModel = surveyModel
@@ -97,6 +103,7 @@ init sessionStorage location key =
     , Cmd.batch
         [ Cmd.map CommentsMsg commentsCmd
         , Cmd.map AuthenticationMsg authCmd
+        , Cmd.map OnBoardingMsg onBoardingCmd
         , Cmd.map ReportsMsg reportsCmd
         , Cmd.map SurveyMsg surveyCmd
         , Cmd.map SurveyResponseMsg surveyResponsesCmd
@@ -128,6 +135,7 @@ type Msg
     | AuthenticationMsg Authentication.Msg
     | DashboardMsg Dashboard.Msg
     | CommentsMsg Comments.Msg
+    | OnBoardingMsg OnBoarding.Msg
     | ReportsMsg Reports.Msg
     | SurveyMsg Survey.Msg
     | SurveyResponseMsg SurveyResponses.Msg
@@ -166,6 +174,13 @@ update msg model =
         UrlChange location ->
             ( { model | url = location }, Cmd.none )
 
+        OnBoardingMsg onBoardingMsg ->
+            let
+                ( onBoardingModel, cmd ) =
+                    OnBoarding.update onBoardingMsg model.onBoardingModel model.authModel
+            in
+            ( { model | onBoardingModel = onBoardingModel }, Cmd.none )
+
         AuthenticationMsg authMsg ->
             let
                 ( authModel, cmd ) =
@@ -173,6 +188,9 @@ update msg model =
 
                 ( commentsModel, commentsCmd ) =
                     Comments.init authModel
+
+                ( onBoardingModel, onBoardingCmd ) =
+                    OnBoarding.init authModel
 
                 ( reportsModel, reportsCmd ) =
                     Reports.init authModel
@@ -190,6 +208,7 @@ update msg model =
             , Cmd.batch
                 [ Cmd.map AuthenticationMsg cmd
                 , Cmd.map CommentsMsg commentsCmd
+                , Cmd.map OnBoardingMsg onBoardingCmd
                 , Cmd.map ReportsMsg reportsCmd
                 , Cmd.map SurveyMsg surveyCmd
                 , Cmd.map SurveyResponseMsg surveyResponsesCmd

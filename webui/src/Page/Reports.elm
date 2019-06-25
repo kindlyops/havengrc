@@ -2,6 +2,7 @@ module Page.Reports exposing (Model, Msg(..), dashboardView, getReports, init, u
 
 import Authentication
 import Bytes exposing (Bytes)
+import Data.OnBoarding as OnBoarding
 import Data.Report exposing (Report)
 import File.Download as Download
 import Html exposing (Html, a, button, div, i, input, label, li, p, text, ul)
@@ -33,6 +34,7 @@ type Msg
     | DownloadReport Report
     | GotReports (Result Http.Error (List Report))
     | GotDownload (Result Http.Error FileDownload)
+    | UpdatedOnboardingStatus OnBoarding.Msg
     | HideError
 
 
@@ -137,7 +139,12 @@ update msg model authModel =
             )
 
         GotDownload (Ok response) ->
-            ( model, downloadReportBytes response.report.name response.body )
+            ( model
+            , Cmd.batch
+                [ downloadReportBytes response.report.name response.body
+                , Cmd.map UpdatedOnboardingStatus (OnBoarding.set "new" True)
+                ]
+            )
 
         GotDownload (Err error) ->
             ( { model
@@ -145,6 +152,9 @@ update msg model authModel =
               }
             , Process.sleep 3000 |> Task.perform (always HideError)
             )
+
+        UpdatedOnboardingStatus _ ->
+            ( model, Cmd.none )
 
 
 view : Authentication.Model -> Model -> Html Msg
