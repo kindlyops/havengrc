@@ -43,14 +43,13 @@ have a preferred or default mental model or way of looking at the world.
 By learning the models you can be more deliberate
 about which model you are choosing to use.
 
-::: notes
+### notes
 You can use these slides in your own company presentations. If you prefer
 to use Keynote rather than powerpoint, Keynote can import and convert the
 slides.
 
 The People-Centric Security Toolkit by [Lance Hayden](http://lancehayden.net/culture/)
 is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.
-:::
 
 ### What are the 4 cultures or models?
 
