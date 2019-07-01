@@ -6,7 +6,8 @@ import (
 	"bytes"
 	"io/ioutil"
 	"strings"
-
+	"time"
+	"github.com/gobuffalo/uuid"
 	faktory "github.com/contribsys/faktory/client"
 	"log"
 	"github.com/getsentry/raven-go"
@@ -18,22 +19,31 @@ import (
 // rl is the rate limited to 5 requests per second.
 // var rl = ratelimit.New(5)
 
-// SurveyResponse is a data type for the survey
-type SurveyResponse struct {
-	ID               string `json:"uuid"`
-	UserID           string `json:"user_id"`
-	Email            string `json:"user_email"`
-	Org              string `json:"org"`
-	AnswerID         string `json:"answer_id"`
-	GroupNumber      int    `json:"group_number"`
-	PointsAssigned   int    `json:"points_assigned"`
-	CreatedAt        string `json:"created_at"`
-	SurveyResponseID string `json:"survey_response_id"`
+// IpsativeResponse is a data type for the entered response
+type IpsativeResponse struct {
+	UUID             uuid.UUID   `json:"uuid" db:"uuid"`
+	AnswerID         string      `json:"answer_id" db:"answer_id"`
+	Category         string      `json:"category" db:"-"`
+	GroupNumber      int         `json:"group_number" db:"group_number"`
+	PointsAssigned   int         `json:"points_assigned" db:"points_assigned"`
+	CreatedAt        time.Time   `json:"created_at" db:"created_at"`
+	UserID           uuid.UUID   `json:"user_id" db:"user_id"`
+	SurveyResponseID uuid.UUID   `json:"survey_response_id" db:"survey_response_id"`
+	UserEmail        string      `json:"user_email" db:"user_email"`
 }
 
-// RegistrationStruct is a struct for the funnel
+// SurveyResult is a data type for the survey
+type SurveyResult struct {
+	AnswerID         string `json:"answer_id"`
+	Category         string `json:"category"`
+	GroupNumber      int    `json:"group_number"`
+	PointsAssigned   int    `json:"points_assigned"`
+}
+
+
+// resultsStruct is a struct for the funnel
 type resultsStruct struct {
-	Results []SurveyResponse `json:"survey_results"`
+	Results []SurveyResult `json:"survey_results"`
 }
 
 // SurveysHandler accepts json
@@ -53,11 +63,10 @@ func SurveysHandler(c buffalo.Context) error {
 		raven.CaptureError(err, nil)
 		return c.Error(500, err)
 	}
-	log.Printf("body: %s", body)
 
 	remoteAddress := strings.Split(request.RemoteAddr, ":")[0]
 
-	surveyID, err := SaveSurveyResponses(results.Results, c)
+	surveyID, err := SaveSurveyResults(results.Results, c)
 	if err != nil {
 		raven.CaptureError(err, nil)
 
@@ -85,11 +94,25 @@ func SurveysHandler(c buffalo.Context) error {
 		return c.Error(500, err)
 	}
 
-	return c.Render(200, r.JSON(map[string]string{"message": surveyID}))
+	responses := []IpsativeResponse{}
+	// To find the state the value of sub from the Middleware is used.
+	tx := c.Value("tx").(*pop.Connection)
+	err = tx.RawQuery("set local search_path to mappa, public").Exec()
+	if err != nil {
+		return c.Error(500, fmt.Errorf("Database error: %s", err.Error()))
+	}
+	query := tx.Where("survey_response_id = ($1)", surveyID )
+	err = query.All(&responses)
+	if err != nil {
+		raven.CaptureError(err, nil)
+		return c.Error(500, err)
+	}
+
+	return c.Render(200, r.JSON(responses))
 }
 
-// SaveSurveyResponses creates a survey_response and saves all responses
-func SaveSurveyResponses(responses []SurveyResponse, c buffalo.Context) (string, error) {
+// SaveSurveyResults creates a survey_response and saves all responses
+func SaveSurveyResults(results []SurveyResult, c buffalo.Context) (string, error) {
 	tx := c.Value("tx").(*pop.Connection)
 	rows, err := tx.TX.Query("INSERT INTO mappa.survey_responses DEFAUlT VALUES RETURNING uuid;")
 	if err != nil {
@@ -111,12 +134,12 @@ func SaveSurveyResponses(responses []SurveyResponse, c buffalo.Context) (string,
 		log.Fatal(err)
 	}
 
-	for _, response := range responses {
+	for _, result := range results {
 		_, err = tx.TX.Exec(
 			"INSERT INTO mappa.ipsative_responses (answer_id, group_number, points_assigned, survey_response_id) VALUES ($1, $2, $3, $4)",
-			response.AnswerID,
-			response.GroupNumber,
-			response.PointsAssigned,
+			result.AnswerID,
+			result.GroupNumber,
+			result.PointsAssigned,
 			surveyResponseID,
 		)
 		if err != nil {
