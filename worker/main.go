@@ -307,7 +307,7 @@ func createSurveyInput(surveyID string, tx *sqlx.Tx) (string, error) {
 		ON mappa.ipsative_answers.uuid = current_survey.answer_id`, surveyID)
 	handleError(err)
 	if len(surveyData) == 0 {
-		return "", fmt.Errorf("No Results Found.")
+		return "", fmt.Errorf("no results found")
 	}
 	fileContents := "question,Process,Compliance,Autonomy,Trust,respondent\n"
 	questions := make([][]int, 10)
@@ -411,12 +411,11 @@ func addFileToZip(zipWriter *zip.Writer, filename string) error {
 func handleError(err error) {
 	if err != nil {
 		raven.CaptureErrorAndWait(err, nil)
-		log.Print(err)
 		retryJob := false
 		if retryJob {
 			log.Fatal(err)
 		} else {
-			fmt.Errorf("error: %s . waiting", err.Error())
+			log.Print(err)
 		}
 	}
 }
