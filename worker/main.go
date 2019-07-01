@@ -219,7 +219,11 @@ func CreateSlideJob(ctx worker.Context, args ...interface{}) error {
 func createSlide(surveyID string, userEmail string, tx *sqlx.Tx) error {
 	var outputDir = "output/"
 	fileContents, err := createSurveyInput(surveyID, tx)
+	// exit slide creation and allow retry if there is an error
 	handleError(err)
+	if err != nil {
+		return err
+	}
 	// Create new file
 	file, err := ioutil.TempFile("/tmp/", "havengrc-survey-data-*.csv")
 	handleError(err)
@@ -243,7 +247,7 @@ func createSlide(surveyID string, userEmail string, tx *sqlx.Tx) error {
 		handleError(err)
 	}()
 
-	fmt.Println("Creating Slide for survey id: ", surveyID, "And file name: ", slideshowFile.Name())
+	fmt.Println("Creating Slide for survey id: ", surveyID, " with temp csv file:", file.Name() , "And slideShowFile.name: ", slideshowFile.Name())
 	compileReport := exec.Command("compilereport", "-d", file.Name(), "-o", slideshowFile.Name())
 	compileReportOut, err := compileReport.Output()
 	if err != nil {
@@ -286,11 +290,8 @@ func createSurveyInput(surveyID string, tx *sqlx.Tx) (string, error) {
 	surveyData := []SurveyData{}
 
 	err := tx.Select(&surveyData, `WITH current_survey AS(
-		SELECT mappa.ipsative_responses.answer_id, mappa.survey_responses.user_id,
-			mappa.ipsative_responses.points_assigned
+		SELECT mappa.ipsative_responses.answer_id, mappa.ipsative_responses.points_assigned
 		FROM mappa.ipsative_responses
-		INNER JOIN mappa.survey_responses
-		ON mappa.ipsative_responses.user_id=mappa.survey_responses.user_id
 		WHERE mappa.ipsative_responses.survey_response_id = $1)
 		SELECT mappa.ipsative_answers.uuid, (
 			SELECT mappa.ipsative_questions.order_number
@@ -305,6 +306,9 @@ func createSurveyInput(surveyID string, tx *sqlx.Tx) (string, error) {
 		INNER JOIN mappa.ipsative_answers
 		ON mappa.ipsative_answers.uuid = current_survey.answer_id`, surveyID)
 	handleError(err)
+	if len(surveyData) == 0 {
+		return "", fmt.Errorf("no results found")
+	}
 	fileContents := "question,Process,Compliance,Autonomy,Trust,respondent\n"
 	questions := make([][]int, 10)
 	// Collect answer point assignments
@@ -407,15 +411,11 @@ func addFileToZip(zipWriter *zip.Writer, filename string) error {
 func handleError(err error) {
 	if err != nil {
 		raven.CaptureErrorAndWait(err, nil)
-		log.Print(err)
 		retryJob := false
 		if retryJob {
 			log.Fatal(err)
 		} else {
-			// We are exiting with 0 because we don't expect the job to succeed if
-			// faktory queues it again.
 			log.Print(err)
-			os.Exit(0)
 		}
 	}
 }

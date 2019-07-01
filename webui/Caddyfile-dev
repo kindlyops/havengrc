@@ -51,6 +51,9 @@ proxy /api/registration_funnel havenapi:3000 {
   transparent
 }
 
+proxy /api/surveys havenapi:3000 {
+  transparent
+}
 
 log / stdout "{combined}"
 errors stdout

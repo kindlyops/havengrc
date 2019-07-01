@@ -131,23 +131,24 @@ getIpsativeSurvey authModel id =
 postIpsativeResponse : Authentication.Model -> Survey.IpsativeSurvey -> Cmd Msg
 postIpsativeResponse authModel ipsativeSurvey =
     let
-        body =
-            Survey.ipsativeResponseEncoder ipsativeSurvey
-                |> Http.jsonBody
-
         headers =
             Authentication.getReturnHeaders
     in
     Http.request
         { method = "POST"
         , headers = headers
-        , url = "/api/ipsative_responses"
-        , body = body
+        , url = "/api/surveys"
+        , body = Http.jsonBody (postEncoder ipsativeSurvey)
         , expect = Http.expectJson IpsativeSurveySaved (Decode.list Survey.ipsativeResponseDecoder)
         , timeout = Nothing
         , tracker = Nothing
         }
 
+postEncoder : IpsativeSurvey -> Encode.Value
+postEncoder survey =
+    Encode.object
+        [ ( "survey_results", Survey.ipsativeResponseEncoder survey )
+        ]
 
 getLikertSurveys : Authentication.Model -> Cmd Msg
 getLikertSurveys authModel =
@@ -1170,14 +1171,14 @@ viewRegistration model =
                 [ h1 [ class "survey-heading mb-5" ] [ text "You finished the survey!" ]
                 , div [ class "vis", id "vis" ] []
                 , div [ class "col-md-8 mx-auto my-5" ]
-                      [ p [] [ text "Where does Haven GRC fit in? For a detailed deck of these results and how we can personalize your compliance and rish dashboard, just enter your email below." ]
-                      , div [ class "col-md-7 mx-auto mt-5" ]
-                            [ div [ class "input-group"]
-                              [ input [ placeholder "Email Address", class "form-control", value model.emailAddress, onInput UpdateEmail ] []
-                              , i [ class "material-icons" ] [ text "chevron_right" ]
-                              ]
+                    [ p [] [ text "Where does Haven GRC fit in? For a detailed deck of these results and how we can personalize your compliance and rish dashboard, just enter your email below." ]
+                    , div [ class "col-md-7 mx-auto mt-5" ]
+                        [ div [ class "input-group" ]
+                            [ input [ placeholder "Email Address", class "form-control", value model.emailAddress, onInput UpdateEmail ] []
+                            , i [ class "material-icons" ] [ text "chevron_right" ]
                             ]
-                      ]
+                        ]
+                    ]
                 , button [ class "btn btn-primary", onClick RegisterNewUser ] [ text "Click to save results to the server." ]
                 ]
             ]
