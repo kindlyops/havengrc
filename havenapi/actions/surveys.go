@@ -65,7 +65,6 @@ func SurveysHandler(c buffalo.Context) error {
 	}
 
 	remoteAddress := strings.Split(request.RemoteAddr, ":")[0]
-
 	surveyID, err := SaveSurveyResults(results.Results, c)
 	if err != nil {
 		raven.CaptureError(err, nil)
@@ -87,6 +86,8 @@ func SurveysHandler(c buffalo.Context) error {
 	}
 
 	createSlideJob := faktory.NewJob("CreateSlide", surveyID, c.Value("email") )
+	createSlideJob.ReserveFor = 60
+	createSlideJob.Queue = "critical"
 	err = client.Push(createSlideJob)
 	if err != nil {
 		raven.CaptureError(err, nil)
