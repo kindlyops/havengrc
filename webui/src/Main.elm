@@ -172,7 +172,18 @@ update msg model =
                     ( model, Nav.load href )
 
         UrlChange location ->
-            ( { model | url = location }, Cmd.none )
+            case location.path of
+                "/dashboard/" ->
+                    let
+                        ( reportsModel, reportsCmd ) =
+                            Reports.update Reports.GetReports model.reportsModel model.authModel
+                    in
+                    ( { model | url = location, reportsModel = reportsModel }
+                    , Cmd.map ReportsMsg reportsCmd
+                    )
+
+                _ ->
+                    ( { model | url = location }, Cmd.none )
 
         OnBoardingMsg onBoardingMsg ->
             let
@@ -224,7 +235,9 @@ update msg model =
                 newModel =
                     { model | dashboardModel = dashboardModel }
             in
-            ( newModel, Cmd.map DashboardMsg cmd )
+            ( newModel
+            , Cmd.map DashboardMsg cmd
+            )
 
         CommentsMsg commentMsg ->
             let
