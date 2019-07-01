@@ -144,11 +144,13 @@ postIpsativeResponse authModel ipsativeSurvey =
         , tracker = Nothing
         }
 
+
 postEncoder : IpsativeSurvey -> Encode.Value
 postEncoder survey =
     Encode.object
         [ ( "survey_results", Survey.ipsativeResponseEncoder survey )
         ]
+
 
 getLikertSurveys : Authentication.Model -> Cmd Msg
 getLikertSurveys authModel =
@@ -415,7 +417,7 @@ update msg model authModel =
             )
 
         IpsativeSurveySaved (Ok responses) ->
-            ( initialModel
+            ( model
             , Cmd.none
             )
 
@@ -589,7 +591,11 @@ update msg model authModel =
                                     Ports.renderVega (havenSpecs model)
                             in
                             ( newModel
-                            , Cmd.batch [ storeSurvey newModel (getQuestionNumber newModel), cmd ]
+                            , Cmd.batch
+                                [ storeSurvey newModel (getQuestionNumber newModel)
+                                , cmd
+                                , postIpsativeResponse authModel survey
+                                ]
                             )
 
                 Likert survey ->
@@ -1156,7 +1162,10 @@ viewFinished model =
         , div [ class "row" ]
             [ div [ class "col-md-12 text-center mt-5" ]
                 [ h1 [ class "survey-heading" ] [ text "You finished the survey!" ]
-                , button [ class "btn btn-primary mt-4", onClick SaveCurrentSurvey ] [ text "Click to save results to the server." ]
+                , div [ class "vis", id "vis" ] []
+                , div [ class "col-md-8 mx-auto my-5" ]
+                    [ p [] [ text "A report is now being generated." ]
+                    ]
                 ]
             ]
         ]
