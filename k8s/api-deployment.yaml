@@ -44,7 +44,7 @@ spec:
             - name: PGRST_SERVER_PORT
               value: "8180"
             - name: PGRST_SERVER_PROXY_URI
-              value: "https://staging.havengrc.com/api"
+              value: "https://www.havengrc.com/api"
           volumeMounts:
             - name: secret-volume
               mountPath: /etc/haven-credentials/

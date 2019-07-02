@@ -19,7 +19,7 @@ spec:
             - name: DB_DATABASE
               value: "havenstage"
             - name: KEYCLOAK_HOSTNAME
-              value: "staging.havengrc.com"
+              value: "www.havengrc.com"
             - name: KEYCLOAK_HTTP_PORT
               value: "80"
             - name: KEYCLOAK_HTTPS_PORT
