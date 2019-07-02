@@ -26,9 +26,9 @@ view =
                         ]
                     , button
                         [ class "btn btn-primary mt-4"
-                        , onClick Authentication.LoginMsg
+                        , onClick Authentication.StartSurveyMsg
                         ]
-                        [ text "Login" ]
+                        [ text "Get Started" ]
                     ]
                 ]
             ]

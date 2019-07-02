@@ -2,7 +2,7 @@ module Page.Home exposing (view)
 
 import Authentication
 import Browser
-import Html exposing (Html, a, button, div, footer, h1, h3, img, p, span, text)
+import Html exposing (Html, a, button, div, footer, h1, h2, h3, img, p, span, text)
 import Html.Attributes exposing (alt, attribute, class, height, href, id, src, title, width)
 import Html.Events exposing (onClick)
 
@@ -10,25 +10,30 @@ import Html.Events exposing (onClick)
 view : Html Authentication.Msg
 view =
     div [ class "" ]
-        [ div [ class "" ]
+        [ div [ class "py-5 bg-light text-right " ]
+            [ div [ class "col-sm-12 col-lg-4 px-4" ]
+                [ button
+                    [ class "btn btn-block mx-auto login-btn"
+                    , onClick Authentication.LoginMsg
+                    ]
+                    [ text "Login" ]
+                ]
+            ]
+        , div [ class "" ]
             [ div [ class "jumbotron text-center" ]
                 [ div [ class "container" ]
                     [ img [ class "img-fluid mb-4", alt "Haven GRC Company Logo", attribute "data-rjs" "2", id "logo", src "/img/logo@2x.png", height 71, width 82 ]
                         []
-                    , h1 [ class "login-header" ]
-                        [ span [ class "text-secondary" ]
-                            [ text "Compliance" ]
-                        , span [ class "text-primary" ]
-                            [ text " & " ]
-                        , span [ class "text-secondary" ]
-                            [ text "Risk " ]
-                        , text "Dashboard"
+                    , h3 [ class "login-header" ]
+                        [ text "smarter cyber risk governance"
                         ]
+                    , p [ class "homeparagraph" ]
+                        [ text "Lorem Ipsum security culture is mental models. With this quick survey, learn your preferred approach to security and see how that fits with your organization growth plans" ]
                     , button
-                        [ class "btn btn-secondary btn-block mx-auto login-btn"
-                        , onClick Authentication.LoginMsg
+                        [ class "btn btn-primary btn-block mx-auto login-btn"
+                        , onClick Authentication.StartSurveyMsg
                         ]
-                        [ text "Login" ]
+                        [ text "Get Started" ]
                     ]
                 ]
             ]

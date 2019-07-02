@@ -62,7 +62,7 @@ init : Decode.Value -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init sessionStorage location key =
     let
         ( initialAuthModel, authCmd ) =
-            Authentication.init
+            Authentication.init key
 
         ( commentsModel, commentsCmd ) =
             Comments.init initialAuthModel

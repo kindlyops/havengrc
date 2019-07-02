@@ -31,16 +31,13 @@ type alias Model =
 init : Authentication.Model -> ( Model, Cmd Page.Reports.Msg )
 init authModel =
     let
-        ( initialAuthModel, authCmd ) =
-            Authentication.init
-
         ( reportsModel, reportsCmd ) =
-            Page.Reports.init initialAuthModel
+            Page.Reports.init authModel
 
         model =
             { data = []
             , reportsModel = reportsModel
-            , authModel = initialAuthModel
+            , authModel = authModel
             , errorModel = errorInit
             }
     in
