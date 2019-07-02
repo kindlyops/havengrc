@@ -21,7 +21,7 @@ view =
                         [ class "btn btn-outline-default my-2 my-sm-0 login-btn"
                         , onClick Authentication.LoginMsg
                         ]
-                        [ text "Login" ]
+                        [ text "Why this Login doesn't?" ]
                     ]
                 ]
             ]
@@ -37,7 +37,7 @@ view =
                         [ class "btn btn-primary btn-block mx-auto login-btn"
                         , onClick Authentication.LoginMsg
                         ]
-                        [ text "Login" ]
+                        [ text "Why this Login works?" ]
                     , button
                         [ class "btn btn-primary btn-block mx-auto login-btn"
                         , onClick Authentication.StartSurveyMsg
