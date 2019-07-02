@@ -46,7 +46,7 @@ public class MagicLinkFormAuthenticator extends AbstractUsernameFormAuthenticato
         UserModel user = context.getSession().users().getUserByEmail(email, context.getRealm());
         if (user == null) {
             context.getEvent().error(Errors.USER_NOT_FOUND);
-            context.failure(AuthenticationFlowError.INVALID_CREDENTIALS);
+            context.challenge(context.form().createForm("view-email.ftl"));
             return;
 
             // Uncomment the following line to require user to update profile on first login
