@@ -2,33 +2,39 @@ module Page.Home exposing (view)
 
 import Authentication
 import Browser
-import Html exposing (Html, a, button, div, footer, h1, h2, h3, img, p, span, text)
-import Html.Attributes exposing (alt, attribute, class, height, href, id, src, title, width)
+import Html exposing (Html, a, button, div, footer, h1, h2, h3, img, nav, p, span, text)
+import Html.Attributes exposing (alt, attribute, class, height, href, id, src, title, type_, width)
 import Html.Events exposing (onClick)
 
 
 view : Html Authentication.Msg
 view =
     div [ class "" ]
-        [ div [ class "py-5 bg-light text-right " ]
-            [ div [ class "col-sm-12 col-lg-4 px-4" ]
-                [ button
-                    [ class "btn btn-block mx-auto login-btn"
-                    , onClick Authentication.LoginMsg
+        [ nav [ class "navbar navbar-expand-md navbar-light bg-light" ]
+            [ img [ class "img-fluid mb-4", alt "Haven GRC Company Logo", attribute "data-rjs" "2", id "logo", src "/img/logo@2x.png", height 71, width 82 ]
+                []
+            , button [ class "navbar-toggler", type_ "button", attribute "data-toggle" "collapse", attribute "data-target" "#NavbarLogin" ]
+                [ span [ class "navbar-toggler-icon" ] [] ]
+            , div [ class "collapse navbar-collapse", id "NavbarLogin" ]
+                [ Html.form [ class "form-inline ml-auto my-2 my-lg-0" ]
+                    [ button [ class "btn btn-outline-default my-2 my-sm-0 login-btn", onClick Authentication.LoginMsg ]
+                        [ text "Login" ]
                     ]
-                    [ text "Login" ]
                 ]
             ]
         , div [ class "" ]
             [ div [ class "jumbotron text-center" ]
                 [ div [ class "container" ]
-                    [ img [ class "img-fluid mb-4", alt "Haven GRC Company Logo", attribute "data-rjs" "2", id "logo", src "/img/logo@2x.png", height 71, width 82 ]
-                        []
-                    , h3 [ class "login-header" ]
+                    [ h3 [ class "login-header" ]
                         [ text "smarter cyber risk governance"
                         ]
                     , p [ class "homeparagraph" ]
                         [ text "Lorem Ipsum security culture is mental models. With this quick survey, learn your preferred approach to security and see how that fits with your organization growth plans" ]
+                    , button
+                        [ class "btn btn-primary btn-block mx-auto login-btn"
+                        , onClick Authentication.LoginMsg
+                        ]
+                        [ text "Login" ]
                     , button
                         [ class "btn btn-primary btn-block mx-auto login-btn"
                         , onClick Authentication.StartSurveyMsg
