@@ -38,7 +38,7 @@ import Html exposing (Html, a, br, button, div, footer, h1, h3, h4, hr, i, img, 
 import Html.Attributes exposing (alt, attribute, class, disabled, height, href, id, placeholder, src, style, title, type_, value, width)
 import Html.Events exposing (onClick, onInput)
 import Http
-import Json.Decode as Decode exposing (Decoder, andThen, decodeString, field, int, map, map5, oneOf)
+import Json.Decode as Decode exposing (Decoder, andThen, decodeString, field, int, map, map2, map5, oneOf)
 import Json.Encode as Encode
 import List.Zipper as Zipper
 import Page.Errors exposing (ErrorData, errorInit, setErrorMessage, viewError)
@@ -61,13 +61,15 @@ totalGroups =
 
 type alias TestStructure =
     { storedSurvey : SavedState
+    , featureEnv : String
     }
 
 
 testDecoder : Decoder TestStructure
 testDecoder =
-    map TestStructure
+    map2 TestStructure
         (field "storedSurvey" decodeSavedState)
+        (field "featureEnv" Decode.string)
 
 
 type alias SavedState =

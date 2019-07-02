@@ -41,6 +41,7 @@ type alias Model =
     , surveyResponseModel : SurveyResponses.Model
     , key : Nav.Key
     , url : Url.Url
+    , featureEnv : String
     }
 
 
@@ -77,13 +78,13 @@ init sessionStorage location key =
         ( reportsModel, reportsCmd ) =
             Reports.init initialAuthModel
 
-        ( surveyModel, surveyCmd ) =
+        ( ( surveyModel, surveyCmd ), featureEnv ) =
             case Result.toMaybe (Decode.decodeValue Survey.testDecoder sessionStorage) of
                 Just savedState ->
-                    Survey.initWithSave initialAuthModel savedState
+                    ( Survey.initWithSave initialAuthModel savedState, savedState.featureEnv )
 
                 Nothing ->
-                    Survey.init initialAuthModel
+                    ( Survey.init initialAuthModel, "development" )
 
         ( surveyResponseModel, surveyResponsesCmd ) =
             SurveyResponses.init initialAuthModel
@@ -98,6 +99,7 @@ init sessionStorage location key =
             , surveyResponseModel = surveyResponseModel
             , key = key
             , url = location
+            , featureEnv = featureEnv
             }
     in
     ( model
@@ -273,15 +275,27 @@ getGravatar email =
     "https:" ++ url
 
 
-navDrawerItems : List MenuItem
-navDrawerItems =
-    [ { text = "Dashboard", iconName = "dashboard", path = "/dashboard/" }
-    , { text = "Activity", iconName = "history", path = "/activity/" }
-    , { text = "Reports", iconName = "library_books", path = "/reports/" }
-    , { text = "Comments", iconName = "gavel", path = "/comments/" }
-    , { text = "Survey", iconName = "assignment", path = "/survey/" }
-    , { text = "SurveyResponses", iconName = "insert_chart", path = "/surveyResponses/" }
-    ]
+navDrawerItems : Model -> List MenuItem
+navDrawerItems model =
+    let
+        baseItems =
+            [ { text = "Dashboard", iconName = "dashboard", path = "/dashboard/" }
+            , { text = "Survey", iconName = "assignment", path = "/survey/" }
+            ]
+
+        allItems =
+            if model.featureEnv == "development" then
+                baseItems
+                    ++ [ { text = "Activity", iconName = "history", path = "/activity/" }
+                       , { text = "Reports", iconName = "library_books", path = "/reports/" }
+                       , { text = "Comments", iconName = "gavel", path = "/comments/" }
+                       , { text = "SurveyResponses", iconName = "insert_chart", path = "/surveyResponses/" }
+                       ]
+
+            else
+                baseItems
+    in
+    allItems
 
 
 view : Model -> Browser.Document Msg
@@ -367,7 +381,7 @@ viewNavigationDrawer model user =
                     []
                 , viewNavUser model user
                 ]
-            , viewNavDrawerItems navDrawerItems model.url
+            , viewNavDrawerItems (navDrawerItems model) model.url
             ]
         ]
 

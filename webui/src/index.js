@@ -3,13 +3,14 @@ import "./main.scss";
 import { Elm } from './Main.elm'
 
 if (process.env.NODE_ENV === 'development') {
-  var CLIENT_ID = process.env.ELM_APP_KEYCLOAK_CLIENT_ID
+  var FEATURE_ENV = 'development'
 } else {
-  var CLIENT_ID = '{{.Env.ELM_APP_KEYCLOAK_CLIENT_ID}}'
+  var FEATURE_ENV = '{{.Env.FEATURE_ENV}}'
 }
 var storedSurveyState = sessionStorage.getItem('storedSurvey')
 var initialData = {
-  storedSurvey: storedSurveyState ? JSON.parse(storedSurveyState) : null
+  storedSurvey: storedSurveyState ? JSON.parse(storedSurveyState) : null,
+  featureEnv: FEATURE_ENV
 }
 
 document.arrive("#lottie", () => {
