@@ -56,3 +56,49 @@ let updateChart = function (spec) {
 }
 
 elmApp.ports.renderVega.subscribe(updateChart);
+
+(function (w,d) {
+  var loader = function () {
+    var s = d.createElement("script"), tag = d.getElementsByTagName("script")[0];
+    s.src="https://cdn.iubenda.com/iubenda.js";
+    tag.parentNode.insertBefore(s,tag);
+    // Add an observer to adjust the style of the iubenda buttons
+    // after they are added to the iframe.
+    observer.observe(document.body, config);
+  };
+  if(w.addEventListener){
+    w.addEventListener("load", loader, false);
+  }else if(w.attachEvent){
+    w.attachEvent("onload", loader);
+  }else{
+    w.onload = loader;
+  }
+  var observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+        if (mutation.addedNodes && mutation.addedNodes.length > 0) {
+            // element added to DOM
+            var hasClass = [].some.call(mutation.addedNodes, function() {
+                var found = document.getElementsByClassName('iubenda-ibadge');
+                if (found) {
+                  return found;
+                }
+                  return false;
+            });
+            if (hasClass) {
+              var el = document.getElementsByClassName('iubenda-ibadge');
+              for (var i = 0; i < el.length; i++) {
+                el[i].classList.add("ml-3");
+                el[i].classList.add("align-middle");
+              };
+             }
+        }
+    });
+  });
+
+  var config = {
+    attributes: true,
+    childList: true,
+    characterData: true
+  };
+
+})(window, document);

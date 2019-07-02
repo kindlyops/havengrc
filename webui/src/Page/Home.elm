@@ -86,6 +86,18 @@ view =
                         [ text "© 2019 "
                         , a [ class "text-white underline", href "https://kindlyops.com", title "Kindly Ops Website" ]
                             [ text "KINDLY OPS" ]
+                        , a
+                            [ class "text-white underline no-brand iubenda-embed"
+                            , href "https://www.iubenda.com/privacy-policy/52382945"
+                            , title "Privacy Policy "
+                            ]
+                            [ text "Privacy Policy" ]
+                        , a
+                            [ class "text-white underline no-brand iubenda-embed"
+                            , href "https://www.iubenda.com/privacy-policy/52382945/cookie-policy"
+                            , title "Cookie Policy "
+                            ]
+                            [ text "Cookie Policy" ]
                         ]
                     ]
                 ]
