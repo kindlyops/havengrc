@@ -10,14 +10,17 @@ import Html.Events exposing (onClick)
 view : Html Authentication.Msg
 view =
     div [ class "" ]
-        [ nav [ class "navbar navbar-expand-md navbar-light bg-light" ]
-            [ img [ class "img-fluid mb-4", alt "Haven GRC Company Logo", attribute "data-rjs" "2", id "logo", src "/img/logo@2x.png", height 71, width 82 ]
+        [ nav [ class "navbar navbar-expand-md" ]
+            [ img [ class "img-fluid", alt "Haven GRC Company Logo", attribute "data-rjs" "2", id "logo", src "/img/logo@2x.png", height 71, width 82 ]
                 []
             , button [ class "navbar-toggler", type_ "button", attribute "data-toggle" "collapse", attribute "data-target" "#NavbarLogin" ]
                 [ span [ class "navbar-toggler-icon" ] [] ]
             , div [ class "collapse navbar-collapse", id "NavbarLogin" ]
                 [ Html.form [ class "form-inline ml-auto my-2 my-lg-0" ]
-                    [ button [ class "btn btn-outline-default my-2 my-sm-0 login-btn", onClick Authentication.LoginMsg ]
+                    [ button
+                        [ class "btn btn-outline-default my-2 my-sm-0 login-btn"
+                        , onClick Authentication.LoginMsg
+                        ]
                         [ text "Login" ]
                     ]
                 ]
