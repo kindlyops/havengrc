@@ -23,6 +23,12 @@ WORKDIR /home/havenuser
 
 COPY --from=builder /go/src/github.com/kindlyops/havengrc/worker/app .
 COPY --from=builder /go/src/github.com/kindlyops/havengrc/worker/compilereport /usr/local/bin/
+COPY --from=builder /go/src/github.com/kindlyops/havengrc/worker/presentation.Rmd .
+COPY --from=builder /go/src/github.com/kindlyops/havengrc/worker/template.pptx .
+COPY --from=builder /go/src/github.com/kindlyops/havengrc/worker/input.csv .
+COPY --from=builder /go/src/github.com/kindlyops/havengrc/worker/docker-compose.yml .
+COPY --from=builder /go/src/github.com/kindlyops/havengrc/worker/culture-as-mental-model.png .
+RUN mkdir -p /home/havenuser/output
 RUN chown -R havenuser:havenuser /home/havenuser
 RUN chgrp -R 0 /home/havenuser && chmod -R g=u /home/havenuser
 USER havenuser
