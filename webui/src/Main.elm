@@ -284,9 +284,9 @@ navDrawerItems model =
             ]
 
         allItems =
-            if model.featureEnv == "development" then
+            if String.startsWith "dev" model.featureEnv then
                 baseItems
-                    ++ [ { text = "Activity", iconName = "history", path = "/activity/" }
+                    ++ [ { text = model.featureEnv, iconName = "history", path = "/activity/" }
                        , { text = "Reports", iconName = "library_books", path = "/reports/" }
                        , { text = "Comments", iconName = "gavel", path = "/comments/" }
                        , { text = "SurveyResponses", iconName = "insert_chart", path = "/surveyResponses/" }
