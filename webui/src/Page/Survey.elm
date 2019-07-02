@@ -591,12 +591,20 @@ update msg model authModel =
 
                                 cmd =
                                     Ports.renderVega (havenSpecs model)
+
+                                -- Post right away if the user is logged in
+                                extraCmd =
+                                    if Authentication.isLoggedIn authModel then
+                                        postIpsativeResponse authModel survey
+
+                                    else
+                                        Cmd.none
                             in
                             ( newModel
                             , Cmd.batch
                                 [ storeSurvey newModel (getQuestionNumber newModel)
                                 , cmd
-                                , postIpsativeResponse authModel survey
+                                , extraCmd
                                 ]
                             )
 
