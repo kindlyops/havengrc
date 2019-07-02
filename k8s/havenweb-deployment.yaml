@@ -16,8 +16,8 @@ spec:
         - name: havenweb
           image: havengrc-docker.jfrog.io/kindlyops/havenweb:latest
           env:
-            - name: ELM_APP_KEYCLOAK_CLIENT_ID
-              value: "havendev"
+            - name: FEATURE_ENV
+              value: "production"
           ports:
             - containerPort: 8081
               protocol: TCP
