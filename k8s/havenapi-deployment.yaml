@@ -40,7 +40,7 @@ spec:
             - name: HAVEN_JWK_PATH
               value: "/etc/haven-credentials/jwk.json"
             - name: HAVEN_JWT_ISS
-              value: "https://staging.havengrc.com/auth/realms/havendev"
+              value: "https://www.havengrc.com/auth/realms/havendev"
             - name: KC_HOST
               value: "https://havenweb"
             - name: KC_PORT
