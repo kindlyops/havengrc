@@ -21,7 +21,7 @@ view =
                         [ class "btn btn-outline-default my-2 my-sm-0"
                         , onClick Authentication.LoginMsg
                         ]
-                        [ text "Why this Login doesn't?" ]
+                        [ text "Login" ]
                     ]
                 ]
             ]
@@ -33,11 +33,6 @@ view =
                         ]
                     , p [ class "homeparagraph" ]
                         [ text "Lorem Ipsum security culture is mental models. With this quick survey, learn your preferred approach to security and see how that fits with your organization growth plans" ]
-                    , button
-                        [ class "btn btn-primary btn-block mx-auto login-btn"
-                        , onClick Authentication.LoginMsg
-                        ]
-                        [ text "Why this Login works?" ]
                     , button
                         [ class "btn btn-primary btn-block mx-auto login-btn"
                         , onClick Authentication.StartSurveyMsg
