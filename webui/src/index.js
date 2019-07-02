@@ -77,12 +77,12 @@ elmApp.ports.renderVega.subscribe(updateChart);
     mutations.forEach(function(mutation) {
         if (mutation.addedNodes && mutation.addedNodes.length > 0) {
             // element added to DOM
-            var hasClass = [].some.call(mutation.addedNodes, function(el) {
+            var hasClass = [].some.call(mutation.addedNodes, function() {
                 var found = document.getElementsByClassName('iubenda-ibadge');
                 if (found) {
                   return found;
                 }
-                  return;
+                  return false;
             });
             if (hasClass) {
               var el = document.getElementsByClassName('iubenda-ibadge');
