@@ -116,7 +116,6 @@
       <div class="row">
         <div class="col-12 text-center">
           <img src="${url.resourcesPath}/img/logo@2x.png" width="82" height="71" />
-          <#nested "header">
         </div>
       </div>
     </div>
@@ -158,7 +157,7 @@
       <img alt="Wireframe graphic of compliance and risk dashboard Haven GRC" data-rjs="2" id="footer-lines" src="/img/footer_lines@2x.png" data-rjs-processed="true" title="" >
     </div>
     <footer class="align-center">
-      <p>© 2017 <a href="https://kindlyops.com" title="Kindly Ops Website">KINDLY OPS</a></p>
+      <p>© 2019 <a href="https://kindlyops.com" title="Kindly Ops Website">KINDLY OPS</a></p>
     </footer>
   </div>
 
