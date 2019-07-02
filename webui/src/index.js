@@ -5,8 +5,9 @@ import { Elm } from './Main.elm'
 if (process.env.NODE_ENV === 'development') {
   var FEATURE_ENV = 'development'
 } else {
-  var FEATURE_ENV = '{{.Env.FEATURE_ENV}}'
+  var FEATURE_ENV = process.env.FEATURE_ENV
 }
+
 var storedSurveyState = sessionStorage.getItem('storedSurvey')
 var initialData = {
   storedSurvey: storedSurveyState ? JSON.parse(storedSurveyState) : null,
