@@ -14,7 +14,7 @@ import Page.Errors exposing (ErrorData, errorInit, setErrorMessage, viewError)
 import Ports
 import Process
 import Task
-import Utils exposing (getHTTPErrorMessage)
+import Utils exposing (formatPrettyDate, getHTTPErrorMessage)
 
 
 type alias Model =
@@ -105,11 +105,7 @@ downloadReportBytes name content =
 
 initialCommands : Authentication.Model -> List (Cmd Msg)
 initialCommands authModel =
-    if Authentication.isLoggedIn authModel then
-        [ getReports authModel ]
-
-    else
-        []
+    [ getReports authModel ]
 
 
 update : Msg -> Model -> Authentication.Model -> ( Model, Cmd Msg )
@@ -165,7 +161,7 @@ view authModel model =
             (List.map
                 (\l ->
                     li []
-                        [ text (l.name ++ "(" ++ l.user_id ++ ")" ++ " created at " ++ l.created_at)
+                        [ text (l.name ++ "(" ++ l.user_id ++ ")" ++ " created " ++ l.created_at)
                         , button [ class "btn btn-secondary", onClick (DownloadReport l) ] [ text "Download" ]
                         ]
                 )
@@ -180,22 +176,18 @@ view authModel model =
 
 dashboardView : Authentication.Model -> Model -> Html Msg
 dashboardView authModel model =
-    div [ class "card" ]
-        [ div
-            [ class "card-body" ]
-            [ div [ class "card-title" ] [ text "Latest Report:" ]
-            , ul [ class "list-group" ]
-                (List.map
-                    (\l ->
-                        li [ class "list-group-item" ]
-                            [ p [] [ text ("Report created on " ++ l.created_at) ]
-                            , button [ class "btn btn-secondary", onClick (DownloadReport l) ] [ text l.name, i [ class "material-icons pl-2" ] [ text "cloud_download" ] ]
-                            ]
-                    )
-                    model.reports
+    div []
+        [ ul [ class "list-group" ]
+            (List.map
+                (\l ->
+                    li [ class "list-group-item" ]
+                        [ p [] [ text ("This report created " ++ formatPrettyDate authModel.now l.created_at) ]
+                        , button [ class "btn btn-secondary", onClick (DownloadReport l) ] [ text l.name, i [ class "material-icons pl-2" ] [ text "cloud_download" ] ]
+                        ]
                 )
-            , viewError model.errorModel
-            ]
+                model.reports
+            )
+        , viewError model.errorModel
         ]
 
 

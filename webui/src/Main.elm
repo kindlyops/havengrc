@@ -26,6 +26,7 @@ import Ports
 import Process
 import Route
 import Task
+import Time
 import Url
 import Visualization exposing (havenSpecs)
 
@@ -108,13 +109,15 @@ init sessionStorage location key =
         , Cmd.map SurveyMsg surveyCmd
         , Cmd.map SurveyResponseMsg surveyResponsesCmd
         , Ports.renderVega (havenSpecs surveyModel)
+        , Cmd.map AuthenticationMsg (Task.perform Authentication.AdjustTimeZone Time.here)
         ]
     )
 
 
 subscriptions : Model -> Sub Msg
-subscriptions _ =
-    Sub.none
+subscriptions model =
+    Sub.map AuthenticationMsg
+        (Time.every 1000 Authentication.Tick)
 
 
 main : Program Decode.Value Model Msg
@@ -196,35 +199,10 @@ update msg model =
             let
                 ( authModel, cmd ) =
                     Authentication.update authMsg model.authModel
-
-                ( commentsModel, commentsCmd ) =
-                    Comments.init authModel
-
-                ( onBoardingModel, onBoardingCmd ) =
-                    OnBoarding.init authModel
-
-                ( reportsModel, reportsCmd ) =
-                    Reports.init authModel
-
-                ( surveyResponseModel, surveyResponsesCmd ) =
-                    SurveyResponses.init authModel
-
-                ( _, surveyCmd ) =
-                    Survey.init authModel
             in
-            ( { model
-                | authModel = authModel
-                , commentsModel = commentsModel
-              }
+            ( { model | authModel = authModel }
             , Cmd.batch
-                [ Cmd.map AuthenticationMsg cmd
-                , Cmd.map CommentsMsg commentsCmd
-                , Cmd.map OnBoardingMsg onBoardingCmd
-                , Cmd.map ReportsMsg reportsCmd
-                , Cmd.map SurveyMsg surveyCmd
-                , Cmd.map SurveyResponseMsg surveyResponsesCmd
-                , Ports.renderVega (havenSpecs model.surveyModel)
-                ]
+                [ Cmd.map AuthenticationMsg cmd ]
             )
 
         DashboardMsg dashboardMsg ->

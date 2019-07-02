@@ -1,6 +1,10 @@
-module Utils exposing (getHTTPErrorMessage, smashList)
+module Utils exposing (formatPrettyDate, getHTTPErrorMessage, smashList)
 
+import DateFormat
+import DateFormat.Relative exposing (relativeTime)
 import Http
+import Iso8601
+import Time exposing (Posix, Zone, now, utc)
 
 
 getHTTPErrorMessage : Http.Error -> String
@@ -35,3 +39,37 @@ smashList list =
             [ a ] ++ b
         )
         list
+
+
+ourTimezone : Zone
+ourTimezone =
+    -- TODO this should be a preference in user profile
+    utc
+
+
+ourFormatter : Zone -> Posix -> String
+ourFormatter =
+    DateFormat.format
+        [ DateFormat.monthNameFull
+        , DateFormat.text " "
+        , DateFormat.dayOfMonthSuffix
+        , DateFormat.text ", "
+        , DateFormat.yearNumber
+        ]
+
+
+formatPrettyDate : Posix -> String -> String
+formatPrettyDate now isotimestamp =
+    let
+        t =
+            Iso8601.toTime isotimestamp
+
+        formatted =
+            case t of
+                Ok timestamp ->
+                    relativeTime now timestamp
+
+                Err _ ->
+                    "Error: could not decode timestamp"
+    in
+    formatted
