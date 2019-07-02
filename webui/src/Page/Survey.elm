@@ -1430,7 +1430,7 @@ viewIpsativeSurveyBoxes surveyQuestion =
 viewSurveyBox : IpsativeAnswer -> Html Msg
 viewSurveyBox answer =
     div [ class "col-md-6 pt-5" ]
-        [ div [ class "question-container" ]
+        [ div [ class "question-container", style "height" "170px" ]
             [ p [ class "question-text" ] [ text answer.answer ]
             , div []
                 (List.map
