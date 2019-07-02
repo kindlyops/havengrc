@@ -30,6 +30,8 @@
             "gicentre/elm-vegalite": "1.12.0",
             "kuzzmi/elm-gravatar": "2.0.2",
             "rtfeldman/elm-css": "16.0.1",
+            "rtfeldman/elm-iso8601-date-strings": "1.1.3",
+            "ryannhg/date-format": "2.3.0",
             "wernerdegroot/listzipper": "4.0.0"
         },
         "indirect": {
@@ -46,8 +48,6 @@
             "justinmimbs/date": "3.1.2",
             "justinmimbs/time-extra": "1.1.0",
             "rtfeldman/elm-hex": "1.0.0",
-            "rtfeldman/elm-iso8601-date-strings": "1.1.3",
-            "ryannhg/date-format": "2.3.0",
             "truqu/elm-md5": "1.1.0",
             "zwilias/elm-utf-tools": "2.0.1"
         }

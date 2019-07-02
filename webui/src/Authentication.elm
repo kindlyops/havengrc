@@ -15,6 +15,7 @@ import Http
 import Json.Decode as Decode exposing (Decoder, bool, field, int, map2, map5, oneOf, string, succeed)
 import Json.Decode.Pipeline exposing (required)
 import Ports as Ports exposing (saveSurveyState)
+import Time
 
 
 type AuthenticationState
@@ -35,6 +36,8 @@ type alias Model =
     { state : AuthenticationState
     , lastError : Maybe Http.Error
     , key : Nav.Key
+    , now : Time.Posix
+    , zone : Time.Zone
     }
 
 
@@ -43,6 +46,8 @@ type Msg
     | LogOut
     | LoginMsg
     | StartSurveyMsg
+    | Tick Time.Posix
+    | AdjustTimeZone Time.Zone
 
 
 init : Nav.Key -> ( Model, Cmd Msg )
@@ -50,6 +55,8 @@ init navkey =
     ( { state = LoggedOut
       , lastError = Nothing
       , key = navkey
+      , zone = Time.utc -- start with utc then update
+      , now = Time.millisToPosix 0
       }
     , Cmd.batch initialCommands
     )
@@ -77,6 +84,12 @@ getProfile =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        Tick newTime ->
+            ( { model | now = newTime }, Cmd.none )
+
+        AdjustTimeZone newZone ->
+            ( { model | zone = newZone }, Cmd.none )
+
         HandleProfileResult result ->
             -- we loaded the user profile info from
             -- /realms/{realm-name}/protocol/openid-connect/userinfo
