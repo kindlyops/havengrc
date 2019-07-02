@@ -38,7 +38,7 @@ import Html exposing (Html, a, br, button, div, footer, h1, h3, h4, hr, i, img, 
 import Html.Attributes exposing (alt, attribute, class, disabled, height, href, id, placeholder, src, style, title, type_, value, width)
 import Html.Events exposing (onClick, onInput)
 import Http
-import Json.Decode as Decode exposing (Decoder, andThen, decodeString, field, int, map, map2, map5, oneOf)
+import Json.Decode as Decode exposing (Decoder, andThen, decodeString, field, int, map, map2, map5, nullable, oneOf, string)
 import Json.Encode as Encode
 import List.Zipper as Zipper
 import Page.Errors exposing (ErrorData, errorInit, setErrorMessage, viewError)
@@ -60,7 +60,7 @@ totalGroups =
 
 
 type alias TestStructure =
-    { storedSurvey : SavedState
+    { storedSurvey : Maybe SavedState
     , featureEnv : String
     }
 
@@ -68,7 +68,7 @@ type alias TestStructure =
 testDecoder : Decoder TestStructure
 testDecoder =
     map2 TestStructure
-        (field "storedSurvey" decodeSavedState)
+        (field "storedSurvey" (nullable decodeSavedState))
         (field "featureEnv" Decode.string)
 
 
@@ -212,28 +212,37 @@ initWithSave authModel testStructure =
         savedState =
             testStructure.storedSurvey
 
-        upgradedSurvey =
-            upgradeSurvey savedState.surveyData savedState.selectedSurveyMetaData savedState.currentQuestionNumber
+        returnModel =
+            case savedState of
+                Just state ->
+                    let
+                        upgradedSurvey =
+                            upgradeSurvey state.surveyData state.selectedSurveyMetaData state.currentQuestionNumber
 
-        upgradedModel =
-            case upgradedSurvey of
-                Ipsative survey ->
-                    { initialModel
-                        | currentSurvey = upgradedSurvey
-                        , currentPage = savedState.currentPage
-                        , selectedSurveyMetaData = savedState.selectedSurveyMetaData
-                        , isSurveyReady = savedState.isSurveyReady
-                    }
+                        upgradedModel =
+                            case upgradedSurvey of
+                                Ipsative survey ->
+                                    { initialModel
+                                        | currentSurvey = upgradedSurvey
+                                        , currentPage = state.currentPage
+                                        , selectedSurveyMetaData = state.selectedSurveyMetaData
+                                        , isSurveyReady = state.isSurveyReady
+                                    }
 
-                Likert survey ->
-                    { initialModel
-                        | currentSurvey = upgradedSurvey
-                        , currentPage = savedState.currentPage
-                        , selectedSurveyMetaData = savedState.selectedSurveyMetaData
-                        , isSurveyReady = savedState.isSurveyReady
-                    }
+                                Likert survey ->
+                                    { initialModel
+                                        | currentSurvey = upgradedSurvey
+                                        , currentPage = state.currentPage
+                                        , selectedSurveyMetaData = state.selectedSurveyMetaData
+                                        , isSurveyReady = state.isSurveyReady
+                                    }
+                    in
+                    upgradedModel
+
+                Nothing ->
+                    initialModel
     in
-    ( upgradedModel
+    ( returnModel
     , Cmd.batch (initialCommands authModel)
     )
 

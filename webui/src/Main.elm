@@ -52,14 +52,6 @@ type alias MenuItem =
     }
 
 
-decodeSavedState : Decode.Value -> Maybe Survey.TestStructure
-decodeSavedState json =
-    json
-        |> Decode.decodeValue Decode.string
-        |> Result.toMaybe
-        |> Maybe.andThen (Decode.decodeString Survey.testDecoder >> Result.toMaybe)
-
-
 init : Decode.Value -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init sessionStorage location key =
     let
@@ -78,13 +70,16 @@ init sessionStorage location key =
         ( reportsModel, reportsCmd ) =
             Reports.init initialAuthModel
 
+        decoded =
+            Decode.decodeValue Survey.testDecoder sessionStorage
+
         ( ( surveyModel, surveyCmd ), featureEnv ) =
-            case Result.toMaybe (Decode.decodeValue Survey.testDecoder sessionStorage) of
+            case Result.toMaybe decoded of
                 Just savedState ->
                     ( Survey.initWithSave initialAuthModel savedState, savedState.featureEnv )
 
                 Nothing ->
-                    ( Survey.init initialAuthModel, "development" )
+                    ( Survey.init initialAuthModel, "production" )
 
         ( surveyResponseModel, surveyResponsesCmd ) =
             SurveyResponses.init initialAuthModel
