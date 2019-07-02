@@ -16,6 +16,7 @@ spec:
         - ip: "127.0.0.1"
           hostnames:
           - "staging.havengrc.com"
+          - "www.havengrc.com"
       containers:
         - name: gatekeeper
           image: havengrc-docker.jfrog.io/kindlyops/gatekeeper:latest
@@ -30,7 +31,7 @@ spec:
             - name: KEYCLOAK_INTERNAL
               value: "http://keycloak.haven-production.svc:8080"
             - name: REDIRECTION_URL
-              value: "https://staging.havengrc.com"
+              value: "https://www.havengrc.com"
             - name: BASE_URI
               value: ""
             - name: SECURE_COOKIE
@@ -42,7 +43,7 @@ spec:
             - name: KEYCLOAK_SCHEME
               value: "https"
             - name: DISCOVERY_URL
-              value: "https://staging.havengrc.com/auth/realms/havendev"
+              value: "https://www.havengrc.com/auth/realms/havendev"
             - name: CLIENT_SECRET
               valueFrom:
                 secretKeyRef:

@@ -34,6 +34,7 @@ type alias LoggedInUser =
 type alias Model =
     { state : AuthenticationState
     , lastError : Maybe Http.Error
+    , key : Nav.Key
     }
 
 
@@ -41,12 +42,14 @@ type Msg
     = HandleProfileResult (Result Http.Error UserProfile)
     | LogOut
     | LoginMsg
+    | StartSurveyMsg
 
 
-init : ( Model, Cmd Msg )
-init =
+init : Nav.Key -> ( Model, Cmd Msg )
+init navkey =
     ( { state = LoggedOut
       , lastError = Nothing
+      , key = navkey
       }
     , Cmd.batch initialCommands
     )
@@ -87,6 +90,9 @@ update msg model =
                             ( LoggedOut, Just err )
             in
             ( { model | state = newState, lastError = error }, Cmd.none )
+
+        StartSurveyMsg ->
+            ( model, Nav.pushUrl model.key "/survey/" )
 
         LoginMsg ->
             -- Force full page reload of dashboard using Nav.load, which will trigger
