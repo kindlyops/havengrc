@@ -1,17 +1,18 @@
-module Page.Privacy exposing (view)
+module Page.Cookie exposing (view)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
 
 
-viewPrivacy : Html msg
-viewPrivacy =
+viewCookie : Html msg
+viewCookie =
     div []
         [ a
-            [ href "https://www.iubenda.com/privacy-policy/52382945"
+            -- TODO: make this loaded from the database rather than hardcoded to kindlyops
+            [ href "https://www.iubenda.com/privacy-policy/52382945/cookie-policy"
             , class "iubenda-white no-brand iubenda-embed iub-no-markup iub-body-embed"
             ]
-            [ text "Privacy Policy" ]
+            [ text "Cookie Policy" ]
         ]
 
 
@@ -24,7 +25,7 @@ view =
                     [ img [ class "img-fluid mb-4", alt "Haven GRC Company Logo", attribute "data-rjs" "2", id "logo", src "/img/logo@2x.png", height 71, width 82 ]
                         []
                     , h1 []
-                        [ text "Haven GRC Software Service Privacy Policy" ]
+                        [ text "Haven GRC Software Service Cookie Policy" ]
                     ]
                 ]
             ]
@@ -33,7 +34,7 @@ view =
                 [ div [ class "pb-5" ]
                     [ div [ class "row px-5" ]
                         [ div [ class "col-12 px-12" ]
-                            [ viewPrivacy ]
+                            [ viewCookie ]
                         ]
                     ]
                 ]

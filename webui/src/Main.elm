@@ -13,6 +13,7 @@ import Html.Events exposing (onClick)
 import Json.Decode as Decode
 import Page.Activity as Activity
 import Page.Comments as Comments
+import Page.Cookie as Cookie
 import Page.Dashboard as Dashboard
 import Page.Home as Home
 import Page.Landing as Landing
@@ -326,6 +327,9 @@ outsideView model =
         Route.Privacy ->
             outsideContainer Privacy.view
 
+        Route.Cookie ->
+            outsideContainer Cookie.view
+
         Route.Terms ->
             outsideContainer Terms.view
 
@@ -393,6 +397,9 @@ viewBody model =
 
             Route.Privacy ->
                 Privacy.view
+
+            Route.Cookie ->
+                Cookie.view
 
             Route.Terms ->
                 Terms.view

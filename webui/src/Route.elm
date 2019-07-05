@@ -18,6 +18,7 @@ type Route
     | EditComment Int
     | Home
     | Privacy
+    | Cookie
     | Landing
     | Reports
     | ShowComment Int
@@ -37,6 +38,7 @@ routeParser =
         , map Login (s "login")
         , map Logout (s "logout")
         , map Privacy (s "privacy")
+        , map Cookie (s "cookie")
         , map Landing (s "l")
         , map Reports (s "reports")
         , map Survey (s "survey")
@@ -74,6 +76,9 @@ titleFor r =
 
                 Privacy ->
                     "Privacy Policy"
+
+                Cookie ->
+                    "Cookie Policy"
 
                 Landing ->
                     "Welcome"
@@ -129,6 +134,9 @@ pathFor loc =
 
                 Privacy ->
                     "/privacy/"
+
+                Cookie ->
+                    "/cookie/"
 
                 Reports ->
                     "/reports/"
