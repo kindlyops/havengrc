@@ -1199,7 +1199,14 @@ viewRegistration model =
                 [ h1 [ class "survey-heading mb-5" ] [ text "You finished the survey!" ]
                 , div [ class "vis", id "vis" ] []
                 , div [ class "col-md-8 mx-auto my-5" ]
-                    [ p [] [ text "Where does Haven GRC fit in? For a detailed deck of these results and how we can personalize your compliance and rish dashboard, just enter your email below." ]
+                    [ p [] [ text "Do you want a shareable version of these results? Enter your email and we will generate a customized powerpoint presentation that includes these results so that you can incorporate them into your own presentation." ]
+                    , p []
+                        [ text "By submitting your email you agree to our "
+                        , a [ href " " ] [ text "Terms of Service" ]
+                        , text " and "
+                        , a [ href " " ] [ text "Privacy Policy" ]
+                        , text "."
+                        ]
                     , div [ class "col-md-7 mx-auto mt-5" ]
                         [ div [ class "input-group" ]
                             [ input [ placeholder "Email Address", class "form-control", value model.emailAddress, onInput UpdateEmail ] []

@@ -85,19 +85,25 @@ view =
                     [ span []
                         [ text "© 2019 "
                         , a [ class "text-white underline", href "https://kindlyops.com", title "Kindly Ops Website" ]
-                            [ text "KINDLY OPS" ]
+                            [ text "KINDLY OPS " ]
                         , a
-                            [ class "text-white underline no-brand iubenda-embed"
-                            , href "https://www.iubenda.com/privacy-policy/52382945"
+                            [ class "text-white underline"
+                            , href "/privacy"
                             , title "Privacy Policy "
                             ]
-                            [ text "Privacy Policy" ]
+                            [ text "Privacy Policy " ]
                         , a
-                            [ class "text-white underline no-brand iubenda-embed"
-                            , href "https://www.iubenda.com/privacy-policy/52382945/cookie-policy"
+                            [ class "text-white underline"
+                            , href "/cookie"
                             , title "Cookie Policy "
                             ]
                             [ text "Cookie Policy" ]
+                        , a
+                            [ class "text-white underline"
+                            , href "/terms"
+                            , title "Terms of Service "
+                            ]
+                            [ text "Terms of Service " ]
                         ]
                     ]
                 ]

@@ -17,11 +17,11 @@ viewTerms =
 
     (a) The **Software** is Haven GRC, for tamper proof evidence storage, security culture metrics, and risk dashboard.
 
-    (b) The **Website** is at https://havengrc.com/.
+    (b) The **Website** is at https://www.havengrc.com/.
 
-    (c) The **Account Dashboard** is at https://account.havengrc.com/.
+    (c) The **Account Dashboard** is at https://www.havengrc.com/.
 
-    (d) The **Documentation** is at https://docs.havengrc.com/.
+    (d) The **Documentation** is at https://www.havengrc.com/.
 
 2. _Order_.
 
