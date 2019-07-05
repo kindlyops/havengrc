@@ -17,58 +17,6 @@ services:
     depends_on:
       - keycloak
     command: keycloak:8080
-  zap:
-    image: owasp/zap2docker-weekly
-    depends_on:
-      - webui
-    command: zap-baseline.py -t http://webui:2016
-  alertmanager:
-    image: prom/alertmanager
-    ports:
-      - 9093:9093
-    volumes:
-      - "./alertmanager/:/etc/alertmanager/"
-    command:
-      - '--config.file=/etc/alertmanager/config.yml'
-      - '--storage.path=/alertmanager'
-  # 
-  # cadvisor is not working on windows, remove for now
-  #
-  # prometheus:
-  #   image: prom/prometheus
-  #   volumes:
-  #     - ./prometheus/:/etc/prometheus/
-  #     - prometheus_data:/prometheus
-  #   command:
-  #     - '--config.file=/etc/prometheus/prometheus.yml'
-  #     - '--storage.tsdb.path=/prometheus'
-  #     - '--web.console.libraries=/usr/share/prometheus/console_libraries'
-  #     - '--web.console.templates=/usr/share/prometheus/consoles'
-  #   ports:
-  #     - 9090:9090
-  #   depends_on:
-  #     - cadvisor
-  # cadvisor:
-  #   image: google/cadvisor
-  #   volumes:
-  #     - /:/rootfs:ro
-  #     - /var/run:/var/run:rw
-  #     - /sys:/sys:ro
-  #     - /var/lib/docker/:/var/lib/docker:ro
-  #  ports:
-  #    - 8080:8080
-  mailhog:
-    image: mailhog/mailhog:v1.0.0
-    ports:
-      - "8025:8025"
-      - "1025:1025"
-    environment:
-      - MH_STORAGE=maildir
-      - MH_MAILDIR_PATH=/maildir
-      - VIRTUAL_HOST=mailhog.dev.havengrc.com
-      - VIRTUAL_PORT=8025
-    volumes:
-      - ./mailhog/maildir:/maildir
   faktory:
     build:
       context: ./faktory
@@ -103,7 +51,6 @@ services:
       - KEYCLOAK_HTTPS_PORT=443
     links:
       - db:postgres
-      - mailhog
     volumes:
       - ./keycloak/themes/haven:/opt/jboss/keycloak/themes/haven
       - ./keycloak/data:/keycloak
@@ -124,24 +71,6 @@ services:
     command: ["migrate", "-placeholders.databaseUser=postgres"]
     links:
       - db
-  apitest:
-    build:
-      context: .
-      dockerfile: ./apitest/Dockerfile
-    working_dir: /usr/src/app
-    environment:
-      - API_SERVER=api:8180
-      - AUTH_SERVER=dev.havengrc.com
-      - BUFFALO_SERVER=dev.havengrc.com
-    volumes:
-      - ./apitest:/usr/src/app
-    links:
-      - api
-      - keycloak
-      - webui:dev.havengrc.com
-    depends_on:
-      - start_dependencies
-    command: [cucumber]
   api:
     build:
       dockerfile: ./postgrest/Dockerfile
@@ -163,28 +92,6 @@ services:
       - db
     depends_on:
       - flyway
-  swagger:
-    image: havengrc-docker.jfrog.io/swaggerapi/swagger-ui:v3.0.2
-    ports:
-      - "3002:8080"
-    volumes:
-      - ./swagger/index.html:/usr/share/nginx/html/index.html
-  unleash:
-    build:
-      context: ./unleash
-    ports:
-      - "4242:4242"
-    environment:
-      - DATABASE_URL=postgres://postgres:postgres@db/mappamundi_dev
-      - KEYCLOAK_HOST=http://localhost:2015
-      - KEYCLOAK_REALM=havendev
-      - KEYCLOAK_CLIENT_ID=unleash
-      - KEYCLOAK_CLIENT_SECRET=2e78e079-b39a-4a8b-8f33-0ab327518ae6
-      - SITE_URL=http://localhost:2015/unleash
-    depends_on:
-      - start_dependencies
-    links:
-      - keycloak
   db:
     image: postgres:9.6.4
     ports:
@@ -193,13 +100,6 @@ services:
       - POSTGRES_DB=mappamundi_dev
     volumes:
       - ./postgresql-data:/var/lib/postgresql
-  pgadmin:
-    image: dpage/pgadmin4
-    environment:
-      - "PGADMIN_DEFAULT_EMAIL=user1@havengrc.com"
-      - "PGADMIN_DEFAULT_PASSWORD=password"
-    ports:
-      - "8081:80"
   gatekeeper:
     build:
       context: gatekeeper/
@@ -270,17 +170,6 @@ services:
       - keycloak
     ports:
       - "3000:3000"
-  # grafana:
-  #   image: grafana/grafana
-  #   depends_on:
-  #     - prometheus
-  #   ports:
-  #     - 3500:3000
-  #   volumes:
-  #     - grafana_data:/var/lib/grafana
-  #     - ./grafana/provisioning/:/etc/grafana/provisioning/
-  #   env_file:
-  #     - ./grafana/config.monitoring
   webui:
     working_dir: /code
     volumes:
@@ -294,45 +183,10 @@ services:
       - api
       - havenapi
       - keycloak
-      - unleash
     ports:
       - "2015:80"
     command: [/code/installrun.sh]
     environment:
       - ELM_APP_KEYCLOAK_CLIENT_ID=havendev
       - VIRTUAL_HOST=dev.havengrc.com
-  docs:
-    working_dir: /docs
-    volumes:
-      - ./docs:/docs
-      - /docs/node_modules
-    build:
-      context: .
-      dockerfile: ./docs/Dockerfile
-    ports:
-      - "4000:4000"
-    command: [serve]
-    environment:
-      - VIRTUAL_HOST=docs.dev.havengrc.com
-  plantuml:
-    working_dir: /docs
-    volumes:
-      - ./docs:/docs
-    build:
-      context: .
-      dockerfile: ./docs/plantuml/Dockerfile
-    command: [-v, /docs/plantuml/*.puml]
-  mjml:
-    build:
-      context: mjml/
-    volumes:
-      - ./mjml/templates:/home/mjml/templates
-      - ./mjml/dist:/home/mjml/dist
-    command: ["templates/*.mjml", "-o", "dist/"]
-  cypress:
-    build:
-      context: webui
-      dockerfile: Dockerfile-cypress
-    links:
-      - gatekeeper:dev.havengrc.com
-    command: ["npx", "cypress", "run"]
+
