@@ -7,9 +7,9 @@ This zip file contains your Security Culture Survey results as well as the sourc
 *filename*: SecurityCultureSurveyPresentation.pptx
 *Description*: This presentation is compatible with PowerPoint and Keynote. It contains your survey results graph as well some explainations of each quadrant.
 
-## Source files
+### Source files
 
-Also included are the your survey response data and the source code for the graph.
+Also included: your survey response data and the source code for the graph.
 
 - `docker-compose.yml`
 - `presentation.Rmd`
