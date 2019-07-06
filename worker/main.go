@@ -12,6 +12,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"time"
 
 	worker "github.com/contribsys/faktory_worker_go"
 	"github.com/getsentry/raven-go"
@@ -215,6 +216,11 @@ func CreateSlideJob(ctx worker.Context, args ...interface{}) error {
 	return err
 }
 
+type zipEntry struct {
+	source string
+	name   string
+}
+
 // createSlide creates a slide user R
 func createSlide(surveyID string, userEmail string, tx *sqlx.Tx) error {
 	var outputDir = "output/"
@@ -247,7 +253,7 @@ func createSlide(surveyID string, userEmail string, tx *sqlx.Tx) error {
 		handleError(err)
 	}()
 
-	fmt.Println("Creating Slide for survey id: ", surveyID, " with temp csv file:", file.Name() , "And slideShowFile.name: ", slideshowFile.Name())
+	fmt.Println("Creating Slide for survey id: ", surveyID, " with temp csv file:", file.Name(), "And slideShowFile.name: ", slideshowFile.Name())
 	compileReport := exec.Command("compilereport", "-d", file.Name(), "-o", slideshowFile.Name())
 	compileReportOut, err := compileReport.Output()
 	if err != nil {
@@ -259,16 +265,21 @@ func createSlide(surveyID string, userEmail string, tx *sqlx.Tx) error {
 	handleError(err)
 	fmt.Println("Created Slide for: ", userEmail)
 	// Zip up all the files related to the survey
-	files := []string{
-		file.Name(),
-		slideshowFile.Name(),
-		"presentation.Rmd",
-		"template.pptx",
-		"docker-compose.yml",
-		"compilereport",
-		"culture-as-mental-model.png",
+	files := []zipEntry{
+		zipEntry{file.Name(), "survey-data.csv"},
+		zipEntry{slideshowFile.Name(), "SecurityCultureSurveyPresentation.pptx"},
+		zipEntry{"presentation.Rmd", ""},
+		zipEntry{"template.pptx", ""},
+		zipEntry{"docker-compose.yml", ""},
+		zipEntry{"compilereport", ""},
+		zipEntry{"culture-as-mental-model.png", ""},
+		zipEntry{"README.txt", ""},
 	}
-	output, err := ioutil.TempFile(outputDir, "havengrc-report-*.zip")
+	currentTime := time.Now()
+	timeStr := currentTime.Format("2006-01-02 3:4:5")
+	tempFilePattern := fmt.Sprintf("havengrc-report-%s-*.zip", timeStr)
+	savedFileName := fmt.Sprintf("havengrc-report-%s.zip", timeStr)
+	output, err := ioutil.TempFile(outputDir, tempFilePattern)
 	handleError(err)
 
 	if err := zipFiles(output.Name(), files); err != nil {
@@ -279,7 +290,7 @@ func createSlide(surveyID string, userEmail string, tx *sqlx.Tx) error {
 		handleError(err)
 	}()
 
-	err = saveFileToDB(userEmail, output.Name())
+	err = saveFileToDB(userEmail, output.Name(), savedFileName)
 	handleError(err)
 	return err
 }
@@ -326,7 +337,7 @@ func createSurveyInput(surveyID string, tx *sqlx.Tx) (string, error) {
 	return fileContents, err
 }
 
-func saveFileToDB(userEmail string, fileName string) error {
+func saveFileToDB(userEmail string, fileName string, savedFileName string) error {
 	file, err := os.Open(fileName)
 	handleError(err)
 	users, err := keycloak.GetUser(userEmail)
@@ -346,7 +357,7 @@ func saveFileToDB(userEmail string, fileName string) error {
 	buf.ReadFrom(file)
 	_, err = tx.Exec("SELECT set_config('request.jwt.claim.sub', $1, true)", users[0].ID)
 	handleError(err)
-	_, err = tx.Exec("INSERT INTO mappa.files (name, file) VALUES ($1, $2)", "report.zip", buf.Bytes())
+	_, err = tx.Exec("INSERT INTO mappa.files (name, file) VALUES ($1, $2)", savedFileName, buf.Bytes())
 	handleError(err)
 
 	err = tx.Commit()
@@ -356,7 +367,7 @@ func saveFileToDB(userEmail string, fileName string) error {
 	return err
 }
 
-func zipFiles(filename string, files []string) error {
+func zipFiles(filename string, files []zipEntry) error {
 
 	newZipFile, err := os.Create(filename)
 	if err != nil {
@@ -369,7 +380,7 @@ func zipFiles(filename string, files []string) error {
 
 	// Add files to zip
 	for _, file := range files {
-		fmt.Println("Adding file to zip: ", file)
+		fmt.Println("Adding file to zip: ", file.source)
 		if err = addFileToZip(zipWriter, file); err != nil {
 			return err
 		}
@@ -377,9 +388,9 @@ func zipFiles(filename string, files []string) error {
 	return nil
 }
 
-func addFileToZip(zipWriter *zip.Writer, filename string) error {
+func addFileToZip(zipWriter *zip.Writer, entry zipEntry) error {
 
-	fileToZip, err := os.Open(filename)
+	fileToZip, err := os.Open(entry.source)
 	if err != nil {
 		return err
 	}
@@ -396,7 +407,11 @@ func addFileToZip(zipWriter *zip.Writer, filename string) error {
 		return err
 	}
 
-	header.Name = filepath.Base(filename)
+	if entry.name != "" {
+		header.Name = entry.name
+	} else {
+		header.Name = filepath.Base(entry.source)
+	}
 
 	header.Method = zip.Deflate
 
