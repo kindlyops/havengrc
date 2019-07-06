@@ -299,6 +299,7 @@ encodeIpsativeAnswer ipsativeAnswer =
         , ( "answer", Encode.string <| ipsativeAnswer.answer )
         , ( "category", Encode.string <| ipsativeAnswer.category )
         , ( "orderNumber", Encode.int <| ipsativeAnswer.orderNumber )
+        , ( "questionNumber", Encode.int <| ipsativeAnswer.questionNumber )
         , ( "pointsAssigned", ipsativeAnswer.pointsAssigned |> Encode.list encodePointsAssigned )
         ]
 
@@ -323,7 +324,7 @@ encodePointsAssigned pointsAssigned =
 decodeIpsativeSurveyWithoutZipper : Decoder IpsativeSurveyWithoutZipper
 decodeIpsativeSurveyWithoutZipper =
     map4 IpsativeSurveyWithoutZipper
-        (field "metadata" decodeSurveyMetaData)
+        (field "metaData" decodeSurveyMetaData)
         (field "pointsPerQuestion" int)
         (field "numGroups" int)
         (field "questions" (Decode.list decodeIpsativeQuestion))
