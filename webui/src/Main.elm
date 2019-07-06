@@ -151,19 +151,22 @@ update msg model =
                     let
                         -- a few paths in our application are not part of the SPA
                         -- but are instead other mini apps mounted at the path.
-                        -- for things like keycloak (and in the future, unleash)
+                        -- for things like keycloak.
                         -- force a full browser page load even though it's a path
                         -- on the same domain.
+                        -- For Iubenda, we need a full page load to get the
+                        -- IUbenda javascript to load the embedded policies
                         isKeycloak =
                             String.startsWith "/auth" url.path
 
                         isGatekeeper =
                             String.startsWith "/oauth/" url.path
-                    in
-                    if isKeycloak then
-                        ( model, Nav.load (Url.toString url) )
 
-                    else if isGatekeeper then
+                        isIubenda =
+                            String.startsWith "/cookie" url.path
+                                || String.startsWith "/privacy" url.path
+                    in
+                    if isKeycloak || isGatekeeper || isIubenda then
                         ( model, Nav.load (Url.toString url) )
 
                     else
