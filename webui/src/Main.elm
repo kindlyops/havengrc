@@ -186,6 +186,15 @@ update msg model =
                     , Cmd.map ReportsMsg reportsCmd
                     )
 
+                "/survey/" ->
+                    let
+                        ( surveyModel, surveyCmd ) =
+                            Survey.update Survey.RenderVegaCharts model.surveyModel model.authModel
+                    in
+                    ( { model | url = location, surveyModel = surveyModel }
+                    , Cmd.map SurveyMsg surveyCmd
+                    )
+
                 _ ->
                     ( { model | url = location }, Cmd.none )
 

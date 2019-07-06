@@ -8,6 +8,7 @@
     "dependencies": {
         "direct": {
             "NoRedInk/elm-json-decode-pipeline": "1.0.0",
+            "andrewMacmurray/elm-delay": "3.0.0",
             "avh4/elm-color": "1.0.0",
             "elm/browser": "1.0.1",
             "elm/bytes": "1.0.8",

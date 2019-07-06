@@ -11,6 +11,7 @@ module Page.Survey exposing
     )
 
 import Authentication
+import Browser.Navigation as Nav
 import Data.Registration as Registration exposing (Registration)
 import Data.Survey as Survey
     exposing
@@ -34,6 +35,7 @@ import Data.Survey as Survey
         , encodeSurveyMetaData
         , upgradeSurvey
         )
+import Delay exposing (TimeUnit(..), after)
 import Html exposing (Html, a, br, button, div, footer, h1, h3, h4, hr, i, img, input, li, p, span, table, tbody, td, text, th, thead, tr, ul)
 import Html.Attributes exposing (alt, attribute, class, disabled, height, href, id, placeholder, src, style, title, type_, value, width)
 import Html.Events exposing (onClick, onInput)
@@ -318,7 +320,10 @@ type Msg
     | UpdateAnswer IpsativeAnswer Int String
     | NextQuestion
     | PreviousQuestion
+    | LoadReportDashboard
     | GoToHome
+    | RestartSurvey
+    | RenderVegaCharts
     | SelectLikertAnswer String String
     | GotoQuestion Int
     | GetIpsativeSurveys
@@ -598,23 +603,25 @@ update msg model authModel =
                                 newModel =
                                     { model | currentPage = Finished }
 
+                                -- TODO: render a spinner
                                 cmd =
-                                    Ports.renderVega (havenSpecs model)
+                                    Delay.after 1500 Millisecond RenderVegaCharts
 
                                 -- Post right away if the user is logged in
-                                extraCmd =
+                                extraCmds =
                                     if Authentication.isLoggedIn authModel then
-                                        postIpsativeResponse authModel survey
+                                        [ postIpsativeResponse authModel survey ]
 
                                     else
-                                        Cmd.none
+                                        []
                             in
                             ( newModel
                             , Cmd.batch
-                                [ storeSurvey newModel (getQuestionNumber newModel)
-                                , cmd
-                                , extraCmd
-                                ]
+                                ([ storeSurvey newModel (getQuestionNumber newModel)
+                                 , cmd
+                                 ]
+                                    ++ extraCmds
+                                )
                             )
 
                 Likert survey ->
@@ -639,6 +646,19 @@ update msg model authModel =
                             ( newModel
                             , Cmd.batch [ storeSurvey newModel (getQuestionNumber newModel), cmd ]
                             )
+
+        RestartSurvey ->
+            ( { model | currentSurvey = Ipsative Survey.emptyIpsativeServerSurvey }
+            , Cmd.none
+            )
+
+        RenderVegaCharts ->
+            ( model, Ports.renderVega (havenSpecs model) )
+
+        LoadReportDashboard ->
+            ( { model | currentSurvey = Ipsative Survey.emptyIpsativeServerSurvey }
+            , Nav.pushUrl authModel.key "/dashboard/"
+            )
 
         PreviousQuestion ->
             case model.currentSurvey of
@@ -1183,7 +1203,9 @@ viewFinished model =
                 [ h1 [ class "survey-heading" ] [ text "You finished the survey!" ]
                 , div [ class "vis", id "vis" ] []
                 , div [ class "col-md-8 mx-auto my-5" ]
-                    [ p [] [ text "A report is now being generated." ]
+                    [ p [] [ text "A custom powerpoint version of this report is being generated and will be available on your dashboard shortly." ]
+                    , div [ class "col text-center mt-4" ]
+                        [ button [ class "btn btn-primary next-question-btn", onClick RestartSurvey ] [ text "Restart Survey" ] ]
                     ]
                 ]
             ]
