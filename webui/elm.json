@@ -26,7 +26,7 @@
             "elm-community/string-extra": "4.0.1",
             "elm-community/typed-svg": "5.0.1",
             "elm-explorations/markdown": "1.0.0",
-            "gampleman/elm-visualization": "2.0.0",
+            "gampleman/elm-visualization": "2.0.1",
             "gicentre/elm-vega": "5.1.0",
             "gicentre/elm-vegalite": "1.12.0",
             "kuzzmi/elm-gravatar": "2.0.2",
