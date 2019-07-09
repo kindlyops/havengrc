@@ -32,7 +32,7 @@ view =
                         [ text "smarter cyber risk governance"
                         ]
                     , p [ class "homeparagraph" ]
-                        [ text "Lorem Ipsum security culture is mental models. With this quick survey, learn your preferred approach to security and see how that fits with your organization growth plans" ]
+                        [ text "Security culture is mental models. With this quick survey, learn your preferred approach to security and see how that fits with your organization growth plans" ]
                     , button
                         [ class "btn btn-primary btn-block mx-auto login-btn"
                         , onClick Authentication.StartSurveyMsg
