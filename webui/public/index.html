@@ -39,6 +39,25 @@
     <script src="%PUBLIC_URL%/js/vega-embed.js"></script>
     <script src="%PUBLIC_URL%/js/arrive.min.js"></script>
     <script src="%PUBLIC_URL%/js/lottie.min.js" type="text/javascript"></script>
+    <script>
+        window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+        // TODO: template the GA ID
+        var GOOGLE_ANALYTICS_ID = 'UA-64718568-5';
+        ga('create', GOOGLE_ANALYTICS_ID, 'auto');
+
+        // Replace the following lines with the plugins you want to use.
+        ga('require', 'eventTracker');
+        ga('require', 'outboundLinkTracker');
+        ga('require', 'urlChangeTracker');
+        ga('require', 'mediaQueryTracker');
+
+        ga('send', 'pageview');
+    </script>
+
+    <script async src="https://www.google-analytics.com/analytics.js"></script>
+
+    <script async src="%PUBLIC_URL%/js/autotrack.js"></script>
+
 
 </head>
 <body>
