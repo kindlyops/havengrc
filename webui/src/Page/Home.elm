@@ -34,7 +34,7 @@ view =
                     , p [ class "homeparagraph" ]
                         [ text "Haven GRC is the only Governance, Risk, and Compliance solution build on a foundation of empathy for humans. Security culture is beliefs and assumptions that drive decisions and behavior. We call these mental models." ]
                     , p [ class "homeparagraph" ]
-                        [ text "Take this free 10 question security culture survey to learn which model your organization currently uses for security and see how that fits with where your organization needs to go this year." ]
+                        [ text "Take this free 10 question security culture survey to learn which model your team currently uses for security and see how that fits with where your team needs to go this year." ]
                     , button
                         [ class "btn btn-primary btn-block mx-auto login-btn"
                         , onClick Authentication.StartSurveyMsg
@@ -58,7 +58,7 @@ view =
                         , h3 [ class "py-3" ]
                             [ text "SECURITY METRICS" ]
                         , p [ class "homeparagraph" ]
-                            [ text "Each security culture has strengths and weaknesses. Measure your organizations security culture along with metrics that measure the performance of your cyber security program. Understanding the different security models will help your team appreciate the benefits of learning new approaches as you work to take on calculated risk for innovation or improve discipline to meet regulatory compliance goals." ]
+                            [ text "Each security culture has strengths and weaknesses. Measure your team's security culture along with metrics that measure the performance of your cyber security program. Understanding the different security models will help your team appreciate the benefits of learning new approaches as you work to take on calculated risk for innovation or improve discipline to meet regulatory compliance goals." ]
                         ]
                     , div [ class "col-sm-12 col-lg-4 px-4" ]
                         [ img [ alt "icon with exclaimation point warning symbol alert", class "img-responsive center-block", attribute "data-rjs" "2", src "/img/track_risk.png" ]
