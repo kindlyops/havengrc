@@ -9,7 +9,7 @@ header / {
   # Disallow the site to be rendered within a frame (clickjacking protection)
   X-Frame-Options "sameorigin"
   # CSP
-  Content-Security-Policy "default-src 'self' *.iubenda.com; script-src 'self' *.iubenda.com 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: www.gravatar.com *.iubenda.com; style-src 'self' 'unsafe-inline' *.iubenda.com;  frame-src: *.iubenda.com *.consensu.org; font-src 'self' data: ;"
+  Content-Security-Policy "default-src 'self' *.iubenda.com; script-src 'self' *.iubenda.com www.google-analytics.com 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: www.gravatar.com *.iubenda.com www.google-analytics.com; style-src 'self' 'unsafe-inline' *.iubenda.com;  frame-src: *.iubenda.com *.consensu.org; font-src 'self' data: ;"
   Feature-Policy "autoplay 'none'; camera 'none'; microphone 'none'; midi 'none'; usb 'none'; vr 'none';"
   Referrer-Policy "strict-origin"
 }
