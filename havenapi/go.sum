@@ -580,6 +580,8 @@ github.com/markbates/grift v1.0.4/go.mod h1:wbmtW74veyx+cgfwFhlnnMWqhoz55rnHR47o
 github.com/markbates/grift v1.0.5/go.mod h1:EHmVIjOQoj/OOBDzlZ8RW0ZkvOtQ4xRHjrPvmfoiFaU=
 github.com/markbates/grift v1.0.6 h1:ZTw+Y3A0HjfiYc7xR3jdu8TvCbwNiTJ5eXXb1LgK+0M=
 github.com/markbates/grift v1.0.6/go.mod h1:2AUYA/+pODhwonRbYwsltPVPIztBzw5nIJEGiWgKMPM=
+github.com/markbates/grift v1.1.0 h1:DsljFKUSK1ELpU22ZE+Gi93jiQI3cYD/RQ+vHM/PpY8=
+github.com/markbates/grift v1.1.0/go.mod h1:8N7ybWEcnMOvtSb0kW+dLJpYii9eq/FP3Gtu/cNPDTY=
 github.com/markbates/hmax v1.0.0/go.mod h1:cOkR9dktiESxIMu+65oc/r/bdY4bE8zZw3OLhLx0X2c=
 github.com/markbates/hmax v1.1.0 h1:MswE0ks4Iv1UAQNlvAyFpsyFQSBHolckas95gRUkka4=
 github.com/markbates/hmax v1.1.0/go.mod h1:hhn8pJiRwNTEmNlxhfiTbL+CtEYiAX3wuhSf/kg/6wI=
