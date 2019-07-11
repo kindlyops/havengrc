@@ -23,6 +23,7 @@ WORKDIR /home/havenuser
 
 COPY --from=builder /go/src/github.com/kindlyops/havengrc/worker/app .
 COPY --from=builder /go/src/github.com/kindlyops/havengrc/worker/compilereport /usr/local/bin/
+COPY --from=builder /go/src/github.com/kindlyops/havengrc/worker/compilereport .
 COPY --from=builder /go/src/github.com/kindlyops/havengrc/worker/presentation.Rmd .
 COPY --from=builder /go/src/github.com/kindlyops/havengrc/worker/template.pptx .
 COPY --from=builder /go/src/github.com/kindlyops/havengrc/worker/README.txt .
