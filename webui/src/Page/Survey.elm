@@ -37,7 +37,7 @@ import Data.Survey as Survey
         )
 import Delay exposing (TimeUnit(..), after)
 import Html exposing (Html, a, br, button, div, footer, h1, h3, h4, hr, i, img, input, li, p, span, table, tbody, td, text, th, thead, tr, ul)
-import Html.Attributes exposing (alt, attribute, class, disabled, height, href, id, placeholder, src, style, title, type_, value, width)
+import Html.Attributes exposing (alt, attribute, class, disabled, height, href, id, placeholder, src, style, title, type_, value, width, target, rel)
 import Html.Events exposing (onClick, onInput)
 import Http
 import Json.Decode as Decode exposing (Decoder, andThen, decodeString, field, int, map, map2, map5, nullable, oneOf, string)
@@ -1176,7 +1176,7 @@ getTotalAvailableSurveys model =
 
 viewHero : Model -> Html Msg
 viewHero model =
-    div []
+    div [ class "d-flex flex-column" ]
         [ img [ class "img-fluid mt-3", alt "Haven GRC Company Logo", attribute "data-rjs" "2", id "logo", src "/img/logo@2x.png", height 71, width 82 ] []
         , div [ class "row" ]
             (List.map
@@ -1196,7 +1196,7 @@ viewHero model =
 
 viewFinished : Model -> Html Msg
 viewFinished model =
-    div []
+    div [ class "d-flex flex-column" ]
         [ img [ class "img-fluid mt-3", alt "Haven GRC Company Logo", attribute "data-rjs" "2", id "logo", src "/img/logo@2x.png", height 71, width 82 ] []
         , div [ class "row" ]
             [ div [ class "col-md-12 text-center mt-5" ]
@@ -1214,7 +1214,7 @@ viewFinished model =
 
 viewRegistration : Model -> Html Msg
 viewRegistration model =
-    div []
+    div [ class "d-flex flex-column" ]
         [ img [ class "img-fluid mt-3", alt "Haven GRC Company Logo", attribute "data-rjs" "2", id "logo", src "/img/logo@2x.png", height 71, width 82 ] []
         , div [ class "row" ]
             [ div [ class "col-xs-12 text-center mt-5" ]
@@ -1224,19 +1224,19 @@ viewRegistration model =
                     [ p [] [ text "Do you want a shareable version of these results? Enter your email and we will generate a customized powerpoint presentation that includes these results so that you can incorporate them into your own presentation." ]
                     , p []
                         [ text "By submitting your email you agree to our "
-                        , a [ href " " ] [ text "Terms of Service" ]
+                        , a [ href "/terms", target "_blank", rel "noopener noreferrer" ] [ text "Terms of Service" ]
                         , text " and "
-                        , a [ href " " ] [ text "Privacy Policy" ]
+                        , a [ href "/privacy", target "_blank", rel "noopener noreferrer" ] [ text "Privacy Policy" ]
                         , text "."
                         ]
                     , div [ class "col-md-7 mx-auto mt-5" ]
                         [ div [ class "input-group" ]
                             [ input [ placeholder "Email Address", class "form-control", value model.emailAddress, onInput UpdateEmail ] []
-                            , i [ class "material-icons" ] [ text "chevron_right" ]
+                            , i [ class "material-icons", style "color" "rgba(0, 0, 0, 0.42)" ] [ text "chevron_right" ]
                             ]
                         ]
                     ]
-                , button [ class "btn btn-primary", onClick RegisterNewUser ] [ text "Click to save results to the server." ]
+                , button [ class "btn btn-primary", onClick RegisterNewUser ] [ text "Click to save results to the server" ]
                 ]
             ]
         ]
@@ -1437,7 +1437,7 @@ viewPointsLeft : List PointsLeft -> Int -> List (Html Msg)
 viewPointsLeft pointsLeft pointsPerQuestion =
     List.map
         (\x ->
-            div [ class "col-md" ]
+            div [ class "col-md", style "padding-bottom" "10px" ]
                 [ p [] [ text ("Points remaining: " ++ String.fromInt x.pointsLeft ++ " of " ++ String.fromInt pointsPerQuestion) ]
                 , div [ class "progress" ]
                     [ div [ class "progress-bar bg-secondary", (\( a, b ) -> style a b) (calculateProgressBarPercent x.pointsLeft pointsPerQuestion) ] []
@@ -1464,7 +1464,7 @@ calculateProgressBarPercent current max =
 
 viewIpsativeSurveyBoxes : IpsativeQuestion -> Html Msg
 viewIpsativeSurveyBoxes surveyQuestion =
-    div [ class "col-md-8 mt-5" ]
+    div [ class "col-md-8 mt-3 mt-lg-5" ]
         [ div [ class "row" ]
             (List.map
                 (\answer ->
@@ -1477,8 +1477,8 @@ viewIpsativeSurveyBoxes surveyQuestion =
 
 viewSurveyBox : IpsativeAnswer -> Html Msg
 viewSurveyBox answer =
-    div [ class "col-md-6 pt-5" ]
-        [ div [ class "question-container", style "height" "170px" ]
+    div [ class "col-md-6 pt-5 no-top-padding" ]
+        [ div [ class "question-container"]
             [ p [ class "question-text" ] [ text answer.answer ]
             , div []
                 (List.map
