@@ -6,13 +6,13 @@ We help organizations avoid getting bogged down in rules that no longer make sen
 
 By prioritizing people and culture (beliefs and assumptions aka mental models) over prescriptive checklists, we build resilience and cut down on toil.
 
-<details><summary>What does Haven GRC do </summary>
+### What does Haven GRC do?
 
 -   Measures and reports on key security metrics. such as SCDS and FORCE.
--   Guided tool for performing scenario-based risk analysis as required by NIST CSF. Risk analysis modules is based on FAIR topology for quantitative risk estimation.
+-   Guided tool for performing scenario-based risk analysis as required by NIST CSF. Risk analysis modules based on FAIR topology for quantitative risk estimation.
 -   Calibration exercises for subject matter experts. Subject matter experts provide estimates based on their expert judgement, calibration training improves accuracy of estimates.
--   Tamper proof evidence store for compliance artifacts. Examples include risk acceptance documents, attestations that management oversight tasks have been completed, and third-party security assessment reports. Make your audits much easier!
-</details>
+-   Tamper proof evidence store for compliance artifacts. Examples include risk acceptance documents, attestations of management oversight task completion, and third-party security assessment reports. Make your audits much easier!
+
 
 <details><summary>
 Future roadmap
@@ -39,43 +39,45 @@ Applications and frameworks that are complementary to Haven. We would prefer to 
 ## Table of Contents
 
 <!--ts-->
-- [Haven GRC is a modern risk & compliance dashboard](#haven-grc-is-a-modern-risk--compliance-dashboard)
+- [Haven GRC is a modern risk & compliance dashboard](#Haven-GRC-is-a-modern-risk--compliance-dashboard)
+    - [What does Haven GRC do?](#What-does-Haven-GRC-do)
   - [!screenshot of app](#screenshot-of-app)
-  - [Table of Contents](#table-of-contents)
+  - [Table of Contents](#Table-of-Contents)
   - [thank you to vendors that support the project](#thank-you-to-vendors-that-support-the-project)
   - [setting up the dev environment](#setting-up-the-dev-environment)
-    - [Tmux](#tmux)
-    - [Windows users](#windows-users)
+    - [Tmux](#Tmux)
+    - [Windows users](#Windows-users)
   - [running the service](#running-the-service)
-    - [to access the main webUI](#to-access-the-main-webui)
-    - [to access the swagger-ui for the postgrest API](#to-access-the-swagger-ui-for-the-postgrest-api)
+    - [to access the main webUI](#to-access-the-main-webUI)
+    - [to access the swagger-ui for the postgrest API](#to-access-the-swagger-ui-for-the-postgrest-API)
     - [to access keycloak](#to-access-keycloak)
-    - [to access the GitBook documentation site](#to-access-the-gitbook-documentation-site)
-    - [to see emails sent from Haven / keycloak](#to-see-emails-sent-from-haven--keycloak)
-    - [Background jobs](#background-jobs)
-    - [Monitoring activity with Grafana](#monitoring-activity-with-grafana)
-    - [Security scanning with Zed Attack Proxy](#security-scanning-with-zed-attack-proxy)
-    - [Bazel](#bazel)
-  - [Developer tips](#developer-tips)
+    - [to access the GitBook documentation site](#to-access-the-GitBook-documentation-site)
+    - [to see emails sent from Haven / keycloak](#to-see-emails-sent-from-Haven--keycloak)
+    - [Background jobs](#Background-jobs)
+    - [Monitoring activity with Grafana](#Monitoring-activity-with-Grafana)
+    - [Security scanning with Zed Attack Proxy](#Security-scanning-with-Zed-Attack-Proxy)
+    - [Bazel](#Bazel)
+  - [Developer tips](#Developer-tips)
     - [look around inside the database](#look-around-inside-the-database)
-    - [Run Go Buffalo tasks](#run-go-buffalo-tasks)
+    - [Run Go Buffalo tasks](#Run-Go-Buffalo-tasks)
     - [to export keycloak realm data (to refresh the dev users)](#to-export-keycloak-realm-data-to-refresh-the-dev-users)
-    - [To clear local storage in Chrome for your local site](#to-clear-local-storage-in-chrome-for-your-local-site)
-    - [Testing on a real mobile device](#testing-on-a-real-mobile-device)
+    - [To clear local storage in Chrome for your local site](#To-clear-local-storage-in-Chrome-for-your-local-site)
+    - [Testing on a real mobile device](#Testing-on-a-real-mobile-device)
     - [add a database migration](#add-a-database-migration)
-  - [Authentication with JWT and Keycloak](#authentication-with-jwt-and-keycloak)
+  - [Authentication with JWT and Keycloak](#Authentication-with-JWT-and-Keycloak)
     - [architecture](#architecture)
     - [roles and permissions](#roles-and-permissions)
     - [multi-tenancy](#multi-tenancy)
-    - [Low level JWT interactions](#low-level-jwt-interactions)
-  - [Learning Elm](#learning-elm)
-    - [Design framework and tooling](#design-framework-and-tooling)
-    - [WebUI testing with Cypress](#webui-testing-with-cypress)
-  - [Working with RMarkdown templates](#working-with-rmarkdown-templates)
-  - [Deploying with kubernetes / OpenShift](#deploying-with-kubernetes--openshift)
-    - [Using OpenShift](#using-openshift)
-    - [Database resource](#database-resource)
-    - [TLS](#tls)
+    - [Low level JWT interactions](#Low-level-JWT-interactions)
+  - [Learning Elm](#Learning-Elm)
+    - [Design framework and tooling](#Design-framework-and-tooling)
+    - [WebUI testing with Cypress](#WebUI-testing-with-Cypress)
+  - [Working with RMarkdown templates](#Working-with-RMarkdown-templates)
+  - [Deploying with kubernetes / OpenShift](#Deploying-with-kubernetes--OpenShift)
+    - [Using OpenShift](#Using-OpenShift)
+    - [Database resource](#Database-resource)
+    - [TLS](#TLS)
+  - [License](#License)
 
 <!--te-->
 ## thank you to vendors that support the project
