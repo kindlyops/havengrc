@@ -32,7 +32,7 @@ view =
                         [ text "cyber risk governance for real people"
                         ]
                     , p [ class "homeparagraph" ]
-                        [ text "Haven GRC is the only Governance, Risk, and Compliance solution build on a foundation of empathy for humans. Security culture is beliefs and assumptions that drive decisions and behavior. We call these mental models." ]
+                        [ text "Haven GRC is the only Governance, Risk, and Compliance solution built on a foundation of empathy for humans. Security culture is beliefs and assumptions that drive decisions and behavior. We call these mental models." ]
                     , p [ class "homeparagraph" ]
                         [ text "Take this free 10 question security culture survey to learn which model your team currently uses for security and see how that fits with where your team needs to go this year." ]
                     , button
