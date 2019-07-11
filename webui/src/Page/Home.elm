@@ -48,7 +48,7 @@ view =
                 [ div [ class "pb-5" ]
                     [ img [ class "img-lg d-none d-md-inline", id "Wireframe", width 552, height 375, alt "Wireframe graphic of compliance and risk dashboard Haven GRC", src "/img/wireframe-large.png" ]
                         []
-                    , img [ class "img-sm d-md-none", id "Wireframe", width 329, height 229, alt "Wireframe graphic of compliance and risk dashboard Haven GRC", src "/img/wireframe@2x.png" ]
+                    , img [ class "img-sm d-md-none", id "Wireframe", width 320, height 223, alt "Wireframe graphic of compliance and risk dashboard Haven GRC", src "/img/wireframe@2x.png" ]
                         []
                     ]
                 , div [ class "row mx-5" ]
