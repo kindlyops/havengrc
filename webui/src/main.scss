@@ -144,37 +144,43 @@ button{
 }
 
 .custom-range{
-
 }
 
 .custom-range::-webkit-slider-thumb{
   -webkit-appearance: none;
-    background: var(--primary);
-    cursor: pointer;
-    height:18px;
-    width: 28px;
-    margin-top: -4px;
-    border-radius: 10px;
+      background: transparent;
+      cursor: pointer;
+      height: 20px;
+      width: 27px;
+      background-image: url(/img/thumb.png);
+      border-radius: 10px;
 }
 
 .custom-range::-moz-range-thumb
 {
-  background: var(--primary);
+  background: transparent;
   cursor: pointer;
+  height: 20px;
+  width: 27px;
+  background-image: url(/img/thumb.png);
+  border-radius: 10px;
 }
 
 .custom-range::-ms-thumb{
-  background: var(--primary);
+  background: transparent;
   cursor: pointer;
-  height:16px;
-  width: 20px;
+  height: 20px;
+  width: 27px;
+  background-image: url(/img/thumb.png);
+  border-radius: 10px;
 }
 
 .custom-range:focus::-webkit-slider-thumb,
 .custom-range:active::-webkit-slider-thumb{
   box-shadow: none;
   outline:none;
-  background: var(--primary);
+  background: transparent;
+  background-image: url(/img/thumb.png);
  }
 
 .custom-range::-webkit-slider-runnable-track{
@@ -262,7 +268,11 @@ button{
 }
 
 .vega-embed{
-  padding-right: 0px;
+  padding: 0px 10px !important;
+}
+
+.vega-embed > canvas{
+  max-width: 100% !important;
 }
 
 /** End Survey **/
@@ -273,6 +283,9 @@ button{
   }
   img#logo{
     align-self:center
+  }
+  .no-top-padding:first-child{
+    padding-top: 0px !important;
   }
 }
 
