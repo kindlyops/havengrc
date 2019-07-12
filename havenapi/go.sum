@@ -459,6 +459,8 @@ github.com/gobuffalo/suite v2.6.2+incompatible h1:f1Q2QNCJRO/MvfdI6+hcDqj3NcCR7g
 github.com/gobuffalo/suite v2.6.2+incompatible/go.mod h1:VCaZ8EgrnJKbt0QGkrEKIMsJlWFxMXWYSHXqjH2UJJE=
 github.com/gobuffalo/suite v2.7.0+incompatible h1:uekngvYwan4Ebu1FUbqsO1v0s7vp+xWeEGmbeRM9mfU=
 github.com/gobuffalo/suite v2.7.0+incompatible/go.mod h1:VCaZ8EgrnJKbt0QGkrEKIMsJlWFxMXWYSHXqjH2UJJE=
+github.com/gobuffalo/suite v2.8.1+incompatible h1:rGzyOBsOONyowdREfAurQ1EDbckVVDx0tAUhes0enZY=
+github.com/gobuffalo/suite v2.8.1+incompatible/go.mod h1:VCaZ8EgrnJKbt0QGkrEKIMsJlWFxMXWYSHXqjH2UJJE=
 github.com/gobuffalo/syncx v0.0.0-20181120191700-98333ab04150/go.mod h1:HhnNqWY95UYwwW3uSASeV7vtgYkT2t16hJgV3AEPUpw=
 github.com/gobuffalo/syncx v0.0.0-20181120194010-558ac7de985f/go.mod h1:HhnNqWY95UYwwW3uSASeV7vtgYkT2t16hJgV3AEPUpw=
 github.com/gobuffalo/syncx v0.0.0-20190224160051-33c29581e754 h1:tpom+2CJmpzAWj5/VEHync2rJGi+epHNIeRSWjzGA+4=
