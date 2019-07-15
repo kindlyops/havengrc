@@ -360,7 +360,7 @@ outsideContainer html =
 
 outsideView : Model -> Html Msg
 outsideView model =
-    case model.transit.page of
+    case Route.locFor model.url of
         Route.Privacy ->
             outsideContainer Privacy.view
 
