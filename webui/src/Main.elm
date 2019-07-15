@@ -179,7 +179,11 @@ update msg model =
                     else
                         let
                             ( newTransit, transitCmd ) =
-                                Transit.start TransitMsg (SetPage (Route.locFor url)) ( 500, 500 ) model.transit
+                                if url /= model.url then
+                                    Transit.start TransitMsg (SetPage (Route.locFor url)) ( 500, 500 ) model.transit
+
+                                else
+                                    ( model.transit, Cmd.none )
                         in
                         ( { model | transit = newTransit }, Cmd.batch [ Nav.pushUrl model.key (Url.toString url), transitCmd ] )
 
