@@ -28,6 +28,7 @@ import Process
 import Route
 import Task
 import Time
+import Transit exposing (Step(..))
 import Url
 import Visualization exposing (havenSpecs)
 
@@ -43,6 +44,7 @@ type alias Model =
     , key : Nav.Key
     , url : Url.Url
     , featureEnv : String
+    , transit : Transit.WithTransition { page : Route.Route }
     }
 
 
@@ -96,6 +98,7 @@ init sessionStorage location key =
             , key = key
             , url = location
             , featureEnv = featureEnv
+            , transit = { page = Route.Home, transition = Transit.empty }
             }
     in
     ( model
@@ -114,8 +117,10 @@ init sessionStorage location key =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.map AuthenticationMsg
-        (Time.every 1000 Authentication.Tick)
+    Sub.batch
+        [ Sub.map AuthenticationMsg (Time.every 1000 Authentication.Tick)
+        , Transit.subscriptions TransitMsg model.transit
+        ]
 
 
 main : Program Decode.Value Model Msg
@@ -138,8 +143,10 @@ type Msg
     | CommentsMsg Comments.Msg
     | OnBoardingMsg OnBoarding.Msg
     | ReportsMsg Reports.Msg
+    | SetPage Route.Route
     | SurveyMsg Survey.Msg
     | SurveyResponseMsg SurveyResponses.Msg
+    | TransitMsg (Transit.Msg Msg)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -170,7 +177,11 @@ update msg model =
                         ( model, Nav.load (Url.toString url) )
 
                     else
-                        ( model, Nav.pushUrl model.key (Url.toString url) )
+                        let
+                            ( newTransit, transitCmd ) =
+                                Transit.start TransitMsg (SetPage (Route.locFor url)) ( 500, 500 ) model.transit
+                        in
+                        ( { model | transit = newTransit }, Cmd.batch [ Nav.pushUrl model.key (Url.toString url), transitCmd ] )
 
                 Browser.External href ->
                     ( model, Nav.load href )
@@ -197,6 +208,16 @@ update msg model =
 
                 _ ->
                     ( { model | url = location }, Cmd.none )
+
+        SetPage route ->
+            let
+                temp =
+                    model.transit
+
+                transit =
+                    { temp | page = route }
+            in
+            ( { model | transit = transit }, Cmd.none )
 
         OnBoardingMsg onBoardingMsg ->
             let
@@ -269,6 +290,13 @@ update msg model =
             in
             ( { model | surveyResponseModel = surveyResponseModel }, Cmd.map SurveyResponseMsg cmd )
 
+        TransitMsg transitMsg ->
+            let
+                ( transit, c ) =
+                    Transit.tick TransitMsg transitMsg model.transit
+            in
+            ( { model | transit = transit }, c )
+
 
 getGravatar : String -> String
 getGravatar email =
@@ -308,14 +336,7 @@ navDrawerItems model =
 
 view : Model -> Browser.Document Msg
 view model =
-    let
-        r =
-            Route.locFor model.url
-
-        t =
-            Route.titleFor r
-    in
-    { title = t
+    { title = Route.titleFor model.transit.page
     , body =
         [ case Authentication.tryGetUserProfile model.authModel of
             Nothing ->
@@ -335,7 +356,7 @@ outsideContainer html =
 
 outsideView : Model -> Html Msg
 outsideView model =
-    case Route.locFor model.url of
+    case model.transit.page of
         Route.Privacy ->
             outsideContainer Privacy.view
 
@@ -359,48 +380,11 @@ outsideView model =
             Home.view |> Html.map AuthenticationMsg
 
 
-insideView : Model -> UserProfile.UserProfile -> Html Msg
-insideView model user =
-    div []
-        [ viewNavBar model
-        , viewNavigationDrawer model user
-        , viewBody model
-        ]
-
-
-viewNavBar : Model -> Html Msg
-viewNavBar model =
-    nav [ class "navbar navbar-expand-lg fixed-top navbar-dark bg-primary " ]
-        [ button [ attribute "aria-controls" "navdrawerDefault", attribute "aria-expanded" "false", attribute "aria-label" "Toggle Navdrawer", class "navbar-toggler d-lg-none", attribute "data-breakpoint" "lg", attribute "data-target" "#navdrawerDefault", attribute "data-toggle" "navdrawer", attribute "data-type" "permanent" ]
-            [ span [ class "navbar-toggler-icon" ]
-                []
-            ]
-        , div [ class "navbar-brand" ]
-            [ text "Haven GRC" ]
-        ]
-
-
-viewNavigationDrawer : Model -> UserProfile.UserProfile -> Html Msg
-viewNavigationDrawer model user =
-    div [ attribute "aria-hidden" "true", class "navdrawer navdrawer-permanent-lg navdrawer-permanent-clipped", id "navdrawerDefault", attribute "tabindex" "-1" ]
-        [ div [ class "navdrawer-content" ]
-            [ div [ class "navdrawer-header" ]
-                [ img
-                    [ attribute "src" (getGravatar user.username)
-                    , class "user-avatar"
-                    ]
-                    []
-                , viewNavUser model user
-                ]
-            , viewNavDrawerItems (navDrawerItems model) model.url
-            ]
-        ]
-
-
 viewBody : Model -> Html Msg
 viewBody model =
-    div [ id "content", class "content-wrapper container" ]
-        [ case Route.locFor model.url of
+    -- put the transition style here
+    div [ id "content", class "content-wrapper container", style "opacity" (String.fromFloat (Transit.getValue model.transit.transition)) ]
+        [ case model.transit.page of
             Route.Home ->
                 Dashboard.view model.authModel model.dashboardModel model.reportsModel |> Html.map DashboardMsg
 
@@ -452,6 +436,44 @@ viewBody model =
 
             Route.Logout ->
                 notFoundBody model
+        ]
+
+
+insideView : Model -> UserProfile.UserProfile -> Html Msg
+insideView model user =
+    div []
+        [ viewNavBar model
+        , viewNavigationDrawer model user
+        , viewBody model
+        ]
+
+
+viewNavBar : Model -> Html Msg
+viewNavBar model =
+    nav [ class "navbar navbar-expand-lg fixed-top navbar-dark bg-primary " ]
+        [ button [ attribute "aria-controls" "navdrawerDefault", attribute "aria-expanded" "false", attribute "aria-label" "Toggle Navdrawer", class "navbar-toggler d-lg-none", attribute "data-breakpoint" "lg", attribute "data-target" "#navdrawerDefault", attribute "data-toggle" "navdrawer", attribute "data-type" "permanent" ]
+            [ span [ class "navbar-toggler-icon" ]
+                []
+            ]
+        , div [ class "navbar-brand" ]
+            [ text "Haven GRC" ]
+        ]
+
+
+viewNavigationDrawer : Model -> UserProfile.UserProfile -> Html Msg
+viewNavigationDrawer model user =
+    div [ attribute "aria-hidden" "true", class "navdrawer navdrawer-permanent-lg navdrawer-permanent-clipped", id "navdrawerDefault", attribute "tabindex" "-1" ]
+        [ div [ class "navdrawer-content" ]
+            [ div [ class "navdrawer-header" ]
+                [ img
+                    [ attribute "src" (getGravatar user.username)
+                    , class "user-avatar"
+                    ]
+                    []
+                , viewNavUser model user
+                ]
+            , viewNavDrawerItems (navDrawerItems model) model.url
+            ]
         ]
 
 
