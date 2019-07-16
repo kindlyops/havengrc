@@ -253,7 +253,7 @@ jobs:
             # disabling cypress run in CircleCI for now
             # we need some work on TLS certificates to use valid certs with
             # gatekeeper and webui in order to get this working again.
-            docker run --network net0 -v $PWD/webui:/e2e kindlyops/cypress
+            docker run --network net0 -v $PWD/webui:/e2e kindlyops/cypress run
       - store_artifacts:
           path: webui/cypress/videos
       - notify-failed
