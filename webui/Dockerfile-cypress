@@ -1,4 +1,5 @@
 FROM        cypress/included:3.4.0
 MAINTAINER  Kindly Ops, LLC <support@kindlyops.com>
 WORKDIR     /e2e
+ADD . /e2e
 ENTRYPOINT ["/usr/local/bin/cypress"]
