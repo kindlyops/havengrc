@@ -225,9 +225,6 @@ jobs:
             docker create -v /cfg -v /keycloak --name configs alpine:3.4 /bin/true
             docker cp postgrest/keycloak-dev-public-key.json configs:/cfg
             docker cp keycloak/data/havendev-realm.json configs:/keycloak
-            mkdir -p home/node
-            cp webui/cypress-ci.json webui/cypress.json
-            docker cp home configs:/home
             # start keycloak in background container
             docker run --volumes-from configs --network net0 -d -e DB_DATABASE -e DB_USER -e DB_ADDR -e KEYCLOAK_USER -e KEYCLOAK_PASSWORD -e PROXY_ADDRESS_FORWARDING -h keycloak --name keycloak kindlyops/keycloak:$CIRCLE_SHA1 -b 0.0.0.0 -Dkeycloak.migration.file=/keycloak/havendev-realm.json -Dkeycloak.migration.strategy=IGNORE_EXISTING -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.action=import
             # Wait for keycloak
@@ -249,7 +246,7 @@ jobs:
             docker cp privkey.pem certs:/certs
             docker run -d --volumes-from certs --network net0 -h webui --name webui -e ELM_APP_KEYCLOAK_CLIENT_ID=havendev --publish 127.0.0.1:8443:8443 kindlyops/havenweb:latest
             docker build -t kindlyops/gatekeeper -f gatekeeper/Dockerfile ./gatekeeper
-            docker run -d --volumes-from certs --network net0 -h gatekeeper --name gatekeeper -e DISCOVERY_URL -e UPSTREAM_URL kindlyops/gatekeeper:latest
+            docker run -d --volumes-from certs --network net0 -h dev.havengrc.com --name gatekeeper -e DISCOVERY_URL -e UPSTREAM_URL kindlyops/gatekeeper:latest
             docker build -t kindlyops/cypress -f webui/Dockerfile-cypress ./webui
             docker pull qoomon/docker-host:2.2.0
             #docker run -d --name 'dockerhost' --cap-add=NET_ADMIN --cap-add=NET_RAW --restart on-failure qooman/docker-host
