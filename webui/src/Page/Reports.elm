@@ -1,6 +1,7 @@
 module Page.Reports exposing (Model, Msg(..), dashboardView, getReports, init, update, view)
 
 import Authentication
+import Browser.Navigation as Nav
 import Bytes exposing (Bytes)
 import Data.OnBoarding as OnBoarding
 import Data.Report exposing (Report)
@@ -128,10 +129,26 @@ update msg model authModel =
             )
 
         GotReports (Err error) ->
+            let
+                errorCmd =
+                    case error of
+                        Http.BadBody errorString ->
+                            if String.contains "Decode" errorString then
+                                Nav.reload
+
+                            else
+                                Cmd.none
+
+                        _ ->
+                            Cmd.none
+            in
             ( { model
                 | errorModel = setErrorMessage model.errorModel (getHTTPErrorMessage error)
               }
-            , Process.sleep 3000 |> Task.perform (always HideError)
+            , Cmd.batch
+                [ errorCmd
+                , Process.sleep 3000 |> Task.perform (always HideError)
+                ]
             )
 
         GotDownload (Ok response) ->
