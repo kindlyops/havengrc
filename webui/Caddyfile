@@ -44,6 +44,11 @@ proxy /rpc api:3001 {
   header_upstream X-Forwarded-Proto {>X-Forwarded-Proto}
 }
 
+proxy /api/comments havenapi:3000 {
+  transparent
+  header_upstream X-Forwarded-Proto {>X-Forwarded-Proto}
+}
+
 proxy /api/onboarding havenapi:3000 {
   transparent
   header_upstream X-Forwarded-Proto {>X-Forwarded-Proto}

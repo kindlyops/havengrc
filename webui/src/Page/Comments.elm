@@ -25,7 +25,7 @@ type Msg
     = GetComments
     | AddComment Authentication.Model Comment
     | GotComments (Result Http.Error (List Comment))
-    | NewComment (Result Http.Error (List Comment))
+    | NewComment (Result Http.Error Comment)
     | SetCommentMessageInput String
     | HideError
 
@@ -77,7 +77,7 @@ postComment authModel newComment =
         , headers = headers
         , url = commentsUrl
         , body = body
-        , expect = Http.expectJson NewComment (Decode.list Data.Comment.decode)
+        , expect = Http.expectJson NewComment Data.Comment.decode
         , timeout = Nothing
         , tracker = Nothing
         }
@@ -114,7 +114,7 @@ update msg model authModel =
         NewComment (Ok comment) ->
             let
                 updatedComments =
-                    model.comments ++ comment
+                    model.comments ++ [ comment ]
             in
             ( { model | newComment = emptyNewComment, comments = updatedComments }
             , Cmd.none
@@ -184,7 +184,7 @@ commentsForm authModel newComment =
 commentToString : Comment -> String
 commentToString comment =
     "{ "
-        ++ comment.uuid
+        ++ comment.id
         ++ ", "
         ++ comment.created_at
         ++ ", "

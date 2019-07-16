@@ -81,6 +81,8 @@ func App() *buffalo.App {
 		api.Middleware.Skip(JwtMiddleware, RegistrationHandler)
 		api.POST("surveys", SurveysHandler)
 		api.POST("reports", UploadHandler)
+		api.POST("comments", CommentPostHandler)
+		api.GET("comments", CommentGetHandler)
 		api.GET("reports", DownloadHandler)
 		api.POST("registration_funnel", RegistrationHandler)
 

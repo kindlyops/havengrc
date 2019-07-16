@@ -5,7 +5,7 @@ import Json.Encode as Encode exposing (Value)
 
 
 type alias Comment =
-    { uuid : String
+    { id : String
     , created_at : String
     , user_email : String
     , user_id : String
@@ -21,7 +21,7 @@ emptyNewComment =
 decode : Decoder Comment
 decode =
     map5 Comment
-        (field "uuid" string)
+        (field "id" string)
         (field "created_at" string)
         (field "user_email" string)
         (field "user_id" string)
