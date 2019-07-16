@@ -251,10 +251,14 @@ jobs:
             docker build -t kindlyops/gatekeeper -f gatekeeper/Dockerfile ./gatekeeper
             docker run -d --volumes-from certs --network net0 -h gatekeeper --name gatekeeper -e DISCOVERY_URL -e UPSTREAM_URL kindlyops/gatekeeper:latest
             docker build -t kindlyops/cypress -f webui/Dockerfile-cypress ./webui
+            docker pull qoomon/docker-host:2.2.0
+            #docker run -d --name 'dockerhost' --cap-add=NET_ADMIN --cap-add=NET_RAW --restart on-failure qooman/docker-host
             # disabling cypress run in CircleCI for now
             # we need some work on TLS certificates to use valid certs with
             # gatekeeper and webui in order to get this working again.
-            # docker run --network net0 kindlyops/cypress
+            docker run --network net0 -v $PWD/webui:/e2e kindlyops/cypress
+      - store_artifacts:
+          path: webui/cypress/videos
       - notify-failed
       - run:
           name: notify tests complete

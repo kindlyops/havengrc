@@ -143,7 +143,7 @@ services:
       - ./mjml/dist:/home/mjml/dist
     command: ["templates/*.mjml", "-o", "dist/"]
   dockerhost:
-    image: qoomon/docker-host
+    image: qoomon/docker-host:2.2.0
     cap_add: [ 'NET_ADMIN', 'NET_RAW' ]
     mem_limit: 8M
     restart: on-failure
