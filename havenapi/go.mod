@@ -15,7 +15,7 @@ require (
 	github.com/gobuffalo/mw-csrf v0.0.0-20190129204204-25460a055517 // indirect
 	github.com/gobuffalo/mw-forcessl v0.0.0-20190224202501-6d1ef7ffb276
 	github.com/gobuffalo/mw-paramlogger v0.0.0-20190224201358-0d45762ab655
-	github.com/gobuffalo/packr/v2 v2.4.0
+	github.com/gobuffalo/packr/v2 v2.5.2
 	github.com/gobuffalo/pop v4.11.2+incompatible
 	github.com/gobuffalo/suite v2.8.1+incompatible
 	github.com/gobuffalo/uuid v2.0.5+incompatible
@@ -24,6 +24,7 @@ require (
 	github.com/markbates/grift v1.1.0
 	github.com/nleof/goyesql v1.0.1
 	github.com/rs/cors v1.6.0
+	github.com/spf13/afero v1.2.1 // indirect
 	github.com/uber-go/atomic v1.4.0 // indirect
 	github.com/unrolled/secure v1.0.0
 	go.uber.org/ratelimit v0.0.0-20180316092928-c15da0234277
