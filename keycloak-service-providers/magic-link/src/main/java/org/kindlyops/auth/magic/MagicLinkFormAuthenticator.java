@@ -66,7 +66,7 @@ public class MagicLinkFormAuthenticator extends AbstractUsernameFormAuthenticato
                     .toString();
         }
 
-        String body = "<a href=\"" + link + "\">Click to login</a>";
+        String body = "Please open the link using the same web browser that requested it.</br><a href=\"" + link + "\">Click here to login.</a>";
         try {
             context.getSession().getProvider(EmailSenderProvider.class).send(context.getRealm().getSmtpConfig(), user,
                     "Login link", null, body);
