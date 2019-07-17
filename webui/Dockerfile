@@ -1,11 +1,11 @@
 FROM        alpine
 MAINTAINER  Kindly Ops, LLC <support@kindlyops.com>
-RUN apk add --no-cache bash
-RUN apk add --no-cache ca-certificates
+RUN apk add --no-cache bash ca-certificates libcap
 RUN addgroup -S havenuser && adduser -S -g havenuser havenuser
 WORKDIR /home/havenuser
 RUN         mkdir .caddy
 ADD         vendor/linux/caddy caddy
+RUN         setcap CAP_NET_BIND_SERVICE=+eip /home/havenuser/caddy
 ADD         build/ .
 ADD         Caddyfile .
 ENV         ENV_VERBOSITY 无

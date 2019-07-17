@@ -204,8 +204,8 @@ jobs:
             - API_SERVER: api:8180
             - AUTH_SERVER: keycloak:8080
             - BUFFALO_SERVER: havenapi:3000
-            - DISCOVERY_URL: http://webui:8081/auth/realms/havendev
-            - UPSTREAM_URL: http://webui:8081/
+            - DISCOVERY_URL: http://webui/auth/realms/havendev
+            - UPSTREAM_URL: http://webui/
           command: |
             # create network for containers
             docker network create -d bridge net0
@@ -244,7 +244,7 @@ jobs:
             docker create -v /certs --name certs alpine:3.4 /bin/true
             docker cp fullchain.pem certs:/certs
             docker cp privkey.pem certs:/certs
-            docker run -d --volumes-from certs --network net0 -h webui --name webui -e ELM_APP_KEYCLOAK_CLIENT_ID=havendev --publish 127.0.0.1:8081:8081 kindlyops/havenweb:latest
+            docker run -d --volumes-from certs --network net0 -h webui --name webui -e ELM_APP_KEYCLOAK_CLIENT_ID=havendev kindlyops/havenweb:latest
             docker build -t kindlyops/gatekeeper -f gatekeeper/Dockerfile ./gatekeeper
             docker run -d --volumes-from certs --network net0 -h dev.havengrc.com --name gatekeeper -e DISCOVERY_URL -e UPSTREAM_URL kindlyops/gatekeeper:latest
             docker build -t kindlyops/cypress -f webui/Dockerfile-cypress ./webui
