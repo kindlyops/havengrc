@@ -206,6 +206,10 @@ jobs:
             - BUFFALO_SERVER: havenapi:3000
             - DISCOVERY_URL: http://webui/auth/realms/havendev
             - UPSTREAM_URL: http://webui/
+            - GATEKEEPER_SESSION_KEY: c01f3736e640ea874d66c3704ddb7a9a
+            - SECURE_COOKIE: "false"
+            - GATEKEEPER_LISTEN_PORT: "81"
+            - REDIRECTION_URL: http://dev.havengrc.com/
           command: |
             # create network for containers
             docker network create -d bridge net0
@@ -246,10 +250,10 @@ jobs:
             docker cp privkey.pem certs:/certs
             docker run -d --volumes-from certs --network net0 -h webui --name webui -e ELM_APP_KEYCLOAK_CLIENT_ID=havendev kindlyops/havenweb:latest
             docker build -t kindlyops/gatekeeper -f gatekeeper/Dockerfile ./gatekeeper
-            docker run -d --volumes-from certs --network net0 -h dev.havengrc.com --name gatekeeper -e DISCOVERY_URL -e UPSTREAM_URL kindlyops/gatekeeper:latest
+            docker run -d --volumes-from certs --network net0 --publish 80:81 --name gatekeeper -e DISCOVERY_URL -e UPSTREAM_URL -e REDIRECTION_URL -e GATEKEEPER_LISTEN_PORT -e SECURE_COOKIE -e GATEKEEPER_SESSION_KEY kindlyops/gatekeeper:latest
             docker build -t kindlyops/cypress -f webui/Dockerfile-cypress ./webui
             docker pull qoomon/docker-host:2.2.0
-            #docker run -d --name 'dockerhost' --cap-add=NET_ADMIN --cap-add=NET_RAW --restart on-failure qooman/docker-host
+            docker run -d --name 'dockerhost' -h dev.havengrc.com --cap-add=NET_ADMIN --cap-add=NET_RAW --restart on-failure qooman/docker-host
             # disabling cypress run in CircleCI for now
             # we need some work on TLS certificates to use valid certs with
             # gatekeeper and webui in order to get this working again.
