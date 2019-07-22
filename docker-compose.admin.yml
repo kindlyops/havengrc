@@ -142,18 +142,15 @@ services:
       - ./mjml/templates:/home/mjml/templates
       - ./mjml/dist:/home/mjml/dist
     command: ["templates/*.mjml", "-o", "dist/"]
-  dockerhost:
-    image: qoomon/docker-host:2.2.0
-    cap_add: [ 'NET_ADMIN', 'NET_RAW' ]
-    mem_limit: 8M
-    restart: on-failure
   cypress:
     build:
       context: webui
       dockerfile: Dockerfile-cypress
-    links:
+    depends_on:
       - gatekeeper
-      - dockerhost:dev.havengrc.com
     volumes:
       - ./webui:/e2e
-    command: ["run"]
+    extra_hosts:
+      - "dev.havengrc.com:127.0.0.1"
+    environment:
+      - "GATEKEEPER_INTERNAL=http://gatekeeper:81"
