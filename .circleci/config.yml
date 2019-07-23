@@ -260,6 +260,9 @@ jobs:
             # creating dummy container to hold volume with outputs from cypress
             docker create -v /e2e/cypress/videos/ --name videos alpine:3.4 /bin/true
             docker run --network net0 -e GATEKEEPER_INTERNAL --volumes-from videos kindlyops/cypress run
+      - run:
+          name: extract cypress logs
+          command: |
             docker cp videos:/e2e/cypress/videos ./webui/cypress/videos
       - store_artifacts:
           path: webui/cypress/videos
