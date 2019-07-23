@@ -261,7 +261,8 @@ jobs:
             docker create -v /e2e/cypress/videos/ --name videos alpine:3.4 /bin/true
             docker run --network net0 -e GATEKEEPER_INTERNAL --volumes-from videos kindlyops/cypress run
       - run:
-          name: extract cypress logs
+          name: save cypress logs
+          when: always
           command: |
             docker cp videos:/e2e/cypress/videos ./webui/cypress/videos
       - store_artifacts:
