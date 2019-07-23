@@ -146,6 +146,11 @@ services:
     build:
       context: webui
       dockerfile: Dockerfile-cypress
-    links:
-      - gatekeeper:dev.havengrc.com
-    command: ["npx", "cypress", "run"]
+    depends_on:
+      - gatekeeper
+    volumes:
+      - ./webui:/e2e
+    extra_hosts:
+      - "dev.havengrc.com:127.0.0.1"
+    environment:
+      - "GATEKEEPER_INTERNAL=http://gatekeeper:81"

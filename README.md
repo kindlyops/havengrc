@@ -335,8 +335,15 @@ Within the app we are using [SASS](http://sass-lang.com/), and the guidance from
 
 We are starting to use Cypress for some web ui testing.
 
-    npm install
+To run interactive gui with a local cypress install outside of docker
+
+    cd webui
+    npm install -g @percy/cypress
     npm run cypress:open
+
+To run cypress automated inside docker (with video recordings saved)
+
+    ./dca run cypress
 
 ## Working with RMarkdown templates
 

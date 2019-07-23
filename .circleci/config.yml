@@ -204,8 +204,18 @@ jobs:
             - API_SERVER: api:8180
             - AUTH_SERVER: keycloak:8080
             - BUFFALO_SERVER: havenapi:3000
-            - DISCOVERY_URL: https://webui:8443/auth/realms/havendev
-            - UPSTREAM_URL: https://webui:8443
+            - DISCOVERY_URL: http://webui/auth/realms/havendev
+            - UPSTREAM_URL: http://webui/
+            - GATEKEEPER_SESSION_KEY: c01f3736e640ea874d66c3704ddb7a9a
+            - SECURE_COOKIE: "false"
+            - GATEKEEPER_LISTEN_PORT: "81"
+            - REDIRECTION_URL: http://dev.havengrc.com/
+            - KEYCLOAK_INTERNAL: http://keycloak:8080
+            - KEYCLOAK_SCHEME: http
+            - DISCOVERY_URL: http://dev.havengrc.com/auth/realms/havendev
+            - BASE_URI:
+            - GATEKEEPER_INTERNAL: http://gatekeeper:81
+            - CLIENT_SECRET: df2ba720-1d10-4d85-940a-6df77ef69baa
           command: |
             # create network for containers
             docker network create -d bridge net0
@@ -225,9 +235,6 @@ jobs:
             docker create -v /cfg -v /keycloak --name configs alpine:3.4 /bin/true
             docker cp postgrest/keycloak-dev-public-key.json configs:/cfg
             docker cp keycloak/data/havendev-realm.json configs:/keycloak
-            mkdir -p home/node
-            cp webui/cypress-ci.json webui/cypress.json
-            docker cp home configs:/home
             # start keycloak in background container
             docker run --volumes-from configs --network net0 -d -e DB_DATABASE -e DB_USER -e DB_ADDR -e KEYCLOAK_USER -e KEYCLOAK_PASSWORD -e PROXY_ADDRESS_FORWARDING -h keycloak --name keycloak kindlyops/keycloak:$CIRCLE_SHA1 -b 0.0.0.0 -Dkeycloak.migration.file=/keycloak/havendev-realm.json -Dkeycloak.migration.strategy=IGNORE_EXISTING -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.action=import
             # Wait for keycloak
@@ -243,18 +250,25 @@ jobs:
             docker run --volumes-from configs --network net0 -e API_SERVER -e AUTH_SERVER -e BUFFALO_SERVER --workdir /usr/src/app kindlyops/apitest cucumber
             echo $WEBUI_TEST_CERT|base64 -d - > fullchain.pem
             echo $WEBUI_TEST_KEY|base64 -d - > privkey.pem
-            # creating dummy container which will hold a volume with config
+            # creating dummy container which will hold a volume with certs
             docker create -v /certs --name certs alpine:3.4 /bin/true
             docker cp fullchain.pem certs:/certs
             docker cp privkey.pem certs:/certs
-            docker run -d --volumes-from certs --network net0 -h webui --name webui -e ELM_APP_KEYCLOAK_CLIENT_ID=havendev --publish 127.0.0.1:8443:8443 kindlyops/havenweb:latest
+            docker pull kindlyops/havenweb:$CIRCLE_SHA1
+            docker run -d --volumes-from certs --network net0 -h webui --name webui -e ELM_APP_KEYCLOAK_CLIENT_ID=havendev kindlyops/havenweb:$CIRCLE_SHA1
             docker build -t kindlyops/gatekeeper -f gatekeeper/Dockerfile ./gatekeeper
-            docker run -d --volumes-from certs --network net0 -h gatekeeper --name gatekeeper -e DISCOVERY_URL -e UPSTREAM_URL kindlyops/gatekeeper:latest
+            docker run -d --volumes-from certs --network net0 --publish 80:81 --name gatekeeper -e DISCOVERY_URL -e UPSTREAM_URL -e REDIRECTION_URL -e GATEKEEPER_LISTEN_PORT -e SECURE_COOKIE -e GATEKEEPER_SESSION_KEY -e KEYCLOAK_INTERNAL -e KEYCLOAK_SCHEME -e DISCOVERY_URL -e BASE_URI -e CLIENT_SECRET kindlyops/gatekeeper:latest
             docker build -t kindlyops/cypress -f webui/Dockerfile-cypress ./webui
-            # disabling cypress run in CircleCI for now
-            # we need some work on TLS certificates to use valid certs with
-            # gatekeeper and webui in order to get this working again.
-            # docker run --network net0 kindlyops/cypress
+            # creating dummy container to hold volume with outputs from cypress
+            docker create -v /e2e/cypress/videos/ --name videos alpine:3.4 /bin/true
+            docker run --network net0 -e GATEKEEPER_INTERNAL --volumes-from videos kindlyops/cypress run
+      - run:
+          name: save cypress logs
+          when: always
+          command: |
+            docker cp videos:/e2e/cypress/videos ./webui/cypress/videos
+      - store_artifacts:
+          path: webui/cypress/videos
       - notify-failed
       - run:
           name: notify tests complete

@@ -1,5 +1,5 @@
 #!/bin/bash
 set -x
-docker-compose run apitest
-docker-compose run havenapi buffalo test
-docker-compose run cypress
+docker-compose -f docker-compose.yml -f docker-compose.admin.yml run apitest
+docker-compose -f docker-compose.yml -f docker-compose.admin.yml run havenapi buffalo test
+docker-compose -f docker-compose.yml -f docker-compose.admin.yml run cypress
