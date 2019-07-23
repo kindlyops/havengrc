@@ -1,0 +1,105 @@
+{
+  "projectName": "havengrc",
+  "projectOwner": "kindlyops",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "commitConvention": "none",
+  "contributors": [
+    {
+      "login": "nikita-abraham",
+      "name": "Nikita Abraham",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/14129019?v=4",
+      "profile": "https://github.com/nikita-abraham",
+      "contributions": [
+        "design"
+      ]
+    },
+    {
+      "login": "adplusverb",
+      "name": "Aaron",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/6987835?v=4",
+      "profile": "https://github.com/adplusverb",
+      "contributions": [
+        "design"
+      ]
+    },
+    {
+      "login": "Romansky1987",
+      "name": "Austin Romansky",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/26156964?v=4",
+      "profile": "https://www.romanskydesigns.com/",
+      "contributions": [
+        "design"
+      ]
+    },
+    {
+      "login": "Halfwintr",
+      "name": "Hiromi Matsumoto",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/249198?v=4",
+      "profile": "https://github.com/Halfwintr",
+      "contributions": [
+        "design"
+      ]
+    },
+    {
+      "login": "statik",
+      "name": "Elliot Murphy",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/983?v=4",
+      "profile": "https://www.kindlyops.com",
+      "contributions": [
+        "business"
+      ]
+    },
+    {
+      "login": "crashGoBoom",
+      "name": "Christopher Mundus",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/17323411?v=4",
+      "profile": "https://github.com/crashGoBoom",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "laurencaitlan",
+      "name": "Lauren Behan",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/17053034?v=4",
+      "profile": "https://github.com/laurencaitlan",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "dstreet26",
+      "name": "David Streeter",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/6311278?v=4",
+      "profile": "https://davidstreeterconsulting.com",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "knmurphy",
+      "name": "Kevin N. Murphy",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/2067836?v=4",
+      "profile": "https://github.com/knmurphy",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "joelclermont",
+      "name": "Joel Clermont",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/298100?v=4",
+      "profile": "http://joelclermont.com",
+      "contributions": [
+        "code"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7
+}

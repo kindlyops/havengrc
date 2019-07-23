@@ -1,4 +1,5 @@
 [![CircleCI](https://circleci.com/gh/kindlyops/havengrc.svg?style=svg)](https://circleci.com/gh/kindlyops/havengrc) [![experimental](http://badges.github.io/stability-badges/dist/experimental.svg)](http://github.com/badges/stability-badges) [![Say Thanks!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/statik) [![Maintainability](https://api.codeclimate.com/v1/badges/d2af9dcd5ad434172a27/maintainability)](https://codeclimate.com/github/kindlyops/havengrc/maintainability)[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fkindlyops%2Fhavengrc.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fkindlyops%2Fhavengrc?ref=badge_shield)
+[![All Contributors](https://img.shields.io/badge/all_contributors-10-orange.svg?style=flat-square)](#contributors-)
 
 # Haven GRC is a modern risk & compliance dashboard
 
@@ -401,3 +402,33 @@ Haven GRC is licensed under the Apache License 2.0
 Please use it and enjoy!
 
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fkindlyops%2Fhavengrc.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fkindlyops%2Fhavengrc?ref=badge_large)
+
+## Contributors ✨
+
+Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+  <tr>
+    <td align="center"><a href="https://github.com/nikita-abraham"><img src="https://avatars2.githubusercontent.com/u/14129019?v=4" width="100px;" alt="Nikita Abraham"/><br /><sub><b>Nikita Abraham</b></sub></a><br /><a href="#design-nikita-abraham" title="Design">🎨</a></td>
+    <td align="center"><a href="https://github.com/adplusverb"><img src="https://avatars2.githubusercontent.com/u/6987835?v=4" width="100px;" alt="Aaron"/><br /><sub><b>Aaron</b></sub></a><br /><a href="#design-adplusverb" title="Design">🎨</a></td>
+    <td align="center"><a href="https://www.romanskydesigns.com/"><img src="https://avatars0.githubusercontent.com/u/26156964?v=4" width="100px;" alt="Austin Romansky"/><br /><sub><b>Austin Romansky</b></sub></a><br /><a href="#design-Romansky1987" title="Design">🎨</a></td>
+    <td align="center"><a href="https://github.com/Halfwintr"><img src="https://avatars0.githubusercontent.com/u/249198?v=4" width="100px;" alt="Hiromi Matsumoto"/><br /><sub><b>Hiromi Matsumoto</b></sub></a><br /><a href="#design-Halfwintr" title="Design">🎨</a></td>
+    <td align="center"><a href="https://www.kindlyops.com"><img src="https://avatars2.githubusercontent.com/u/983?v=4" width="100px;" alt="Elliot Murphy"/><br /><sub><b>Elliot Murphy</b></sub></a><br /><a href="#business-statik" title="Business development">💼</a></td>
+    <td align="center"><a href="https://github.com/crashGoBoom"><img src="https://avatars0.githubusercontent.com/u/17323411?v=4" width="100px;" alt="Christopher Mundus"/><br /><sub><b>Christopher Mundus</b></sub></a><br /><a href="https://github.com/kindlyops/havengrc/commits?author=crashGoBoom" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/laurencaitlan"><img src="https://avatars2.githubusercontent.com/u/17053034?v=4" width="100px;" alt="Lauren Behan"/><br /><sub><b>Lauren Behan</b></sub></a><br /><a href="https://github.com/kindlyops/havengrc/commits?author=laurencaitlan" title="Code">💻</a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://davidstreeterconsulting.com"><img src="https://avatars2.githubusercontent.com/u/6311278?v=4" width="100px;" alt="David Streeter"/><br /><sub><b>David Streeter</b></sub></a><br /><a href="https://github.com/kindlyops/havengrc/commits?author=dstreet26" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/knmurphy"><img src="https://avatars0.githubusercontent.com/u/2067836?v=4" width="100px;" alt="Kevin N. Murphy"/><br /><sub><b>Kevin N. Murphy</b></sub></a><br /><a href="https://github.com/kindlyops/havengrc/commits?author=knmurphy" title="Code">💻</a></td>
+    <td align="center"><a href="http://joelclermont.com"><img src="https://avatars0.githubusercontent.com/u/298100?v=4" width="100px;" alt="Joel Clermont"/><br /><sub><b>Joel Clermont</b></sub></a><br /><a href="https://github.com/kindlyops/havengrc/commits?author=joelclermont" title="Code">💻</a></td>
+  </tr>
+</table>
+
+<!-- markdownlint-enable -->
+<!-- prettier-ignore-end -->
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
+This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
