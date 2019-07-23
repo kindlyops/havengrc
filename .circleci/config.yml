@@ -215,6 +215,7 @@ jobs:
             - DISCOVERY_URL: http://dev.havengrc.com/auth/realms/havendev
             - BASE_URI:
             - GATEKEEPER_INTERNAL: http://gatekeeper:81
+            - CLIENT_SECRET: df2ba720-1d10-4d85-940a-6df77ef69baa
           command: |
             # create network for containers
             docker network create -d bridge net0
@@ -253,9 +254,10 @@ jobs:
             docker create -v /certs --name certs alpine:3.4 /bin/true
             docker cp fullchain.pem certs:/certs
             docker cp privkey.pem certs:/certs
-            docker run -d --volumes-from certs --network net0 -h webui --name webui -e ELM_APP_KEYCLOAK_CLIENT_ID=havendev kindlyops/havenweb:latest
+            docker pull kindlyops/havenweb:$CIRCLE_SHA1
+            docker run -d --volumes-from certs --network net0 -h webui --name webui -e ELM_APP_KEYCLOAK_CLIENT_ID=havendev kindlyops/havenweb:$CIRCLE_SHA1
             docker build -t kindlyops/gatekeeper -f gatekeeper/Dockerfile ./gatekeeper
-            docker run -d --volumes-from certs --network net0 --publish 80:81 --name gatekeeper -e DISCOVERY_URL -e UPSTREAM_URL -e REDIRECTION_URL -e GATEKEEPER_LISTEN_PORT -e SECURE_COOKIE -e GATEKEEPER_SESSION_KEY -e KEYCLOAK_INTERNAL -e KEYCLOAK_SCHEME -e DISCOVERY_URL -e BASE_URI kindlyops/gatekeeper:latest
+            docker run -d --volumes-from certs --network net0 --publish 80:81 --name gatekeeper -e DISCOVERY_URL -e UPSTREAM_URL -e REDIRECTION_URL -e GATEKEEPER_LISTEN_PORT -e SECURE_COOKIE -e GATEKEEPER_SESSION_KEY -e KEYCLOAK_INTERNAL -e KEYCLOAK_SCHEME -e DISCOVERY_URL -e BASE_URI -e CLIENT_SECRET kindlyops/gatekeeper:latest
             docker build -t kindlyops/cypress -f webui/Dockerfile-cypress ./webui
             # creating dummy container to hold volume with outputs from cypress
             docker create -v /e2e/cypress/videos/ --name videos alpine:3.4 /bin/true
