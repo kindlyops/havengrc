@@ -99,6 +99,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "wnstn",
+      "name": "Winston Hearn",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/779882?v=4",
+      "profile": "http://www.winstonhearn.com",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7
