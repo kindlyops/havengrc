@@ -118,6 +118,16 @@
         "ideas",
         "code"
       ]
+    },
+    {
+      "login": "tlots",
+      "name": "John Stoltenborg",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/39569?v=4",
+      "profile": "https://stoltenb.org/",
+      "contributions": [
+        "code",
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7
