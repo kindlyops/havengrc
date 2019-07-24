@@ -415,8 +415,7 @@ Please use it and enjoy!
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-<!-- prettier-ignore-start -->
-<!-- markdownlint-disable -->
+<!-- prettier-ignore -->
 <table>
   <tr>
     <td align="center"><a href="https://github.com/nikita-abraham"><img src="https://avatars2.githubusercontent.com/u/14129019?v=4" width="100px;" alt="Nikita Abraham"/><br /><sub><b>Nikita Abraham</b></sub></a><br /><a href="#design-nikita-abraham" title="Design">🎨</a></td>
@@ -431,11 +430,10 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://davidstreeterconsulting.com"><img src="https://avatars2.githubusercontent.com/u/6311278?v=4" width="100px;" alt="David Streeter"/><br /><sub><b>David Streeter</b></sub></a><br /><a href="https://github.com/kindlyops/havengrc/commits?author=dstreet26" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/knmurphy"><img src="https://avatars0.githubusercontent.com/u/2067836?v=4" width="100px;" alt="Kevin N. Murphy"/><br /><sub><b>Kevin N. Murphy</b></sub></a><br /><a href="https://github.com/kindlyops/havengrc/commits?author=knmurphy" title="Code">💻</a></td>
     <td align="center"><a href="http://joelclermont.com"><img src="https://avatars0.githubusercontent.com/u/298100?v=4" width="100px;" alt="Joel Clermont"/><br /><sub><b>Joel Clermont</b></sub></a><br /><a href="https://github.com/kindlyops/havengrc/commits?author=joelclermont" title="Code">💻</a></td>
+    <td align="center"><a href="http://www.winstonhearn.com"><img src="https://avatars2.githubusercontent.com/u/779882?v=4" width="100px;" alt="Winston Hearn"/><br /><sub><b>Winston Hearn</b></sub></a><br /><a href="https://github.com/kindlyops/havengrc/commits?author=wnstn" title="Code">💻</a></td>
   </tr>
 </table>
 
-<!-- markdownlint-enable -->
-<!-- prettier-ignore-end -->
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
