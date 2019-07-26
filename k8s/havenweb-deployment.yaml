@@ -19,7 +19,7 @@ spec:
             - name: FEATURE_ENV
               value: "production"
           ports:
-            - containerPort: 8081
+            - containerPort: 80
               protocol: TCP
           volumeMounts:
             - name: secret-volume
