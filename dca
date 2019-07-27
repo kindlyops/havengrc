@@ -1,2 +1,27 @@
 #!/bin/bash
+
+set -e
+
+USAGE='dca <docker-compose commands>'
+DESCRIPTION='
+  Layers in a docker-compose command for access to additional dev
+  containers. Specify any normal docker-compose command such as
+  run or build.
+
+  Dependencies: requires docker-compose command to be installed.'
+
+function usage() {
+	echo "$USAGE" "$DESCRIPTION" >&2
+}
+
+type docker-compose >/dev/null 2>&1 || {
+	echo >&2 "Error: docker-compose must be installed. Aborting."
+	usage
+	exit 1
+}
+[ $# -eq 0 ] || {
+	usage
+	exit 1
+}
+
 exec docker-compose -f docker-compose.yml -f docker-compose.admin.yml $*

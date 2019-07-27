@@ -1,2 +1,25 @@
 #!/bin/bash
+
+set -e
+
+USAGE='dc <docker-compose commands>'
+DESCRIPTION='
+  Convenience alias for docker-compose.
+
+  Dependencies: requires docker-compose command to be installed.'
+
+function usage() {
+	echo "$USAGE" "$DESCRIPTION" >&2
+}
+
+type docker-compose >/dev/null 2>&1 || {
+	echo >&2 "Error: docker-compose must be installed. Aborting."
+	usage
+	exit 1
+}
+[ $# -eq 0 ] || {
+	usage
+	exit 1
+}
+
 exec docker-compose $*

@@ -1,18 +1,28 @@
 #!/bin/bash
+set -e
+
+USAGE='dump-token'
+DESCRIPTION='
+  Decodes a JWT from Haven GRC.
+  This is useful for inspecting the claims present in the token when
+  working on claim mappers in keycloak.
+
+  Dependencies: requires step command to be installed: try brew install step'
+
+function usage() {
+	echo "$USAGE" "$DESCRIPTION" >&2
+}
+
+type step >/dev/null 2>&1 || {
+	echo >&2 "Error: step cli must be installed. Aborting."
+	usage
+	exit 1
+}
+[ $# -eq 0 ] || {
+	usage
+	exit 1
+}
+
 TOKEN=`./get-token`
-IFS=. read header payload signature <<<"${TOKEN}"
-# echo length of payload is  ${#payload}
-# base64 strings should have = padding to make them a multiple of 3
-# since we extract a chunk from the middle of the JWT it has no padding
-# we add padding as needed to avoid a warning from base64 decode command
-padding=""
-if (( ${#payload} % 3 == 1 ))
-then
-    # echo "Adding a double ="
-    padding="="
-elif (( ${#payload} % 3 == 2 ))
-then
-    # echo "Adding a double =="
-    padding="=="
-fi
-printf "%s%s" $payload $padding|base64 --decode|jq .
+
+echo ${TOKEN} | step crypto jwt inspect --insecure 
