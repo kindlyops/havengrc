@@ -50,7 +50,7 @@ spec:
                   name: haven-gatekeeper-credentials
                   key: clientsecret
             - name: UPSTREAM_URL
-              value: "http://havenweb.haven-production.svc:8081/"
+              value: "http://havenweb.haven-production.svc:80/"
           volumeMounts:
             - name: secret-volume
               mountPath: /certs/
