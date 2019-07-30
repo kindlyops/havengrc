@@ -38,6 +38,7 @@ type Msg
     | UpdatedOnboardingStatus OnBoarding.Msg
     | InitCmd Authentication.Model
     | HideError
+    | AuthMsg Authentication.Msg
 
 
 init : Authentication.Model -> String -> ( Model, Cmd Msg )
@@ -146,9 +147,13 @@ update msg model authModel =
             let
                 errorCmd =
                     case error of
-                        Http.BadBody errorString ->
-                            if String.contains "viewport" (getHTTPErrorMessage error) then
-                                Nav.load "/dashboard"
+                        Http.BadStatus statusCode ->
+                            if statusCode == 401 then
+                                let
+                                    newCmd =
+                                        Cmd.map AuthMsg (logOut authModel)
+                                in
+                                newCmd
 
                             else
                                 Cmd.none
@@ -187,6 +192,18 @@ update msg model authModel =
             ( model
             , Cmd.none
             )
+
+        AuthMsg authMsg ->
+            ( model, Cmd.none )
+
+
+logOut : Authentication.Model -> Cmd Authentication.Msg
+logOut model =
+    let
+        ( logOutModel, logOutCmd ) =
+            Authentication.update Authentication.LogOut model
+    in
+    logOutCmd
 
 
 view : Authentication.Model -> Model -> Html Msg
