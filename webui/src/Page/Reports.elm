@@ -36,15 +36,16 @@ type Msg
     | GotReports (Result Http.Error (List Report))
     | GotDownload (Result Http.Error FileDownload)
     | UpdatedOnboardingStatus OnBoarding.Msg
+    | InitCmd Authentication.Model
     | HideError
 
 
-init : Authentication.Model -> ( Model, Cmd Msg )
-init authModel =
+init : Authentication.Model -> String -> ( Model, Cmd Msg )
+init authModel location =
     ( { reports = []
       , errorModel = errorInit
       }
-    , Cmd.batch (initialCommands authModel)
+    , Cmd.batch (initialCommands authModel location)
     )
 
 
@@ -59,6 +60,11 @@ getReports authModel =
         { url = reportsUrl
         , expect = Http.expectJson GotReports (Decode.list Data.Report.decode)
         }
+
+
+initReports : Authentication.Model -> Cmd Msg
+initReports authModel =
+    Cmd.none
 
 
 expectBytes : Report -> (Result Http.Error FileDownload -> msg) -> Http.Expect msg
@@ -104,9 +110,17 @@ downloadReportBytes name content =
     Download.bytes name "application/octet-stream" content
 
 
-initialCommands : Authentication.Model -> List (Cmd Msg)
-initialCommands authModel =
-    [ getReports authModel ]
+initialCommands : Authentication.Model -> String -> List (Cmd Msg)
+initialCommands authModel location =
+    let
+        initialCmd =
+            if String.contains "/dashboard" location then
+                getReports
+
+            else
+                initReports
+    in
+    [ initialCmd authModel ]
 
 
 update : Msg -> Model -> Authentication.Model -> ( Model, Cmd Msg )
@@ -133,8 +147,8 @@ update msg model authModel =
                 errorCmd =
                     case error of
                         Http.BadBody errorString ->
-                            if String.contains "Decode" errorString then
-                                Nav.reload
+                            if String.contains "viewport" (getHTTPErrorMessage error) then
+                                Nav.load "/dashboard"
 
                             else
                                 Cmd.none
@@ -168,6 +182,11 @@ update msg model authModel =
 
         UpdatedOnboardingStatus _ ->
             ( model, Cmd.none )
+
+        InitCmd message ->
+            ( model
+            , Cmd.none
+            )
 
 
 view : Authentication.Model -> Model -> Html Msg

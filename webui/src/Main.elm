@@ -71,7 +71,7 @@ init sessionStorage location key =
             Dashboard.init initialAuthModel
 
         ( reportsModel, reportsCmd ) =
-            Reports.init initialAuthModel
+            Reports.init initialAuthModel location.path
 
         decoded =
             Decode.decodeValue Survey.testDecoder sessionStorage

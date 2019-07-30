@@ -32,7 +32,7 @@ init : Authentication.Model -> ( Model, Cmd Page.Reports.Msg )
 init authModel =
     let
         ( reportsModel, reportsCmd ) =
-            Page.Reports.init authModel
+            Page.Reports.init authModel "/dashboard"
 
         model =
             { data = []
@@ -42,7 +42,7 @@ init authModel =
             }
     in
     ( model
-    , Cmd.batch (initialCommands model.authModel)
+    , Cmd.batch (initialCommands authModel)
     )
 
 
