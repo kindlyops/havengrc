@@ -26,7 +26,7 @@ require (
 	github.com/rs/cors v1.6.0
 	github.com/spf13/afero v1.2.1 // indirect
 	github.com/uber-go/atomic v1.4.0 // indirect
-	github.com/unrolled/secure v1.0.0
+	github.com/unrolled/secure v1.0.1
 	go.uber.org/ratelimit v0.0.0-20180316092928-c15da0234277
 	gopkg.in/square/go-jose.v2 v2.3.1
 )
