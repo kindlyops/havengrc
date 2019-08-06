@@ -20,7 +20,16 @@ getHTTPErrorMessage error =
             "Is the server running?"
 
         Http.BadStatus code ->
-            "Bad status reponse " ++ String.fromInt code
+            let
+                -- 422 Unprocessable Entity
+                stringResponse =
+                    if code == 422 then
+                        "Please use a valid email address."
+
+                    else
+                        "Bad status reponse " ++ String.fromInt code
+            in
+            stringResponse
 
         Http.BadBody message ->
             "Decoding Failed: " ++ message

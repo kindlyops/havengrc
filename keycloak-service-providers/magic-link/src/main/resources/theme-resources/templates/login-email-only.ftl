@@ -13,7 +13,7 @@
                     </div>
 
                     <div class="${properties.kcInputWrapperClass!}">
-                        <input tabindex="1" id="email" class="${properties.kcInputClass!}" name="email"  type="text" autofocus autocomplete="off" />
+                        <input tabindex="1" id="email" class="${properties.kcInputClass!}" name="email" type="email" required autofocus autocomplete="off" />
                     </div>
                 </div>
 
