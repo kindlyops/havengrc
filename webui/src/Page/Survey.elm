@@ -1214,36 +1214,6 @@ viewFinished model =
         ]
 
 
-viewRegistrationError : Model -> Html Msg
-viewRegistrationError model =
-    div [ class "d-flex flex-column" ]
-        [ img [ class "img-fluid mt-3", alt "Haven GRC Company Logo", attribute "data-rjs" "2", id "logo", src "/img/logo@2x.png", height 71, width 82 ] []
-        , div [ class "row" ]
-            [ div [ class "col-xs-12 text-center mt-5" ]
-                [ h1 [ class "survey-heading mb-5" ] [ text "You finished the survey!" ]
-                , div [ class "vis", id "vis" ] []
-                , div [ class "col-md-8 mx-auto my-5" ]
-                    [ p [] [ text "Do you want a shareable version of these results? Enter your email and we will generate a customized powerpoint presentation that includes these results so that you can incorporate them into your own presentation." ]
-                    , p []
-                        [ text "By submitting your email you agree to our "
-                        , a [ href "/terms", target "_blank", rel "noopener noreferrer" ] [ text "Terms of Service" ]
-                        , text " and "
-                        , a [ href "/privacy", target "_blank", rel "noopener noreferrer" ] [ text "Privacy Policy" ]
-                        , text "."
-                        ]
-                    , div [ class "col-md-7 mx-auto mt-5" ]
-                        [ div [ class "input-group" ]
-                            [ input [ type_ "email", required True, placeholder "Email Address", class "form-control", value model.emailAddress, onInput UpdateEmail ] []
-                            , i [ class "material-icons", style "color" "rgba(0, 0, 0, 0.42)" ] [ text "chevron_right" ]
-                            ]
-                        ]
-                    ]
-                , button [ class "btn btn-primary", onClick RegisterNewUser, disabled <| isValidEmail model.emailAddress ] [ text "Click to save results to the server" ]
-                ]
-            ]
-        ]
-
-
 viewRegistration : Model -> Html Msg
 viewRegistration model =
     div [ class "d-flex flex-column" ]
