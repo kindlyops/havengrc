@@ -79,13 +79,18 @@ func App() *buffalo.App {
 		api.Use(popmw.Transaction(models.DB))
 		api.Use(JwtMiddleware)
 		api.Middleware.Skip(JwtMiddleware, RegistrationHandler)
-		api.POST("surveys", SurveysHandler)
+
 		api.POST("reports", UploadHandler)
 		api.POST("comments", CommentPostHandler)
 		api.GET("comments", CommentGetHandler)
 		api.GET("reports", DownloadHandler)
 		api.POST("registration_funnel", RegistrationHandler)
 
+		api.POST("surveys", SurveysHandler)
+		api.GET("ipsative_surveys", GetIpsativeSurveys)
+		api.GET("likert_surveys", GetLikertSurveys)
+		api.Middleware.Skip(JwtMiddleware, GetLikertSurveys)
+		api.Middleware.Skip(JwtMiddleware, GetIpsativeSurveys)
 		api.GET("onboarding", GetState)
 		api.POST("onboarding", UpdateState)
 

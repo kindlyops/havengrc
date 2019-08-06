@@ -513,7 +513,7 @@ update msg model authModel =
 
         GotLikertServerData (Ok data) ->
             ( { model | inBoundLikertData = Just data }
-            , getLikertChoices authModel model.selectedSurveyMetaData.uuid
+            , getLikertChoices authModel model.selectedSurveyMetaData.id
             )
 
         GotLikertChoices (Err error) ->
@@ -571,12 +571,12 @@ update msg model authModel =
 
         StartLikertSurvey metaData ->
             ( { model | currentPage = Survey, selectedSurveyMetaData = metaData }
-            , getLikertSurvey authModel metaData.uuid
+            , getLikertSurvey authModel metaData.id
             )
 
         StartIpsativeSurvey metaData ->
             ( { model | currentPage = Survey, selectedSurveyMetaData = metaData }
-            , getIpsativeSurvey authModel metaData.uuid
+            , getIpsativeSurvey authModel metaData.id
             )
 
         NextQuestion ->

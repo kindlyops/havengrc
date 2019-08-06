@@ -6,14 +6,15 @@ import (
 	"bytes"
 	"io/ioutil"
 	"strings"
+	"log"
 	"time"
 	"github.com/gobuffalo/uuid"
 	faktory "github.com/contribsys/faktory/client"
-	"log"
+	helmLog "github.com/deis/helm/log"
 	"github.com/getsentry/raven-go"
 	"github.com/gobuffalo/buffalo"
 	"github.com/gobuffalo/pop"
-
+	"github.com/kindlyops/havengrc/havenapi/models"
 )
 
 // rl is the rate limited to 5 requests per second.
@@ -149,4 +150,36 @@ func SaveSurveyResults(results []SurveyResult, c buffalo.Context) (string, error
 	}
 
 	return surveyResponseID, err
+}
+
+// GetIpsativeSurveys returns all ipsative surveys
+// the path GET /api/ipsative_surveys
+func GetIpsativeSurveys(c buffalo.Context) error {
+
+	surveys := []models.IpsativeSurvey{}
+
+	tx := c.Value("tx").(*pop.Connection)
+
+	err := tx.All(&surveys)
+	if err != nil {
+		helmLog.Info("Something went wrong in GetSurveys")
+		return c.Error(500, fmt.Errorf("Database error here: %s", err.Error()))
+	}
+	return c.Render(200, r.JSON(surveys))
+}
+
+// GetLikertSurveys returns all likert surveys
+// the path GET /api/likert_surveys
+func GetLikertSurveys(c buffalo.Context) error {
+
+	surveys := []models.LikertSurvey{}
+
+	tx := c.Value("tx").(*pop.Connection)
+
+	err := tx.All(&surveys)
+	if err != nil {
+		helmLog.Info("Something went wrong in GetSurveys")
+		return c.Error(500, fmt.Errorf("Database error here: %s", err.Error()))
+	}
+	return c.Render(200, r.JSON(surveys))
 }
