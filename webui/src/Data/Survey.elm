@@ -253,7 +253,7 @@ encodeLikertSurveyWithoutZipper surveyWithoutZipper =
 encodeSurveyMetaData : SurveyMetaData -> Encode.Value
 encodeSurveyMetaData surveyMetaData =
     Encode.object
-        [ ( "uuid", Encode.string <| surveyMetaData.uuid )
+        [ ( "id", Encode.string <| surveyMetaData.id )
         , ( "created_at", Encode.string <| surveyMetaData.created_at )
         , ( "name", Encode.string <| surveyMetaData.name )
         , ( "description", Encode.string <| surveyMetaData.description )
@@ -411,7 +411,7 @@ decodeSelectedChoice =
 decodeSurveyMetaData : Decoder SurveyMetaData
 decodeSurveyMetaData =
     map6 SurveyMetaData
-        (field "uuid" string)
+        (field "id" string)
         (field "created_at" string)
         (field "name" string)
         (field "description" string)
@@ -549,7 +549,7 @@ likertSingleResponseEncoder singleResponse =
 
 
 type alias SurveyMetaData =
-    { uuid : String
+    { id : String
     , created_at : String
     , name : String
     , description : String
@@ -778,7 +778,7 @@ type alias PointsAssigned =
 
 emptyIpsativeServerMetaData : SurveyMetaData
 emptyIpsativeServerMetaData =
-    { uuid = "test"
+    { id = "test"
     , created_at = "test"
     , name = "test"
     , description = "test"

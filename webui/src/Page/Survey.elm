@@ -37,7 +37,7 @@ import Data.Survey as Survey
         )
 import Delay exposing (TimeUnit(..), after)
 import Html exposing (Html, a, br, button, div, footer, h1, h3, h4, hr, i, img, input, li, p, span, table, tbody, td, text, th, thead, tr, ul)
-import Html.Attributes exposing (alt, attribute, class, disabled, height, href, id, placeholder, src, style, title, type_, value, width, target, rel)
+import Html.Attributes exposing (alt, attribute, class, disabled, height, href, id, placeholder, rel, src, style, target, title, type_, value, width)
 import Html.Events exposing (onClick, onInput)
 import Http
 import Json.Decode as Decode exposing (Decoder, andThen, decodeString, field, int, map, map2, map5, nullable, oneOf, string)
@@ -511,7 +511,7 @@ update msg model authModel =
 
         GotLikertServerData (Ok data) ->
             ( { model | inBoundLikertData = Just data }
-            , getLikertChoices authModel model.selectedSurveyMetaData.uuid
+            , getLikertChoices authModel model.selectedSurveyMetaData.id
             )
 
         GotLikertChoices (Err error) ->
@@ -569,12 +569,12 @@ update msg model authModel =
 
         StartLikertSurvey metaData ->
             ( { model | currentPage = Survey, selectedSurveyMetaData = metaData }
-            , getLikertSurvey authModel metaData.uuid
+            , getLikertSurvey authModel metaData.id
             )
 
         StartIpsativeSurvey metaData ->
             ( { model | currentPage = Survey, selectedSurveyMetaData = metaData }
-            , getIpsativeSurvey authModel metaData.uuid
+            , getIpsativeSurvey authModel metaData.id
             )
 
         NextQuestion ->
@@ -1478,7 +1478,7 @@ viewIpsativeSurveyBoxes surveyQuestion =
 viewSurveyBox : IpsativeAnswer -> Html Msg
 viewSurveyBox answer =
     div [ class "col-md-6 pt-5 no-top-padding" ]
-        [ div [ class "question-container"]
+        [ div [ class "question-container" ]
             [ p [ class "question-text" ] [ text answer.answer ]
             , div []
                 (List.map

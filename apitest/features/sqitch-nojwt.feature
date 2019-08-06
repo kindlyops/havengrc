@@ -41,12 +41,22 @@ Feature: Basic sqitch access control
         Then the response status should be "401"
 
     Scenario: Get ipsative surveys
-        When I send a GET request to "http://{api_server}/ipsative_surveys"
+        When I send a GET request to "http://{buffalo_server}/api/ipsative_surveys"
         Then the response status should be "200"
         And the JSON response root should be array
 	And the JSON response should have "$[0].author" of type string and value "Lance Hayden"
 
     Scenario: Delete ipsative surveys
-        When I send a DELETE request to "http://{api_server}/ipsative_surveys"
-        Then the response status should be "401"
+        When I send a DELETE request to "http://{buffalo_server}/api/ipsative_surveys"
+        Then the response status should be "405"
+
+    Scenario: Get likert surveys
+        When I send a GET request to "http://{buffalo_server}/api/likert_surveys"
+        Then the response status should be "200"
+        And the JSON response root should be array
+	And the JSON response should have "$[0].author" of type string and value "Lance Hayden"
+
+    Scenario: Delete likert surveys
+        When I send a DELETE request to "http://{buffalo_server}/api/likert_surveys"
+        Then the response status should be "405"
 
