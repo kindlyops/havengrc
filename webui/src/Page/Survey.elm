@@ -36,8 +36,8 @@ import Data.Survey as Survey
         , upgradeSurvey
         )
 import Delay exposing (TimeUnit(..), after)
-import Html exposing (Html, a, br, button, div, footer, h1, h3, h4, hr, i, img, input, li, p, span, table, tbody, td, text, th, thead, tr, ul)
-import Html.Attributes exposing (alt, attribute, class, disabled, height, href, id, placeholder, src, style, title, type_, value, width, target, rel)
+import Html exposing (Html, a, br, button, div, footer, form, h1, h3, h4, hr, i, img, input, li, p, span, table, tbody, td, text, th, thead, tr, ul)
+import Html.Attributes exposing (action, alt, attribute, class, disabled, height, href, id, placeholder, rel, required, src, style, target, title, type_, value, width)
 import Html.Events exposing (onClick, onInput)
 import Http
 import Json.Decode as Decode exposing (Decoder, andThen, decodeString, field, int, map, map2, map5, nullable, oneOf, string)
@@ -46,6 +46,7 @@ import List.Zipper as Zipper
 import Page.Errors exposing (ErrorData, errorInit, setErrorMessage, viewError)
 import Ports
 import Process
+import Regex
 import Task
 import Utils exposing (getHTTPErrorMessage)
 import Views.SurveyCard
@@ -411,9 +412,10 @@ update msg model authModel =
                     )
 
         NewUserRegistered (Err error) ->
-            -- TODO: figure out how to handle "New User error" error
-            ( initialModel
-            , Cmd.none
+            ( { model
+                | errorModel = setErrorMessage model.errorModel (getHTTPErrorMessage error)
+              }
+            , Process.sleep 3000 |> Task.perform (always HideError)
             )
 
         NewUserRegistered (Ok responses) ->
@@ -1212,6 +1214,36 @@ viewFinished model =
         ]
 
 
+viewRegistrationError : Model -> Html Msg
+viewRegistrationError model =
+    div [ class "d-flex flex-column" ]
+        [ img [ class "img-fluid mt-3", alt "Haven GRC Company Logo", attribute "data-rjs" "2", id "logo", src "/img/logo@2x.png", height 71, width 82 ] []
+        , div [ class "row" ]
+            [ div [ class "col-xs-12 text-center mt-5" ]
+                [ h1 [ class "survey-heading mb-5" ] [ text "You finished the survey!" ]
+                , div [ class "vis", id "vis" ] []
+                , div [ class "col-md-8 mx-auto my-5" ]
+                    [ p [] [ text "Do you want a shareable version of these results? Enter your email and we will generate a customized powerpoint presentation that includes these results so that you can incorporate them into your own presentation." ]
+                    , p []
+                        [ text "By submitting your email you agree to our "
+                        , a [ href "/terms", target "_blank", rel "noopener noreferrer" ] [ text "Terms of Service" ]
+                        , text " and "
+                        , a [ href "/privacy", target "_blank", rel "noopener noreferrer" ] [ text "Privacy Policy" ]
+                        , text "."
+                        ]
+                    , div [ class "col-md-7 mx-auto mt-5" ]
+                        [ div [ class "input-group" ]
+                            [ input [ type_ "email", required True, placeholder "Email Address", class "form-control", value model.emailAddress, onInput UpdateEmail ] []
+                            , i [ class "material-icons", style "color" "rgba(0, 0, 0, 0.42)" ] [ text "chevron_right" ]
+                            ]
+                        ]
+                    ]
+                , button [ class "btn btn-primary", onClick RegisterNewUser, disabled <| isValidEmail model.emailAddress ] [ text "Click to save results to the server" ]
+                ]
+            ]
+        ]
+
+
 viewRegistration : Model -> Html Msg
 viewRegistration model =
     div [ class "d-flex flex-column" ]
@@ -1231,15 +1263,39 @@ viewRegistration model =
                         ]
                     , div [ class "col-md-7 mx-auto mt-5" ]
                         [ div [ class "input-group" ]
-                            [ input [ placeholder "Email Address", class "form-control", value model.emailAddress, onInput UpdateEmail ] []
+                            [ input [ type_ "email", required True, placeholder "Email Address", class "form-control", value model.emailAddress, onInput UpdateEmail ] []
                             , i [ class "material-icons", style "color" "rgba(0, 0, 0, 0.42)" ] [ text "chevron_right" ]
                             ]
                         ]
                     ]
-                , button [ class "btn btn-primary", onClick RegisterNewUser ] [ text "Click to save results to the server" ]
+                , button [ class "btn btn-primary", onClick RegisterNewUser, disabled <| isValidEmail model.emailAddress ] [ text "Click to save results to the server" ]
                 ]
             ]
         ]
+
+
+
+-- isValidEmail checks for simple universal email standards
+-- Starts with \S+. At least one non whitespace char
+-- Must contain an @ symbol
+-- Must contain non whitespace after the @
+
+
+isValidEmail : String -> Bool
+isValidEmail email =
+    let
+        pattern =
+            Maybe.withDefault Regex.never <|
+                Regex.fromString "(\\S+@{1}\\S+)"
+
+        result =
+            if Regex.contains pattern email then
+                False
+
+            else
+                True
+    in
+    result
 
 
 viewRegistered : Model -> Html Msg
@@ -1478,7 +1534,7 @@ viewIpsativeSurveyBoxes surveyQuestion =
 viewSurveyBox : IpsativeAnswer -> Html Msg
 viewSurveyBox answer =
     div [ class "col-md-6 pt-5 no-top-padding" ]
-        [ div [ class "question-container"]
+        [ div [ class "question-container" ]
             [ p [ class "question-text" ] [ text answer.answer ]
             , div []
                 (List.map
