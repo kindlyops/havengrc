@@ -50,3 +50,13 @@ Feature: Basic sqitch access control
         When I send a DELETE request to "http://{api_server}/ipsative_surveys"
         Then the response status should be "401"
 
+    Scenario: Save registration with invalid email address
+        When I set JSON request body to:
+        """
+        {
+        "email": "_@_",
+        "survey_results": []
+        }
+        """
+        And  I send a POST request to "http://{buffalo_server}/api/registration_funnel"
+        Then the response status should be "422"
