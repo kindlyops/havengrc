@@ -18,6 +18,9 @@ jobs:
           command: ./notify-slack notifications "CircleCI starting pipeline for ${CIRCLE_PULL_REQUEST:-$CIRCLE_BRANCH}" circleci
       - add_ssh_keys
       - run:
+          name: Check services to build
+          command: ./report-changed-services
+      - run:
           name: Check docker version
           command: docker -v
       - restore_cache:
@@ -306,6 +309,8 @@ jobs:
             sentry-cli releases new -p haven-grc $VERSION
             # Associate commits with the release
             sentry-cli releases set-commits --auto $VERSION || true
+            # figure out which services need deploys
+            ./report-changed-services
             oc set image deployment/havenapi havenapi=havengrc-docker.jfrog.io/kindlyops/havenapi:$CIRCLE_SHA1
             oc set image deployment/havenweb havenweb=havengrc-docker.jfrog.io/kindlyops/havenweb:$CIRCLE_SHA1
             oc set image deployment/keycloak keycloak=havengrc-docker.jfrog.io/kindlyops/keycloak:$CIRCLE_SHA1
