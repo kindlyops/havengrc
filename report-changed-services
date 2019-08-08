@@ -1,4 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# this depends on bash >= 4 as it uses associative arrays to handle
+# lists of filenames that may contain spaces
 
 set -e
 
@@ -19,7 +21,7 @@ DESCRIPTION='
   has any patterns that match the file list in order to determine if the
   service needs to be deployed.
 
-  Dependencies: requires git to be installed.'
+  Dependencies: requires git to be installed, requires bash >= 4'
 
 function usage() {
 	echo "$USAGE" "$DESCRIPTION" >&2
@@ -35,14 +37,17 @@ type git >/dev/null 2>&1 || {
 	exit 1
 }
 
+if [ "${BASH_VERSINFO:-0}" -lt 4 ]; then
+  echo "This version of bash does not support associative arrays, cannot run"
+  usage
+  exit 1
+fi
 
-#var COMMIT_SHA
-#COMMIT_SHA=$(git rev-parse HEAD 2> /dev/null)
-#MASTER_COMMIT_SHA=$(git rev-parse remotes/origin/master 2> /dev/null)
-#CURRENT_BRANCH=$(git branch | grep \* | cut -d ' ' -f2)
+CURRENT_BRANCH=$(git branch | grep \* | cut -d ' ' -f2)
+echo "Current branch is ${CURRENT_BRANCH}"
 
 declare -A changed_files
-if [[ "$" == "master" ]]; then
+if [[ "$CURRENT_BRANCH" == "master" ]]; then
   # If we are on master, calculate the changes in the merge commit.
   for filename in $(git diff --name-only HEAD^! 2>/dev/null); do
     changed_files["$filename"]=$filename
