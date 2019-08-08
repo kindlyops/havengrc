@@ -18,6 +18,9 @@ jobs:
           command: ./notify-slack notifications "CircleCI starting pipeline for ${CIRCLE_PULL_REQUEST:-$CIRCLE_BRANCH}" circleci
       - add_ssh_keys
       - run:
+          name: Check services to build
+          command: ./report-changed-services
+      - run:
           name: Check docker version
           command: docker -v
       - restore_cache:
@@ -306,11 +309,23 @@ jobs:
             sentry-cli releases new -p haven-grc $VERSION
             # Associate commits with the release
             sentry-cli releases set-commits --auto $VERSION || true
-            oc set image deployment/havenapi havenapi=havengrc-docker.jfrog.io/kindlyops/havenapi:$CIRCLE_SHA1
-            oc set image deployment/havenweb havenweb=havengrc-docker.jfrog.io/kindlyops/havenweb:$CIRCLE_SHA1
-            oc set image deployment/keycloak keycloak=havengrc-docker.jfrog.io/kindlyops/keycloak:$CIRCLE_SHA1
-            oc set image deployment/worker worker=kindlyops/havenworker:$CIRCLE_SHA1
-            oc set image deployment/gatekeeper gatekeeper=kindlyops/gatekeeper:$CIRCLE_SHA1
+            # figure out which services need deploys
+            source ./report-changed-services
+            if [[ "$DEPLOY_HAVENAPI" == "true" ]]; then
+              oc set image deployment/havenapi havenapi=havengrc-docker.jfrog.io/kindlyops/havenapi:$CIRCLE_SHA1
+            fi
+            if [[ "$DEPLOY_WEBUI" == "true" ]]; then
+              oc set image deployment/havenweb havenweb=havengrc-docker.jfrog.io/kindlyops/havenweb:$CIRCLE_SHA1
+            fi
+            if [[ "$DEPLOY_KEYCLOAK" == "true" ]]; then
+              oc set image deployment/keycloak keycloak=havengrc-docker.jfrog.io/kindlyops/keycloak:$CIRCLE_SHA1
+            fi
+            if [[ "$DEPLOY_WORKER" == "true" ]]; then
+              oc set image deployment/worker worker=kindlyops/havenworker:$CIRCLE_SHA1
+            fi
+            if [[ "$DEPLOY_GATEKEEPER" == "true" ]]; then
+              oc set image deployment/gatekeeper gatekeeper=kindlyops/gatekeeper:$CIRCLE_SHA1
+            fi
       - notify-failed
       - run:
           name: notify deploy complete
