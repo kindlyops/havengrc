@@ -5,6 +5,11 @@ metadata:
   name: havenapi
 spec:
   replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 50%
   template:
     metadata:
       annotations:
