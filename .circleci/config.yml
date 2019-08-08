@@ -18,6 +18,13 @@ jobs:
           command: ./notify-slack notifications "CircleCI starting pipeline for ${CIRCLE_PULL_REQUEST:-$CIRCLE_BRANCH}" circleci
       - add_ssh_keys
       - run:
+          name: Check services to build
+          command: |
+            source ./report-changed-services
+            if [ "$DEPLOY_WEBUI" = "false" ]; then
+              circleci-agent step halt
+            fi
+      - run:
           name: Check docker version
           command: docker -v
       - restore_cache:
@@ -58,13 +65,6 @@ jobs:
       - run: docker build -t kindlyops/havenweb:latest webui
       - run: docker tag kindlyops/havenweb:latest kindlyops/havenweb:$CIRCLE_SHA1
       - run: docker tag kindlyops/havenweb:latest kindlyops/havenweb:$CIRCLE_BUILD_NUM
-      - run:
-          name: Check services to build
-          command: |
-            source ./report-changed-services
-            if [ "$DEPLOY_WEBUI" = "false" ]; then
-              circleci-agent step halt
-            fi
       - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
       - run: docker push kindlyops/havenweb:$CIRCLE_SHA1
       - run: docker push kindlyops/havenweb:$CIRCLE_BUILD_NUM
@@ -76,11 +76,6 @@ jobs:
     steps:
       - checkout
       - add_ssh_keys
-      - setup_remote_docker:
-          docker_layer_caching: true
-      - run: docker build -t kindlyops/havenflyway:latest flyway
-      - run: docker tag kindlyops/havenflyway:latest kindlyops/havenflyway:$CIRCLE_SHA1
-      - run: docker tag kindlyops/havenflyway:latest kindlyops/havenflyway:$CIRCLE_BUILD_NUM
       - run:
           name: Check services to build
           command: |
@@ -88,6 +83,11 @@ jobs:
             if [ "$DEPLOY_FLYWAY" = "false" ]; then
               circleci-agent step halt
             fi
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run: docker build -t kindlyops/havenflyway:latest flyway
+      - run: docker tag kindlyops/havenflyway:latest kindlyops/havenflyway:$CIRCLE_SHA1
+      - run: docker tag kindlyops/havenflyway:latest kindlyops/havenflyway:$CIRCLE_BUILD_NUM
       - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
       - run: docker push kindlyops/havenflyway:$CIRCLE_SHA1
       - run: docker push kindlyops/havenflyway:$CIRCLE_BUILD_NUM
@@ -116,11 +116,6 @@ jobs:
     steps:
       - checkout
       - add_ssh_keys
-      - setup_remote_docker:
-          docker_layer_caching: true
-      - run: docker build -t kindlyops/keycloak:latest -f keycloak/Dockerfile .
-      - run: docker tag kindlyops/keycloak:latest kindlyops/keycloak:$CIRCLE_SHA1
-      - run: docker tag kindlyops/keycloak:latest kindlyops/keycloak:$CIRCLE_BUILD_NUM
       - run:
           name: Check services to build
           command: |
@@ -128,6 +123,11 @@ jobs:
             if [ "$DEPLOY_KEYCLOAK" = "false" ]; then
               circleci-agent step halt
             fi
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run: docker build -t kindlyops/keycloak:latest -f keycloak/Dockerfile .
+      - run: docker tag kindlyops/keycloak:latest kindlyops/keycloak:$CIRCLE_SHA1
+      - run: docker tag kindlyops/keycloak:latest kindlyops/keycloak:$CIRCLE_BUILD_NUM
       - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
       - run: docker push kindlyops/keycloak:$CIRCLE_SHA1
       - run: docker push kindlyops/keycloak:$CIRCLE_BUILD_NUM
@@ -139,11 +139,6 @@ jobs:
     steps:
       - checkout
       - add_ssh_keys
-      - setup_remote_docker:
-          docker_layer_caching: true
-      - run: docker build --rm=false -t kindlyops/havenapi havenapi
-      - run: docker tag kindlyops/havenapi:latest kindlyops/havenapi:$CIRCLE_SHA1
-      - run: docker tag kindlyops/havenapi:latest kindlyops/havenapi:$CIRCLE_BUILD_NUM
       - run:
           name: Check services to build
           command: |
@@ -151,6 +146,11 @@ jobs:
             if [ "$DEPLOY_HAVENAPI" = "false" ]; then
               circleci-agent step halt
             fi
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run: docker build --rm=false -t kindlyops/havenapi havenapi
+      - run: docker tag kindlyops/havenapi:latest kindlyops/havenapi:$CIRCLE_SHA1
+      - run: docker tag kindlyops/havenapi:latest kindlyops/havenapi:$CIRCLE_BUILD_NUM
       - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
       - run: docker push kindlyops/havenapi:$CIRCLE_BUILD_NUM
       - run: docker push kindlyops/havenapi:$CIRCLE_SHA1
@@ -162,11 +162,6 @@ jobs:
     steps:
       - checkout
       - add_ssh_keys
-      - setup_remote_docker:
-          docker_layer_caching: true
-      - run: docker build --rm=false -t kindlyops/gatekeeper gatekeeper
-      - run: docker tag kindlyops/gatekeeper:latest kindlyops/gatekeeper:$CIRCLE_SHA1
-      - run: docker tag kindlyops/gatekeeper:latest kindlyops/gatekeeper:$CIRCLE_BUILD_NUM
       - run:
           name: Check services to build
           command: |
@@ -174,6 +169,11 @@ jobs:
             if [ "$DEPLOY_GATEKEEPER" = "false" ]; then
               circleci-agent step halt
             fi
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run: docker build --rm=false -t kindlyops/gatekeeper gatekeeper
+      - run: docker tag kindlyops/gatekeeper:latest kindlyops/gatekeeper:$CIRCLE_SHA1
+      - run: docker tag kindlyops/gatekeeper:latest kindlyops/gatekeeper:$CIRCLE_BUILD_NUM
       - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
       - run: docker push kindlyops/gatekeeper:$CIRCLE_BUILD_NUM
       - run: docker push kindlyops/gatekeeper:$CIRCLE_SHA1
@@ -185,6 +185,13 @@ jobs:
     steps:
       - checkout
       - add_ssh_keys
+      - run:
+          name: Check services to build
+          command: |
+            source ./report-changed-services
+            if [ "$DEPLOY_WORKER" = "false" ]; then
+              circleci-agent step halt
+            fi
       - setup_remote_docker:
           docker_layer_caching: true
       - run: docker build --build-arg=COMMIT=$CIRCLE_SHA1 --rm=false -t kindlyops/havenworker -f worker/Dockerfile .
@@ -194,13 +201,6 @@ jobs:
       - run: docker tag kindlyops/faktory:latest kindlyops/faktory:$CIRCLE_SHA1
       - run: docker tag kindlyops/faktory:latest kindlyops/faktory:$CIRCLE_BUILD_NUM
       - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
-      - run:
-          name: Check services to build
-          command: |
-            source ./report-changed-services
-            if [ "$DEPLOY_WORKER" = "false" ]; then
-              circleci-agent step halt
-            fi
       - run: docker push kindlyops/havenworker:$CIRCLE_BUILD_NUM
       - run: docker push kindlyops/havenworker:$CIRCLE_SHA1
       - run: docker push kindlyops/havenworker:latest
@@ -277,6 +277,7 @@ jobs:
             docker create -v /cfg -v /keycloak --name configs alpine:3.4 /bin/true
             docker cp postgrest/keycloak-dev-public-key.json configs:/cfg
             docker cp keycloak/data/havendev-realm.json configs:/keycloak
+            docker build -t kindlyops/keycloak:$CIRCLE_SHA1 -f keycloak/Dockerfile .
             # start keycloak in background container
             docker run --volumes-from configs --network net0 -d -e DB_DATABASE -e DB_USER -e DB_ADDR -e KEYCLOAK_USER -e KEYCLOAK_PASSWORD -e PROXY_ADDRESS_FORWARDING -h keycloak --name keycloak kindlyops/keycloak:$CIRCLE_SHA1 -b 0.0.0.0 -Dkeycloak.migration.file=/keycloak/havendev-realm.json -Dkeycloak.migration.strategy=IGNORE_EXISTING -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.action=import
             # Wait for keycloak
