@@ -310,12 +310,22 @@ jobs:
             # Associate commits with the release
             sentry-cli releases set-commits --auto $VERSION || true
             # figure out which services need deploys
-            ./report-changed-services
-            oc set image deployment/havenapi havenapi=havengrc-docker.jfrog.io/kindlyops/havenapi:$CIRCLE_SHA1
-            oc set image deployment/havenweb havenweb=havengrc-docker.jfrog.io/kindlyops/havenweb:$CIRCLE_SHA1
-            oc set image deployment/keycloak keycloak=havengrc-docker.jfrog.io/kindlyops/keycloak:$CIRCLE_SHA1
-            oc set image deployment/worker worker=kindlyops/havenworker:$CIRCLE_SHA1
-            oc set image deployment/gatekeeper gatekeeper=kindlyops/gatekeeper:$CIRCLE_SHA1
+            source ./report-changed-services
+            if [[ "$DEPLOY_HAVENAPI" == "true" ]]; then
+              oc set image deployment/havenapi havenapi=havengrc-docker.jfrog.io/kindlyops/havenapi:$CIRCLE_SHA1
+            fi
+            if [[ "$DEPLOY_WEBUI" == "true" ]]; then
+              oc set image deployment/havenweb havenweb=havengrc-docker.jfrog.io/kindlyops/havenweb:$CIRCLE_SHA1
+            fi
+            if [[ "$DEPLOY_KEYCLOAK" == "true" ]]; then
+              oc set image deployment/keycloak keycloak=havengrc-docker.jfrog.io/kindlyops/keycloak:$CIRCLE_SHA1
+            fi
+            if [[ "$DEPLOY_WORKER" == "true" ]]; then
+              oc set image deployment/worker worker=kindlyops/havenworker:$CIRCLE_SHA1
+            fi
+            if [[ "$DEPLOY_GATEKEEPER" == "true" ]]; then
+              oc set image deployment/gatekeeper gatekeeper=kindlyops/gatekeeper:$CIRCLE_SHA1
+            fi
       - notify-failed
       - run:
           name: notify deploy complete

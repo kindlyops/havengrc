@@ -63,7 +63,6 @@ CHANGE_COUNT=${#changed_files[@]}
 
 if [ "$CHANGE_COUNT" -eq 0 ]; then
   echo 'Did not detect any changed files'
-  exit 0
 else
   echo "Found $CHANGE_COUNT changed files"
   printf " * %s\n" "${changed_files[@]}"
