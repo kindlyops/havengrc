@@ -77,12 +77,45 @@ for filename in "${changed_files[@]}"; do
     gatekeeper/*)
       DEPLOY_GATEKEEPER=true
       ;;
+    webui/*)
+      DEPLOY_WEBUI=true
+      ;;
+    keycloak/*)
+      DEPLOY_KEYCLOAK=true
+      ;;
+    keycloak-service-providers/*)
+      DEPLOY_KEYCLOAK=true
+      ;;
+    worker/*)
+      DEPLOY_WORKER=true
+      ;;
+    havenapi/*)
+      DEPLOY_HAVENAPI=true
+      ;;
+    flyway/*)
+      DEPLOY_FLYWAY=true
+      ;;
+    faktory/*)
+      DEPLOY_FAKTORY=true
+      ;;
     *)
       echo "$filename did not trigger a service deploy"
     ;;
   esac
 done
 
+printf "\n"
+echo "***********************************"
+echo "* Services that need deployment   *"
+echo "***********************************"
+printf "\n"
 
+echo "DEPLOY_GATEKEEPER=${DEPLOY_GATEKEEPER}"
+echo "DEPLOY_WEBUI=${DEPLOY_WEBUI}"
+echo "DEPLOY_KEYCLOAK=${DEPLOY_KEYCLOAK}"
+echo "DEPLOY_WORKER=${DEPLOY_WORKER}"
+echo "DEPLOY_HAVENAPI=${DEPLOY_HAVENAPI}"
+echo "DEPLOY_FLYWAY=${DEPLOY_FLYWAY}"
+echo "DEPLOY_FAKTORY=${DEPLOY_FAKTORY}"
 
 
