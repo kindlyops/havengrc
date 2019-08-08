@@ -19,7 +19,11 @@ jobs:
       - add_ssh_keys
       - run:
           name: Check services to build
-          command: ./report-changed-services
+          command: |
+            source ./report-changed-services
+            if [ "$DEPLOY_WEBUI" = "false" ]; then
+              circleci-agent step halt
+            fi
       - run:
           name: Check docker version
           command: docker -v
@@ -72,6 +76,13 @@ jobs:
     steps:
       - checkout
       - add_ssh_keys
+      - run:
+          name: Check services to build
+          command: |
+            source ./report-changed-services
+            if [ "$DEPLOY_FLYWAY" = "false" ]; then
+              circleci-agent step halt
+            fi
       - setup_remote_docker:
           docker_layer_caching: true
       - run: docker build -t kindlyops/havenflyway:latest flyway
@@ -105,6 +116,13 @@ jobs:
     steps:
       - checkout
       - add_ssh_keys
+      - run:
+          name: Check services to build
+          command: |
+            source ./report-changed-services
+            if [ "$DEPLOY_KEYCLOAK" = "false" ]; then
+              circleci-agent step halt
+            fi
       - setup_remote_docker:
           docker_layer_caching: true
       - run: docker build -t kindlyops/keycloak:latest -f keycloak/Dockerfile .
@@ -121,6 +139,13 @@ jobs:
     steps:
       - checkout
       - add_ssh_keys
+      - run:
+          name: Check services to build
+          command: |
+            source ./report-changed-services
+            if [ "$DEPLOY_HAVENAPI" = "false" ]; then
+              circleci-agent step halt
+            fi
       - setup_remote_docker:
           docker_layer_caching: true
       - run: docker build --rm=false -t kindlyops/havenapi havenapi
@@ -137,6 +162,13 @@ jobs:
     steps:
       - checkout
       - add_ssh_keys
+      - run:
+          name: Check services to build
+          command: |
+            source ./report-changed-services
+            if [ "$DEPLOY_GATEKEEPER" = "false" ]; then
+              circleci-agent step halt
+            fi
       - setup_remote_docker:
           docker_layer_caching: true
       - run: docker build --rm=false -t kindlyops/gatekeeper gatekeeper
@@ -153,6 +185,13 @@ jobs:
     steps:
       - checkout
       - add_ssh_keys
+      - run:
+          name: Check services to build
+          command: |
+            source ./report-changed-services
+            if [ "$DEPLOY_WORKER" = "false" ]; then
+              circleci-agent step halt
+            fi
       - setup_remote_docker:
           docker_layer_caching: true
       - run: docker build --build-arg=COMMIT=$CIRCLE_SHA1 --rm=false -t kindlyops/havenworker -f worker/Dockerfile .
