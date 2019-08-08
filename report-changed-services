@@ -41,24 +41,19 @@ type git >/dev/null 2>&1 || {
 #MASTER_COMMIT_SHA=$(git rev-parse remotes/origin/master 2> /dev/null)
 #CURRENT_BRANCH=$(git branch | grep \* | cut -d ' ' -f2)
 
-declare -A changed_files
+declare changed_files
 if [[ "$" == "master" ]]; then
   # If we are on master, calculate the changes in the merge commit.
-  for filename in $(git diff --name-only HEAD^! 2>/dev/null); do
-    changed_files["$filename"]=$filename
-  done
+  changed_files=$(git diff --name-only HEAD^! 2>/dev/null)
 else
   # If we are not on master, calculate the differences on this branch that are not yet in master
-  for filename in $(git diff origin/master... --name-only 2>/dev/null); do
-   changed_files["$filename"]=$filename
-  done
+  changed_files=$(git diff origin/master... --name-only 2>/dev/null)
 fi
 
 CHANGE_COUNT=${#changed_files[@]}
 
 if [ "$CHANGE_COUNT" -eq 0 ]; then
   echo 'Did not detect any changed files'
-  exit 0
 else
   echo "Found $CHANGE_COUNT changed files"
   printf " * %s\n" "${changed_files[@]}"
