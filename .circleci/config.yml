@@ -68,7 +68,10 @@ jobs:
       - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
       - run: docker push kindlyops/havenweb:$CIRCLE_SHA1
       - run: docker push kindlyops/havenweb:$CIRCLE_BUILD_NUM
-      - run: docker push kindlyops/havenweb:latest
+      - run: |
+          if [ "$CIRCLE_BRANCH" = "master" ]; then
+            docker push kindlyops/havenweb:latest
+          fi
       - notify-failed
   flyway-build-job:
     docker:
@@ -91,7 +94,10 @@ jobs:
       - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
       - run: docker push kindlyops/havenflyway:$CIRCLE_SHA1
       - run: docker push kindlyops/havenflyway:$CIRCLE_BUILD_NUM
-      - run: docker push kindlyops/havenflyway:latest
+      - run: |
+          if [ "$CIRCLE_BRANCH" = "master" ]; then
+            docker push kindlyops/havenflyway:latest
+          fi
       - notify-failed
 
   postgrest-build-job:
@@ -108,7 +114,10 @@ jobs:
       - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
       - run: docker push kindlyops/postgrest:$CIRCLE_SHA1
       - run: docker push kindlyops/postgrest:$CIRCLE_BUILD_NUM
-      - run: docker push kindlyops/postgrest:latest
+      - run: |
+          if [ "$CIRCLE_BRANCH" = "master" ]; then
+            docker push kindlyops/postgrest:latest
+          fi
       - notify-failed
   keycloak-build-job:
     docker:
@@ -131,7 +140,10 @@ jobs:
       - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
       - run: docker push kindlyops/keycloak:$CIRCLE_SHA1
       - run: docker push kindlyops/keycloak:$CIRCLE_BUILD_NUM
-      - run: docker push kindlyops/keycloak:latest
+      - run: |
+          if [ "$CIRCLE_BRANCH" = "master" ]; then
+            docker push kindlyops/keycloak:latest
+          fi
       - notify-failed
   havenapi-build-job:
     docker:
@@ -154,7 +166,10 @@ jobs:
       - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
       - run: docker push kindlyops/havenapi:$CIRCLE_BUILD_NUM
       - run: docker push kindlyops/havenapi:$CIRCLE_SHA1
-      - run: docker push kindlyops/havenapi:latest
+      - run: |
+          if [ "$CIRCLE_BRANCH" = "master" ]; then
+            docker push kindlyops/havenapi:latest
+          fi
       - notify-failed
   gatekeeper-build-job:
     docker:
@@ -177,7 +192,10 @@ jobs:
       - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
       - run: docker push kindlyops/gatekeeper:$CIRCLE_BUILD_NUM
       - run: docker push kindlyops/gatekeeper:$CIRCLE_SHA1
-      - run: docker push kindlyops/gatekeeper:latest
+      - run: |
+          if [ "$CIRCLE_BRANCH" = "master" ]; then
+            docker push kindlyops/gatekeeper:latest
+          fi
       - notify-failed
   havenworker-build-job:
     docker:
@@ -206,7 +224,10 @@ jobs:
       - run: docker push kindlyops/havenworker:latest
       - run: docker push kindlyops/faktory:$CIRCLE_BUILD_NUM
       - run: docker push kindlyops/faktory:$CIRCLE_SHA1
-      - run: docker push kindlyops/faktory:latest
+      - run: |
+          if [ "$CIRCLE_BRANCH" = "master" ]; then
+            docker push kindlyops/faktory:latest
+          fi
       - notify-failed
   havenapi-testing-job:
     docker:

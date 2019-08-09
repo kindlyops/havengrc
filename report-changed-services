@@ -75,19 +75,19 @@ fi
 # when a service hasn't changed. The origin/master revision will be the tag
 # for the currently shipped version of any service.
 export DEPLOY_GATEKEEPER=false
-export GATEKEEPER_REV=${MASTER_REV}
+export GATEKEEPER_REV=latest
 export DEPLOY_WEBUI=false
-export WEBUI_REV=${MASTER_REV}
+export WEBUI_REV=latest
 export DEPLOY_KEYCLOAK=false
-export KEYCLOAK_REV=${MASTER_REV}
+export KEYCLOAK_REV=latest
 export DEPLOY_WORKER=false
-export WORKER_REV=${MASTER_REV}
+export WORKER_REV=latest
 export DEPLOY_HAVENAPI=false
-export HAVENAPI_REV=${MASTER_REV}
+export HAVENAPI_REV=latest
 export DEPLOY_FLYWAY=false
-export FLYWAY_REV=${MASTER_REV}
+export FLYWAY_REV=latest
 export DEPLOY_FAKTORY=false
-export FAKTORY_REV=${MASTER_REV}
+export FAKTORY_REV=latest
 
 for filename in "${changed_files[@]}"; do
   case $filename in
