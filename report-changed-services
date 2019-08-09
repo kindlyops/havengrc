@@ -1,0 +1,146 @@
+#!/usr/bin/env bash
+# this depends on bash >= 4 as it uses associative arrays to handle
+# lists of filenames that may contain spaces
+
+set -e
+
+USAGE='report-changed-services'
+DESCRIPTION='
+  Deploy helper to figure out what services were changed in a merge
+  commit. Long term it would be better to use something like bazel,
+  but this is good enough for now.
+
+  This does not figure out when docker image base layers have changed,
+  it only looks at the files in our monorepo to guess at which services
+  have changes.
+
+  We first get a list of all files changed in the merge commit or the
+  branch being tested.
+
+  Then, we run a list of checks for each service to see if that service
+  has any patterns that match the file list in order to determine if the
+  service needs to be deployed.
+
+  Dependencies: requires git to be installed, requires bash >= 4'
+
+function usage() {
+	echo "$USAGE" "$DESCRIPTION" >&2
+}
+
+type git >/dev/null 2>&1 || {
+	echo >&2 "Error: git must be installed. Aborting."
+	usage
+	exit 1
+}
+[ $# -eq 0 ] || {
+	usage
+	exit 1
+}
+
+if [ "${BASH_VERSINFO:-0}" -lt 4 ]; then
+  echo "This version of bash does not support associative arrays, cannot run"
+  usage
+  exit 1
+fi
+
+CURRENT_BRANCH=$(git branch | grep \* | cut -d ' ' -f2)
+echo "Current branch is ${CURRENT_BRANCH}"
+CURRENT_REV=$(git rev-parse HEAD)
+MASTER_REV=$(git rev-parse origin/master)
+
+declare -A changed_files
+if [[ "$CURRENT_BRANCH" == "master" ]]; then
+  # If we are on master, calculate the changes in the merge commit.
+  for filename in $(git diff --name-only HEAD^! 2>/dev/null); do
+    changed_files["$filename"]=$filename
+  done
+else
+  # If we are not on master, calculate the differences on this branch that are not yet in master
+  for filename in $(git diff origin/master... --name-only 2>/dev/null); do
+   changed_files["$filename"]=$filename
+  done
+fi
+
+CHANGE_COUNT=${#changed_files[@]}
+
+if [ "$CHANGE_COUNT" -eq 0 ]; then
+  echo 'Did not detect any changed files'
+else
+  echo "Found $CHANGE_COUNT changed files"
+  printf " * %s\n" "${changed_files[@]}"
+fi
+
+# in order to minimize gratuitous rebuilds and publishing container
+# revisions with no meaningful changes, we use the current shipped container
+# when a service hasn't changed. The origin/master revision will be the tag
+# for the currently shipped version of any service.
+export DEPLOY_GATEKEEPER=false
+export GATEKEEPER_REV=${MASTER_REV}
+export DEPLOY_WEBUI=false
+export WEBUI_REV=${MASTER_REV}
+export DEPLOY_KEYCLOAK=false
+export KEYCLOAK_REV=${MASTER_REV}
+export DEPLOY_WORKER=false
+export WORKER_REV=${MASTER_REV}
+export DEPLOY_HAVENAPI=false
+export HAVENAPI_REV=${MASTER_REV}
+export DEPLOY_FLYWAY=false
+export FLYWAY_REV=${MASTER_REV}
+export DEPLOY_FAKTORY=false
+export FAKTORY_REV=${MASTER_REV}
+
+for filename in "${changed_files[@]}"; do
+  case $filename in
+    gatekeeper/*)
+      DEPLOY_GATEKEEPER=true
+      GATEKEEPER_REV=${CURRENT_REV}
+      ;;
+    webui/*)
+      DEPLOY_WEBUI=true
+      WEBUI_REV=${CURRENT_REV}
+      ;;
+    keycloak/*)
+      DEPLOY_KEYCLOAK=true
+      KEYCLOAK_REV=${CURRENT_REV}
+      ;;
+    keycloak-service-providers/*)
+      DEPLOY_KEYCLOAK=true
+      KEYCLOAK_REV=${CURRENT_REV}
+      ;;
+    worker/*)
+      DEPLOY_WORKER=true
+      WORKER_REV=${CURRENT_REV}
+      ;;
+    havenapi/*)
+      DEPLOY_HAVENAPI=true
+      HAVENAPI_REV=${CURRENT_REV}
+      ;;
+    flyway/*)
+      DEPLOY_FLYWAY=true
+      FLYWAY_REV=${CURRENT_REV}
+      ;;
+    faktory/*)
+      DEPLOY_FAKTORY=true
+      FAKTORY_REV=${CURRENT_REV}
+      ;;
+    *)
+      echo "$filename did not trigger a service deploy"
+    ;;
+  esac
+done
+
+printf "\n"
+echo "***********************************"
+echo "* Services that need deployment   *"
+echo "***********************************"
+printf "\n"
+
+echo "DEPLOY_GATEKEEPER=${DEPLOY_GATEKEEPER}"
+echo "DEPLOY_WEBUI=${DEPLOY_WEBUI}"
+echo "DEPLOY_KEYCLOAK=${DEPLOY_KEYCLOAK}"
+echo "DEPLOY_WORKER=${DEPLOY_WORKER}"
+echo "DEPLOY_HAVENAPI=${DEPLOY_HAVENAPI}"
+echo "DEPLOY_FLYWAY=${DEPLOY_FLYWAY}"
+echo "DEPLOY_FAKTORY=${DEPLOY_FAKTORY}"
+
+

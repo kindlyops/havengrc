@@ -200,7 +200,7 @@ interfere with proxying of other html and javascript content types.
 ## Running Tests
 
 Create Elm App uses [elm-test](https://github.com/rtfeldman/node-test-runner)
-as its test runner.
+as its test runner. We also use cypress.io for testing UI interactions.
 
 ### Dependencies in Tests
 
@@ -209,3 +209,5 @@ To use packages in tests, you also need to install them in `tests` directory.
 ```bash
 elm-app test --add-dependencies elm-package.json
 ```
+
+

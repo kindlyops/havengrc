@@ -224,14 +224,8 @@ button{
   background: var(--primary);
 }
 
-.question-container{
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
 .question-text{
-  flex-grow: 2;
+  height: 120px;
 }
 
 .question-list{
@@ -277,6 +271,18 @@ button{
 
 /** End Survey **/
 
+@media screen and (max-width:1200px){
+  .question-text{
+    height:140px;
+  }
+}
+
+@media screen and (max-width:991px){
+  .question-text{
+    height:215px;
+  }
+}
+
 @media screen and (max-width:767px){
   .login-header{
     font-size: 36px;
@@ -286,6 +292,9 @@ button{
   }
   .no-top-padding:first-child{
     padding-top: 0px !important;
+  }
+  .question-text{
+    height: 140px;
   }
 }
 

@@ -16,6 +16,8 @@ import (
 	"github.com/gobuffalo/pop"
 	"github.com/kindlyops/havengrc/havenapi/models"
 	"go.uber.org/ratelimit"
+	"github.com/gobuffalo/validate"
+	"github.com/gobuffalo/validate/validators"
 )
 
 // rl is the rate limited to 5 requests per second.
@@ -48,6 +50,15 @@ func RegistrationHandler(c buffalo.Context) error {
 		raven.CaptureError(err, nil)
 		return c.Error(500, err)
 	}
+	// Validate email address and if it fails return 422 Unprocessable Entity
+	errors := validate.Validate(
+		&validators.EmailIsPresent{Name: "Email", Field: registration.Email, Message: "Email is invalid."},
+	)
+	if errors.Count() > 0 {
+		raven.CaptureError(errors, nil)
+		return c.Error(422, errors)
+	}
+
 	log.Info(registration.Email)
 	log.Info("body: %s", body)
 	results, err := json.Marshal(registration.Results)

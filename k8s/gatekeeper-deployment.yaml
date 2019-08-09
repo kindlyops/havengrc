@@ -5,6 +5,11 @@ metadata:
   name: gatekeeper
 spec:
   replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 50%
   template:
     metadata:
       annotations:
@@ -50,7 +55,7 @@ spec:
                   name: haven-gatekeeper-credentials
                   key: clientsecret
             - name: UPSTREAM_URL
-              value: "http://havenweb.haven-production.svc:8081/"
+              value: "http://havenweb.haven-production.svc:80/"
           volumeMounts:
             - name: secret-volume
               mountPath: /certs/
@@ -58,6 +63,14 @@ spec:
           ports:
             - containerPort: 8443
               protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /
+              scheme: HTTPS
+              port: 8443
+              initialDelaySeconds: 5
+              periodSeconds: 5
+              successThreshold: 1
           resources:
             limits:
               memory: 256Mi

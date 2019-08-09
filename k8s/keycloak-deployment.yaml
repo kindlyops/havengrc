@@ -5,6 +5,11 @@ metadata:
   name: keycloak
 spec:
   replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 50%
   template:
     metadata:
       annotations:
@@ -48,8 +53,6 @@ spec:
           ports:
             - containerPort: 8080
               protocol: TCP
-            - containerPort: 8443
-              protocol: TCP
           resources:
             limits:
               memory: 764Mi
@@ -59,7 +62,7 @@ spec:
             httpGet:
               path: /
               port: 8080
-            initialDelaySeconds: 75
+            initialDelaySeconds: 180
             periodSeconds: 5
       restartPolicy: Always
   strategy:

@@ -8,5 +8,5 @@ spec:
   ports:
   - name: https
     protocol: TCP
-    port: 8081
-    targetPort: 8081
+    port: 80
+    targetPort: 80

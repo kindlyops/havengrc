@@ -1,0 +1,10 @@
+:80
+
+proxy / {{ .Env.GATEKEEPER_INTERNAL }} {
+    header_upstream Host {host}
+    header_upstream X-Real-IP {remote}
+    header_upstream X-Forwarded-For {remote}
+}
+
+log / stdout "{combined}"
+errors stdout
