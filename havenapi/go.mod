@@ -9,7 +9,7 @@ require (
 	github.com/deis/helm v0.0.0-20170331182919-6c2d9fc8b9e6
 	github.com/deis/pkg v0.5.0 // indirect
 	github.com/getsentry/raven-go v0.2.0
-	github.com/gobuffalo/buffalo v0.14.6
+	github.com/gobuffalo/buffalo v0.14.7
 	github.com/gobuffalo/buffalo-pop v1.16.0
 	github.com/gobuffalo/envy v1.7.0
 	github.com/gobuffalo/mw-csrf v0.0.0-20190129204204-25460a055517 // indirect
