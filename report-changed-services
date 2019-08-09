@@ -45,6 +45,8 @@ fi
 
 CURRENT_BRANCH=$(git branch | grep \* | cut -d ' ' -f2)
 echo "Current branch is ${CURRENT_BRANCH}"
+CURRENT_REV=$(git rev-parse HEAD)
+MASTER_REV=$(git rev-parse origin/master)
 
 declare -A changed_files
 if [[ "$CURRENT_BRANCH" == "master" ]]; then
@@ -68,39 +70,58 @@ else
   printf " * %s\n" "${changed_files[@]}"
 fi
 
+# in order to minimize gratuitous rebuilds and publishing container
+# revisions with no meaningful changes, we use the current shipped container
+# when a service hasn't changed. The origin/master revision will be the tag
+# for the currently shipped version of any service.
 export DEPLOY_GATEKEEPER=false
+export GATEKEEPER_REV=${MASTER_REV}
 export DEPLOY_WEBUI=false
+export WEBUI_REV=${MASTER_REV}
 export DEPLOY_KEYCLOAK=false
+export KEYCLOAK_REV=${MASTER_REV}
 export DEPLOY_WORKER=false
+export WORKER_REV=${MASTER_REV}
 export DEPLOY_HAVENAPI=false
+export HAVENAPI_REV=${MASTER_REV}
 export DEPLOY_FLYWAY=false
+export FLYWAY_REV=${MASTER_REV}
 export DEPLOY_FAKTORY=false
+export FAKTORY_REV=${MASTER_REV}
 
 for filename in "${changed_files[@]}"; do
   case $filename in
     gatekeeper/*)
       DEPLOY_GATEKEEPER=true
+      GATEKEEPER_REV=${CURRENT_REV}
       ;;
     webui/*)
       DEPLOY_WEBUI=true
+      WEBUI_REV=${CURRENT_REV}
       ;;
     keycloak/*)
       DEPLOY_KEYCLOAK=true
+      KEYCLOAK_REV=${CURRENT_REV}
       ;;
     keycloak-service-providers/*)
       DEPLOY_KEYCLOAK=true
+      KEYCLOAK_REV=${CURRENT_REV}
       ;;
     worker/*)
       DEPLOY_WORKER=true
+      WORKER_REV=${CURRENT_REV}
       ;;
     havenapi/*)
       DEPLOY_HAVENAPI=true
+      HAVENAPI_REV=${CURRENT_REV}
       ;;
     flyway/*)
       DEPLOY_FLYWAY=true
+      FLYWAY_REV=${CURRENT_REV}
       ;;
     faktory/*)
       DEPLOY_FAKTORY=true
+      FAKTORY_REV=${CURRENT_REV}
       ;;
     *)
       echo "$filename did not trigger a service deploy"

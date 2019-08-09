@@ -19,7 +19,11 @@ jobs:
       - add_ssh_keys
       - run:
           name: Check services to build
-          command: ./report-changed-services
+          command: |
+            source ./report-changed-services
+            if [ "$DEPLOY_WEBUI" = "false" ]; then
+              circleci-agent step halt
+            fi
       - run:
           name: Check docker version
           command: docker -v
@@ -72,6 +76,13 @@ jobs:
     steps:
       - checkout
       - add_ssh_keys
+      - run:
+          name: Check services to build
+          command: |
+            source ./report-changed-services
+            if [ "$DEPLOY_FLYWAY" = "false" ]; then
+              circleci-agent step halt
+            fi
       - setup_remote_docker:
           docker_layer_caching: true
       - run: docker build -t kindlyops/havenflyway:latest flyway
@@ -105,6 +116,13 @@ jobs:
     steps:
       - checkout
       - add_ssh_keys
+      - run:
+          name: Check services to build
+          command: |
+            source ./report-changed-services
+            if [ "$DEPLOY_KEYCLOAK" = "false" ]; then
+              circleci-agent step halt
+            fi
       - setup_remote_docker:
           docker_layer_caching: true
       - run: docker build -t kindlyops/keycloak:latest -f keycloak/Dockerfile .
@@ -121,6 +139,13 @@ jobs:
     steps:
       - checkout
       - add_ssh_keys
+      - run:
+          name: Check services to build
+          command: |
+            source ./report-changed-services
+            if [ "$DEPLOY_HAVENAPI" = "false" ]; then
+              circleci-agent step halt
+            fi
       - setup_remote_docker:
           docker_layer_caching: true
       - run: docker build --rm=false -t kindlyops/havenapi havenapi
@@ -137,6 +162,13 @@ jobs:
     steps:
       - checkout
       - add_ssh_keys
+      - run:
+          name: Check services to build
+          command: |
+            source ./report-changed-services
+            if [ "$DEPLOY_GATEKEEPER" = "false" ]; then
+              circleci-agent step halt
+            fi
       - setup_remote_docker:
           docker_layer_caching: true
       - run: docker build --rm=false -t kindlyops/gatekeeper gatekeeper
@@ -153,6 +185,13 @@ jobs:
     steps:
       - checkout
       - add_ssh_keys
+      - run:
+          name: Check services to build
+          command: |
+            source ./report-changed-services
+            if [ "$DEPLOY_WORKER" = "false" ]; then
+              circleci-agent step halt
+            fi
       - setup_remote_docker:
           docker_layer_caching: true
       - run: docker build --build-arg=COMMIT=$CIRCLE_SHA1 --rm=false -t kindlyops/havenworker -f worker/Dockerfile .
@@ -219,7 +258,9 @@ jobs:
             - BASE_URI:
             - GATEKEEPER_INTERNAL: http://gatekeeper:81
             - CLIENT_SECRET: df2ba720-1d10-4d85-940a-6df77ef69baa
+            - GO_ENV: production
           command: |
+            source ./report-changed-services
             # create network for containers
             docker network create -d bridge net0
             # run db
@@ -238,12 +279,15 @@ jobs:
             docker create -v /cfg -v /keycloak --name configs alpine:3.4 /bin/true
             docker cp postgrest/keycloak-dev-public-key.json configs:/cfg
             docker cp keycloak/data/havendev-realm.json configs:/keycloak
+            docker pull kindlyops/keycloak:$KEYCLOAK_REV
             # start keycloak in background container
-            docker run --volumes-from configs --network net0 -d -e DB_DATABASE -e DB_USER -e DB_ADDR -e KEYCLOAK_USER -e KEYCLOAK_PASSWORD -e PROXY_ADDRESS_FORWARDING -h keycloak --name keycloak kindlyops/keycloak:$CIRCLE_SHA1 -b 0.0.0.0 -Dkeycloak.migration.file=/keycloak/havendev-realm.json -Dkeycloak.migration.strategy=IGNORE_EXISTING -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.action=import
+            docker run --volumes-from configs --network net0 -d -e DB_DATABASE -e DB_USER -e DB_ADDR -e KEYCLOAK_USER -e KEYCLOAK_PASSWORD -e PROXY_ADDRESS_FORWARDING -h keycloak --name keycloak kindlyops/keycloak:$KEYCLOAK_REV -b 0.0.0.0 -Dkeycloak.migration.file=/keycloak/havendev-realm.json -Dkeycloak.migration.strategy=IGNORE_EXISTING -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.action=import
             # Wait for keycloak
             docker run --network net0 jwilder/dockerize  -wait tcp://keycloak:8080 -timeout 2m
-            docker run --network net0 -e FLYWAY_URL -e FLYWAY_USER -e FLYWAY_IGNORE_MISSING_MIGRATIONS -e FLYWAY_GROUP -e FLYWAY_SCHEMAS kindlyops/havenflyway:$CIRCLE_SHA1 migrate -placeholders.databaseUser=circleci
+            docker pull kindlyops/havenflyway:$FLYWAY_REV
+            docker run --network net0 -e FLYWAY_URL -e FLYWAY_USER -e FLYWAY_IGNORE_MISSING_MIGRATIONS -e FLYWAY_GROUP -e FLYWAY_SCHEMAS kindlyops/havenflyway:$FLYWAY_REV migrate -placeholders.databaseUser=circleci
             docker build -t kindlyops/havenapitest -f havenapi/Dockerfile-hotreload .
+            docker pull kindlyops/havenapi:$HAVENAPI_REV
             docker build -t kindlyops/apitest -f apitest/Dockerfile .
             docker run -d --volumes-from configs --network net0 -h api --name api -e DATABASE_USERNAME -e DATABASE_PASSWORD -e DATABASE_HOST -e HAVEN_JWK_PATH -e PGRST_JWT_AUD_CLAIM -e PGRST_SERVER_PROXY_URI kindlyops/postgrest postgrest config
             docker run --network net0 jwilder/dockerize  -wait tcp://api:8180 -timeout 2m
@@ -257,10 +301,10 @@ jobs:
             docker create -v /certs --name certs alpine:3.4 /bin/true
             docker cp fullchain.pem certs:/certs
             docker cp privkey.pem certs:/certs
-            docker pull kindlyops/havenweb:$CIRCLE_SHA1
-            docker run -d --volumes-from certs --network net0 -h webui --name webui -e ELM_APP_KEYCLOAK_CLIENT_ID=havendev kindlyops/havenweb:$CIRCLE_SHA1
-            docker build -t kindlyops/gatekeeper -f gatekeeper/Dockerfile ./gatekeeper
-            docker run -d --volumes-from certs --network net0 --publish 80:81 --name gatekeeper -e DISCOVERY_URL -e UPSTREAM_URL -e REDIRECTION_URL -e GATEKEEPER_LISTEN_PORT -e SECURE_COOKIE -e GATEKEEPER_SESSION_KEY -e KEYCLOAK_INTERNAL -e KEYCLOAK_SCHEME -e DISCOVERY_URL -e BASE_URI -e CLIENT_SECRET kindlyops/gatekeeper:latest
+            docker pull kindlyops/havenweb:$WEBUI_REV
+            docker run -d --volumes-from certs --network net0 -h webui --name webui -e ELM_APP_KEYCLOAK_CLIENT_ID=havendev kindlyops/havenweb:$WEBUI_REV
+            docker pull kindlyops/gatekeeper:$GATEKEEPER_REV
+            docker run -d --volumes-from certs --network net0 --publish 80:81 --name gatekeeper -e DISCOVERY_URL -e UPSTREAM_URL -e REDIRECTION_URL -e GATEKEEPER_LISTEN_PORT -e SECURE_COOKIE -e GATEKEEPER_SESSION_KEY -e KEYCLOAK_INTERNAL -e KEYCLOAK_SCHEME -e DISCOVERY_URL -e BASE_URI -e CLIENT_SECRET kindlyops/gatekeeper:$GATEKEEPER_REV
             docker build -t kindlyops/cypress -f webui/Dockerfile-cypress ./webui
             # creating dummy container to hold volume with outputs from cypress
             docker create -v /e2e/cypress/videos/ --name videos alpine:3.4 /bin/true
@@ -357,13 +401,3 @@ workflows:
           filters:
             branches:
               only: master
-      # TODO: port to circle 2.0
-      # release:
-      #   tag: /v[0-9]+(\.[0-9]+)*/
-      #   owner: kindlyops
-      #   commands:
-      #     - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-      #     - docker tag kindlyops/havenweb kindlyops/havenweb:$CIRCLE_TAG
-      #     - docker tag kindlyops/havenweb kindlyops/havenweb:$CIRCLE_SHA1
-      #     - docker push kindlyops/havenweb:$CIRCLE_TAG
-      #     - docker push kindlyops/havenweb:$CIRCLE_SHA1
