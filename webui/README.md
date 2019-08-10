@@ -6,29 +6,6 @@ This project was initially bootstrapped with [Create Elm App](https://github.com
 
 To turn off Elm Debugger, set `ELM_DEBUGGER` environment variable to `false`
 
-## Changing the base path of the assets in the HTML
-
-By default assets will be linked from the HTML to the root url. For example `/css/style.css`.
-
-If you deploy to a path that is not the root, you can change the `PUBLIC_URL`
-environment variable to properly reference your assets in the compiled assets.
-For example: `PUBLIC_URL=./ elm-app build`.
-
-## Changing the Page `<title>`
-
-You can find the source HTML file in the `public` folder of the generated
-project. You may edit the `<title>` tag in it to change the title from
-“Elm App” to anything else.
-
-Note that normally you wouldn’t edit files in the `public` folder very often.
-For example, [adding a stylesheet](#adding-a-stylesheet) is done without
-touching the HTML.
-
-If you need to dynamically update the page title based on the content, you
-can use the browser
-[`document.title`](https://developer.mozilla.org/en-US/docs/Web/API/Document/title)
-API and [ports.](https://guide.elm-lang.org/interop/javascript.html#ports)
-
 ## Adding a Stylesheet
 
 This project setup uses [Webpack](https://webpack.js.org/) for handling all
