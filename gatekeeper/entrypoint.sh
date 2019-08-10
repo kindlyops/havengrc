@@ -2,6 +2,7 @@
 
 set -x
 
+
 # Run caddy forward proxy for openID discovery in background
 /usr/local/bin/dockerize -template /opt/Caddyfile.tmpl:/opt/Caddyfile
 /opt/caddy -agree&
