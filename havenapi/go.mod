@@ -23,7 +23,7 @@ require (
 	github.com/gobuffalo/x v0.0.0-20190224155809-6bb134105960
 	github.com/markbates/grift v1.1.0
 	github.com/nleof/goyesql v1.0.1
-	github.com/rs/cors v1.6.0
+	github.com/rs/cors v1.7.0
 	github.com/spf13/afero v1.2.1 // indirect
 	github.com/uber-go/atomic v1.4.0 // indirect
 	github.com/unrolled/secure v1.0.1
