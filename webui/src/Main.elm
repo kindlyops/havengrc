@@ -260,11 +260,20 @@ update msg model =
             ( { model | commentsModel = commentsModel }, Cmd.map CommentsMsg cmd )
 
         ReportsMsg reportMsg ->
-            let
-                ( reportsModel, cmd ) =
-                    Reports.update reportMsg model.reportsModel model.authModel
-            in
-            ( { model | reportsModel = reportsModel }, Cmd.map ReportsMsg cmd )
+            case reportMsg of
+                Reports.LogOut ->
+                    let
+                        ( authModel, cmd ) =
+                            Authentication.update Authentication.LogOut model.authModel
+                    in
+                    ( { model | authModel = authModel }, Cmd.map AuthenticationMsg cmd )
+
+                _ ->
+                    let
+                        ( reportsModel, cmd ) =
+                            Reports.update reportMsg model.reportsModel model.authModel
+                    in
+                    ( { model | reportsModel = reportsModel }, Cmd.map ReportsMsg cmd )
 
         SurveyMsg surveyMsg ->
             case surveyMsg of

@@ -113,7 +113,14 @@ update msg model =
             ( model, Nav.load "/oauth/authorize" )
 
         LogOut ->
-            ( { model | state = LoggedOut }, Ports.saveSurveyState Nothing )
+            let
+                cmds =
+                    Cmd.batch
+                        [ Ports.saveSurveyState Nothing
+                        , Nav.pushUrl model.key "/"
+                        ]
+            in
+            ( { model | state = LoggedOut }, cmds )
 
 
 tryGetUserProfile : Model -> Maybe UserProfile

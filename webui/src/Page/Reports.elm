@@ -36,9 +36,8 @@ type Msg
     | GotReports (Result Http.Error (List Report))
     | GotDownload (Result Http.Error FileDownload)
     | UpdatedOnboardingStatus OnBoarding.Msg
-    | InitCmd Authentication.Model
     | HideError
-    | AuthMsg Authentication.Msg
+    | LogOut
 
 
 init : Authentication.Model -> String -> ( Model, Cmd Msg )
@@ -145,21 +144,17 @@ update msg model authModel =
 
         GotReports (Err error) ->
             let
-                errorCmd =
+                ( errorModel, errorCmd ) =
                     case error of
                         Http.BadStatus statusCode ->
                             if statusCode == 401 then
-                                let
-                                    newCmd =
-                                        Cmd.map AuthMsg (logOut authModel)
-                                in
-                                newCmd
+                                ( model, logOut )
 
                             else
-                                Cmd.none
+                                ( model, Cmd.none )
 
                         _ ->
-                            Cmd.none
+                            ( model, Cmd.none )
             in
             ( { model
                 | errorModel = setErrorMessage model.errorModel (getHTTPErrorMessage error)
@@ -188,22 +183,15 @@ update msg model authModel =
         UpdatedOnboardingStatus _ ->
             ( model, Cmd.none )
 
-        InitCmd message ->
-            ( model
-            , Cmd.none
-            )
-
-        AuthMsg authMsg ->
+        LogOut ->
+            -- NO-OP, we intercept this message in the parent update and
+            -- dispatch a logout message to the Authentication module.
             ( model, Cmd.none )
 
 
-logOut : Authentication.Model -> Cmd Authentication.Msg
-logOut model =
-    let
-        ( logOutModel, logOutCmd ) =
-            Authentication.update Authentication.LogOut model
-    in
-    logOutCmd
+logOut : Cmd Msg
+logOut =
+    Task.succeed LogOut |> Task.perform identity
 
 
 view : Authentication.Model -> Model -> Html Msg
