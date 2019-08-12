@@ -1,6 +1,7 @@
 module Page.Reports exposing (Model, Msg(..), dashboardView, getReports, init, update, view)
 
 import Authentication
+import Browser.Navigation as Nav
 import Bytes exposing (Bytes)
 import Data.OnBoarding as OnBoarding
 import Data.Report exposing (Report)
@@ -36,14 +37,15 @@ type Msg
     | GotDownload (Result Http.Error FileDownload)
     | UpdatedOnboardingStatus OnBoarding.Msg
     | HideError
+    | LogOut
 
 
-init : Authentication.Model -> ( Model, Cmd Msg )
-init authModel =
+init : Authentication.Model -> String -> ( Model, Cmd Msg )
+init authModel location =
     ( { reports = []
       , errorModel = errorInit
       }
-    , Cmd.batch (initialCommands authModel)
+    , Cmd.batch (initialCommands authModel location)
     )
 
 
@@ -58,6 +60,11 @@ getReports authModel =
         { url = reportsUrl
         , expect = Http.expectJson GotReports (Decode.list Data.Report.decode)
         }
+
+
+initReports : Authentication.Model -> Cmd Msg
+initReports authModel =
+    Cmd.none
 
 
 expectBytes : Report -> (Result Http.Error FileDownload -> msg) -> Http.Expect msg
@@ -103,9 +110,17 @@ downloadReportBytes name content =
     Download.bytes name "application/octet-stream" content
 
 
-initialCommands : Authentication.Model -> List (Cmd Msg)
-initialCommands authModel =
-    [ getReports authModel ]
+initialCommands : Authentication.Model -> String -> List (Cmd Msg)
+initialCommands authModel location =
+    let
+        initialCmd =
+            if String.contains "/dashboard" location then
+                getReports
+
+            else
+                initReports
+    in
+    [ initialCmd authModel ]
 
 
 update : Msg -> Model -> Authentication.Model -> ( Model, Cmd Msg )
@@ -128,10 +143,26 @@ update msg model authModel =
             )
 
         GotReports (Err error) ->
+            let
+                ( errorModel, errorCmd ) =
+                    case error of
+                        Http.BadStatus statusCode ->
+                            if statusCode == 401 then
+                                ( model, logOut )
+
+                            else
+                                ( model, Cmd.none )
+
+                        _ ->
+                            ( model, Cmd.none )
+            in
             ( { model
                 | errorModel = setErrorMessage model.errorModel (getHTTPErrorMessage error)
               }
-            , Process.sleep 3000 |> Task.perform (always HideError)
+            , Cmd.batch
+                [ errorCmd
+                , Process.sleep 3000 |> Task.perform (always HideError)
+                ]
             )
 
         GotDownload (Ok response) ->
@@ -151,6 +182,16 @@ update msg model authModel =
 
         UpdatedOnboardingStatus _ ->
             ( model, Cmd.none )
+
+        LogOut ->
+            -- NO-OP, we intercept this message in the parent update and
+            -- dispatch a logout message to the Authentication module.
+            ( model, Cmd.none )
+
+
+logOut : Cmd Msg
+logOut =
+    Task.succeed LogOut |> Task.perform identity
 
 
 view : Authentication.Model -> Model -> Html Msg

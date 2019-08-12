@@ -110,10 +110,17 @@ update msg model =
         LoginMsg ->
             -- Force full page reload of dashboard using Nav.load, which will trigger
             -- gatekeeper to initiate the OIDC redirect for login at Keycloak
-            ( model, Nav.load "/dashboard/" )
+            ( model, Nav.load "/oauth/authorize" )
 
         LogOut ->
-            ( { model | state = LoggedOut }, Ports.saveSurveyState Nothing )
+            let
+                cmds =
+                    Cmd.batch
+                        [ Ports.saveSurveyState Nothing
+                        , Nav.pushUrl model.key "/"
+                        ]
+            in
+            ( { model | state = LoggedOut }, cmds )
 
 
 tryGetUserProfile : Model -> Maybe UserProfile

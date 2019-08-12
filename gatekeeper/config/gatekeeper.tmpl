@@ -9,7 +9,7 @@ client-secret: {{ .Env.CLIENT_SECRET }}
 
 # the redirection url, essentially the site url, note: /oauth/callback is added at the end
 redirection-url: {{ .Env.REDIRECTION_URL }}
-
+no-redirects: true
 # the name of the access cookie, defaults to kc-access
 cookie-access-name: havengrc-access
 secure-cookie: {{ .Env.SECURE_COOKIE }}
