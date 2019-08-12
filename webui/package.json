@@ -44,7 +44,7 @@
     "postcss-loader": "3.0.0",
     "promise": "8.0.3",
     "react-dev-utils": "9.0.2",
-    "react-error-overlay": "^5.1.6",
+    "react-error-overlay": "^6.0.0",
     "sass-loader": "^7.1.0",
     "string-replace-loader": "^2.2.0",
     "style-loader": "^0.23.1",
