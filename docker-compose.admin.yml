@@ -60,13 +60,12 @@ services:
       dockerfile: ./apitest/Dockerfile
     working_dir: /usr/src/app
     environment:
-      - API_SERVER=api:8180
+      - API_SERVER=dev.havengrc.com
       - AUTH_SERVER=dev.havengrc.com
       - BUFFALO_SERVER=dev.havengrc.com
     volumes:
       - ./apitest:/usr/src/app
     links:
-      - api
       - keycloak
       - webui:dev.havengrc.com
     depends_on:
