@@ -25,6 +25,26 @@ type IpsativeSurvey Survey
 // LikertSurvey Is for the ipsative surveys available
 type LikertSurvey Survey
 
+
+// Question is the question info for the survey
+type Question struct {
+	ID             uuid.UUID    `json:"id" db:"id"`
+	CreatedAt      time.Time    `json:"created_at" db:"created_at"`
+	SurveyID       uuid.UUID    `json:"survey_id" db:"survey_id"`
+	ChoiceGroupID  uuid.UUID    `json:"choice_group_id" db:"choice_group_id"`
+	OrderNumber    int          `json:"order_number" db:"order_number"`
+	Title          string       `json:"title" db:"title"`
+}
+
+// LikertQuestion is for the likert survey questions.
+type LikertQuestion Question
+
+// TableName overrides the schema and table name
+func (LikertQuestion) TableName() string {
+	// schema.table_name
+	return "mappa.likert_questions"
+}
+
 // TableName overrides the schema and table name
 func (IpsativeSurvey) TableName() string {
 	// schema.table_name

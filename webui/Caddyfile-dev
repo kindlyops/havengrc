@@ -67,5 +67,9 @@ proxy /api/likert_surveys havenapi:3000 {
   transparent
 }
 
+proxy /api/likert_questions havenapi:3000 {
+  transparent
+}
+
 log / stdout "{combined}"
 errors stdout

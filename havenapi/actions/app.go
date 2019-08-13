@@ -89,6 +89,8 @@ func App() *buffalo.App {
 		api.POST("surveys", SurveysHandler)
 		api.GET("ipsative_surveys", GetIpsativeSurveys)
 		api.GET("likert_surveys", GetLikertSurveys)
+		api.GET("likert_questions", GetLikertQuestions)
+		api.Middleware.Skip(JwtMiddleware, GetLikertQuestions)
 		api.Middleware.Skip(JwtMiddleware, GetLikertSurveys)
 		api.Middleware.Skip(JwtMiddleware, GetIpsativeSurveys)
 		api.GET("onboarding", GetState)

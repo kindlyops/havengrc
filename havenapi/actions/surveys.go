@@ -183,3 +183,19 @@ func GetLikertSurveys(c buffalo.Context) error {
 	}
 	return c.Render(200, r.JSON(surveys))
 }
+
+// GetLikertQuestions returns all likert questions
+// the path GET /api/likert_questions
+func GetLikertQuestions(c buffalo.Context) error {
+
+	questions := []models.LikertQuestion{}
+
+	tx := c.Value("tx").(*pop.Connection)
+
+	err := tx.All(&questions)
+	if err != nil {
+		helmLog.Info("Something went wrong in GetLikertQuestions")
+		return c.Error(500, fmt.Errorf("Database error here: %s", err.Error()))
+	}
+	return c.Render(200, r.JSON(questions))
+}

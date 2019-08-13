@@ -78,6 +78,12 @@ proxy /api/likert_surveys havenapi:3000 {
   transparent
   header_upstream X-Forwarded-Proto {>X-Forwarded-Proto}
 }
+
+proxy /api/likert_questions havenapi:3000 {
+  transparent
+  header_upstream X-Forwarded-Proto {>X-Forwarded-Proto}
+}
+
 # this rewrite makes it so anything we are not proxying to api or auth
 # is rewritten to index.html, so that the SPA is served. This is necessary
 # to support path-based-routing in a single page application in cases where

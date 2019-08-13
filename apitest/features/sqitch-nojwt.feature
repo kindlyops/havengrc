@@ -16,14 +16,14 @@ Feature: Basic sqitch access control
         Then the response status should be "401"
 
     Scenario: Get likert questions
-        When I send a GET request to "http://{api_server}/likert_questions"
+        When I send a GET request to "http://{buffalo_server}/api/likert_questions"
         Then the response status should be "200"
         And the JSON response root should be array
 	And the JSON response should have "$[0].title" of type string and value "Security Value of Failure"
 
     Scenario: Delete likert questions
-        When I send a DELETE request to "http://{api_server}/likert_questions"
-        Then the response status should be "401"
+        When I send a DELETE request to "http://{buffalo_server}/api/likert_questions"
+        Then the response status should be "405"
 
     Scenario: Add/update a question without a JWT to see access denied
         When I set JSON request body to:
@@ -37,8 +37,8 @@ Feature: Basic sqitch access control
 	"title":"newgroup"
 	}
         """
-        And  I send a POST request to "http://{api_server}/likert_questions"
-        Then the response status should be "401"
+        And  I send a POST request to "http://{buffalo_server}/api/likert_questions"
+        Then the response status should be "405"
 
     Scenario: Get ipsative surveys
         When I send a GET request to "http://{buffalo_server}/api/ipsative_surveys"
