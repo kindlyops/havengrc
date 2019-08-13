@@ -63,3 +63,19 @@ func CreateSlide(surveyID string, email string) error {
 	err = client.Push(createSlideJob)
 	return err
 }
+
+// GetFiles returns all files available for the user
+// the path GET /api/files
+func GetFiles(c buffalo.Context) error {
+
+	files := models.Files{}
+
+	tx := c.Value("tx").(*pop.Connection)
+
+	err := tx.All(&files)
+	if err != nil {
+		log.Info("Something went wrong in GetFiles")
+		return c.Error(500, fmt.Errorf("Database error here: %s", err.Error()))
+	}
+	return c.Render(200, r.JSON(files))
+}
