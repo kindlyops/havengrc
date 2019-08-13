@@ -11,8 +11,6 @@ export DATABASE_USERNAME=circleci
 export DATABASE_PASSWORD=""
 export DATABASE_HOST=db
 export HAVEN_JWK_PATH=/keycloak-dev-public-key.json
-export PGRST_JWT_AUD_CLAIM=havendev
-export PGRST_SERVER_PROXY_URI=http://api:8180
 export KEYCLOAK_USER=admin
 export KEYCLOAK_PASSWORD=admin
 export PROXY_ADDRESS_FORWARDING="true"
@@ -24,7 +22,7 @@ export FLYWAY_SCHEMAS=mappa,1
 export HAVEN_JWK_PATH=/cfg/keycloak-dev-public-key.json
 export HAVEN_JWT_ISS=http://keycloak:8080/auth/realms/havendev
 export TEST_DATABASE_URL="postgres://circleci@db:5432/mappamundi_test?sslmode=disable"
-export API_SERVER=api:8180
+export API_SERVER=havenapi:3000
 export AUTH_SERVER=keycloak:8080
 export BUFFALO_SERVER=havenapi:3000
 export DISCOVERY_URL=http://webui/auth/realms/havendev
@@ -58,7 +56,7 @@ docker run --network net0 -d -h mailhog --name mailhog mailhog/mailhog:v1.0.0
 docker run --network net0 --name dockerize2 jwilder/dockerize  -wait tcp://mailhog:8025 -timeout 2m
 # creating dummy container which will hold a volume with config
 docker create -v /cfg -v /keycloak --name configs alpine:3.4 /bin/true
-docker cp postgrest/keycloak-dev-public-key.json configs:/cfg
+docker cp keycloak/keycloak-dev-public-key.json configs:/cfg
 docker cp keycloak/data/havendev-realm.json configs:/keycloak
 docker pull kindlyops/keycloak:$KEYCLOAK_REV
 # start keycloak in background container
@@ -70,8 +68,6 @@ docker run --network net0 --name flyway -e FLYWAY_URL -e FLYWAY_USER -e FLYWAY_I
 docker build -t kindlyops/havenapitest -f havenapi/Dockerfile-hotreload .
 docker pull kindlyops/havenapi:$HAVENAPI_REV
 docker build -t kindlyops/apitest -f apitest/Dockerfile .
-docker run -d --volumes-from configs --network net0 -h api --name api -e DATABASE_USERNAME -e DATABASE_PASSWORD -e DATABASE_HOST -e HAVEN_JWK_PATH -e PGRST_JWT_AUD_CLAIM -e PGRST_SERVER_PROXY_URI kindlyops/postgrest postgrest config
-docker run --network net0 --name dockerize4 jwilder/dockerize  -wait tcp://api:8180 -timeout 2m
 docker run --volumes-from configs --network net0 --name buffalotest -e KC_ADMIN=admin -e KC_PW=admin -e KC_HOST=http://keycloak -e KC_PORT=8080 -e TEST_DATABASE_URL -e HAVEN_JWK_PATH -e HAVEN_JWT_ISS kindlyops/havenapitest /go/bin/buffalo test
 docker run --volumes-from configs --network net0 -d -h havenapi --name havenapi -e KC_ADMIN=admin -e KC_PW=admin -e KC_HOST=http://keycloak -e KC_PORT=8080 -e TEST_DATABASE_URL -e HAVEN_JWK_PATH -e HAVEN_JWT_ISS kindlyops/havenapitest /go/bin/buffalo dev
 docker run --network net0 --name dockerize5 jwilder/dockerize  -wait tcp://havenapi:3000 -timeout 2m

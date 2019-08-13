@@ -50,7 +50,6 @@ Applications and frameworks that are complementary to Haven. We would prefer to 
     - [Windows users](#Windows-users)
   - [running the service](#running-the-service)
     - [to access the main webUI](#to-access-the-main-webUI)
-    - [to access the swagger-ui for the postgrest API](#to-access-the-swagger-ui-for-the-postgrest-API)
     - [to access keycloak](#to-access-keycloak)
     - [to access the GitBook documentation site](#to-access-the-GitBook-documentation-site)
     - [to see emails sent from Haven / keycloak](#to-see-emails-sent-from-Haven--keycloak)
@@ -134,18 +133,6 @@ From this point on, you just just be able to use docker-compose up/down normally
 Open [dev.havengrc.com](http://dev.havengrc.com/), click the login button. You can login with user1\@havengrc.com/password or user2\@havengrc.com/password. User2 will prompt you to configure 2Factor authentication.
 
 If you cannot connect to [dev.havengrc.com](http://dev.havengrc.com), try getting the docker machine ip using the command `docker-machine ip default` and use that instead.
-
-### to access the swagger-ui for the postgrest API
-
-Open [localhost:3002](http://localhost:3002/)
-
-The swagger browser is loading the authenicated api by default. To view the public API, adjust the file being loaded to public.json.
-
-To refresh the swagger documentation, such as after modifying postgres to expose additional APIs, use these commands
-
-    curl http://localhost:2015/api/ > webui/public/swagger/public.json
-    export TOKEN=`./get-token`
-    curl -H "Authorization: Bearer $TOKEN" http://localhost:2015/api/ > webui/public/swagger/authenticated.json
 
 ### to access keycloak
 
