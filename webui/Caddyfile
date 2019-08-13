@@ -33,53 +33,7 @@ proxy /auth keycloak:8080 {
   # proxy (gatekeeper)
 }
 
-proxy /api api:3001 {
-  without /api
-  transparent
-  header_upstream X-Forwarded-Proto {>X-Forwarded-Proto}
-}
-
-proxy /rpc api:3001 {
-  transparent
-  header_upstream X-Forwarded-Proto {>X-Forwarded-Proto}
-}
-
-proxy /api/comments havenapi:3000 {
-  transparent
-  header_upstream X-Forwarded-Proto {>X-Forwarded-Proto}
-}
-
-proxy /api/onboarding havenapi:3000 {
-  transparent
-  header_upstream X-Forwarded-Proto {>X-Forwarded-Proto}
-}
-
-proxy /api/reports havenapi:3000 {
-  transparent
-  header_upstream X-Forwarded-Proto {>X-Forwarded-Proto}
-}
-
-proxy /api/registration_funnel havenapi:3000 {
-  transparent
-  header_upstream X-Forwarded-Proto {>X-Forwarded-Proto}
-}
-
-proxy /api/surveys havenapi:3000 {
-  transparent
-  header_upstream X-Forwarded-Proto {>X-Forwarded-Proto}
-}
-
-proxy /api/ipsative_surveys havenapi:3000 {
-  transparent
-  header_upstream X-Forwarded-Proto {>X-Forwarded-Proto}
-}
-
-proxy /api/likert_surveys havenapi:3000 {
-  transparent
-  header_upstream X-Forwarded-Proto {>X-Forwarded-Proto}
-}
-
-proxy /api/likert_questions havenapi:3000 {
+proxy /api havenapi:3000 {
   transparent
   header_upstream X-Forwarded-Proto {>X-Forwarded-Proto}
 }

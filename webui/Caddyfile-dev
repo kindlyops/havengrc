@@ -30,44 +30,7 @@ proxy /auth keycloak:8080 {
   transparent
 }
 
-proxy /api api:8180 {
-  without /api
-  transparent
-}
-
-proxy /rpc api:8180 {
-  transparent
-}
-
-proxy /api/comments havenapi:3000 {
-  transparent
-}
-
-proxy /api/onboarding havenapi:3000 {
-  transparent
-}
-
-proxy /api/reports havenapi:3000 {
-  transparent
-}
-
-proxy /api/registration_funnel havenapi:3000 {
-  transparent
-}
-
-proxy /api/surveys havenapi:3000 {
-  transparent
-}
-
-proxy /api/ipsative_surveys havenapi:3000 {
-  transparent
-}
-
-proxy /api/likert_surveys havenapi:3000 {
-  transparent
-}
-
-proxy /api/likert_questions havenapi:3000 {
+proxy /api havenapi:3000 {
   transparent
 }
 

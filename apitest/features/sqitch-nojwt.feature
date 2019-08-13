@@ -12,7 +12,7 @@ Feature: Basic sqitch access control
         "message": "The system must be tested"
         }
         """
-        And  I send a POST request to "http://{api_server}/comments"
+        And  I send a POST request to "http://{buffalo_server}/api/comments"
         Then the response status should be "401"
 
     Scenario: Get likert questions
