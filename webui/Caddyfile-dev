@@ -25,7 +25,9 @@ proxy / localhost:2015 {
   transparent
   websocket
 }
-
+proxy /rpc api:8180 {
+  transparent
+}
 proxy /auth keycloak:8080 {
   transparent
 }

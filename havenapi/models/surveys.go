@@ -39,6 +39,23 @@ type Question struct {
 // LikertQuestion is for the likert survey questions.
 type LikertQuestion Question
 
+// IpsativeData is for the gets all ipsative data
+type IpsativeData struct {
+	QuestionID           uuid.UUID  `json:"question_id" db:"question_id"`
+	QuestionTitle        string     `json:"question_title" db:"question_title"`
+	QuestionOrderNumber  int        `json:"question_order_number" db:"question_order_number"`
+	AnswerID             uuid.UUID  `json:"answer_id" db:"answer_id"`
+	Answer               string     `json:"answer" db:"answer"`
+	Category             string     `json:"category" db:"category"`
+	AnswerOrderNumber    int        `json:"answer_order_number" db:"answer_order_number"`
+}
+
+// TableName overrides the schema and table name
+func (IpsativeData) TableName() string {
+	// schema.table_name
+	return "mappa.ipsative_data"
+}
+
 // TableName overrides the schema and table name
 func (LikertQuestion) TableName() string {
 	// schema.table_name

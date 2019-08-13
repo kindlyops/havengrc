@@ -90,6 +90,8 @@ func App() *buffalo.App {
 		api.GET("ipsative_surveys", GetIpsativeSurveys)
 		api.GET("likert_surveys", GetLikertSurveys)
 		api.GET("likert_questions", GetLikertQuestions)
+		api.GET("ipsative_data/{surveyID}", GetIpsativeData)
+		api.Middleware.Skip(JwtMiddleware, GetIpsativeData)
 		api.Middleware.Skip(JwtMiddleware, GetLikertQuestions)
 		api.Middleware.Skip(JwtMiddleware, GetLikertSurveys)
 		api.Middleware.Skip(JwtMiddleware, GetIpsativeSurveys)

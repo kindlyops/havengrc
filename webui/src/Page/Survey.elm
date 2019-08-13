@@ -128,7 +128,7 @@ getIpsativeSurveys authModel =
 getIpsativeSurvey : Authentication.Model -> String -> Cmd Msg
 getIpsativeSurvey authModel id =
     Http.get
-        { url = "/api/ipsative_data?survey_id=eq." ++ id
+        { url = "/api/ipsative_data/" ++ id
         , expect = Http.expectJson GotIpsativeServerData (Decode.list Survey.ipsativeSurveyDataDecoder)
         }
 
