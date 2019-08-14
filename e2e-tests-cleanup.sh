@@ -26,6 +26,9 @@ docker rm cucumber
 docker stop gatekeeper
 docker rm gatekeeper
 
+docker stop webui
+docker rm webui
+
 docker rm cypress
 
 docker stop db
