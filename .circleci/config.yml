@@ -100,25 +100,6 @@ jobs:
           fi
       - notify-failed
 
-  postgrest-build-job:
-    docker:
-      - image: circleci/openjdk:9
-    steps:
-      - checkout
-      - add_ssh_keys
-      - setup_remote_docker:
-          docker_layer_caching: true
-      - run: docker build -t kindlyops/postgrest:latest -f postgrest/Dockerfile .
-      - run: docker tag kindlyops/postgrest:latest kindlyops/postgrest:$CIRCLE_SHA1
-      - run: docker tag kindlyops/postgrest:latest kindlyops/postgrest:$CIRCLE_BUILD_NUM
-      - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
-      - run: docker push kindlyops/postgrest:$CIRCLE_SHA1
-      - run: docker push kindlyops/postgrest:$CIRCLE_BUILD_NUM
-      - run: |
-          if [ "$CIRCLE_BRANCH" = "master" ]; then
-            docker push kindlyops/postgrest:latest
-          fi
-      - notify-failed
   keycloak-build-job:
     docker:
       - image: circleci/openjdk:9
@@ -319,13 +300,11 @@ workflows:
       - havenapi-build-job
       - havenworker-build-job
       - gatekeeper-build-job
-      - postgrest-build-job
       - havenapi-testing-job:
           requires:
             - flyway-build-job
             - keycloak-build-job
             - havenapi-build-job
-            - postgrest-build-job
             - gatekeeper-build-job
             - webui-build-job
       - deploy-staging:

@@ -33,51 +33,11 @@ proxy /auth keycloak:8080 {
   # proxy (gatekeeper)
 }
 
-proxy /api api:3001 {
-  without /api
+proxy /api havenapi:3000 {
   transparent
   header_upstream X-Forwarded-Proto {>X-Forwarded-Proto}
 }
 
-proxy /rpc api:3001 {
-  transparent
-  header_upstream X-Forwarded-Proto {>X-Forwarded-Proto}
-}
-
-proxy /api/comments havenapi:3000 {
-  transparent
-  header_upstream X-Forwarded-Proto {>X-Forwarded-Proto}
-}
-
-proxy /api/onboarding havenapi:3000 {
-  transparent
-  header_upstream X-Forwarded-Proto {>X-Forwarded-Proto}
-}
-
-proxy /api/reports havenapi:3000 {
-  transparent
-  header_upstream X-Forwarded-Proto {>X-Forwarded-Proto}
-}
-
-proxy /api/registration_funnel havenapi:3000 {
-  transparent
-  header_upstream X-Forwarded-Proto {>X-Forwarded-Proto}
-}
-
-proxy /api/surveys havenapi:3000 {
-  transparent
-  header_upstream X-Forwarded-Proto {>X-Forwarded-Proto}
-}
-
-proxy /api/ipsative_surveys havenapi:3000 {
-  transparent
-  header_upstream X-Forwarded-Proto {>X-Forwarded-Proto}
-}
-
-proxy /api/likert_surveys havenapi:3000 {
-  transparent
-  header_upstream X-Forwarded-Proto {>X-Forwarded-Proto}
-}
 # this rewrite makes it so anything we are not proxying to api or auth
 # is rewritten to index.html, so that the SPA is served. This is necessary
 # to support path-based-routing in a single page application in cases where

@@ -3,8 +3,8 @@ module github.com/kindlyops/havengrc/havenapi
 go 1.12
 
 require (
+	cloud.google.com/go v0.36.0 // indirect
 	github.com/certifi/gocertifi v0.0.0-20190506164543-d2eda7129713 // indirect
-	github.com/codegangsta/negroni v1.0.0 // indirect
 	github.com/contribsys/faktory v0.9.0-1
 	github.com/deis/helm v0.0.0-20170331182919-6c2d9fc8b9e6
 	github.com/deis/pkg v0.5.0 // indirect
@@ -24,7 +24,6 @@ require (
 	github.com/markbates/grift v1.1.0
 	github.com/nleof/goyesql v1.0.1
 	github.com/rs/cors v1.7.0
-	github.com/spf13/afero v1.2.1 // indirect
 	github.com/uber-go/atomic v1.4.0 // indirect
 	github.com/unrolled/secure v1.0.1
 	go.uber.org/ratelimit v0.0.0-20180316092928-c15da0234277

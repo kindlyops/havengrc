@@ -183,3 +183,34 @@ func GetLikertSurveys(c buffalo.Context) error {
 	}
 	return c.Render(200, r.JSON(surveys))
 }
+
+// GetLikertQuestions returns all likert questions
+// the path GET /api/likert_questions
+func GetLikertQuestions(c buffalo.Context) error {
+
+	questions := []models.LikertQuestion{}
+
+	tx := c.Value("tx").(*pop.Connection)
+
+	err := tx.All(&questions)
+	if err != nil {
+		helmLog.Info("Something went wrong in GetLikertQuestions")
+		return c.Error(500, fmt.Errorf("Database error here: %s", err.Error()))
+	}
+	return c.Render(200, r.JSON(questions))
+}
+
+// GetIpsativeData returns ipsative data
+// the path GET /api/ipsative_data/{surveyID}
+func GetIpsativeData(c buffalo.Context) error {
+
+	data := []models.IpsativeData{}
+
+	tx := c.Value("tx").(*pop.Connection)
+	err := tx.Where("survey_id = ($1)", c.Param("surveyID") ).All(&data)
+	if err != nil {
+		helmLog.Info("Something went wrong in GetIpsativeData")
+		return c.Error(500, fmt.Errorf("Database error here: %s", err.Error()))
+	}
+	return c.Render(200, r.JSON(data))
+}

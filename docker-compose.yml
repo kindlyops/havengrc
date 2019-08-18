@@ -71,27 +71,6 @@ services:
     command: ["migrate", "-placeholders.databaseUser=postgres"]
     links:
       - db
-  api:
-    build:
-      dockerfile: ./postgrest/Dockerfile
-      context: .
-    command: [postgrest, "/config"]
-    environment:
-      - DATABASE_NAME=mappamundi_dev
-      - DATABASE_USERNAME=postgres
-      - DATABASE_PASSWORD=postgres
-      - DATABASE_HOST=db
-      - HAVEN_JWK_PATH=/keycloak-dev-public-key.json
-      - PGRST_JWT_AUD_CLAIM=havendev
-      - PGRST_SERVER_PROXY_URI=http://localhost:8180
-    volumes:
-      - ./postgrest/keycloak-dev-public-key.json:/keycloak-dev-public-key.json
-    ports:
-      - "3001:8180"
-    links:
-      - db
-    depends_on:
-      - flyway
   db:
     image: postgres:9.6.4
     ports:
@@ -152,7 +131,7 @@ services:
     volumes:
       - ./havenapi:/go/src/github.com/kindlyops/havengrc/havenapi
       - /go/src/github.com/kindlyops/havengrc/havenapi/vendor
-      - ./postgrest/keycloak-dev-public-key.json:/keycloak-dev-public-key.json
+      - ./keycloak/keycloak-dev-public-key.json:/keycloak-dev-public-key.json
     environment:
       - HAVEN_JWK_PATH=/keycloak-dev-public-key.json
       - HAVEN_JWT_ISS=http://dev.havengrc.com/auth/realms/havendev
@@ -180,7 +159,6 @@ services:
       context: .
       dockerfile: ./webui/Dockerfile-hotreload
     depends_on:
-      - api
       - havenapi
       - keycloak
     ports:
