@@ -22,7 +22,6 @@ export FLYWAY_SCHEMAS=mappa,1
 export HAVEN_JWK_PATH=/cfg/keycloak-dev-public-key.json
 export HAVEN_JWT_ISS=http://keycloak:8080/auth/realms/havendev
 export TEST_DATABASE_URL="postgres://circleci@db:5432/mappamundi_test?sslmode=disable"
-export API_SERVER=havenapi:3000
 export AUTH_SERVER=keycloak:8080
 export BUFFALO_SERVER=havenapi:3000
 export DISCOVERY_URL=http://webui/auth/realms/havendev
@@ -71,7 +70,7 @@ docker build -t kindlyops/apitest -f apitest/Dockerfile .
 docker run --volumes-from configs --network net0 --name buffalotest -e KC_ADMIN=admin -e KC_PW=admin -e KC_HOST=http://keycloak -e KC_PORT=8080 -e TEST_DATABASE_URL -e HAVEN_JWK_PATH -e HAVEN_JWT_ISS kindlyops/havenapitest /go/bin/buffalo test
 docker run --volumes-from configs --network net0 -d -h havenapi --name havenapi -e KC_ADMIN=admin -e KC_PW=admin -e KC_HOST=http://keycloak -e KC_PORT=8080 -e TEST_DATABASE_URL -e HAVEN_JWK_PATH -e HAVEN_JWT_ISS kindlyops/havenapitest /go/bin/buffalo dev
 docker run --network net0 --name dockerize5 jwilder/dockerize  -wait tcp://havenapi:3000 -timeout 2m
-docker run --volumes-from configs --name cucumber --network net0 -e API_SERVER -e AUTH_SERVER -e BUFFALO_SERVER --workdir /usr/src/app kindlyops/apitest cucumber
+docker run --volumes-from configs --name cucumber --network net0 -e AUTH_SERVER -e BUFFALO_SERVER --workdir /usr/src/app kindlyops/apitest cucumber
 echo $WEBUI_TEST_CERT|base64 --decode - > fullchain.pem
 echo $WEBUI_TEST_KEY|base64 --decode - > privkey.pem
 # creating dummy container which will hold a volume with certs

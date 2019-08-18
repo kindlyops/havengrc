@@ -60,7 +60,6 @@ services:
       dockerfile: ./apitest/Dockerfile
     working_dir: /usr/src/app
     environment:
-      - API_SERVER=dev.havengrc.com
       - AUTH_SERVER=dev.havengrc.com
       - BUFFALO_SERVER=dev.havengrc.com
     volumes:
