@@ -67,9 +67,9 @@ docker run --volumes-from configs --network net0 -d -e DB_DATABASE -e DB_USER -e
 docker run --network net0 --name dockerize3 jwilder/dockerize  -wait tcp://keycloak:8080 -timeout 2m
 docker pull kindlyops/havenflyway:$FLYWAY_REV
 docker run --network net0 --name flyway -e FLYWAY_URL -e FLYWAY_USER -e FLYWAY_IGNORE_MISSING_MIGRATIONS -e FLYWAY_GROUP -e FLYWAY_SCHEMAS kindlyops/havenflyway:$FLYWAY_REV migrate -placeholders.databaseUser=circleci
-docker build -t kindlyops/havenapitest -f havenapi/Dockerfile-hotreload .
+docker build -t kindlyops/havenapitest -f havenapi/Dockerfile-hotreload ./havenapi
 docker pull kindlyops/havenapi:$HAVENAPI_REV
-docker build -t kindlyops/apitest -f apitest/Dockerfile .
+docker build -t kindlyops/apitest -f apitest/Dockerfile ./apitest
 docker run -d --volumes-from configs --network net0 -h api --name api -e DATABASE_USERNAME -e DATABASE_PASSWORD -e DATABASE_HOST -e HAVEN_JWK_PATH -e PGRST_JWT_AUD_CLAIM -e PGRST_SERVER_PROXY_URI kindlyops/postgrest postgrest config
 docker run --network net0 --name dockerize4 jwilder/dockerize  -wait tcp://api:8180 -timeout 2m
 docker run --volumes-from configs --network net0 --name buffalotest -e KC_ADMIN=admin -e KC_PW=admin -e KC_HOST=http://keycloak -e KC_PORT=8080 -e TEST_DATABASE_URL -e HAVEN_JWK_PATH -e HAVEN_JWT_ISS kindlyops/havenapitest /go/bin/buffalo test
