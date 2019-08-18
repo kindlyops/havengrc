@@ -4,7 +4,8 @@ proxy / {{ .Env.GATEKEEPER_INTERNAL }} {
     header_upstream Host {host}
     header_upstream X-Real-IP {remote}
     header_upstream X-Forwarded-For {remote}
+    header_upstream X-Forwarded-Proto {scheme}
 }
 
-log / stdout "{combined}"
-errors stdout
+log / /tmp/caddy.log "{combined}"
+errors /tmp/caddy.err
