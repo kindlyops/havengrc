@@ -97,6 +97,8 @@ github.com/gobuffalo/buffalo v0.14.7 h1:WrbHRjwtdyArOzsGrkJY5qylZ7zUpMwuzsLp3Zr4
 github.com/gobuffalo/buffalo v0.14.7/go.mod h1:QUv+IA6levJAREwZfoM+VsHCkBASow7Y1g/qaUis+3g=
 github.com/gobuffalo/buffalo v0.14.8 h1:At9zA6rcg+0l9oGI8Kfebg1OMgRJqoumhMN7idR11Mc=
 github.com/gobuffalo/buffalo v0.14.8/go.mod h1:M8XWw+Rcotn7C4NYpCEGBg3yX+O1TeD1pBfmiILhgHw=
+github.com/gobuffalo/buffalo v0.14.9 h1:5gRzcO7JuzL0Wi+0dY7RhW11j0DkQAJ8UwyULmmHUGc=
+github.com/gobuffalo/buffalo v0.14.9/go.mod h1:M8XWw+Rcotn7C4NYpCEGBg3yX+O1TeD1pBfmiILhgHw=
 github.com/gobuffalo/buffalo-docker v1.0.5/go.mod h1:NZ3+21WIdqOUlOlM2onCt7cwojYp4Qwlsngoolw8zlE=
 github.com/gobuffalo/buffalo-docker v1.0.6/go.mod h1:UlqKHJD8CQvyIb+pFq+m/JQW2w2mXuhxsaKaTj1X1XI=
 github.com/gobuffalo/buffalo-docker v1.0.7/go.mod h1:BdB8AhcmjwR6Lo3rDPMzyh/+eNjYnZ1TAO0eZeLkhig=
@@ -468,6 +470,8 @@ github.com/gobuffalo/pop v4.11.1+incompatible h1:WPaOpbIZZpOz0hcIF1trnYgC3FivQST
 github.com/gobuffalo/pop v4.11.1+incompatible/go.mod h1:DwBz3SD5SsHpTZiTubcsFWcVDpJWGsxjVjMPnkiThWg=
 github.com/gobuffalo/pop v4.11.2+incompatible h1:yohroCWPJDiarrFtB79XrCiCK0MAu2dpzbXFFv3bnuM=
 github.com/gobuffalo/pop v4.11.2+incompatible/go.mod h1:DwBz3SD5SsHpTZiTubcsFWcVDpJWGsxjVjMPnkiThWg=
+github.com/gobuffalo/pop v4.11.3+incompatible h1:69Dbrurv5HbIprXrUDEa5Yy0SLlCyI4w7j8V6fapLrM=
+github.com/gobuffalo/pop v4.11.3+incompatible/go.mod h1:DwBz3SD5SsHpTZiTubcsFWcVDpJWGsxjVjMPnkiThWg=
 github.com/gobuffalo/release v1.0.35/go.mod h1:VtHFAKs61vO3wboCec5xr9JPTjYyWYcvaM3lclkc4x4=
 github.com/gobuffalo/release v1.0.38/go.mod h1:VtHFAKs61vO3wboCec5xr9JPTjYyWYcvaM3lclkc4x4=
 github.com/gobuffalo/release v1.0.42/go.mod h1:RPs7EtafH4oylgetOJpGP0yCZZUiO4vqHfTHJjSdpug=

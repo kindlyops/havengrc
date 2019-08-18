@@ -56,7 +56,7 @@ services:
       - ./mailhog/maildir:/maildir
   apitest:
     build:
-      context: .
+      context: ./apitest
       dockerfile: ./apitest/Dockerfile
     working_dir: /usr/src/app
     environment:
