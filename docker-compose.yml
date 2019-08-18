@@ -162,7 +162,7 @@ services:
       - KC_PORT=8080
       - FAKTORY_URL=tcp://:fassword@faktory:7419
     build:
-      context: .
+      context: ./havenapi
       dockerfile: ./havenapi/Dockerfile-hotreload
     links:
       - db
@@ -188,5 +188,3 @@ services:
     command: [/code/installrun.sh]
     environment:
       - ELM_APP_KEYCLOAK_CLIENT_ID=havendev
-      - VIRTUAL_HOST=dev.havengrc.com
-
