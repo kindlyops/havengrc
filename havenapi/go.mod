@@ -9,14 +9,14 @@ require (
 	github.com/deis/helm v0.0.0-20170331182919-6c2d9fc8b9e6
 	github.com/deis/pkg v0.5.0 // indirect
 	github.com/getsentry/raven-go v0.2.0
-	github.com/gobuffalo/buffalo v0.14.8
+	github.com/gobuffalo/buffalo v0.14.9
 	github.com/gobuffalo/buffalo-pop v1.16.0
 	github.com/gobuffalo/envy v1.7.0
 	github.com/gobuffalo/mw-csrf v0.0.0-20190129204204-25460a055517 // indirect
 	github.com/gobuffalo/mw-forcessl v0.0.0-20190224202501-6d1ef7ffb276
 	github.com/gobuffalo/mw-paramlogger v0.0.0-20190224201358-0d45762ab655
 	github.com/gobuffalo/packr/v2 v2.5.2
-	github.com/gobuffalo/pop v4.11.2+incompatible
+	github.com/gobuffalo/pop v4.11.3+incompatible
 	github.com/gobuffalo/suite v2.8.1+incompatible
 	github.com/gobuffalo/uuid v2.0.5+incompatible
 	github.com/gobuffalo/validate v2.0.3+incompatible

@@ -302,6 +302,14 @@ To get the content-disposition header set with the filename prefilled:
 
 You can decode the token to inspect the contents at jwt.io. You will need to get the public cert from the Keycloak Admin interface: Havendev-\>Realm Settings-\>Keys-\>Public Key and enter it into the jwt.io page to decode the token.
 
+### Low level network debugging
+
+To inspect network traffic received by Keycloak for debugging complex network
+proxy issues, you can exec a shell inside the keycloak container and run ngrep.
+
+    docker exec -u 0 -it keycloak bash
+    ngrep -q -W byline port 8080
+
 ## Learning Elm
 
 16 minute video by Richard Feldman that explains the framework architecture choices that Elm makes compared to jQuery and Flux. [From jQuery to Flux to Elm](https://www.youtube.com/watch?v=NgwQHGqIMbw).
