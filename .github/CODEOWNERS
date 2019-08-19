@@ -1,0 +1,17 @@
+# configuration for authorized and required reviewers
+
+* @kindlyops/maintainers
+
+# UI changes
+/keycloak/themes/ @kindlyops/maintainers @laurencaitlan
+/webui/ @kindlyops/maintainers @laurencaitlan
+
+# infra
+
+# policies
+/.github/ISSUE_TEMPLATES/ @kindlyops/maintainers
+/.github/PULL_REQUEST_TEMPLATE.md  @kindlyops/maintainers
+
+# CODEOWNERS
+/.github/CODEOWNERS @statik
+
