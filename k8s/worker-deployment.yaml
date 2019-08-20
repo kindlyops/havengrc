@@ -15,6 +15,11 @@ spec:
       containers:
         - name: worker
           image: kindlyops/havenworker
+          resources:
+            limits:
+              memory: 128Mi
+            requests:
+              memory: 128Mi
           env:
             - name: DATABASE_NAME
               value: "havenstage"
