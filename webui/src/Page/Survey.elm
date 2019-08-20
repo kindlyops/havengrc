@@ -5,6 +5,7 @@ module Page.Survey exposing
     , decodeSavedState
     , init
     , initWithSave
+    , subscriptions
     , testDecoder
     , update
     , view
@@ -48,6 +49,7 @@ import Ports
 import Process
 import Regex
 import Task
+import Transit exposing (Step(..))
 import Utils exposing (getHTTPErrorMessage)
 import Views.SurveyCard
 import Visualization exposing (havenSpecs)
@@ -261,6 +263,7 @@ initialModel =
     , inBoundLikertData = Nothing
     , emailAddress = ""
     , errorModel = errorInit
+    , transit = { page = Home, transition = Transit.empty }
     }
 
 
@@ -320,6 +323,7 @@ type Msg
     | DecrementAnswer IpsativeAnswer Int
     | UpdateAnswer IpsativeAnswer Int String
     | NextQuestion
+    | SetNextQuestion
     | PreviousQuestion
     | LoadReportDashboard
     | GoToHome
@@ -341,6 +345,7 @@ type Msg
     | IpsativeSurveySaved (Result Http.Error (List Survey.IpsativeResponse))
     | LikertSurveySaved (Result Http.Error (List Survey.LikertResponse))
     | HideError
+    | TransitMsg (Transit.Msg Msg)
 
 
 registrationUrl : String
@@ -579,15 +584,7 @@ update msg model authModel =
             , getIpsativeSurvey authModel metaData.id
             )
 
-        NextQuestion ->
-            --   let
-            --         ( newModel, cmd ) =
-            --             if validateSurvey model.currentSurvey then
-            --                 ( { model | currentPage = Finished }, Ports.renderVega myVis )
-            --             else
-            --                 ( { model | currentPage = IncompleteSurvey }, Cmd.none )
-            --     in
-            --     newModel ! [ storeSurvey newModel (getQuestionNumber newModel), cmd ]
+        SetNextQuestion ->
             case model.currentSurvey of
                 Ipsative survey ->
                     case Zipper.next survey.questions of
@@ -599,6 +596,23 @@ update msg model authModel =
                             ( newModel
                             , storeSurvey newModel (getQuestionNumber newModel)
                             )
+
+                        _ ->
+                            ( model, Cmd.none )
+
+                Likert survey ->
+                    ( model, Cmd.none )
+
+        NextQuestion ->
+            case model.currentSurvey of
+                Ipsative survey ->
+                    case Zipper.next survey.questions of
+                        Just x ->
+                            let
+                                ( newTransit, transitCmd ) =
+                                    Transit.start TransitMsg SetNextQuestion ( 500, 500 ) model.transit
+                            in
+                            ( { model | transit = newTransit }, transitCmd )
 
                         _ ->
                             let
@@ -789,6 +803,13 @@ update msg model authModel =
                             ( model
                             , Cmd.none
                             )
+
+        TransitMsg transitMsg ->
+            let
+                ( transit, c ) =
+                    Transit.tick TransitMsg transitMsg model.transit
+            in
+            ( { model | transit = transit }, c )
 
 
 getQuestionNumber : Model -> Int
@@ -1117,7 +1138,7 @@ isPointsInGroup pointsLeft group =
 
 view : Authentication.Model -> Model -> Html Msg
 view authModel model =
-    div []
+    div [ style "opacity" (String.fromFloat (Transit.getValue model.transit.transition)) ]
         [ case model.currentPage of
             Home ->
                 viewHero model
@@ -1602,3 +1623,8 @@ viewSurveyFooter : Bool -> Html Msg
 viewSurveyFooter ready =
     div [ class "col text-center mt-4" ]
         [ button [ class "btn btn-primary next-question-btn", onClick NextQuestion, disabled (not ready) ] [ text "Next Question" ] ]
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Transit.subscriptions TransitMsg model.transit
