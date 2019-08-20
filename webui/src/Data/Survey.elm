@@ -42,6 +42,7 @@ module Data.Survey exposing
     , likertResponseEncoder
     , likertSurveyChoicesDecoder
     , likertSurveyDataDecoder
+    , metaDataResponseEncoder
     , upgradeSurvey
     )
 
@@ -442,6 +443,12 @@ ipsativeResponseEncoder survey =
     Encode.list
         ipsativeSingleResponseEncoder
         allResponses
+
+
+metaDataResponseEncoder : IpsativeSurvey -> Encode.Value
+metaDataResponseEncoder survey =
+    Encode.string
+        survey.metaData.id
 
 
 getAllResponsesFromIpsativeSurvey : IpsativeSurvey -> List IpsativeSingleResponse

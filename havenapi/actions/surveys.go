@@ -45,6 +45,8 @@ type SurveyResult struct {
 // resultsStruct is a struct for the funnel
 type resultsStruct struct {
 	Results []SurveyResult `json:"survey_results"`
+	SurveyID uuid.UUID     `json:"survey_id"`
+// TODO add collectors	CollectorID uuid.UUID  `json:"collector_id"`
 }
 
 // SurveysHandler accepts json
@@ -66,7 +68,7 @@ func SurveysHandler(c buffalo.Context) error {
 	}
 
 	remoteAddress := strings.Split(request.RemoteAddr, ":")[0]
-	surveyID, err := SaveSurveyResults(results.Results, c)
+	surveyID, err := SaveSurveyResults(results.Results, results.SurveyID, c)
 	if err != nil {
 		raven.CaptureError(err, nil)
 
@@ -114,9 +116,9 @@ func SurveysHandler(c buffalo.Context) error {
 }
 
 // SaveSurveyResults creates a survey_response and saves all responses
-func SaveSurveyResults(results []SurveyResult, c buffalo.Context) (string, error) {
+func SaveSurveyResults(results []SurveyResult, surveyID uuid.UUID , c buffalo.Context) (string, error) {
 	tx := c.Value("tx").(*pop.Connection)
-	rows, err := tx.TX.Query("INSERT INTO mappa.survey_responses DEFAUlT VALUES RETURNING uuid;")
+	rows, err := tx.TX.Query("INSERT INTO mappa.survey_responses (survey_id) VALUES ($1) RETURNING uuid;", surveyID)
 	if err != nil {
 		return "", err
 	}

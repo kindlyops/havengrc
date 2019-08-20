@@ -157,6 +157,9 @@ postEncoder : IpsativeSurvey -> Encode.Value
 postEncoder survey =
     Encode.object
         [ ( "survey_results", Survey.ipsativeResponseEncoder survey )
+        , ( "survey_id", Survey.metaDataResponseEncoder survey )
+
+        -- TODO add collectors ( "collector_id", survey.metaData.collector.id )
         ]
 
 
