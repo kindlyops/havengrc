@@ -50,6 +50,7 @@ import Process
 import Regex
 import Task
 import Transit exposing (Step(..))
+import TransitStyle
 import Utils exposing (getHTTPErrorMessage)
 import Views.SurveyCard
 import Visualization exposing (havenSpecs)
@@ -1138,7 +1139,7 @@ isPointsInGroup pointsLeft group =
 
 view : Authentication.Model -> Model -> Html Msg
 view authModel model =
-    div [ style "opacity" (String.fromFloat (Transit.getValue model.transit.transition)) ]
+    div (TransitStyle.fadeSlide 50 model.transit.transition)
         [ case model.currentPage of
             Home ->
                 viewHero model
