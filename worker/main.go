@@ -163,7 +163,7 @@ func SaveSurvey(ctx worker.Context, args ...interface{}) error {
 // SaveSurveyResponses creates a survey_response and saves all responses
 func SaveSurveyResponses(responses []SurveyResponse, surveyID uuid.UUID, tx *sqlx.Tx) (string, error) {
 
-	rows, err := tx.Query("INSERT INTO mappa.survey_responses (survey_id) VALUES ($1) RETURNING uuid;", surveyID)
+	rows, err := tx.Query("INSERT INTO mappa.survey_responses (survey_id) VALUES ($1) RETURNING id;", surveyID)
 	handleError(err)
 	defer rows.Close()
 	var surveyResponseID string

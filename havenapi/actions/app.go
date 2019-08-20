@@ -78,7 +78,7 @@ func App() *buffalo.App {
 		// TODO refactor to use dependency injection instead of a package global
 		api.Use(popmw.Transaction(models.DB))
 		api.Use(JwtMiddleware)
-		
+
 		// Dashboard related api
 		api.GET("dashboard", DashboardGetHandler)
 

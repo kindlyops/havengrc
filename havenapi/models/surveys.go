@@ -6,6 +6,7 @@ import (
 
 	"github.com/gobuffalo/pop"
 	"github.com/gobuffalo/uuid"
+	"github.com/gobuffalo/nulls"
 	"github.com/gobuffalo/validate"
 	"github.com/gobuffalo/validate/validators"
 )
@@ -50,6 +51,21 @@ type IpsativeData struct {
 	AnswerOrderNumber    int        `json:"answer_order_number" db:"answer_order_number"`
 }
 
+// SurveyResponse holds the survey responses and ids
+type SurveyResponse struct {
+	ID           uuid.UUID  `json:"id" db:"id"`
+	CreatedAt    time.Time  `json:"created_at" db:"created_at"`
+	UserID       uuid.UUID  `json:"user_id" db:"user_id"`
+	SurveyID     nulls.UUID  `json:"survey_id" db:"survey_id"`
+	CollectorID  nulls.UUID `json:"collector_id" db:"collector_id"`
+}
+
+// TableName overrides the schema and table name
+func (SurveyResponse) TableName() string {
+	// schema.table_name
+	return "mappa.survey_responses"
+}
+
 // TableName overrides the schema and table name
 func (IpsativeData) TableName() string {
 	// schema.table_name
@@ -73,6 +89,13 @@ func (LikertSurvey) TableName() string {
 	// schema.table_name
 	return "mappa.likert_surveys"
 }
+
+// String is not required by pop and may be deleted
+func (s SurveyResponse) String() string {
+	js, _ := json.Marshal(s)
+	return string(js)
+}
+
 // String is not required by pop and may be deleted
 func (s Survey) String() string {
 	js, _ := json.Marshal(s)

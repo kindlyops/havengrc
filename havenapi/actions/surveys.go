@@ -118,7 +118,7 @@ func SurveysHandler(c buffalo.Context) error {
 // SaveSurveyResults creates a survey_response and saves all responses
 func SaveSurveyResults(results []SurveyResult, surveyID uuid.UUID , c buffalo.Context) (string, error) {
 	tx := c.Value("tx").(*pop.Connection)
-	rows, err := tx.TX.Query("INSERT INTO mappa.survey_responses (survey_id) VALUES ($1) RETURNING uuid;", surveyID)
+	rows, err := tx.TX.Query("INSERT INTO mappa.survey_responses (survey_id) VALUES ($1) RETURNING id;", surveyID)
 	if err != nil {
 		return "", err
 	}
