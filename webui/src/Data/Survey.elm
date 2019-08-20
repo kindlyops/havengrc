@@ -51,6 +51,7 @@ import Json.Encode as Encode
 import List.Extra
 import List.Zipper as Zipper
 import Page.Errors exposing (ErrorData)
+import Transit exposing (Step(..))
 import Utils exposing (smashList)
 
 
@@ -72,6 +73,7 @@ type alias Model =
     , inBoundLikertData : Maybe (List LikertServerData)
     , emailAddress : String
     , errorModel : ErrorData
+    , transit : Transit.WithTransition { page : SurveyPage }
     }
 
 

@@ -120,6 +120,7 @@ subscriptions model =
     Sub.batch
         [ Sub.map AuthenticationMsg (Time.every 1000 Authentication.Tick)
         , Transit.subscriptions TransitMsg model.transit
+        , Sub.map SurveyMsg (Survey.subscriptions model.surveyModel)
         ]
 
 

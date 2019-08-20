@@ -142,7 +142,7 @@ services:
       - FAKTORY_URL=tcp://:fassword@faktory:7419
     build:
       context: ./havenapi
-      dockerfile: ./havenapi/Dockerfile-hotreload
+      dockerfile: Dockerfile-hotreload
     links:
       - db
       - faktory
