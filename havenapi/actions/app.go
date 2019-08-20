@@ -84,6 +84,7 @@ func App() *buffalo.App {
 		api.POST("comments", CommentPostHandler)
 		api.GET("comments", CommentGetHandler)
 		api.GET("reports", DownloadHandler)
+		api.GET("files/{fileType}", GetFiles)
 		api.GET("files", GetFiles)
 		api.POST("registration_funnel", RegistrationHandler)
 
