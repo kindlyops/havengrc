@@ -17,6 +17,7 @@ import (
 	worker "github.com/contribsys/faktory_worker_go"
 	"github.com/getsentry/raven-go"
 	"github.com/gobuffalo/envy"
+	"github.com/gobuffalo/uuid"
 	"github.com/jmoiron/sqlx"
 	keycloak "github.com/kindlyops/havengrc/worker/keycloak"
 	_ "github.com/lib/pq"
@@ -31,6 +32,7 @@ type Registration struct {
 	SurveyJSON string `db:"survey_results"`
 	Registered bool   `db:"registered"`
 	CreatedAt  string `db:"created_at"`
+	SurveyID uuid.UUID `db:"survey_id"`
 }
 
 // SurveyData is a data type for the db select to create the csv
@@ -147,7 +149,7 @@ func SaveSurvey(ctx worker.Context, args ...interface{}) error {
 	if err != nil {
 		log.Fatal(err)
 	}
-	surveyID, err := SaveSurveyResponses(responses, tx)
+	surveyID, err := SaveSurveyResponses(responses,registration[0].SurveyID, tx)
 	handleError(err)
 	err = createSlide(surveyID, userEmail, tx)
 	handleError(err)
@@ -159,9 +161,9 @@ func SaveSurvey(ctx worker.Context, args ...interface{}) error {
 }
 
 // SaveSurveyResponses creates a survey_response and saves all responses
-func SaveSurveyResponses(responses []SurveyResponse, tx *sqlx.Tx) (string, error) {
+func SaveSurveyResponses(responses []SurveyResponse, surveyID uuid.UUID, tx *sqlx.Tx) (string, error) {
 
-	rows, err := tx.Query("INSERT INTO mappa.survey_responses DEFAUlT VALUES RETURNING uuid;")
+	rows, err := tx.Query("INSERT INTO mappa.survey_responses (survey_id) VALUES ($1) RETURNING uuid;", surveyID)
 	handleError(err)
 	defer rows.Close()
 	var surveyResponseID string

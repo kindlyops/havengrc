@@ -14,6 +14,7 @@ import (
 	"github.com/getsentry/raven-go"
 	"github.com/gobuffalo/buffalo"
 	"github.com/gobuffalo/pop"
+	"github.com/gobuffalo/uuid"
 	"github.com/kindlyops/havengrc/havenapi/models"
 	"go.uber.org/ratelimit"
 	"github.com/gobuffalo/validate"
@@ -34,6 +35,7 @@ type ResultsStruct struct {
 type RegistrationStruct struct {
 	Email   string          `json:"email"`
 	Results []ResultsStruct `json:"survey_results"`
+	SurveyID uuid.UUID      `json:"survey_id"`
 }
 
 // RegistrationHandler accepts json
@@ -74,6 +76,7 @@ func RegistrationHandler(c buffalo.Context) error {
 		registration.Email,
 		remoteAddress,
 		results,
+		registration.SurveyID,
 	).Exec()
 
 	if err != nil {

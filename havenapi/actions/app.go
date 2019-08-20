@@ -78,27 +78,41 @@ func App() *buffalo.App {
 		// TODO refactor to use dependency injection instead of a package global
 		api.Use(popmw.Transaction(models.DB))
 		api.Use(JwtMiddleware)
-		api.Middleware.Skip(JwtMiddleware, RegistrationHandler)
+		
+		// Dashboard related api
+		api.GET("dashboard", DashboardGetHandler)
 
-		api.POST("reports", UploadHandler)
+		// Comments related api
 		api.POST("comments", CommentPostHandler)
 		api.GET("comments", CommentGetHandler)
+
+		// Report file related api
+		api.POST("reports", UploadHandler)
 		api.GET("reports", DownloadHandler)
 		api.GET("files/{fileType}", GetFiles)
 		api.GET("files", GetFiles)
+
+		// Registration funnel api
 		api.POST("registration_funnel", RegistrationHandler)
 
+		// Survey related api
 		api.POST("surveys", SurveysHandler)
 		api.GET("ipsative_surveys", GetIpsativeSurveys)
 		api.GET("likert_surveys", GetLikertSurveys)
 		api.GET("likert_questions", GetLikertQuestions)
 		api.GET("ipsative_data/{surveyID}", GetIpsativeData)
+
+		// Onboarding related api
+		api.GET("onboarding", GetState)
+		api.POST("onboarding", UpdateState)
+
+		// Skip middleware if the api is public
+		api.Middleware.Skip(JwtMiddleware, RegistrationHandler)
 		api.Middleware.Skip(JwtMiddleware, GetIpsativeData)
 		api.Middleware.Skip(JwtMiddleware, GetLikertQuestions)
 		api.Middleware.Skip(JwtMiddleware, GetLikertSurveys)
 		api.Middleware.Skip(JwtMiddleware, GetIpsativeSurveys)
-		api.GET("onboarding", GetState)
-		api.POST("onboarding", UpdateState)
+
 
 	}
 

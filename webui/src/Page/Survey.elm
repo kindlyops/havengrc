@@ -365,7 +365,7 @@ postRegistration surveyModel emailAddress authModel =
                 |> Http.jsonBody
 
         registration =
-            Registration emailAddress responses
+            Registration emailAddress responses surveyModel.metaData.id
 
         body =
             Registration.encode registration surveyModel
