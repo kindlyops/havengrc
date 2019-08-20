@@ -1,0 +1,42 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: sentry
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 50%
+  template:
+    metadata:
+      annotations:
+        alpha.image.policy.openshift.io/resolve-names: '*'
+      labels:
+        service: sentry
+    spec:
+      containers:
+        - name: sentry
+          image: getsentry/sentry-kubernetes:latest
+          env:
+            - name: ENV
+              value: "production"
+            - name: DSN
+              valueFrom:
+                secretKeyRef:
+                  name: sentry
+                  key: dsn
+          resources:
+            limits:
+              memory: 256Mi
+            requests:
+              memory: 128Mi
+      restartPolicy: Always
+  strategy:
+    type: "Recreate"
+  paused: false
+  revisionHistoryLimit: 2
+  minReadySeconds: 0
+status: {}

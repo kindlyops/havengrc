@@ -73,9 +73,9 @@ spec:
               successThreshold: 1
           resources:
             limits:
-              memory: 256Mi
-            requests:
               memory: 128Mi
+            requests:
+              memory: 64Mi
       volumes:
         - name: secret-volume
           secret:

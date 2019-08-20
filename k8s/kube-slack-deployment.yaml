@@ -1,0 +1,42 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: kube-slack
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  template:
+    metadata:
+      annotations:
+        scheduler.alpha.kubernetes.io/critical-pod: ""
+      name: kube-slack
+      labels:
+        app: kube-slack
+    spec:
+      serviceAccountName: kube-slack
+      containers:
+      - name: kube-slack
+        image: willwill/kube-slack:v4.2.0
+        env:
+        - name: SLACK_URL
+          valueFrom:
+            secretKeyRef:
+              name: slack
+              key: webhook
+        - name: SLACK_USERNAME
+          value: 'kube-slack-bot'
+        - name: SLACK_CHANNEL
+          value: 'notifications'
+        - name: KUBE_NAMESPACES_ONLY
+          value: "haven-production"
+        resources:
+          limits:
+            memory: 128Mi
+          requests:
+            memory: 64Mi
+            cpu: 5m
+      tolerations:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/master
+      - key: CriticalAddonsOnly
+        operator: Exists

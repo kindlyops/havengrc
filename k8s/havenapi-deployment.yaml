@@ -64,6 +64,11 @@ spec:
                 secretKeyRef:
                   name: sentry
                   key: dsn
+            - name: SLACK_WEBHOOK
+              valueFrom:
+                secretKeyRef:
+                  name: slack
+                  key: webhook
           volumeMounts:
             - name: secret-volume
               mountPath: /etc/haven-credentials/

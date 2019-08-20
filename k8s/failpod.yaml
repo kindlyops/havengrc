@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kube-slack-test
+spec:
+  containers:
+  - image: willwill/inexisting
+    name: kube-slack-test
+  resources:
+    limits:
+      memory: 32Mi
+    requests:
+      memory: 32Mi
