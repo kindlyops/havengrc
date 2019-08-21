@@ -148,6 +148,8 @@ github.com/gobuffalo/buffalo-pop v1.16.0 h1:3TGHkwhMIElpy8K+E5tPM5rUo9tG5JxRXfiz
 github.com/gobuffalo/buffalo-pop v1.16.0/go.mod h1:XYA72cNFvL6m1o7PZ+Z7Yd/WDQTPcOiuDukiHvEo2KY=
 github.com/gobuffalo/buffalo-pop v1.17.0 h1:8d5j45Xe9nlDH8y5O1ygdszM6mK68amZAe9SJNp6/4Q=
 github.com/gobuffalo/buffalo-pop v1.17.0/go.mod h1:1foe+nUhgfJdwj8LHT67Hn/TpylgXAKorFTA3ffTg1o=
+github.com/gobuffalo/buffalo-pop v1.17.1 h1:HPHMwfrPkemImPWdDs2mgghKqT8Rz9+lUxl8GPgMUPY=
+github.com/gobuffalo/buffalo-pop v1.17.1/go.mod h1:nyOm0mtmp9/+m2NaXrp+9SqtuKZslA7Ys2DBaT/t2n4=
 github.com/gobuffalo/clara v0.4.1/go.mod h1:3QgAPqYgPqAzhfGbNLlp4UztaZRi2SOg+ZrZwaq9L94=
 github.com/gobuffalo/clara v0.6.0/go.mod h1:RKZxkcH80pLykRi2hLkoxGMxA8T06Dc9fN/pFvutMFY=
 github.com/gobuffalo/clara v0.7.0/go.mod h1:pen7ZMmnuYUYVF/3BbnvidYVAbMEfkyO4O+Tc+FKICU=
