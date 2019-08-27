@@ -19,9 +19,9 @@ WHERE id = current_setting('request.jwt.claim.sub', true)::uuid
 INSERT
 INTO
     mappa.registration_funnel_1
-        (email, ip_address, survey_results)
+        (email, ip_address, survey_results, survey_id)
 VALUES
-    ($1, $2, $3);
+    ($1, $2, $3, $4);
 
 -- name: setemailclaim
 SELECT set_config('request.jwt.claim.email', $1, true);

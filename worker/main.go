@@ -17,6 +17,7 @@ import (
 	worker "github.com/contribsys/faktory_worker_go"
 	"github.com/getsentry/raven-go"
 	"github.com/gobuffalo/envy"
+	"github.com/gobuffalo/uuid"
 	"github.com/jmoiron/sqlx"
 	keycloak "github.com/kindlyops/havengrc/worker/keycloak"
 	_ "github.com/lib/pq"
@@ -25,12 +26,13 @@ import (
 
 // Registration is a data type for the registration funnel
 type Registration struct {
-	ID         string `db:"uuid"`
-	Email      string `db:"email"`
-	IP         string `db:"ip_address"`
-	SurveyJSON string `db:"survey_results"`
-	Registered bool   `db:"registered"`
-	CreatedAt  string `db:"created_at"`
+	ID         string    `db:"uuid"`
+	Email      string    `db:"email"`
+	IP         string    `db:"ip_address"`
+	SurveyJSON string    `db:"survey_results"`
+	Registered bool      `db:"registered"`
+	CreatedAt  string    `db:"created_at"`
+	SurveyID   uuid.UUID `db:"survey_id"`
 }
 
 // SurveyData is a data type for the db select to create the csv
@@ -147,7 +149,7 @@ func SaveSurvey(ctx worker.Context, args ...interface{}) error {
 	if err != nil {
 		log.Fatal(err)
 	}
-	surveyID, err := SaveSurveyResponses(responses, tx)
+	surveyID, err := SaveSurveyResponses(responses, registration[0].SurveyID, tx)
 	handleError(err)
 	err = createSlide(surveyID, userEmail, tx)
 	handleError(err)
@@ -159,9 +161,9 @@ func SaveSurvey(ctx worker.Context, args ...interface{}) error {
 }
 
 // SaveSurveyResponses creates a survey_response and saves all responses
-func SaveSurveyResponses(responses []SurveyResponse, tx *sqlx.Tx) (string, error) {
+func SaveSurveyResponses(responses []SurveyResponse, surveyID uuid.UUID, tx *sqlx.Tx) (string, error) {
 
-	rows, err := tx.Query("INSERT INTO mappa.survey_responses DEFAUlT VALUES RETURNING uuid;")
+	rows, err := tx.Query("INSERT INTO mappa.survey_responses (survey_id) VALUES ($1) RETURNING id;", surveyID)
 	handleError(err)
 	defer rows.Close()
 	var surveyResponseID string
@@ -267,7 +269,6 @@ func createSlide(surveyID string, userEmail string, tx *sqlx.Tx) error {
 	// Zip up all the files related to the survey
 	files := []zipEntry{
 		zipEntry{file.Name(), "survey-data.csv"},
-		zipEntry{slideshowFile.Name(), "SecurityCultureSurveyPresentation.pptx"},
 		zipEntry{"presentation.Rmd", ""},
 		zipEntry{"template.pptx", ""},
 		zipEntry{"docker-compose.yml", ""},
@@ -279,6 +280,7 @@ func createSlide(surveyID string, userEmail string, tx *sqlx.Tx) error {
 	timeStr := currentTime.Format("2006-01-02 3:4:5")
 	tempFilePattern := fmt.Sprintf("havengrc-report-%s-*.zip", timeStr)
 	savedFileName := fmt.Sprintf("havengrc-report-%s.zip", timeStr)
+	savedPPTXFileName := fmt.Sprintf("havengrc-report-%s.pptx", timeStr)
 	output, err := ioutil.TempFile(outputDir, tempFilePattern)
 	handleError(err)
 
@@ -289,8 +291,11 @@ func createSlide(surveyID string, userEmail string, tx *sqlx.Tx) error {
 		os.Remove(output.Name())
 		handleError(err)
 	}()
-
-	err = saveFileToDB(userEmail, output.Name(), savedFileName)
+	// Save Zip file containing all process files
+	err = saveFileToDB(userEmail, output.Name(), savedFileName, surveyID)
+	handleError(err)
+	// Save slideshow separately
+	err = saveFileToDB(userEmail, slideshowFile.Name(), savedPPTXFileName, surveyID)
 	handleError(err)
 	return err
 }
@@ -337,7 +342,7 @@ func createSurveyInput(surveyID string, tx *sqlx.Tx) (string, error) {
 	return fileContents, err
 }
 
-func saveFileToDB(userEmail string, fileName string, savedFileName string) error {
+func saveFileToDB(userEmail string, fileName string, savedFileName string, surveyID string) error {
 	file, err := os.Open(fileName)
 	handleError(err)
 	users, err := keycloak.GetUser(userEmail)
@@ -357,7 +362,7 @@ func saveFileToDB(userEmail string, fileName string, savedFileName string) error
 	buf.ReadFrom(file)
 	_, err = tx.Exec("SELECT set_config('request.jwt.claim.sub', $1, true)", users[0].ID)
 	handleError(err)
-	_, err = tx.Exec("INSERT INTO mappa.files (name, file) VALUES ($1, $2)", savedFileName, buf.Bytes())
+	_, err = tx.Exec("INSERT INTO mappa.files (name, file, survey_response_id) VALUES ($1, $2, $3)", savedFileName, buf.Bytes(), surveyID)
 	handleError(err)
 
 	err = tx.Commit()
