@@ -113,7 +113,6 @@ func App() *buffalo.App {
 		api.Middleware.Skip(JwtMiddleware, GetLikertSurveys)
 		api.Middleware.Skip(JwtMiddleware, GetIpsativeSurveys)
 
-
 	}
 
 	return app

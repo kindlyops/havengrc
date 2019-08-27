@@ -26,13 +26,13 @@ import (
 
 // Registration is a data type for the registration funnel
 type Registration struct {
-	ID         string `db:"uuid"`
-	Email      string `db:"email"`
-	IP         string `db:"ip_address"`
-	SurveyJSON string `db:"survey_results"`
-	Registered bool   `db:"registered"`
-	CreatedAt  string `db:"created_at"`
-	SurveyID uuid.UUID `db:"survey_id"`
+	ID         string    `db:"uuid"`
+	Email      string    `db:"email"`
+	IP         string    `db:"ip_address"`
+	SurveyJSON string    `db:"survey_results"`
+	Registered bool      `db:"registered"`
+	CreatedAt  string    `db:"created_at"`
+	SurveyID   uuid.UUID `db:"survey_id"`
 }
 
 // SurveyData is a data type for the db select to create the csv
@@ -149,7 +149,7 @@ func SaveSurvey(ctx worker.Context, args ...interface{}) error {
 	if err != nil {
 		log.Fatal(err)
 	}
-	surveyID, err := SaveSurveyResponses(responses,registration[0].SurveyID, tx)
+	surveyID, err := SaveSurveyResponses(responses, registration[0].SurveyID, tx)
 	handleError(err)
 	err = createSlide(surveyID, userEmail, tx)
 	handleError(err)
@@ -291,7 +291,7 @@ func createSlide(surveyID string, userEmail string, tx *sqlx.Tx) error {
 		os.Remove(output.Name())
 		handleError(err)
 	}()
-  // Save Zip file containing all process files
+	// Save Zip file containing all process files
 	err = saveFileToDB(userEmail, output.Name(), savedFileName, surveyID)
 	handleError(err)
 	// Save slideshow separately
