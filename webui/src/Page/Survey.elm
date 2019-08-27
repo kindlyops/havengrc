@@ -331,7 +331,7 @@ type Msg
     | PreviousQuestion
     | LoadReportDashboard
     | GoToHome
-    | RestartSurvey
+    | RestartSurvey SurveyMetaData
     | RenderVegaCharts
     | SelectLikertAnswer String String
     | GotoQuestion Int
@@ -667,9 +667,14 @@ update msg model authModel =
                             , Cmd.batch [ storeSurvey newModel (getQuestionNumber newModel), cmd ]
                             )
 
-        RestartSurvey ->
-            ( { model | currentSurvey = Ipsative Survey.emptyIpsativeServerSurvey }
-            , Cmd.none
+        RestartSurvey metaData ->
+            ( { model
+                | currentSurvey = Ipsative Survey.emptyIpsativeServerSurvey
+                , isSurveyReady = False
+                , currentPage = Survey
+                , selectedSurveyMetaData = metaData
+              }
+            , getIpsativeSurvey authModel metaData.id
             )
 
         RenderVegaCharts ->
@@ -1232,7 +1237,16 @@ viewFinished model =
                 , div [ class "col-md-8 mx-auto my-5" ]
                     [ p [] [ text "A custom powerpoint version of this report is being generated and will be available on your dashboard shortly." ]
                     , div [ class "col text-center mt-4" ]
-                        [ button [ class "btn btn-primary next-question-btn", onClick RestartSurvey ] [ text "Restart Survey" ] ]
+                        (List.map
+                            (\availableSurvey ->
+                                if availableSurvey.name == "SCDS_1" then
+                                    div [] [ button [ class "btn btn-primary next-question-btn", onClick (RestartSurvey availableSurvey) ] [ text "Restart Survey" ] ]
+
+                                else
+                                    div [] []
+                            )
+                            model.availableIpsativeSurveys
+                        )
                     ]
                 ]
             ]
