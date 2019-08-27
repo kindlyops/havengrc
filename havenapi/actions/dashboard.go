@@ -1,7 +1,6 @@
 package actions
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/deis/helm/log"
@@ -34,6 +33,20 @@ type DashboardData struct {
 	LastSurveyResponse models.SurveyResponse `json:"last_survey_response"`
 }
 
+// partialResult is a struct of partial data for the dashboard
+type partialResult struct {
+	Slide              slices.Map            `json:"slide"`
+	Zip                slices.Map            `json:"zip"`
+	LastSurveyResponse models.SurveyResponse `json:"last_survey_response"`
+}
+
+// emptyResult is a struct of empty data for the dashboard
+type emptyResult struct {
+	Slide              slices.Map `json:"slide"`
+	Zip                slices.Map `json:"zip"`
+	LastSurveyResponse slices.Map `json:"last_survey_response"`
+}
+
 // DashboardGetHandler returns all goodies for the dashboard
 // the path GET /api/dashboard
 func DashboardGetHandler(c buffalo.Context) error {
@@ -45,21 +58,22 @@ func DashboardGetHandler(c buffalo.Context) error {
 	err := tx.Where("user_id = ($1)", c.Value("sub")).Order("created_at desc").Limit(1).First(&dashboard.LastSurveyResponse)
 	if err != nil {
 		log.Info("Something went wrong in DashboardGetHandler getting latest survey response")
-		return c.Error(206, fmt.Errorf("You haven't taken a survey yet"))
+		return c.Render(200, r.JSON(emptyResult{}))
 	}
-
+	// Provide partial data unless the files have been created.
+	partial := partialResult{LastSurveyResponse: dashboard.LastSurveyResponse}
 	// Get latest Powerpoint file
 	err = tx.Where("name LIKE '%' || ($1) || '%'", "pptx").Order("created_at desc").Limit(1).First(&dashboard.Slide)
 	if err != nil {
 		log.Info("Something went wrong in DashboardGetHandler getting pptx")
-		return c.Error(206, fmt.Errorf("Still waiting on a survey slide to be created"))
+		return c.Render(200, r.JSON(partial))
 	}
 
 	// Get latest Zip file
 	err = tx.Where("name LIKE '%' || ($1) || '%'", "zip").Order("created_at desc").Limit(1).First(&dashboard.Zip)
 	if err != nil {
 		log.Info("Something went wrong in DashboardGetHandler getting zip")
-		return c.Error(206, fmt.Errorf("Still waiting on a survey zip to be created"))
+		return c.Render(200, r.JSON(partial))
 	}
 
 	return c.Render(200, r.JSON(dashboard))

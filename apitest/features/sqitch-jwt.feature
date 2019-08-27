@@ -9,7 +9,7 @@ Feature: Basic sqitch API interaction with JWT
 
     Scenario: Get dashboard info when the user hasnt taken a survey yet
         When I send a GET request to "http://{buffalo_server}/api/dashboard"
-        Then the response status should be "206"
+        Then the response status should be "200"
 
     Scenario: Add/update a comment without ability to spoof the user_email
         When I set JSON request body to:
