@@ -1,19 +1,20 @@
 package actions
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
-	"bytes"
 	"io/ioutil"
-	"strings"
 	"log"
+	"strings"
 	"time"
-	"github.com/gobuffalo/uuid"
+
 	faktory "github.com/contribsys/faktory/client"
 	helmLog "github.com/deis/helm/log"
 	"github.com/getsentry/raven-go"
 	"github.com/gobuffalo/buffalo"
 	"github.com/gobuffalo/pop"
+	"github.com/gobuffalo/uuid"
 	"github.com/kindlyops/havengrc/havenapi/models"
 )
 
@@ -22,31 +23,30 @@ import (
 
 // IpsativeResponse is a data type for the entered response
 type IpsativeResponse struct {
-	UUID             uuid.UUID   `json:"uuid" db:"uuid"`
-	AnswerID         string      `json:"answer_id" db:"answer_id"`
-	Category         string      `json:"category" db:"-"`
-	GroupNumber      int         `json:"group_number" db:"group_number"`
-	PointsAssigned   int         `json:"points_assigned" db:"points_assigned"`
-	CreatedAt        time.Time   `json:"created_at" db:"created_at"`
-	UserID           uuid.UUID   `json:"user_id" db:"user_id"`
-	SurveyResponseID uuid.UUID   `json:"survey_response_id" db:"survey_response_id"`
-	UserEmail        string      `json:"user_email" db:"user_email"`
+	UUID             uuid.UUID `json:"uuid" db:"uuid"`
+	AnswerID         string    `json:"answer_id" db:"answer_id"`
+	Category         string    `json:"category" db:"-"`
+	GroupNumber      int       `json:"group_number" db:"group_number"`
+	PointsAssigned   int       `json:"points_assigned" db:"points_assigned"`
+	CreatedAt        time.Time `json:"created_at" db:"created_at"`
+	UserID           uuid.UUID `json:"user_id" db:"user_id"`
+	SurveyResponseID uuid.UUID `json:"survey_response_id" db:"survey_response_id"`
+	UserEmail        string    `json:"user_email" db:"user_email"`
 }
 
 // SurveyResult is a data type for the survey
 type SurveyResult struct {
-	AnswerID         string `json:"answer_id"`
-	Category         string `json:"category"`
-	GroupNumber      int    `json:"group_number"`
-	PointsAssigned   int    `json:"points_assigned"`
+	AnswerID       string `json:"answer_id"`
+	Category       string `json:"category"`
+	GroupNumber    int    `json:"group_number"`
+	PointsAssigned int    `json:"points_assigned"`
 }
-
 
 // resultsStruct is a struct for the funnel
 type resultsStruct struct {
-	Results []SurveyResult `json:"survey_results"`
-	SurveyID uuid.UUID     `json:"survey_id"`
-// TODO add collectors	CollectorID uuid.UUID  `json:"collector_id"`
+	Results  []SurveyResult `json:"survey_results"`
+	SurveyID uuid.UUID      `json:"survey_id"`
+	// TODO add collectors	CollectorID uuid.UUID  `json:"collector_id"`
 }
 
 // SurveysHandler accepts json
@@ -88,7 +88,7 @@ func SurveysHandler(c buffalo.Context) error {
 		return c.Error(500, err)
 	}
 
-	createSlideJob := faktory.NewJob("CreateSlide", surveyID, c.Value("email") )
+	createSlideJob := faktory.NewJob("CreateSlide", surveyID, c.Value("email"))
 	createSlideJob.ReserveFor = 60
 	createSlideJob.Queue = "critical"
 	err = client.Push(createSlideJob)
@@ -105,7 +105,7 @@ func SurveysHandler(c buffalo.Context) error {
 	if err != nil {
 		return c.Error(500, fmt.Errorf("Database error: %s", err.Error()))
 	}
-	query := tx.Where("survey_response_id = ($1)", surveyID )
+	query := tx.Where("survey_response_id = ($1)", surveyID)
 	err = query.All(&responses)
 	if err != nil {
 		raven.CaptureError(err, nil)
@@ -116,7 +116,7 @@ func SurveysHandler(c buffalo.Context) error {
 }
 
 // SaveSurveyResults creates a survey_response and saves all responses
-func SaveSurveyResults(results []SurveyResult, surveyID uuid.UUID , c buffalo.Context) (string, error) {
+func SaveSurveyResults(results []SurveyResult, surveyID uuid.UUID, c buffalo.Context) (string, error) {
 	tx := c.Value("tx").(*pop.Connection)
 	rows, err := tx.TX.Query("INSERT INTO mappa.survey_responses (survey_id) VALUES ($1) RETURNING id;", surveyID)
 	if err != nil {
@@ -209,7 +209,7 @@ func GetIpsativeData(c buffalo.Context) error {
 	data := []models.IpsativeData{}
 
 	tx := c.Value("tx").(*pop.Connection)
-	err := tx.Where("survey_id = ($1)", c.Param("surveyID") ).All(&data)
+	err := tx.Where("survey_id = ($1)", c.Param("surveyID")).All(&data)
 	if err != nil {
 		helmLog.Info("Something went wrong in GetIpsativeData")
 		return c.Error(500, fmt.Errorf("Database error here: %s", err.Error()))

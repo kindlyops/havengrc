@@ -16,7 +16,7 @@ type File struct {
 	CreatedAt time.Time `json:"created_at" db:"created_at"`
 	UserID    uuid.UUID `json:"user_id" db:"user_id"`
 	Name      string    `json:"name" db:"name"`
-	File      []byte    	`json:"file" db:"file"`
+	File      []byte    `json:"file" db:"file"`
 }
 
 // FileInfo is the survey data file info
@@ -26,11 +26,13 @@ type FileInfo struct {
 	UserID    uuid.UUID `json:"user_id" db:"user_id"`
 	Name      string    `json:"name" db:"name"`
 }
+
 // TableName overrides the schema and table name
 func (FileInfo) TableName() string {
 	// schema.table_name
-	return "mappa.files"
+	return "files"
 }
+
 // String is not required by pop and may be deleted
 func (f FileInfo) String() string {
 	jf, _ := json.Marshal(f)

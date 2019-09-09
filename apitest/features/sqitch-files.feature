@@ -26,3 +26,18 @@ Feature: Basic sqitch API interaction with file storage
         And the JSON response root should be object
         And the JSON response should have "$.message" of type string and value "success"
 
+    Scenario: Test uploading to new reports API with another user
+        When I set form request body to:
+        | name | minimal.pdf                 |
+        | file | file://features/minimal.pdf |
+        And I sign in to keycloak with "test@test.com" and "password"
+        And I send a POST request to "http://{buffalo_server}/api/reports"
+        Then the response status should be "200"
+        And the JSON response root should be object
+        And the JSON response should have "$.message" of type string and value "success"
+
+    Scenario: Make sure the files are for the first user only
+        When I send a GET request to "http://{buffalo_server}/api/files"
+        Then the response status should be "200"
+        And the JSON response root should be array
+        Then all "user_id" fields should be of type string and value "90920d91-3090-4b4a-ae2a-2377cfa06ecd"

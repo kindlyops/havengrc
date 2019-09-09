@@ -9,7 +9,6 @@ import (
 	"github.com/gobuffalo/buffalo"
 	"github.com/gobuffalo/pop"
 	"github.com/kindlyops/havengrc/havenapi/models"
-
 )
 
 // UploadHandler accepts a file upload
@@ -49,7 +48,7 @@ func DownloadHandler(c buffalo.Context) error {
 	}
 
 	log.Info("Got Download")
-	return c.Render(200,  r.Download(c, "report.zip", bytes.NewReader(file.File)))
+	return c.Render(200, r.Download(c, "report.zip", bytes.NewReader(file.File)))
 }
 
 // CreateSlide triggers a worker job to create a report with R
@@ -70,9 +69,14 @@ func GetFiles(c buffalo.Context) error {
 
 	files := models.Files{}
 	tx := c.Value("tx").(*pop.Connection)
+	// Set local search path to the view
+	err := tx.RawQuery("set local search_path to 1").Exec()
+	if err != nil {
+		return c.Error(500, fmt.Errorf("Database error: %s", err.Error()))
+	}
 
 	if c.Param("fileType") == "zip" || c.Param("fileType") == "pptx" {
-		err := tx.Where("name LIKE '%' || ($1) || '%'", c.Param("fileType")).All(&files)
+		err = tx.Where("name LIKE '%' || ($1) || '%'", c.Param("fileType")).All(&files)
 		if err != nil {
 			log.Info("Something went wrong in GetFiles")
 			return c.Error(500, fmt.Errorf("Database error here: %s", err.Error()))
