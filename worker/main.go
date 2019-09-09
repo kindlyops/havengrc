@@ -277,7 +277,7 @@ func createSlide(surveyID string, userEmail string, tx *sqlx.Tx) error {
 		zipEntry{"README.txt", ""},
 	}
 	currentTime := time.Now()
-	timeStr := currentTime.Format("2006-01-02 3:4:5")
+	timeStr := currentTime.Format("2006-01-02-3:4:5")
 	tempFilePattern := fmt.Sprintf("havengrc-report-%s-*.zip", timeStr)
 	savedFileName := fmt.Sprintf("havengrc-report-%s.zip", timeStr)
 	savedPPTXFileName := fmt.Sprintf("havengrc-report-%s.pptx", timeStr)
@@ -359,7 +359,10 @@ func saveFileToDB(userEmail string, fileName string, savedFileName string, surve
 	handleError(err)
 
 	buf := new(bytes.Buffer)
-	buf.ReadFrom(file)
+	totalBytes, err := buf.ReadFrom(file)
+	log.Printf("File: %s and size: %d", fileName, totalBytes)
+	handleError(err)
+
 	_, err = tx.Exec("SELECT set_config('request.jwt.claim.sub', $1, true)", users[0].ID)
 	handleError(err)
 	_, err = tx.Exec("INSERT INTO mappa.files (name, file, survey_response_id) VALUES ($1, $2, $3)", savedFileName, buf.Bytes(), surveyID)
@@ -376,6 +379,7 @@ func zipFiles(filename string, files []zipEntry) error {
 
 	newZipFile, err := os.Create(filename)
 	if err != nil {
+		handleError(err)
 		return err
 	}
 	defer newZipFile.Close()
@@ -387,6 +391,7 @@ func zipFiles(filename string, files []zipEntry) error {
 	for _, file := range files {
 		fmt.Println("Adding file to zip: ", file.source)
 		if err = addFileToZip(zipWriter, file); err != nil {
+			handleError(err)
 			return err
 		}
 	}
@@ -397,6 +402,7 @@ func addFileToZip(zipWriter *zip.Writer, entry zipEntry) error {
 
 	fileToZip, err := os.Open(entry.source)
 	if err != nil {
+		handleError(err)
 		return err
 	}
 	defer fileToZip.Close()
@@ -404,11 +410,13 @@ func addFileToZip(zipWriter *zip.Writer, entry zipEntry) error {
 	// Get the file information
 	info, err := fileToZip.Stat()
 	if err != nil {
+		handleError(err)
 		return err
 	}
 
 	header, err := zip.FileInfoHeader(info)
 	if err != nil {
+		handleError(err)
 		return err
 	}
 
@@ -422,9 +430,15 @@ func addFileToZip(zipWriter *zip.Writer, entry zipEntry) error {
 
 	writer, err := zipWriter.CreateHeader(header)
 	if err != nil {
+		handleError(err)
 		return err
 	}
 	_, err = io.Copy(writer, fileToZip)
+	if err != nil {
+		handleError(err)
+		return err
+	}
+
 	return err
 }
 
