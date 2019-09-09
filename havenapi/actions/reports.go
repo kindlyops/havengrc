@@ -40,9 +40,13 @@ func UploadHandler(c buffalo.Context) error {
 // DownloadHandler downloads a report
 func DownloadHandler(c buffalo.Context) error {
 	tx := c.Value("tx").(*pop.Connection)
+	err := tx.RawQuery("set local search_path to 1").Exec()
+	if err != nil {
+		return c.Error(500, fmt.Errorf("Database error: %s", err.Error()))
+	}
 
 	file := models.File{}
-	err := tx.Find(&file, c.Param("file_id"))
+	err = tx.Find(&file, c.Param("file_id"))
 	if err != nil {
 		return c.Error(500, fmt.Errorf("error retrieving file from database: %s", err.Error()))
 	}
