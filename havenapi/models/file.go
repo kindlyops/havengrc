@@ -33,6 +33,12 @@ func (FileInfo) TableName() string {
 	return "files"
 }
 
+// TableName overrides the schema and table name
+func (File) TableName() string {
+	// schema.table_name
+	return "mappa.files"
+}
+
 // String is not required by pop and may be deleted
 func (f FileInfo) String() string {
 	jf, _ := json.Marshal(f)
