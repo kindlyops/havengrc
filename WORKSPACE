@@ -24,5 +24,5 @@ container_pull(
     name = "keycloak_base",
     registry = "havengrc-docker.jfrog.io",
     repository = "jboss/keycloak",
-    tag = "4.3.0.Final",
+    tag = "7.0.0",
 )

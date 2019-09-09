@@ -1,4 +1,4 @@
-FROM maven:3.5-jdk-8 as build
+FROM maven:3.6.1-jdk-8-slim as build
 
 # be smart about layer caching. do dependency resolution from pom.xml in a layer
 # before the source code layer, so that mvn doesn't re-download when only source
@@ -11,7 +11,7 @@ RUN mvn -f /keycloak-service-providers/pom.xml clean package
 RUN mvn -f /keycloak-service-providers/magic-link/pom.xml dependency:resolve
 RUN mvn -f /keycloak-service-providers/magic-link/pom.xml clean package
 
-FROM                havengrc-docker.jfrog.io/jboss/keycloak:6.0.1
+FROM                havengrc-docker.jfrog.io/jboss/keycloak:7.0.0
 MAINTAINER          Kindly Ops, LLC <support@kindlyops.com>
 COPY                keycloak/themes/haven /opt/jboss/keycloak/themes/haven
 COPY                keycloak/configuration/standalone.xml /opt/jboss/keycloak/standalone/configuration/standalone.xml
