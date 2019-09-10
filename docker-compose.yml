@@ -44,7 +44,7 @@ services:
       - DB_ADDR=postgres
       - KEYCLOAK_USER=admin
       - KEYCLOAK_PASSWORD=admin
-      - KEYCLOAK_LOGLEVEL=info
+      - KEYCLOAK_LOGLEVEL=INFO
       - PROXY_ADDRESS_FORWARDING=true
       - KEYCLOAK_HOSTNAME=dev.havengrc.com
       - KEYCLOAK_HTTP_PORT=80
