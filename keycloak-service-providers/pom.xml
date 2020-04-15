@@ -8,7 +8,7 @@
     <version>0.1.0</version>
     <packaging>jar</packaging>
     <properties>
-        <keycloak.version>7.0.0</keycloak.version>
+        <keycloak.version>9.0.3</keycloak.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <dependencies>
